@@ -1,0 +1,145 @@
+---
+const navItems = [
+  { label: 'KGM', href: '/kgm' },
+  { label: 'OMODA & JAECOO', href: '/omoda-jaecoo' },
+  { label: 'Farizon', href: '/farizon' },
+  { label: 'Skladové vozy', href: '/sklad' },
+  { label: 'Servis', href: '/servis' },
+  { label: 'Kontakt', href: '/kontakt' },
+];
+---
+
+<header class="site-header">
+  <div class="container header__inner">
+    <a href="/" class="header__brand" aria-label="SFR Motor — homepage">
+      <span class="brand__mark">SFR</span>
+      <span class="brand__rest">Motor</span>
+    </a>
+
+    <nav class="header__nav" aria-label="Hlavní navigace">
+      <ul>
+        {navItems.map(({ label, href }) => (
+          <li><a href={href}>{label}</a></li>
+        ))}
+      </ul>
+    </nav>
+
+    <div class="header__cta">
+      <a href="tel:+420771235458" class="header__phone" aria-label="Zavolat na +420 771 235 458">
+        +420 771 235 458
+      </a>
+    </div>
+
+    <button class="header__menu-toggle" aria-label="Otevřít menu" data-menu-toggle>
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</header>
+
+<style>
+  .site-header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(250, 250, 247, 0.92);
+    backdrop-filter: saturate(180%) blur(12px);
+    -webkit-backdrop-filter: saturate(180%) blur(12px);
+    border-bottom: 1px solid var(--line);
+  }
+  .header__inner {
+    display: flex;
+    align-items: center;
+    gap: clamp(16px, 4vw, 48px);
+    height: 64px;
+  }
+  .header__brand {
+    display: flex;
+    align-items: baseline;
+    gap: 4px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    font-size: 1.2rem;
+  }
+  .brand__mark {
+    background: var(--accent);
+    color: white;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 700;
+    font-size: 0.95rem;
+  }
+  .brand__rest {
+    font-weight: 600;
+    color: var(--ink);
+  }
+
+  .header__nav {
+    flex: 1;
+    display: none;
+  }
+  .header__nav ul {
+    list-style: none;
+    display: flex;
+    gap: clamp(12px, 2vw, 28px);
+    align-items: center;
+  }
+  .header__nav a {
+    font-size: 0.92rem;
+    font-weight: 500;
+    color: var(--ink-soft);
+    padding: 8px 0;
+    border-bottom: 2px solid transparent;
+    transition: all 160ms ease;
+  }
+  .header__nav a:hover {
+    color: var(--ink);
+    border-bottom-color: var(--accent);
+  }
+
+  .header__cta {
+    display: none;
+  }
+  .header__phone {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--ink);
+    padding: 8px 14px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    transition: all 160ms ease;
+  }
+  .header__phone:hover {
+    background: var(--ink);
+    color: var(--bg);
+    border-color: var(--ink);
+  }
+
+  .header__menu-toggle {
+    margin-left: auto;
+    width: 40px;
+    height: 40px;
+    display: inline-flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 5px;
+    border-radius: var(--radius);
+    border: 1px solid var(--line);
+    background: white;
+  }
+  .header__menu-toggle span {
+    display: block;
+    width: 18px;
+    height: 2px;
+    background: var(--ink);
+    border-radius: 1px;
+  }
+
+  @media (min-width: 900px) {
+    .header__nav { display: block; }
+    .header__cta { display: block; }
+    .header__menu-toggle { display: none; }
+  }
+</style>

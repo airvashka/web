@@ -1,0 +1,128 @@
+---
+const year = new Date().getFullYear();
+---
+
+<footer class="site-footer">
+  <div class="container footer__grid">
+    <div class="footer__col footer__brand-col">
+      <a href="/" class="footer__brand">
+        <span class="brand__mark">SFR</span>
+        <span class="brand__rest">Motor</span>
+      </a>
+      <p class="footer__address">
+        SFR Motor s.r.o.<br />
+        Ďáblická 553/2, 182 00 Praha 8<br />
+        IČO: 08263523
+      </p>
+    </div>
+
+    <div class="footer__col">
+      <h4>Prodej</h4>
+      <ul>
+        <li><a href="/kgm">KGM</a></li>
+        <li><a href="/omoda-jaecoo">OMODA &amp; JAECOO</a></li>
+        <li><a href="/farizon">Farizon</a></li>
+        <li><a href="/sklad">Skladové vozy</a></li>
+      </ul>
+    </div>
+
+    <div class="footer__col">
+      <h4>Servis</h4>
+      <ul>
+        <li><a href="/servis">Objednat servis</a></li>
+        <li><a href="/servis/cenik">Servisní ceník</a></li>
+        <li><a href="/servis/doplnkove-sluzby">Doplňkové služby</a></li>
+        <li><a href="/pro-majitele/zpetny-odber">Zpětný odběr</a></li>
+      </ul>
+    </div>
+
+    <div class="footer__col">
+      <h4>Kontakt</h4>
+      <ul>
+        <li><a href="tel:+420771235458" class="font-mono">+420 771 235 458 — Prodej</a></li>
+        <li><a href="tel:+420771259323" class="font-mono">+420 771 259 323 — Servis</a></li>
+        <li><a href="mailto:info@sfr-motor.cz">info@sfr-motor.cz</a></li>
+        <li><a href="mailto:servis@sfr-motor.cz">servis@sfr-motor.cz</a></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="container footer__bottom">
+    <p>© {year} SFR Motor s.r.o. — autorizovaný dealer KGM, OMODA &amp; JAECOO a Farizon</p>
+    <ul class="footer__legal">
+      <li><a href="/informace/ochrana-udaju">Ochrana osobních údajů</a></li>
+      <li><a href="/informace/cookies">Cookies</a></li>
+      <li><a href="/informace/podminky">Smluvní podmínky</a></li>
+    </ul>
+  </div>
+</footer>
+
+<style>
+  .site-footer {
+    background: var(--ink);
+    color: var(--bg);
+    padding-block: clamp(40px, 6vw, 72px) 24px;
+    margin-top: var(--section-pad);
+  }
+  .footer__grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 32px;
+  }
+  @media (min-width: 700px) {
+    .footer__grid { grid-template-columns: 1.4fr 1fr 1fr 1fr; }
+  }
+  .footer__brand-col { display: flex; flex-direction: column; gap: 16px; }
+  .footer__brand {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 4px;
+    font-weight: 700;
+    font-size: 1.3rem;
+  }
+  .footer__brand .brand__mark { background: var(--accent); color: white; padding: 4px 8px; border-radius: 4px; font-family: 'JetBrains Mono', monospace; }
+  .footer__brand .brand__rest { color: var(--bg); }
+  .footer__address {
+    color: var(--muted-light);
+    font-size: 0.88rem;
+    line-height: 1.6;
+  }
+  .footer__col h4 {
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--muted-light);
+    margin-bottom: 14px;
+    font-weight: 600;
+  }
+  .footer__col ul {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .footer__col a {
+    font-size: 0.9rem;
+    color: var(--bg);
+    opacity: 0.86;
+    transition: opacity 160ms ease;
+  }
+  .footer__col a:hover { opacity: 1; color: var(--accent); }
+
+  .footer__bottom {
+    margin-top: 40px;
+    padding-top: 24px;
+    border-top: 1px solid rgba(255,255,255,0.1);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    font-size: 0.82rem;
+    color: var(--muted-light);
+  }
+  @media (min-width: 700px) {
+    .footer__bottom { flex-direction: row; justify-content: space-between; align-items: center; }
+  }
+  .footer__legal { list-style: none; display: flex; gap: 20px; flex-wrap: wrap; }
+  .footer__legal a { color: var(--muted-light); transition: color 160ms ease; }
+  .footer__legal a:hover { color: var(--bg); }
+</style>

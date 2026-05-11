@@ -1,0 +1,217 @@
+/* ==========================================================
+   DESIGN TOKENS — odvozeno z sfr-motor-v3.html
+   ========================================================== */
+:root {
+  --bg: #FAFAF7;
+  --bg-soft: #F1F0EA;
+  --bg-card: #FFFFFF;
+  --ink: #0B0B0C;
+  --ink-soft: #2A2A2D;
+  --muted: #6B6B6E;
+  --muted-light: #9B9B9E;
+  --line: #E4E2DA;
+  --line-soft: #EFEDE6;
+  --accent: #FF4A1C;
+  --accent-deep: #C9381A;
+  --success: #1E7B5F;
+  --warning: #B27516;
+  --danger: #B43A2C;
+
+  --container: 1360px;
+  --pad: clamp(20px, 4vw, 56px);
+  --radius: 8px;
+  --radius-lg: 14px;
+  --radius-xl: 22px;
+  --section-pad: clamp(64px, 10vw, 140px);
+
+  --shadow-sm: 0 1px 2px rgba(11, 11, 12, 0.04), 0 2px 6px rgba(11, 11, 12, 0.03);
+  --shadow-md: 0 4px 12px rgba(11, 11, 12, 0.06), 0 8px 24px rgba(11, 11, 12, 0.04);
+  --shadow-lg: 0 16px 40px rgba(11, 11, 12, 0.08);
+}
+
+/* ==========================================================
+   RESET
+   ========================================================== */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+body {
+  font-family: 'Manrope', -apple-system, system-ui, sans-serif;
+  font-size: 16px;
+  line-height: 1.55;
+  color: var(--ink);
+  background: var(--bg);
+  -webkit-font-smoothing: antialiased;
+  font-feature-settings: "ss01", "ss02";
+  letter-spacing: -0.01em;
+  overflow-x: hidden;
+  padding-bottom: 64px; /* prostor pro sticky mobile bar */
+}
+
+@media (min-width: 900px) {
+  body { padding-bottom: 0; }
+}
+
+img, svg, video { max-width: 100%; height: auto; display: block; }
+a { color: inherit; text-decoration: none; transition: color 160ms ease; }
+button {
+  font-family: inherit;
+  cursor: pointer;
+  border: 0;
+  background: none;
+  color: inherit;
+  font-size: inherit;
+}
+input, textarea, select { font-family: inherit; }
+
+/* ==========================================================
+   TYPOGRAPHY
+   ========================================================== */
+h1, h2, h3, h4, h5 {
+  font-family: 'Manrope', sans-serif;
+  font-weight: 500;
+  letter-spacing: -0.025em;
+  line-height: 1.05;
+}
+h1 { font-size: clamp(2.4rem, 6.5vw, 5.5rem); font-weight: 500; }
+h2 { font-size: clamp(1.85rem, 4.2vw, 3.5rem); font-weight: 500; }
+h3 { font-size: clamp(1.3rem, 2.4vw, 2rem); font-weight: 500; }
+h4 { font-size: 1.25rem; font-weight: 600; line-height: 1.2; }
+h5 { font-size: 1rem; font-weight: 600; }
+
+.eyebrow {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.eyebrow-accent { color: var(--accent); }
+
+.lead {
+  font-size: clamp(1rem, 1.4vw, 1.18rem);
+  color: var(--ink-soft);
+  line-height: 1.6;
+  max-width: 60ch;
+  font-weight: 400;
+}
+
+p { max-width: 65ch; }
+
+/* ==========================================================
+   LAYOUT
+   ========================================================== */
+.container {
+  width: 100%;
+  max-width: var(--container);
+  margin: 0 auto;
+  padding-inline: var(--pad);
+}
+
+.section {
+  padding-block: var(--section-pad);
+}
+.section--soft { background: var(--bg-soft); }
+.section--dark { background: var(--ink); color: var(--bg); }
+
+.grid {
+  display: grid;
+  gap: clamp(16px, 2vw, 32px);
+}
+
+/* ==========================================================
+   BUTTONS
+   ========================================================== */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5em;
+  padding: 14px 22px;
+  border-radius: var(--radius);
+  font-weight: 600;
+  font-size: 0.95rem;
+  letter-spacing: -0.005em;
+  transition: all 160ms ease;
+  cursor: pointer;
+  border: 1px solid transparent;
+}
+.btn--primary {
+  background: var(--accent);
+  color: white;
+}
+.btn--primary:hover { background: var(--accent-deep); }
+.btn--ghost {
+  background: transparent;
+  color: var(--ink);
+  border-color: var(--line);
+}
+.btn--ghost:hover { background: var(--bg-soft); border-color: var(--ink); }
+.btn--dark {
+  background: var(--ink);
+  color: var(--bg);
+}
+.btn--dark:hover { background: var(--ink-soft); }
+
+/* ==========================================================
+   FORMS
+   ========================================================== */
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 16px;
+}
+.field label {
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.field input,
+.field textarea,
+.field select {
+  background: white;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  font-size: 0.95rem;
+  color: var(--ink);
+  transition: border-color 160ms ease;
+}
+.field input:focus,
+.field textarea:focus,
+.field select:focus {
+  outline: none;
+  border-color: var(--ink);
+}
+
+/* ==========================================================
+   CARDS
+   ========================================================== */
+.card {
+  background: var(--bg-card);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--line);
+  overflow: hidden;
+}
+.card__media { aspect-ratio: 16/10; background: var(--bg-soft); overflow: hidden; }
+.card__media img { width: 100%; height: 100%; object-fit: cover; }
+.card__body { padding: 20px; }
+
+/* ==========================================================
+   UTILS
+   ========================================================== */
+.sr-only {
+  position: absolute;
+  width: 1px; height: 1px;
+  padding: 0; margin: -1px;
+  overflow: hidden;
+  clip: rect(0,0,0,0);
+  white-space: nowrap;
+  border: 0;
+}
+.no-wrap { white-space: nowrap; }
+.text-accent { color: var(--accent); }
+.text-muted { color: var(--muted); }
+.font-mono { font-family: 'JetBrains Mono', monospace; }

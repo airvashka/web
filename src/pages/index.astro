@@ -1,0 +1,262 @@
+---
+import BaseLayout from '@layouts/BaseLayout.astro';
+---
+
+<BaseLayout
+  title="SFR Motor"
+  description="SFR Motor — autorizovaný dealer KGM, OMODA & JAECOO a Farizon. Skladové vozy, servis pro všechny značky, prodej a doplňkové služby. Praha-Ďáblice."
+>
+  <!-- ====================================================
+       HERO
+  ===================================================== -->
+  <section class="hero">
+    <div class="container hero__inner">
+      <p class="eyebrow eyebrow-accent">Autorizovaný dealer</p>
+      <h1 class="hero__title">
+        Auta, která <em>posouvají hranice</em>
+      </h1>
+      <p class="lead hero__lead">
+        KGM, OMODA &amp; JAECOO a Farizon na jednom místě. Skladové vozy ihned k odběru,
+        autorizovaný servis pro všechny značky, doplňkové služby pod jednou střechou v Praze-Ďáblicích.
+      </p>
+      <div class="hero__cta">
+        <a href="/sklad" class="btn btn--primary">Skladové vozy</a>
+        <a href="/servis" class="btn btn--ghost">Objednat servis</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====================================================
+       BRAND HUB
+  ===================================================== -->
+  <section class="section brands">
+    <div class="container">
+      <header class="section__head">
+        <p class="eyebrow">Naše značky</p>
+        <h2>Tři moderní rodiny vozů</h2>
+      </header>
+
+      <div class="brands__grid">
+        <a href="/kgm" class="brand-card brand-card--lg">
+          <div class="brand-card__media" aria-hidden="true">
+            <div class="brand-card__bg" style="background: linear-gradient(135deg, #1a1a1f, #3a3a45);"></div>
+          </div>
+          <div class="brand-card__body">
+            <p class="eyebrow eyebrow-accent">9 modelů · benzín · hybrid · elektro</p>
+            <h3>KGM <span class="brand-card__alt">(dříve SsangYong)</span></h3>
+            <p>Korejské SUV s charakterem — Korando, Torres, Rexton, Musso Grand, Actyon.</p>
+            <span class="brand-card__cta">Prozkoumat KGM →</span>
+          </div>
+        </a>
+
+        <a href="/omoda-jaecoo" class="brand-card">
+          <div class="brand-card__media" aria-hidden="true">
+            <div class="brand-card__bg" style="background: linear-gradient(135deg, #2a2d3a, #5a5e75);"></div>
+          </div>
+          <div class="brand-card__body">
+            <p class="eyebrow eyebrow-accent">7 modelů · hybrid · PHEV · elektro</p>
+            <h3>OMODA &amp; JAECOO</h3>
+            <p>Nová generace prémiových SUV s pokročilou hybridní technologií.</p>
+            <span class="brand-card__cta">Prozkoumat →</span>
+          </div>
+        </a>
+
+        <a href="/farizon" class="brand-card">
+          <div class="brand-card__media" aria-hidden="true">
+            <div class="brand-card__bg" style="background: linear-gradient(135deg, #1e2a3a, #3e5a75);"></div>
+          </div>
+          <div class="brand-card__body">
+            <p class="eyebrow eyebrow-accent">elektrické užitkové</p>
+            <h3>Farizon</h3>
+            <p>Elektrické dodávky pro moderní podnikatele — SuperVan a V6E.</p>
+            <span class="brand-card__cta">Prozkoumat →</span>
+          </div>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====================================================
+       SKLADOVKA PREVIEW
+  ===================================================== -->
+  <section class="section section--soft">
+    <div class="container">
+      <header class="section__head section__head--row">
+        <div>
+          <p class="eyebrow">Skladové vozy</p>
+          <h2>Vozy ihned k odběru</h2>
+        </div>
+        <a href="/sklad" class="btn btn--ghost">Všechny skladové vozy →</a>
+      </header>
+
+      <div class="stock-placeholder">
+        <p class="text-muted">
+          Seznam skladových vozů bude napojen na admin panel.
+          Po nasazení Directus se zde zobrazí aktuální nabídka.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====================================================
+       SERVIS
+  ===================================================== -->
+  <section class="section servis">
+    <div class="container servis__grid">
+      <div>
+        <p class="eyebrow">Servis</p>
+        <h2>Autorizovaný servis pro&nbsp;všechny&nbsp;značky</h2>
+        <p class="lead">
+          KGM, OMODA &amp; JAECOO, Farizon — a navíc specializovaně Dacia a Renault.
+          Online objednání, pneuservis, karosárna, lakovna, originální díly.
+        </p>
+        <a href="/servis" class="btn btn--dark">Objednat termín</a>
+      </div>
+      <div class="servis__visual">
+        <div class="servis__chip">+420 771 259 323</div>
+        <p class="text-muted">Servisní oddělení · Po–Pá 8:00–17:00</p>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .hero {
+    padding-block: clamp(48px, 8vw, 96px) clamp(60px, 9vw, 120px);
+    background: linear-gradient(180deg, var(--bg) 0%, var(--bg-soft) 100%);
+  }
+  .hero__inner {
+    max-width: 900px;
+  }
+  .hero__title {
+    margin-block: 12px 20px;
+  }
+  .hero__title em {
+    font-style: normal;
+    color: var(--accent);
+  }
+  .hero__lead {
+    margin-bottom: 28px;
+    max-width: 64ch;
+  }
+  .hero__cta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .section__head {
+    margin-bottom: clamp(28px, 4vw, 48px);
+  }
+  .section__head--row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+  .section__head h2 {
+    margin-top: 8px;
+  }
+
+  /* Brand hub */
+  .brands__grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: clamp(16px, 2vw, 28px);
+  }
+  @media (min-width: 700px) {
+    .brands__grid {
+      grid-template-columns: 1.6fr 1fr;
+      grid-template-rows: 1fr 1fr;
+    }
+    .brand-card--lg {
+      grid-row: 1 / 3;
+    }
+  }
+  .brand-card {
+    display: flex;
+    flex-direction: column;
+    background: var(--bg-card);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    border: 1px solid var(--line);
+    transition: transform 200ms ease, box-shadow 200ms ease;
+  }
+  .brand-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+  }
+  .brand-card__media {
+    aspect-ratio: 16/9;
+    overflow: hidden;
+  }
+  .brand-card--lg .brand-card__media {
+    aspect-ratio: 16/10;
+  }
+  .brand-card__bg {
+    width: 100%;
+    height: 100%;
+  }
+  .brand-card__body {
+    padding: clamp(20px, 2.5vw, 32px);
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .brand-card__body h3 {
+    font-size: clamp(1.2rem, 2vw, 1.6rem);
+  }
+  .brand-card__alt {
+    font-size: 0.7em;
+    color: var(--muted);
+    font-weight: 400;
+  }
+  .brand-card__body p {
+    color: var(--ink-soft);
+    font-size: 0.95rem;
+  }
+  .brand-card__cta {
+    margin-top: auto;
+    color: var(--accent);
+    font-weight: 600;
+    font-size: 0.92rem;
+  }
+
+  /* Stock placeholder */
+  .stock-placeholder {
+    padding: 48px;
+    background: var(--bg-card);
+    border: 1px dashed var(--line);
+    border-radius: var(--radius-lg);
+    text-align: center;
+  }
+
+  /* Servis */
+  .servis__grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 40px;
+    align-items: center;
+  }
+  @media (min-width: 900px) {
+    .servis__grid { grid-template-columns: 1.4fr 1fr; }
+  }
+  .servis__visual {
+    background: var(--ink);
+    color: var(--bg);
+    padding: clamp(28px, 4vw, 48px);
+    border-radius: var(--radius-lg);
+  }
+  .servis__chip {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: clamp(1.3rem, 2.4vw, 1.8rem);
+    font-weight: 500;
+    letter-spacing: -0.02em;
+    margin-bottom: 12px;
+  }
+  .servis__visual .text-muted { color: var(--muted-light); }
+  .servis h2 { margin-block: 6px 16px; }
+  .servis .btn--dark { margin-top: 16px; }
+</style>
