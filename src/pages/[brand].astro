@@ -1,0 +1,167 @@
+---
+import BaseLayout from '@layouts/BaseLayout.astro';
+import { directusGet } from '@lib/directus';
+import type { Brand, Model } from '@lib/types';
+
+// Pre-renderuj každou značku statickou stránkou
+export async function getStaticPaths() {
+  const brands = await directusGet<Brand>('brands', { fields: ['slug'] });
+  return brands.map(b => ({ params: { brand: b.slug } }));
+}
+
+const { brand: brandSlug } = Astro.params;
+
+const brands = await directusGet<Brand>('brands', {
+  filter: { slug: { _eq: brandSlug } },
+  limit: 1,
+});
+const brand = brands[0];
+
+if (!brand) {
+  return Astro.redirect('/404');
+}
+
+// Modely této značky
+const models = await directusGet<Model & { sub_brand?: { name: string; slug: string } | null }>('models', {
+  filter: { brand: { _eq: brand.id }, status: { _eq: 'published' } },
+  sort: ['sort'],
+  fields: ['id', 'slug', 'name', 'tagline', 'price_from', 'fuel_type', 'body_type', 'sub_brand.name', 'sub_brand.slug'],
+});
+
+const fuelLabels: Record<string, string> = {
+  'petrol': 'Benzín',
+  'diesel': 'Diesel',
+  'hybrid': 'Hybrid',
+  'phev': 'Plug-in Hybrid',
+  'ev': 'Elektro',
+};
+
+// Group models by sub-brand (pro OMODA & JAECOO)
+const modelsBySubBrand = new Map<string, typeof models>();
+models.forEach(m => {
+  const key = m.sub_brand?.slug ?? '_main';
+  if (!modelsBySubBrand.has(key)) modelsBySubBrand.set(key, []);
+  modelsBySubBrand.get(key)!.push(m);
+});
+---
+
+<BaseLayout
+  title={`${brand.name} | SFR Motor`}
+  description={brand.description ?? brand.tagline ?? `${brand.name} — modely a skladové vozy u SFR Motor.`}
+>
+  <!-- HERO -->
+  <section class="brand-hero" style={`--brand-color: ${brand.primary_color ?? '#1a1a1f'};`}>
+    <div class="container">
+      <p class="eyebrow eyebrow-accent">Autorizovaný dealer</p>
+      <h1 class="brand-hero__title">{brand.name}</h1>
+      {brand.previous_names && brand.previous_names.length > 0 && (
+        <p class="brand-hero__alt">Dříve známé jako {brand.previous_names.join(', ')}</p>
+      )}
+      {brand.tagline && <p class="lead">{brand.tagline}</p>}
+      <div class="brand-hero__cta">
+        <a href="/sklad" class="btn btn--primary">Skladové vozy {brand.name}</a>
+        <a href="#modely" class="btn btn--ghost">Modelová řada</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- MODELY -->
+  <section class="section" id="modely">
+    <div class="container">
+      <header class="section__head">
+        <p class="eyebrow">Modelová řada</p>
+        <h2>{models.length > 0 ? `${models.length} modelů ${brand.name}` : `Modely ${brand.name}`}</h2>
+      </header>
+
+      {models.length === 0 && (
+        <div class="empty-state">
+          <p>Modely pro {brand.name} zatím nejsou v adminu. Přidej je v Directusu → Models → Create Item.</p>
+        </div>
+      )}
+
+      {[...modelsBySubBrand.entries()].map(([subKey, subModels]) => (
+        <div class="models-group">
+          {subKey !== '_main' && subModels[0]?.sub_brand && (
+            <h3 class="models-group__title">{subModels[0].sub_brand.name}</h3>
+          )}
+          <div class="models__grid">
+            {subModels.map(model => (
+              <a href={`/model/${model.slug}`} class="model-card">
+                <div class="model-card__media" aria-hidden="true">
+                  <div class="model-card__bg" style={`background: linear-gradient(135deg, ${brand.primary_color ?? '#1a1a1f'} 0%, #555 100%);`}></div>
+                </div>
+                <div class="model-card__body">
+                  <h4>{model.name}</h4>
+                  {model.tagline && <p class="text-muted">{model.tagline}</p>}
+                  <div class="model-card__meta">
+                    {model.fuel_type && <span class="chip">{fuelLabels[model.fuel_type] ?? model.fuel_type}</span>}
+                    {model.price_from && <span class="model-card__price">od {model.price_from.toLocaleString('cs-CZ')} Kč</span>}
+                  </div>
+                </div>
+              </a>
+            ))}
+          </div>
+        </div>
+      ))}
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="section section--soft">
+    <div class="container brand-cta">
+      <h2>Zaujal vás některý z modelů {brand.name}?</h2>
+      <p class="lead">Domluvte si testovací jízdu nebo navštivte showroom v Praze-Ďáblicích.</p>
+      <div class="brand-cta__buttons">
+        <a href="/kontakt" class="btn btn--primary">Testovací jízda</a>
+        <a href="/sklad" class="btn btn--ghost">Skladové vozy</a>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .brand-hero {
+    padding-block: clamp(60px, 10vw, 120px) clamp(48px, 7vw, 80px);
+    background: linear-gradient(180deg, var(--brand-color) 0%, var(--ink) 100%);
+    color: var(--bg);
+  }
+  .brand-hero__title { margin-block: 8px 4px; font-size: clamp(2.6rem, 7vw, 5.5rem); }
+  .brand-hero__alt { color: var(--muted-light); font-size: 0.95rem; margin-bottom: 20px; }
+  .brand-hero .lead { color: rgba(255,255,255,0.85); margin-bottom: 28px; }
+  .brand-hero__cta { display: flex; flex-wrap: wrap; gap: 12px; }
+
+  .empty-state { padding: 32px; background: var(--bg-soft); border: 1px dashed var(--line); border-radius: var(--radius-lg); text-align: center; color: var(--muted); }
+
+  .models-group { margin-bottom: 48px; }
+  .models-group:last-child { margin-bottom: 0; }
+  .models-group__title { margin-bottom: 20px; font-size: clamp(1.2rem, 2vw, 1.8rem); color: var(--ink-soft); }
+
+  .models__grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: clamp(16px, 2vw, 24px);
+  }
+  @media (min-width: 600px) { .models__grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (min-width: 1000px) { .models__grid { grid-template-columns: repeat(3, 1fr); } }
+
+  .model-card {
+    background: var(--bg-card);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    transition: transform 200ms ease, box-shadow 200ms ease;
+  }
+  .model-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
+  .model-card__media { aspect-ratio: 16/10; overflow: hidden; }
+  .model-card__bg { width: 100%; height: 100%; }
+  .model-card__body { padding: 18px; }
+  .model-card__body h4 { font-size: 1.1rem; margin-bottom: 6px; }
+  .model-card__meta { display: flex; align-items: center; justify-content: space-between; margin-top: 14px; gap: 8px; flex-wrap: wrap; }
+  .chip { font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.08em; background: var(--bg-soft); padding: 4px 8px; border-radius: 4px; color: var(--ink-soft); }
+  .model-card__price { font-weight: 600; color: var(--accent); }
+
+  .brand-cta { text-align: center; max-width: 700px; margin: 0 auto; }
+  .brand-cta h2 { margin-bottom: 12px; }
+  .brand-cta .lead { margin: 0 auto 24px; }
+  .brand-cta__buttons { display: flex; justify-content: center; gap: 12px; flex-wrap: wrap; }
+</style>

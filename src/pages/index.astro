@@ -1,14 +1,39 @@
 ---
 import BaseLayout from '@layouts/BaseLayout.astro';
+import { directusGet } from '@lib/directus';
+import type { Brand } from '@lib/types';
+
+// Načti značky z Directusu (build time)
+const brands = await directusGet<Brand>('brands', {
+  sort: ['sort'],
+  fields: ['id', 'slug', 'name', 'tagline', 'description', 'primary_color', 'previous_names', 'status'],
+});
+
+// Spočítej KPI texty pro brand cards (zatím hard-coded, časem z DB)
+const BRAND_META: Record<string, { eyebrow: string; description: string; bgGradient: string }> = {
+  'kgm': {
+    eyebrow: '9 modelů · benzín · hybrid · elektro',
+    description: 'Korejské SUV s charakterem — Korando, Torres, Rexton, Musso Grand, Actyon.',
+    bgGradient: 'linear-gradient(135deg, #1a1a1f, #3a3a45)',
+  },
+  'omoda-jaecoo': {
+    eyebrow: '7 modelů · hybrid · PHEV · elektro',
+    description: 'Nová generace prémiových SUV s pokročilou hybridní technologií.',
+    bgGradient: 'linear-gradient(135deg, #2a2d3a, #5a5e75)',
+  },
+  'farizon': {
+    eyebrow: 'elektrické užitkové',
+    description: 'Elektrické dodávky pro moderní podnikatele — SuperVan a V6E.',
+    bgGradient: 'linear-gradient(135deg, #1e2a3a, #3e5a75)',
+  },
+};
 ---
 
 <BaseLayout
   title="SFR Motor"
   description="SFR Motor — autorizovaný dealer KGM, OMODA & JAECOO a Farizon. Skladové vozy, servis pro všechny značky, prodej a doplňkové služby. Praha-Ďáblice."
 >
-  <!-- ====================================================
-       HERO
-  ===================================================== -->
+  <!-- HERO -->
   <section class="hero">
     <div class="container hero__inner">
       <p class="eyebrow eyebrow-accent">Autorizovaný dealer</p>
@@ -26,9 +51,7 @@ import BaseLayout from '@layouts/BaseLayout.astro';
     </div>
   </section>
 
-  <!-- ====================================================
-       BRAND HUB
-  ===================================================== -->
+  <!-- BRAND HUB — z Directusu -->
   <section class="section brands">
     <div class="container">
       <header class="section__head">
@@ -36,49 +59,36 @@ import BaseLayout from '@layouts/BaseLayout.astro';
         <h2>Tři moderní rodiny vozů</h2>
       </header>
 
+      {brands.length === 0 && (
+        <div class="empty-state">
+          <p>⚠️ Načtení značek z Directusu selhalo. Zkontroluj <code>PUBLIC_DIRECTUS_URL</code> env variable a deploy znovu.</p>
+        </div>
+      )}
+
       <div class="brands__grid">
-        <a href="/kgm" class="brand-card brand-card--lg">
-          <div class="brand-card__media" aria-hidden="true">
-            <div class="brand-card__bg" style="background: linear-gradient(135deg, #1a1a1f, #3a3a45);"></div>
-          </div>
-          <div class="brand-card__body">
-            <p class="eyebrow eyebrow-accent">9 modelů · benzín · hybrid · elektro</p>
-            <h3>KGM <span class="brand-card__alt">(dříve SsangYong)</span></h3>
-            <p>Korejské SUV s charakterem — Korando, Torres, Rexton, Musso Grand, Actyon.</p>
-            <span class="brand-card__cta">Prozkoumat KGM →</span>
-          </div>
-        </a>
-
-        <a href="/omoda-jaecoo" class="brand-card">
-          <div class="brand-card__media" aria-hidden="true">
-            <div class="brand-card__bg" style="background: linear-gradient(135deg, #2a2d3a, #5a5e75);"></div>
-          </div>
-          <div class="brand-card__body">
-            <p class="eyebrow eyebrow-accent">7 modelů · hybrid · PHEV · elektro</p>
-            <h3>OMODA &amp; JAECOO</h3>
-            <p>Nová generace prémiových SUV s pokročilou hybridní technologií.</p>
-            <span class="brand-card__cta">Prozkoumat →</span>
-          </div>
-        </a>
-
-        <a href="/farizon" class="brand-card">
-          <div class="brand-card__media" aria-hidden="true">
-            <div class="brand-card__bg" style="background: linear-gradient(135deg, #1e2a3a, #3e5a75);"></div>
-          </div>
-          <div class="brand-card__body">
-            <p class="eyebrow eyebrow-accent">elektrické užitkové</p>
-            <h3>Farizon</h3>
-            <p>Elektrické dodávky pro moderní podnikatele — SuperVan a V6E.</p>
-            <span class="brand-card__cta">Prozkoumat →</span>
-          </div>
-        </a>
+        {brands.map((brand, idx) => {
+          const meta = BRAND_META[brand.slug] ?? { eyebrow: '', description: brand.tagline ?? '', bgGradient: '#1a1a1f' };
+          const isFeatured = idx === 0; // První značka má větší kartu
+          const altName = brand.previous_names && brand.previous_names.length > 0 ? ` (dříve ${brand.previous_names[0]})` : '';
+          return (
+            <a href={`/${brand.slug}`} class={`brand-card ${isFeatured ? 'brand-card--lg' : ''}`}>
+              <div class="brand-card__media" aria-hidden="true">
+                <div class="brand-card__bg" style={`background: ${meta.bgGradient};`}></div>
+              </div>
+              <div class="brand-card__body">
+                <p class="eyebrow eyebrow-accent">{meta.eyebrow}</p>
+                <h3>{brand.name}{altName && <span class="brand-card__alt">{altName}</span>}</h3>
+                <p>{meta.description}</p>
+                <span class="brand-card__cta">Prozkoumat {brand.name} →</span>
+              </div>
+            </a>
+          );
+        })}
       </div>
     </div>
   </section>
 
-  <!-- ====================================================
-       SKLADOVKA PREVIEW
-  ===================================================== -->
+  <!-- SKLADOVKA TEASER -->
   <section class="section section--soft">
     <div class="container">
       <header class="section__head section__head--row">
@@ -91,16 +101,14 @@ import BaseLayout from '@layouts/BaseLayout.astro';
 
       <div class="stock-placeholder">
         <p class="text-muted">
-          Seznam skladových vozů bude napojen na admin panel.
-          Po nasazení Directus se zde zobrazí aktuální nabídka.
+          Naskladnění zatím probíhá. Sleduj sekci skladových vozů — brzy zde budou aktuální nabídky.
         </p>
+        <a href="/sklad" class="btn btn--dark" style="margin-top: 16px;">Přejít na skladovku</a>
       </div>
     </div>
   </section>
 
-  <!-- ====================================================
-       SERVIS
-  ===================================================== -->
+  <!-- SERVIS -->
   <section class="section servis">
     <div class="container servis__grid">
       <div>
@@ -125,137 +133,43 @@ import BaseLayout from '@layouts/BaseLayout.astro';
     padding-block: clamp(48px, 8vw, 96px) clamp(60px, 9vw, 120px);
     background: linear-gradient(180deg, var(--bg) 0%, var(--bg-soft) 100%);
   }
-  .hero__inner {
-    max-width: 900px;
-  }
-  .hero__title {
-    margin-block: 12px 20px;
-  }
-  .hero__title em {
-    font-style: normal;
-    color: var(--accent);
-  }
-  .hero__lead {
-    margin-bottom: 28px;
-    max-width: 64ch;
-  }
-  .hero__cta {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 12px;
-  }
+  .hero__inner { max-width: 900px; }
+  .hero__title { margin-block: 12px 20px; }
+  .hero__title em { font-style: normal; color: var(--accent); }
+  .hero__lead { margin-bottom: 28px; max-width: 64ch; }
+  .hero__cta { display: flex; flex-wrap: wrap; gap: 12px; }
 
-  .section__head {
-    margin-bottom: clamp(28px, 4vw, 48px);
-  }
-  .section__head--row {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-end;
-    flex-wrap: wrap;
-    gap: 16px;
-  }
-  .section__head h2 {
-    margin-top: 8px;
-  }
+  .section__head { margin-bottom: clamp(28px, 4vw, 48px); }
+  .section__head--row { display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 16px; }
+  .section__head h2 { margin-top: 8px; }
 
-  /* Brand hub */
-  .brands__grid {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: clamp(16px, 2vw, 28px);
-  }
+  .empty-state { padding: 32px; background: #FEF3C7; border: 1px solid #F59E0B; border-radius: var(--radius-lg); color: #92400E; }
+  .empty-state code { background: rgba(0,0,0,0.1); padding: 2px 6px; border-radius: 4px; font-family: 'JetBrains Mono', monospace; }
+
+  .brands__grid { display: grid; grid-template-columns: 1fr; gap: clamp(16px, 2vw, 28px); }
   @media (min-width: 700px) {
-    .brands__grid {
-      grid-template-columns: 1.6fr 1fr;
-      grid-template-rows: 1fr 1fr;
-    }
-    .brand-card--lg {
-      grid-row: 1 / 3;
-    }
+    .brands__grid { grid-template-columns: 1.6fr 1fr; grid-template-rows: 1fr 1fr; }
+    .brand-card--lg { grid-row: 1 / 3; }
   }
-  .brand-card {
-    display: flex;
-    flex-direction: column;
-    background: var(--bg-card);
-    border-radius: var(--radius-lg);
-    overflow: hidden;
-    border: 1px solid var(--line);
-    transition: transform 200ms ease, box-shadow 200ms ease;
-  }
-  .brand-card:hover {
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-md);
-  }
-  .brand-card__media {
-    aspect-ratio: 16/9;
-    overflow: hidden;
-  }
-  .brand-card--lg .brand-card__media {
-    aspect-ratio: 16/10;
-  }
-  .brand-card__bg {
-    width: 100%;
-    height: 100%;
-  }
-  .brand-card__body {
-    padding: clamp(20px, 2.5vw, 32px);
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-  }
-  .brand-card__body h3 {
-    font-size: clamp(1.2rem, 2vw, 1.6rem);
-  }
-  .brand-card__alt {
-    font-size: 0.7em;
-    color: var(--muted);
-    font-weight: 400;
-  }
-  .brand-card__body p {
-    color: var(--ink-soft);
-    font-size: 0.95rem;
-  }
-  .brand-card__cta {
-    margin-top: auto;
-    color: var(--accent);
-    font-weight: 600;
-    font-size: 0.92rem;
-  }
+  .brand-card { display: flex; flex-direction: column; background: var(--bg-card); border-radius: var(--radius-lg); overflow: hidden; border: 1px solid var(--line); transition: transform 200ms ease, box-shadow 200ms ease; }
+  .brand-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
+  .brand-card__media { aspect-ratio: 16/9; overflow: hidden; }
+  .brand-card--lg .brand-card__media { aspect-ratio: 16/10; }
+  .brand-card__bg { width: 100%; height: 100%; }
+  .brand-card__body { padding: clamp(20px, 2.5vw, 32px); flex: 1; display: flex; flex-direction: column; gap: 10px; }
+  .brand-card__body h3 { font-size: clamp(1.2rem, 2vw, 1.6rem); }
+  .brand-card__alt { font-size: 0.65em; color: var(--muted); font-weight: 400; margin-left: 6px; }
+  .brand-card__body p { color: var(--ink-soft); font-size: 0.95rem; }
+  .brand-card__cta { margin-top: auto; color: var(--accent); font-weight: 600; font-size: 0.92rem; }
 
-  /* Stock placeholder */
-  .stock-placeholder {
-    padding: 48px;
-    background: var(--bg-card);
-    border: 1px dashed var(--line);
-    border-radius: var(--radius-lg);
-    text-align: center;
-  }
+  .stock-placeholder { padding: 48px; background: var(--bg-card); border: 1px dashed var(--line); border-radius: var(--radius-lg); text-align: center; }
 
-  /* Servis */
-  .servis__grid {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 40px;
-    align-items: center;
-  }
+  .servis__grid { display: grid; grid-template-columns: 1fr; gap: 40px; align-items: center; }
   @media (min-width: 900px) {
     .servis__grid { grid-template-columns: 1.4fr 1fr; }
   }
-  .servis__visual {
-    background: var(--ink);
-    color: var(--bg);
-    padding: clamp(28px, 4vw, 48px);
-    border-radius: var(--radius-lg);
-  }
-  .servis__chip {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: clamp(1.3rem, 2.4vw, 1.8rem);
-    font-weight: 500;
-    letter-spacing: -0.02em;
-    margin-bottom: 12px;
-  }
+  .servis__visual { background: var(--ink); color: var(--bg); padding: clamp(28px, 4vw, 48px); border-radius: var(--radius-lg); }
+  .servis__chip { font-family: 'JetBrains Mono', monospace; font-size: clamp(1.3rem, 2.4vw, 1.8rem); font-weight: 500; letter-spacing: -0.02em; margin-bottom: 12px; }
   .servis__visual .text-muted { color: var(--muted-light); }
   .servis h2 { margin-block: 6px 16px; }
   .servis .btn--dark { margin-top: 16px; }

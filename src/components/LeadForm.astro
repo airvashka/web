@@ -1,0 +1,165 @@
+---
+interface Props {
+  formType: 'contact' | 'test_drive' | 'service' | 'stock_inquiry' | 'callback';
+  title?: string;
+  modelId?: number;
+  vehicleId?: number;
+  vehicleLabel?: string;
+}
+
+const { formType, title, modelId, vehicleId, vehicleLabel } = Astro.props;
+
+const titles: Record<string, string> = {
+  contact: 'Napište nám',
+  test_drive: 'Domluvit testovací jízdu',
+  service: 'Objednat servis',
+  stock_inquiry: 'Mám zájem o tento vůz',
+  callback: 'Zavolejte mi zpět',
+};
+
+const displayTitle = title ?? titles[formType] ?? 'Kontaktovat';
+---
+
+<form class="lead-form" data-lead-form data-form-type={formType} data-model-id={modelId} data-vehicle-id={vehicleId}>
+  <h3 class="lead-form__title">{displayTitle}</h3>
+
+  {vehicleLabel && (
+    <p class="lead-form__context">
+      <span class="text-muted">Poptávka pro:</span> <strong>{vehicleLabel}</strong>
+    </p>
+  )}
+
+  <div class="field">
+    <label for={`name-${formType}`}>Vaše jméno *</label>
+    <input type="text" id={`name-${formType}`} name="customer_name" required minlength="2" maxlength="200" />
+  </div>
+
+  <div class="lead-form__row">
+    <div class="field">
+      <label for={`email-${formType}`}>E-mail *</label>
+      <input type="email" id={`email-${formType}`} name="customer_email" required maxlength="200" />
+    </div>
+    <div class="field">
+      <label for={`phone-${formType}`}>Telefon</label>
+      <input type="tel" id={`phone-${formType}`} name="customer_phone" maxlength="50" pattern="[+0-9\s\-()]+" />
+    </div>
+  </div>
+
+  <div class="field">
+    <label for={`message-${formType}`}>Zpráva (nepovinné)</label>
+    <textarea id={`message-${formType}`} name="message" rows="3" maxlength="2000"></textarea>
+  </div>
+
+  <!-- Honeypot proti spam botům — skryté pole, lidé to nevyplní -->
+  <input type="text" name="_hp_website" tabindex="-1" autocomplete="off" class="lead-form__hp" />
+
+  <div class="lead-form__consent">
+    <small class="text-muted">
+      Odesláním souhlasíte se <a href="/informace/ochrana-udaju">zpracováním osobních údajů</a>.
+    </small>
+  </div>
+
+  <button type="submit" class="btn btn--primary lead-form__submit">
+    Odeslat poptávku
+  </button>
+
+  <div class="lead-form__status" data-status></div>
+</form>
+
+<style>
+  .lead-form {
+    background: var(--bg-card);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-lg);
+    padding: clamp(24px, 3vw, 32px);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .lead-form__title { margin-bottom: 8px; }
+  .lead-form__context { font-size: 0.92rem; margin-bottom: 8px; padding: 12px; background: var(--bg-soft); border-radius: var(--radius); }
+  .lead-form__row { display: grid; grid-template-columns: 1fr; gap: 0; }
+  @media (min-width: 600px) {
+    .lead-form__row { grid-template-columns: 1fr 1fr; gap: 16px; }
+  }
+  .lead-form__hp { position: absolute; left: -9999px; top: -9999px; }
+  .lead-form__consent { margin: 8px 0; }
+  .lead-form__submit { align-self: flex-start; margin-top: 8px; }
+  .lead-form__status { min-height: 24px; font-size: 0.9rem; margin-top: 8px; }
+  .lead-form__status.is-success { color: var(--success); }
+  .lead-form__status.is-error { color: var(--danger); }
+
+  /* Loading state */
+  .lead-form.is-loading .lead-form__submit { opacity: 0.6; pointer-events: none; }
+  .lead-form.is-success { background: rgba(30, 123, 95, 0.05); border-color: var(--success); }
+</style>
+
+<script>
+  const DIRECTUS_URL = import.meta.env.PUBLIC_DIRECTUS_URL;
+
+  document.querySelectorAll<HTMLFormElement>('[data-lead-form]').forEach((form) => {
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const statusEl = form.querySelector<HTMLDivElement>('[data-status]')!;
+      const submitBtn = form.querySelector<HTMLButtonElement>('.lead-form__submit')!;
+
+      // Honeypot check — pokud bot vyplnil _hp_website, ticho zahoď
+      const hp = (form.querySelector('[name=_hp_website]') as HTMLInputElement)?.value;
+      if (hp) {
+        statusEl.textContent = 'Zpráva odeslána. Brzy se ozveme.';
+        statusEl.className = 'lead-form__status is-success';
+        form.reset();
+        return;
+      }
+
+      form.classList.add('is-loading');
+      statusEl.textContent = 'Odesílám...';
+      statusEl.className = 'lead-form__status';
+
+      const data = new FormData(form);
+      const formType = form.dataset.formType;
+      const modelId = form.dataset.modelId ? Number(form.dataset.modelId) : null;
+      const vehicleId = form.dataset.vehicleId ? Number(form.dataset.vehicleId) : null;
+
+      const payload: Record<string, unknown> = {
+        form_type: formType,
+        customer_name: data.get('customer_name'),
+        customer_email: data.get('customer_email'),
+        customer_phone: data.get('customer_phone'),
+        message: data.get('message'),
+        source_page: window.location.pathname,
+      };
+      if (modelId) payload.source_model = modelId;
+      if (vehicleId) payload.source_vehicle = vehicleId;
+
+      try {
+        const res = await fetch(`${DIRECTUS_URL}/items/leads`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        statusEl.textContent = '✅ Děkujeme! Brzy se vám ozveme.';
+        statusEl.className = 'lead-form__status is-success';
+        form.classList.add('is-success');
+        form.classList.remove('is-loading');
+        submitBtn.textContent = 'Odesláno';
+        submitBtn.disabled = true;
+
+        // GA event
+        if ((window as any).dataLayer) {
+          (window as any).dataLayer.push({
+            event: 'generate_lead',
+            form_name: formType,
+            source_page: window.location.pathname,
+          });
+        }
+      } catch (err) {
+        statusEl.textContent = '❌ Něco se nepodařilo. Zkuste to prosím znovu nebo zavolejte +420 771 235 458.';
+        statusEl.className = 'lead-form__status is-error';
+        form.classList.remove('is-loading');
+        console.error('Lead form error:', err);
+      }
+    });
+  });
+</script>

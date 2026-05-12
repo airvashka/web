@@ -1,0 +1,107 @@
+---
+import BaseLayout from '@layouts/BaseLayout.astro';
+import LeadForm from '@components/LeadForm.astro';
+import { directusGet } from '@lib/directus';
+import type { Branch, Employee } from '@lib/types';
+
+const branches = await directusGet<Branch>('branches');
+const branch = branches[0];
+
+const employees = await directusGet<Employee>('employees', { sort: ['department', 'full_name'] });
+const sales = employees.filter(e => e.department === 'sales');
+const service = employees.filter(e => e.department === 'service');
+---
+
+<BaseLayout title="Kontakt" description="Kontaktujte SFR Motor — autorizovaný dealer v Praze-Ďáblicích. Prodej, servis, doplňkové služby.">
+  <section class="section">
+    <div class="container kontakt__hero">
+      <p class="eyebrow">Kontakt</p>
+      <h1>Najdete nás v&nbsp;Praze-Ďáblicích</h1>
+    </div>
+  </section>
+
+  <section class="container kontakt__grid">
+    <div class="kontakt__info">
+      {branch && (
+        <div class="info-card">
+          <h3>{branch.name}</h3>
+          <p>
+            {branch.address}<br />
+            {branch.postal_code} {branch.city}
+          </p>
+          <ul class="info-card__list">
+            <li><span class="text-muted">Prodej:</span> <a class="font-mono" href={`tel:${branch.phone?.replace(/\s/g, '')}`}>{branch.phone}</a></li>
+            <li><span class="text-muted">Servis:</span> <a class="font-mono" href="tel:+420771259323">+420 771 259 323</a></li>
+            <li><span class="text-muted">Email:</span> <a href={`mailto:${branch.email}`}>{branch.email}</a></li>
+            <li><span class="text-muted">Servisní:</span> <a href="mailto:servis@sfr-motor.cz">servis@sfr-motor.cz</a></li>
+          </ul>
+        </div>
+      )}
+
+      {sales.length > 0 && (
+        <div class="info-card">
+          <h3>Prodej</h3>
+          <ul class="people">
+            {sales.map(p => (
+              <li>
+                <span class="people__name">{p.full_name}</span>
+                {p.email && <a href={`mailto:${p.email}`} class="people__contact">{p.email}</a>}
+                {p.phone && <a href={`tel:${p.phone.replace(/\s/g, '')}`} class="people__contact font-mono">{p.phone}</a>}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      {service.length > 0 && (
+        <div class="info-card">
+          <h3>Servis</h3>
+          <ul class="people">
+            {service.map(p => (
+              <li>
+                <span class="people__name">{p.full_name}</span>
+                {p.email && <a href={`mailto:${p.email}`} class="people__contact">{p.email}</a>}
+                {p.phone && <a href={`tel:${p.phone.replace(/\s/g, '')}`} class="people__contact font-mono">{p.phone}</a>}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+    </div>
+
+    <div class="kontakt__form">
+      <LeadForm formType="contact" title="Napište nám" />
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .kontakt__hero { max-width: 800px; }
+  .kontakt__hero h1 { margin-top: 8px; }
+
+  .kontakt__grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 40px;
+    margin-bottom: var(--section-pad);
+  }
+  @media (min-width: 900px) {
+    .kontakt__grid { grid-template-columns: 1fr 1fr; }
+  }
+
+  .kontakt__info { display: flex; flex-direction: column; gap: 24px; }
+  .info-card { background: var(--bg-card); border: 1px solid var(--line); border-radius: var(--radius-lg); padding: 24px; }
+  .info-card h3 { margin-bottom: 12px; }
+  .info-card p { margin-bottom: 12px; }
+  .info-card__list { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+  .info-card__list li { font-size: 0.95rem; }
+  .info-card__list a { color: var(--ink); border-bottom: 1px solid var(--line); }
+  .info-card__list a:hover { color: var(--accent); border-bottom-color: var(--accent); }
+
+  .people { list-style: none; display: flex; flex-direction: column; gap: 12px; }
+  .people li { display: flex; flex-direction: column; gap: 4px; padding-bottom: 12px; border-bottom: 1px solid var(--line); }
+  .people li:last-child { border-bottom: 0; }
+  .people__name { font-weight: 600; }
+  .people__contact { font-size: 0.88rem; color: var(--ink-soft); }
+  .people__contact:hover { color: var(--accent); }
+</style>

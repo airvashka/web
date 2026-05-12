@@ -1,0 +1,216 @@
+---
+import BaseLayout from '@layouts/BaseLayout.astro';
+import LeadForm from '@components/LeadForm.astro';
+import { directusGet } from '@lib/directus';
+import type { Brand, Model, ModelYear, TrimLevel } from '@lib/types';
+
+export async function getStaticPaths() {
+  const models = await directusGet<Model>('models', { fields: ['slug'], filter: { status: { _eq: 'published' } } });
+  return models.map(m => ({ params: { slug: m.slug } }));
+}
+
+const { slug } = Astro.params;
+
+const models = await directusGet<Model & { brand: Brand; sub_brand?: { name: string; slug: string } | null }>('models', {
+  filter: { slug: { _eq: slug } },
+  limit: 1,
+  fields: ['*', 'brand.id', 'brand.slug', 'brand.name', 'brand.primary_color', 'brand.previous_names', 'sub_brand.name', 'sub_brand.slug'],
+});
+const model = models[0];
+
+if (!model) {
+  return Astro.redirect('/404');
+}
+
+// Modelové roky + trim levely
+const modelYears = await directusGet<ModelYear>('model_years', {
+  filter: { model: { _eq: model.id }, status: { _eq: 'published' } },
+  sort: ['-year'],
+  fields: ['*'],
+});
+const latestYear = modelYears[0];
+
+const trims = latestYear ? await directusGet<TrimLevel>('trim_levels', {
+  filter: { model_year: { _eq: latestYear.id }, status: { _eq: 'published' } },
+  sort: ['sort'],
+  fields: ['*'],
+}) : [];
+
+const fuelLabels: Record<string, string> = {
+  petrol: 'Benzín', diesel: 'Diesel', hybrid: 'Hybrid', phev: 'Plug-in Hybrid', ev: 'Elektro',
+};
+---
+
+<BaseLayout
+  title={`${model.brand.name} ${model.name}`}
+  description={model.tagline ?? `${model.brand.name} ${model.name} u SFR Motor — autorizovaný dealer v Praze-Ďáblicích.`}
+>
+  <!-- HERO -->
+  <section class="model-hero" style={`--brand-color: ${model.brand.primary_color ?? '#1a1a1f'};`}>
+    <div class="container">
+      <nav class="breadcrumbs">
+        <a href={`/${model.brand.slug}`}>{model.brand.name}</a>
+        <span class="text-muted"> / </span>
+        <span>{model.name}</span>
+      </nav>
+      <h1 class="model-hero__title">{model.brand.name} {model.name}</h1>
+      {model.tagline && <p class="lead model-hero__tagline">{model.tagline}</p>}
+
+      <div class="model-hero__kpi">
+        {model.fuel_type && (
+          <div class="kpi">
+            <div class="kpi__label">Pohon</div>
+            <div class="kpi__value">{fuelLabels[model.fuel_type] ?? model.fuel_type}</div>
+          </div>
+        )}
+        {model.body_type && (
+          <div class="kpi">
+            <div class="kpi__label">Karoserie</div>
+            <div class="kpi__value" style="text-transform: uppercase;">{model.body_type}</div>
+          </div>
+        )}
+        {model.price_from && (
+          <div class="kpi">
+            <div class="kpi__label">Cena od</div>
+            <div class="kpi__value">{model.price_from.toLocaleString('cs-CZ')} Kč</div>
+          </div>
+        )}
+        {latestYear?.year && (
+          <div class="kpi">
+            <div class="kpi__label">Modelový rok</div>
+            <div class="kpi__value">{latestYear.year}</div>
+          </div>
+        )}
+      </div>
+
+      <div class="model-hero__cta">
+        <a href="/sklad" class="btn btn--primary">Skladové vozy</a>
+        <a href="#poptavka" class="btn btn--ghost">Testovací jízda</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- POPIS -->
+  {model.description && (
+    <section class="section">
+      <div class="container model-desc">
+        <p class="eyebrow">O modelu</p>
+        <h2>Představujeme {model.name}</h2>
+        <div class="model-desc__content" set:html={model.description.replace(/\n/g, '<br>')}></div>
+      </div>
+    </section>
+  )}
+
+  <!-- TRIM LEVELY -->
+  {trims.length > 0 && (
+    <section class="section section--soft">
+      <div class="container">
+        <header class="section__head">
+          <p class="eyebrow">Ceny a výbavy</p>
+          <h2>Modelová řada {latestYear?.year ?? ''}</h2>
+        </header>
+        <div class="trims__grid">
+          {trims.map(t => {
+            const hasPromo = t.promo_price && t.list_price && t.promo_price < t.list_price;
+            return (
+              <div class="trim-card">
+                <h3>{t.name}</h3>
+                {t.description && <p class="text-muted">{t.description}</p>}
+                <div class="trim-card__price">
+                  {hasPromo ? (
+                    <>
+                      <span class="trim-card__list">{t.list_price?.toLocaleString('cs-CZ')} Kč</span>
+                      <span class="trim-card__promo">od {t.promo_price?.toLocaleString('cs-CZ')} Kč</span>
+                    </>
+                  ) : (
+                    <span class="trim-card__promo">
+                      {(t.promo_price ?? t.list_price)?.toLocaleString('cs-CZ')} Kč
+                    </span>
+                  )}
+                </div>
+                {t.features && t.features.length > 0 && (
+                  <ul class="trim-card__features">
+                    {t.features.slice(0, 6).map(f => <li>{f}</li>)}
+                    {t.features.length > 6 && <li class="text-muted">+ {t.features.length - 6} dalších</li>}
+                  </ul>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </section>
+  )}
+
+  <!-- TECH DATA -->
+  {latestYear?.technical_data && Array.isArray(latestYear.technical_data) && latestYear.technical_data.length > 0 && (
+    <section class="section">
+      <div class="container">
+        <header class="section__head">
+          <p class="eyebrow">Technické údaje</p>
+          <h2>Specifikace</h2>
+        </header>
+        <table class="tech-table">
+          <tbody>
+            {(latestYear.technical_data as Array<{ label: string; value: string }>).map(row => (
+              <tr>
+                <td>{row.label}</td>
+                <td>{row.value}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </section>
+  )}
+
+  <!-- LEAD FORM -->
+  <section class="section section--soft" id="poptavka">
+    <div class="container poptavka-wrap">
+      <LeadForm formType="test_drive" title={`Mám zájem o ${model.name}`} modelId={model.id as unknown as number} />
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .model-hero { padding-block: clamp(40px, 6vw, 80px); background: linear-gradient(180deg, var(--brand-color, var(--ink)) 0%, var(--ink) 100%); color: var(--bg); }
+  .breadcrumbs { font-size: 0.88rem; margin-bottom: 16px; color: var(--muted-light); }
+  .breadcrumbs a { color: var(--bg); opacity: 0.8; }
+  .breadcrumbs a:hover { opacity: 1; color: var(--accent); }
+
+  .model-hero__title { margin-bottom: 12px; }
+  .model-hero__tagline { color: rgba(255,255,255,0.85); margin-bottom: 32px; }
+
+  .model-hero__kpi { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 16px; margin-bottom: 32px; }
+  .kpi { padding: 14px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); border-radius: var(--radius); }
+  .kpi__label { font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted-light); margin-bottom: 6px; }
+  .kpi__value { font-size: 1.1rem; font-weight: 600; }
+
+  .model-hero__cta { display: flex; flex-wrap: wrap; gap: 12px; }
+
+  .model-desc { max-width: 80ch; }
+  .model-desc h2 { margin-block: 8px 16px; }
+  .model-desc__content { font-size: 1rem; line-height: 1.7; color: var(--ink-soft); }
+  .model-desc__content p { margin-bottom: 12px; }
+
+  .trims__grid { display: grid; grid-template-columns: 1fr; gap: 20px; }
+  @media (min-width: 700px) { .trims__grid { grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); } }
+
+  .trim-card { background: var(--bg-card); border: 1px solid var(--line); border-radius: var(--radius-lg); padding: 24px; }
+  .trim-card h3 { margin-bottom: 8px; }
+  .trim-card__price { margin-block: 16px; display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+  .trim-card__list { font-size: 0.92rem; color: var(--muted); text-decoration: line-through; }
+  .trim-card__promo { font-size: 1.4rem; font-weight: 700; color: var(--accent); }
+  .trim-card__features { list-style: none; padding: 0; margin-top: 12px; display: flex; flex-direction: column; gap: 6px; font-size: 0.88rem; }
+  .trim-card__features li { padding-left: 18px; position: relative; }
+  .trim-card__features li::before { content: '✓'; position: absolute; left: 0; color: var(--success); font-weight: 700; }
+  .trim-card__features .text-muted::before { content: '+'; color: var(--muted); }
+
+  .tech-table { width: 100%; border-collapse: collapse; }
+  .tech-table td { padding: 12px 16px; border-bottom: 1px solid var(--line); }
+  .tech-table tr:nth-child(odd) td { background: var(--bg-soft); }
+  .tech-table td:first-child { font-weight: 500; }
+  .tech-table td:last-child { text-align: right; color: var(--ink-soft); font-family: 'JetBrains Mono', monospace; font-size: 0.92rem; }
+
+  .poptavka-wrap { max-width: 700px; margin: 0 auto; }
+</style>
