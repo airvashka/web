@@ -1,6 +1,8 @@
 ---
 import BaseLayout from '@layouts/BaseLayout.astro';
 import DirectusImage from '@components/DirectusImage.astro';
+import YouTubeSection from '@components/YouTubeSection.astro';
+import InstagramStrip from '@components/InstagramStrip.astro';
 import { directusGet } from '@lib/directus';
 import type { Brand, StockVehicle, Model } from '@lib/types';
 
@@ -254,6 +256,12 @@ const articles = [
       </div>
     </div>
   </section>
+
+  <!-- ===== YOUTUBE ===== -->
+  <YouTubeSection />
+
+  <!-- ===== INSTAGRAM ===== -->
+  <InstagramStrip />
 
   <!-- ===== MAGAZÍN ===== -->
   <section class="magazin" data-screen-label="05 Magazín">

@@ -1,0 +1,154 @@
+---
+/**
+ * InstagramStrip — pruh fotek z @sfrmotor IG
+ *
+ * Stav: Instagram Basic Display API byl deprecated Meta v září 2024.
+ * Žádné free oficiální API už neexistuje. 3 možnosti pro produkci:
+ *
+ *   1) MANUÁLNĚ — admin v Directus collection `instagram_posts` vybírá
+ *      8 nejlepších fotek z IG, nahraje je sem. Web je vykreslí.
+ *      Plus: kontrola, free, GDPR-friendly.
+ *      Minus: ruční práce 1× měsíčně.
+ *
+ *   2) ELFSIGHT widget — JS embed, $5–10/měs.
+ *      Plus: auto-sync z IG profilu.
+ *      Minus: external dependency, načítá JS z elfsight.com.
+ *
+ *   3) BEHOLD.SO / EMBEDSOCIAL / SNAPWIDGET — free tier 20–50 fotek/měs.
+ *      Plus: zdarma.
+ *      Minus: external dependency, branding, limity.
+ *
+ * Aktuální stav: hardcoded placeholdery + CTA "Sledujte @sfrmotor".
+ * TODO: vybrat variantu a napojit.
+ */
+
+interface IgPost {
+  src?: string;          // URL fotky (nebo Directus file ID později)
+  alt?: string;
+  href?: string;         // link na konkrétní IG post
+}
+
+// ===== PLACEHOLDERY — nahradit reálnými fotkami =====
+const POSTS: IgPost[] = [
+  { alt: 'Foto 1' },
+  { alt: 'Foto 2' },
+  { alt: 'Foto 3' },
+  { alt: 'Foto 4' },
+  { alt: 'Foto 5' },
+  { alt: 'Foto 6' },
+];
+
+const PROFILE_URL = 'https://www.instagram.com/sfrmotor/'; // TODO: ověřit reálnou URL
+---
+
+<section class="ig-section" data-screen-label="Instagram">
+  <div class="container">
+    <div class="ig-head">
+      <div>
+        <div class="section-eyebrow">Instagram</div>
+        <h2>Sledujte nás na <a href={PROFILE_URL} target="_blank" rel="noopener" class="ig-handle">@sfrmotor</a></h2>
+      </div>
+      <a class="head-link" href={PROFILE_URL} target="_blank" rel="noopener">
+        Otevřít profil
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7"/><polyline points="7 7 17 7 17 17"/></svg>
+      </a>
+    </div>
+    <div class="ig-grid">
+      {POSTS.map((p) => (
+        <a class="ig-card" href={p.href ?? PROFILE_URL} target="_blank" rel="noopener" aria-label={p.alt ?? 'Foto Instagram'}>
+          {p.src ? (
+            <img src={p.src} alt={p.alt ?? ''} loading="lazy" />
+          ) : (
+            <div class="ig-placeholder" aria-hidden="true">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+                <rect x="3" y="3" width="18" height="18" rx="5"/>
+                <circle cx="12" cy="12" r="4"/>
+                <circle cx="17.5" cy="6.5" r="1" fill="currentColor"/>
+              </svg>
+            </div>
+          )}
+          <span class="ig-overlay" aria-hidden="true">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="3" width="18" height="18" rx="5"/>
+              <circle cx="12" cy="12" r="4"/>
+            </svg>
+          </span>
+        </a>
+      ))}
+    </div>
+  </div>
+</section>
+
+<style>
+  .ig-section {
+    padding: 0 0 120px;
+    background: #fff;
+  }
+  .ig-head {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 32px;
+    align-items: end;
+    margin-bottom: 36px;
+  }
+  .ig-head h2 {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: clamp(28px, 3vw, 40px);
+    letter-spacing: -0.02em;
+    margin: 12px 0 0;
+  }
+  .ig-handle {
+    color: var(--accent);
+    border-bottom: 2px solid transparent;
+    transition: border-color .15s;
+  }
+  .ig-handle:hover { border-bottom-color: var(--accent); }
+
+  .ig-grid {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 8px;
+  }
+  @media (max-width: 1100px) { .ig-grid { grid-template-columns: repeat(3, 1fr); } }
+  @media (max-width: 520px)  { .ig-grid { grid-template-columns: repeat(2, 1fr); } }
+
+  .ig-card {
+    position: relative;
+    aspect-ratio: 1 / 1;
+    overflow: hidden;
+    border-radius: 8px;
+    background: linear-gradient(135deg, #f3f1ec 0%, #e0d6c8 100%);
+    transition: transform .2s;
+  }
+  .ig-card:hover { transform: scale(1.02); }
+  .ig-card img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+  .ig-placeholder {
+    width: 100%; height: 100%;
+    display: grid; place-items: center;
+    color: rgba(11,11,12,0.25);
+  }
+
+  .ig-overlay {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%) scale(0.8);
+    width: 40px; height: 40px;
+    border-radius: 999px;
+    background: rgba(0,0,0,0.55);
+    color: #fff;
+    display: grid; place-items: center;
+    opacity: 0;
+    transition: opacity .2s, transform .2s;
+    pointer-events: none;
+  }
+  .ig-card:hover .ig-overlay {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+
+  @media (max-width: 960px) {
+    .ig-head { grid-template-columns: 1fr; gap: 16px; align-items: start; }
+  }
+</style>

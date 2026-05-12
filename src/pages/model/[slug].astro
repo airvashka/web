@@ -80,22 +80,124 @@ if (latestYear?.technical_data) {
   }
 }
 
-// Hero stats — vyber 4 nejdůležitější (TODO: chytřejší extrakce)
-const STAT_KEYS = ['Výkon', 'Dojezd', 'Spotřeba', 'Zrychlení 0-100', 'Záruka', 'Točivý moment', 'Spotřeba (komb.)'];
-const heroStats = STAT_KEYS
-  .map((kw) => {
-    const found = tdataRows.find(([k]) => k.toLowerCase().includes(kw.toLowerCase()));
-    return found ? { lab: found[0], val: found[1] } : null;
-  })
-  .filter(Boolean)
-  .slice(0, 4) as Array<{ lab: string; val: string }>;
+const fuelKey = (rawModel as any).fuel_type ?? '';
+const badgeText = fuelKey === 'ev' ? 'Elektrické SUV'
+  : fuelKey === 'hybrid' ? 'Hybridní SUV'
+  : fuelKey === 'phev' ? 'Plug-in hybrid SUV'
+  : fuelKey === 'diesel' ? 'SUV · Diesel'
+  : 'SUV';
+
+// ===== Hero stats — extrakce 4 nejdůležitějších s aliasy + jednotky =====
+// Najde podle více alternativních klíčů, normalizuje hodnotu (přidá jednotku pokud chybí)
+function findStat(aliases: string[], unit?: string): string | null {
+  const lowerAliases = aliases.map((a) => a.toLowerCase());
+  for (const [k, v] of tdataRows) {
+    const lk = k.toLowerCase();
+    if (lowerAliases.some((a) => lk.includes(a))) {
+      const val = String(v).trim();
+      // Přidat jednotku, pokud zatím není v hodnotě
+      if (unit && val && !val.includes(unit) && /^[0-9.,\s]+$/.test(val)) {
+        return `${val} ${unit}`;
+      }
+      return val;
+    }
+  }
+  return null;
+}
+
+// Fallback záruka per brand (když není v tdata)
+const WARRANTY_BY_BRAND: Record<string, string> = {
+  kgm: '5 let / 100 000 km',
+  'omoda-jaecoo': '7 let / 150 000 km',
+  farizon: '7 let / 150 000 km',
+};
+
+// Stats per fuel type — různé highlighty pro elektro vs spalovák
+type StatDef = { label: string; aliases: string[]; unit?: string };
+const STAT_SETS: Record<string, StatDef[]> = {
+  petrol: [
+    { label: 'Výkon', aliases: ['čistý výkon motoru', 'systémový výkon', 'výkon'], unit: 'kW' },
+    { label: 'Točivý moment', aliases: ['maximální točivý moment', 'točivý moment'], unit: 'Nm' },
+    { label: 'Spotřeba (komb.)', aliases: ['průměrná spotřeba paliva', 'spotřeba (komb.)', 'spotřeba'], unit: 'l/100 km' },
+    { label: 'Záruka', aliases: ['záruka'] },
+  ],
+  diesel: [
+    { label: 'Výkon', aliases: ['čistý výkon motoru', 'výkon'], unit: 'kW' },
+    { label: 'Točivý moment', aliases: ['maximální točivý moment', 'točivý moment'], unit: 'Nm' },
+    { label: 'Spotřeba (komb.)', aliases: ['průměrná spotřeba paliva', 'spotřeba'], unit: 'l/100 km' },
+    { label: 'Záruka', aliases: ['záruka'] },
+  ],
+  hybrid: [
+    { label: 'Systémový výkon', aliases: ['systémový výkon', 'výkon'], unit: 'kW' },
+    { label: 'Spotřeba (komb.)', aliases: ['průměrná spotřeba paliva', 'spotřeba (komb.)', 'spotřeba'], unit: 'l/100 km' },
+    { label: 'Emise CO₂', aliases: ['emise co₂', 'emise co2'], unit: 'g/km' },
+    { label: 'Záruka', aliases: ['záruka'] },
+  ],
+  phev: [
+    { label: 'Systémový výkon', aliases: ['systémový výkon', 'výkon'], unit: 'kW' },
+    { label: 'Dojezd EV', aliases: ['dojezd ev', 'dojezd elektro', 'elektrický dojezd'], unit: 'km' },
+    { label: 'Spotřeba (komb.)', aliases: ['průměrná spotřeba paliva', 'spotřeba'], unit: 'l/100 km' },
+    { label: 'Záruka', aliases: ['záruka'] },
+  ],
+  ev: [
+    { label: 'Dojezd WLTP', aliases: ['dojezd wltp', 'dojezd'], unit: 'km' },
+    { label: 'Výkon', aliases: ['čistý výkon motoru', 'výkon'], unit: 'kW' },
+    { label: 'Zrychlení 0–100', aliases: ['zrychlení 0-100', 'zrychlení 0–100', 'zrychlení'], unit: 's' },
+    { label: 'Záruka', aliases: ['záruka'] },
+  ],
+};
+const statsForFuel = STAT_SETS[fuelKey] ?? STAT_SETS.petrol;
+
+const heroStats: Array<{ lab: string; val: string }> = [];
+for (const def of statsForFuel) {
+  let val = findStat(def.aliases, def.unit);
+  if (!val && def.label === 'Záruka') val = WARRANTY_BY_BRAND[brand.slug] ?? null;
+  if (val) heroStats.push({ lab: def.label, val });
+  if (heroStats.length >= 4) break;
+}
+// Fallback: pokud máme méně než 2 stats, doplň karoserie a palivo
+if (heroStats.length < 2) {
+  const fuelLabel = fuelLabels[fuelKey] ?? '—';
+  const bodyType = (rawModel as any).body_type;
+  if (fuelLabel !== '—') heroStats.push({ lab: 'Palivo', val: fuelLabel });
+  if (bodyType) heroStats.push({ lab: 'Karoserie', val: String(bodyType).toUpperCase() });
+  if (heroStats.length < 4 && rawModel.price_from) {
+    heroStats.push({ lab: 'Cena od', val: `${rawModel.price_from.toLocaleString('cs-CZ')} Kč` });
+  }
+}
 
 const priceFrom = rawModel.price_from ? `${rawModel.price_from.toLocaleString('cs-CZ')} Kč` : '—';
 const fuelTagClass: Record<string, string> = {
   petrol: 'benzin', diesel: 'diesel', hybrid: 'hybrid', phev: 'phev', ev: 'elektro',
 };
-const fuelKey = (rawModel as any).fuel_type ?? '';
-const badgeText = fuelKey === 'ev' ? 'Elektrické SUV' : fuelKey === 'hybrid' || fuelKey === 'phev' ? 'Hybridní SUV' : 'SUV';
+
+// ===== Variant switcher — modely se stejnou base (Torres / Torres HEV / Torres EVX) =====
+// TODO: přesunout do Directus jako field `variants_group` na models. Pro teď hardcoded mapping.
+const VARIANT_GROUPS: string[][] = [
+  ['torres', 'torres-hev', 'torres-evx'],
+  ['actyon', 'actyon-hev'],
+  ['omoda-5', 'omoda-e5'],
+  ['jaecoo-7', 'jaecoo-7-shs'],
+  // Až budou v Directusu: ['omoda-9', 'omoda-9-shs'], …
+];
+const variantGroup = VARIANT_GROUPS.find((g) => g.includes(slug ?? ''));
+let variantModels: Array<{ slug: string; name: string; fuel_type?: string; description?: string }> = [];
+if (variantGroup && variantGroup.length > 1) {
+  variantModels = await directusGet<any>('models', {
+    filter: { slug: { _in: variantGroup }, status: { _eq: 'published' } },
+    fields: ['slug', 'name', 'fuel_type', 'tagline'],
+  });
+  // Seřadit dle pořadí v VARIANT_GROUPS (ICE/HEV/PHEV/EVX/SHS)
+  variantModels.sort((a, b) => variantGroup.indexOf(a.slug) - variantGroup.indexOf(b.slug));
+}
+
+const variantFuelSub: Record<string, string> = {
+  petrol: 'Benzín · spalovací',
+  diesel: 'Diesel',
+  hybrid: 'Plný hybrid',
+  phev: 'Plug-in hybrid',
+  ev: 'Elektromobil',
+};
 
 // Intro foto = první z gallery, nebo hero_image
 const galleryImages: string[] = (rawModel.gallery ?? []).map((g) => g?.directus_files_id).filter(Boolean) as string[];
@@ -143,6 +245,7 @@ const introCopy = (rawModel.description ?? '').split(/\n\s*\n/).filter(Boolean);
   <div class="subnav">
     <div class="container subnav-inner">
       <a class="subnav-link is-active" href="#predstaveni">Představení</a>
+      {variantModels.length > 1 && (<><span class="subnav-sep">·</span><a class="subnav-link" href="#varianty">Varianty</a></>)}
       <span class="subnav-sep">·</span>
       <a class="subnav-link" href="#technologie">Technologie</a>
       <span class="subnav-sep">·</span>
@@ -153,6 +256,35 @@ const introCopy = (rawModel.description ?? '').split(/\n\s*\n/).filter(Boolean);
       <a class="subnav-link" href="#data">Technické údaje</a>
     </div>
   </div>
+
+  <!-- ===== VARIANT SWITCHER ===== -->
+  {variantModels.length > 1 && (
+    <section class="section tight" id="varianty">
+      <div class="container">
+        <div class="section-eyebrow">Vyberte si pohon</div>
+        <h2 class="section-title" style="margin-bottom: 32px;">{variantGroup?.[0] === 'torres' ? 'Torres' : variantGroup?.[0] === 'actyon' ? 'Actyon' : variantGroup?.[0] === 'omoda-5' ? 'Omoda 5 / E5' : variantGroup?.[0] === 'jaecoo-7' ? 'Jaecoo 7' : rawModel.name} ve třech provedeních</h2>
+        <div class="variants">
+          {variantModels.map((vm) => {
+            const isActive = vm.slug === slug;
+            const fuelType = (vm as any).fuel_type ?? '';
+            return (
+              <a class={`variant-pill${isActive ? ' is-active' : ''}`} href={`/model/${vm.slug}`}>
+                <span class="icbox">
+                  {fuelType === 'ev' && <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>}
+                  {(fuelType === 'hybrid' || fuelType === 'phev') && <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19.2 2.96c1.4 9.3-3.3 16.1-9.2 17.04Z"/><path d="M2 21c0-3 1.85-5.36 5.08-6"/></svg>}
+                  {(fuelType === 'petrol' || fuelType === 'diesel' || !fuelType) && <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="22" x2="15" y2="22"/><line x1="4" y1="9" x2="14" y2="9"/><path d="M14 22V4a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v18"/><path d="M14 13h2a2 2 0 0 1 2 2v2a2 2 0 0 0 2 2 2 2 0 0 0 2-2V9.83a2 2 0 0 0-.59-1.42L18 5"/></svg>}
+                </span>
+                <div>
+                  <div class="vn">{vm.name}</div>
+                  <div class="vs">{variantFuelSub[fuelType] ?? fuelLabels[fuelType] ?? '—'}</div>
+                </div>
+              </a>
+            );
+          })}
+        </div>
+      </div>
+    </section>
+  )}
 
   <!-- ===== INTRO ===== -->
   <section class="section" id="predstaveni">
