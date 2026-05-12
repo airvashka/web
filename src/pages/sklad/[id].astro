@@ -3,6 +3,7 @@ import BaseLayout from '@layouts/BaseLayout.astro';
 import DirectusImage from '@components/DirectusImage.astro';
 import LeadForm from '@components/LeadForm.astro';
 import { directusGet, directusAsset } from '@lib/directus';
+import { getNonEmptyCategories } from '@lib/features';
 import type { Brand, Model, StockVehicle, TrimLevel } from '@lib/types';
 
 export async function getStaticPaths() {
@@ -18,6 +19,9 @@ const { id } = Astro.params;
 // 1) Fetch vehicle — photos musíme expandnout přes M2M junction
 type VehicleWithPhotos = StockVehicle & {
   photos?: Array<{ directus_files_id: string }>;
+  transmission?: string;
+  drivetrain?: string;
+  color_category?: string;
 };
 const vehicles = await directusGet<VehicleWithPhotos>('stock_vehicles', {
   filter: { id: { _eq: Number(id) }, status: { _eq: 'published' } },
@@ -96,6 +100,8 @@ const title = `${brand?.name ?? ''} ${model?.name ?? ''}${trim ? ' ' + trim.name
             {v.km !== undefined && v.km !== null && (
               <div><dt>Najeto</dt><dd class="font-mono">{v.km.toLocaleString('cs-CZ')} km</dd></div>
             )}
+            {(v as any).transmission && <div><dt>Převodovka</dt><dd>{({manual:'Manuál',automatic:'Automat',dct:'DCT',cvt:'CVT',dht:'Hybridní',reduction:'Redukční'} as Record<string,string>)[(v as any).transmission] ?? (v as any).transmission}</dd></div>}
+            {(v as any).drivetrain && <div><dt>Pohon</dt><dd>{({fwd:'FWD',rwd:'RWD',awd:'AWD','4wd':'4×4'} as Record<string,string>)[(v as any).drivetrain] ?? (v as any).drivetrain}</dd></div>}
             {v.color_code && <div><dt>Barva</dt><dd class="font-mono">{v.color_code}</dd></div>}
             {v.first_registration && <div><dt>1. registrace</dt><dd class="font-mono">{v.first_registration}</dd></div>}
             {v.vin && <div><dt>VIN</dt><dd class="font-mono">{v.vin}</dd></div>}
@@ -134,6 +140,25 @@ const title = `${brand?.name ?? ''} ${model?.name ?? ''}${trim ? ' ' + trim.name
         <div class="stock-detail__desc">
           <h2>Popis vozu</h2>
           <div set:html={v.description.replace(/\n/g, '<br>')}></div>
+        </div>
+      )}
+
+      {trim?.features && Array.isArray(trim.features) && trim.features.length > 0 && (
+        <div class="stock-detail__features">
+          <h2>Výbava trim levelu {trim.name}</h2>
+          <div class="features-grid">
+            {getNonEmptyCategories(trim.features).map((cat) => (
+              <section class="feature-cat">
+                <header class="feature-cat__head">
+                  <span class="feature-cat__icon">{cat.icon}</span>
+                  <h3>{cat.label}</h3>
+                </header>
+                <ul>
+                  {cat.items.map((it) => <li>{it}</li>)}
+                </ul>
+              </section>
+            ))}
+          </div>
         </div>
       )}
     </div>
@@ -211,4 +236,28 @@ const title = `${brand?.name ?? ''} ${model?.name ?? ''}${trim ? ' ' + trim.name
   .stock-detail__desc div { line-height: 1.7; color: var(--ink-soft); }
 
   .poptavka-wrap { max-width: 700px; margin: 0 auto; }
+
+  .stock-detail__features {
+    margin-top: 40px;
+    background: var(--bg-card);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-lg);
+    padding: clamp(24px, 3vw, 40px);
+  }
+  .stock-detail__features h2 { margin-bottom: 24px; }
+  .features-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+  @media (min-width: 700px) { .features-grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (min-width: 1100px) { .features-grid { grid-template-columns: repeat(3, 1fr); } }
+
+  .feature-cat { display: flex; flex-direction: column; gap: 8px; }
+  .feature-cat__head { display: flex; align-items: center; gap: 8px; padding-bottom: 8px; border-bottom: 1px solid var(--line); }
+  .feature-cat__icon { font-size: 1.2rem; }
+  .feature-cat__head h3 { font-size: 0.85rem; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; color: var(--ink-soft); }
+  .feature-cat ul { list-style: none; padding: 0; display: flex; flex-direction: column; gap: 4px; font-size: 0.88rem; line-height: 1.5; }
+  .feature-cat li { padding-left: 14px; position: relative; color: var(--ink-soft); }
+  .feature-cat li::before { content: '·'; position: absolute; left: 4px; color: var(--accent); font-weight: 700; font-size: 1.2em; line-height: 1; }
 </style>

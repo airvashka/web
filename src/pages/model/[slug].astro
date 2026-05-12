@@ -3,6 +3,7 @@ import BaseLayout from '@layouts/BaseLayout.astro';
 import LeadForm from '@components/LeadForm.astro';
 import DirectusImage from '@components/DirectusImage.astro';
 import { directusGet, directusAsset } from '@lib/directus';
+import { getNonEmptyCategories } from '@lib/features';
 import type { Brand, Model, ModelYear, TrimLevel } from '@lib/types';
 
 export async function getStaticPaths() {
@@ -203,12 +204,22 @@ const descriptionHtml = (model.description ?? '').replace(/\n/g, '<br>');
                 </span>
               </div>
               {t.features && t.features.length > 0 && (
-                <ul class="trim-card__features">
-                  {t.features.slice(0, 6).map((f) => <li>{f}</li>)}
-                  {t.features.length > 6 && (
-                    <li class="text-muted">+ {t.features.length - 6} dalších</li>
-                  )}
-                </ul>
+                <div class="trim-card__categories">
+                  {getNonEmptyCategories(t.features).slice(0, 4).map((cat) => (
+                    <div class="trim-cat">
+                      <div class="trim-cat__head">
+                        <span class="trim-cat__icon">{cat.icon}</span>
+                        <span class="trim-cat__label">{cat.label}</span>
+                      </div>
+                      <ul class="trim-cat__items">
+                        {cat.items.slice(0, 4).map((it) => <li>{it}</li>)}
+                        {cat.items.length > 4 && (
+                          <li class="text-muted">+ {cat.items.length - 4} dalších</li>
+                        )}
+                      </ul>
+                    </div>
+                  ))}
+                </div>
               )}
             </article>
           ))}
@@ -275,10 +286,14 @@ const descriptionHtml = (model.description ?? '').replace(/\n/g, '<br>');
   .trim-card__price { margin-block: 16px; display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
   .trim-card__list { font-size: 0.92rem; color: var(--muted); text-decoration: line-through; }
   .trim-card__promo { font-size: 1.4rem; font-weight: 700; color: var(--accent); }
-  .trim-card__features { list-style: none; padding: 0; margin-top: 12px; display: flex; flex-direction: column; gap: 6px; font-size: 0.88rem; }
-  .trim-card__features li { padding-left: 18px; position: relative; }
-  .trim-card__features li::before { content: '✓'; position: absolute; left: 0; color: var(--success); font-weight: 700; }
-  .trim-card__features .text-muted::before { content: '+'; color: var(--muted); }
+  .trim-card__categories { display: flex; flex-direction: column; gap: 16px; margin-top: 16px; }
+  .trim-cat { display: flex; flex-direction: column; gap: 6px; }
+  .trim-cat__head { display: flex; align-items: center; gap: 6px; font-size: 0.72rem; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); padding-bottom: 4px; border-bottom: 1px solid var(--line); }
+  .trim-cat__icon { font-size: 0.95rem; }
+  .trim-cat__items { list-style: none; padding: 0; display: flex; flex-direction: column; gap: 4px; font-size: 0.85rem; }
+  .trim-cat__items li { padding-left: 14px; position: relative; line-height: 1.4; }
+  .trim-cat__items li::before { content: '·'; position: absolute; left: 4px; color: var(--accent); font-weight: 700; font-size: 1.2em; line-height: 1; }
+  .trim-cat__items .text-muted::before { content: '+'; color: var(--muted); font-size: 0.85em; top: 1px; }
 
   .tech-table { width: 100%; border-collapse: collapse; }
   .tech-table td { padding: 12px 16px; border-bottom: 1px solid var(--line); }
