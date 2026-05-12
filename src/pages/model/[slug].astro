@@ -1,6 +1,7 @@
 ---
 import BaseLayout from '@layouts/BaseLayout.astro';
 import DirectusImage from '@components/DirectusImage.astro';
+import VideoStrip from '@components/VideoStrip.astro';
 import { directusGet } from '@lib/directus';
 import type { Brand, Model, ModelYear, TrimLevel } from '@lib/types';
 
@@ -46,6 +47,15 @@ const trims: TrimLevel[] = latestYear
   ? await directusGet<TrimLevel>('trim_levels', {
       filter: { model_year: { _eq: latestYear.id }, status: { _eq: 'published' } },
       sort: ['sort'],
+      fields: ['*'],
+    })
+  : [];
+
+// Option packages (paketové výbavy) — bez status a sort, collection je nemá
+const optionPackages = latestYear
+  ? await directusGet<any>('option_packages', {
+      filter: { model_year: { _eq: latestYear.id } },
+      sort: ['name'],
       fields: ['*'],
     })
   : [];
@@ -148,22 +158,24 @@ const STAT_SETS: Record<string, StatDef[]> = {
 };
 const statsForFuel = STAT_SETS[fuelKey] ?? STAT_SETS.petrol;
 
+// Pravidlo: vždy max 3 stats z STAT_SETS a 4. je vždy "Cena od" (pokud existuje).
 const heroStats: Array<{ lab: string; val: string }> = [];
 for (const def of statsForFuel) {
   let val = findStat(def.aliases, def.unit);
   if (!val && def.label === 'Záruka') val = WARRANTY_BY_BRAND[brand.slug] ?? null;
   if (val) heroStats.push({ lab: def.label, val });
-  if (heroStats.length >= 4) break;
+  if (heroStats.length >= 3) break;
 }
-// Fallback: pokud máme méně než 2 stats, doplň karoserie a palivo
+// Fallback pokud chybí data: doplň palivo + karoserie
 if (heroStats.length < 2) {
   const fuelLabel = fuelLabels[fuelKey] ?? '—';
   const bodyType = (rawModel as any).body_type;
   if (fuelLabel !== '—') heroStats.push({ lab: 'Palivo', val: fuelLabel });
   if (bodyType) heroStats.push({ lab: 'Karoserie', val: String(bodyType).toUpperCase() });
-  if (heroStats.length < 4 && rawModel.price_from) {
-    heroStats.push({ lab: 'Cena od', val: `${rawModel.price_from.toLocaleString('cs-CZ')} Kč` });
-  }
+}
+// Cena od — vždy poslední stat (pokud máme price_from)
+if (rawModel.price_from) {
+  heroStats.push({ lab: 'Cena od', val: `${rawModel.price_from.toLocaleString('cs-CZ')} Kč` });
 }
 
 const priceFrom = rawModel.price_from ? `${rawModel.price_from.toLocaleString('cs-CZ')} Kč` : '—';
@@ -174,11 +186,18 @@ const fuelTagClass: Record<string, string> = {
 // ===== Variant switcher — modely se stejnou base (Torres / Torres HEV / Torres EVX) =====
 // TODO: přesunout do Directus jako field `variants_group` na models. Pro teď hardcoded mapping.
 const VARIANT_GROUPS: string[][] = [
+  // KGM Torres family
   ['torres', 'torres-hev', 'torres-evx'],
+  // KGM Actyon family
   ['actyon', 'actyon-hev'],
-  ['omoda-5', 'omoda-e5'],
+  // Omoda 5 family (Benzín / Superhybrid / Elektro)
+  ['omoda-5', 'omoda-5-shs-h', 'omoda-5-ev'],
+  // Omoda 9 family
+  ['omoda-9', 'omoda-9-shs'],
+  // Jaecoo 5 family (zatím jen 1 — switcher se nezobrazí)
+  ['jaecoo-5'],
+  // Jaecoo 7 family
   ['jaecoo-7', 'jaecoo-7-shs'],
-  // Až budou v Directusu: ['omoda-9', 'omoda-9-shs'], …
 ];
 const variantGroup = VARIANT_GROUPS.find((g) => g.includes(slug ?? ''));
 let variantModels: Array<{ slug: string; name: string; fuel_type?: string; description?: string }> = [];
@@ -198,6 +217,29 @@ const variantFuelSub: Record<string, string> = {
   phev: 'Plug-in hybrid',
   ev: 'Elektromobil',
 };
+
+// Ostatní modely stejné značky (kromě aktuálního a kromě variant rodiny)
+const otherModelsRaw = await directusGet<any>('models', {
+  filter: {
+    brand: { _eq: brand.id },
+    status: { _eq: 'published' },
+    slug: { _neq: slug ?? '' },
+  },
+  fields: ['id', 'slug', 'name', 'tagline', 'price_from', 'fuel_type', 'body_type', 'hero_image'],
+  sort: ['sort'],
+  limit: 12,
+});
+const siblingSlugs = new Set(variantGroup ?? []);
+const otherModels = otherModelsRaw.filter((m: any) => !siblingSlugs.has(m.slug)).slice(0, 6);
+
+const fuelTagLabel: Record<string, string> = {
+  petrol: 'Benzín', diesel: 'Diesel', hybrid: 'Hybrid', phev: 'PHEV', ev: 'Elektro',
+};
+
+// Videa modelu (z model.youtube_video_ids field — pokud existuje)
+const modelVideoIds: string[] = Array.isArray((rawModel as any).youtube_video_ids)
+  ? (rawModel as any).youtube_video_ids
+  : [];
 
 // Intro foto = první z gallery, nebo hero_image
 const galleryImages: string[] = (rawModel.gallery ?? []).map((g) => g?.directus_files_id).filter(Boolean) as string[];
@@ -234,7 +276,7 @@ const introCopy = (rawModel.description ?? '').split(/\n\s*\n/).filter(Boolean);
               <div class="val">{s.val}</div>
             </div>
           ))}
-          <div class="mhero-price">Cena od <strong>{priceFrom}</strong></div>
+          <div class="mhero-spacer"></div>
           <a class="btn btn-primary" href="/kontakt">Testovací jízda</a>
         </div>
       </div>
@@ -262,7 +304,14 @@ const introCopy = (rawModel.description ?? '').split(/\n\s*\n/).filter(Boolean);
     <section class="section tight" id="varianty">
       <div class="container">
         <div class="section-eyebrow">Vyberte si pohon</div>
-        <h2 class="section-title" style="margin-bottom: 32px;">{variantGroup?.[0] === 'torres' ? 'Torres' : variantGroup?.[0] === 'actyon' ? 'Actyon' : variantGroup?.[0] === 'omoda-5' ? 'Omoda 5 / E5' : variantGroup?.[0] === 'jaecoo-7' ? 'Jaecoo 7' : rawModel.name} ve třech provedeních</h2>
+        <h2 class="section-title" style="margin-bottom: 32px;">{
+          variantGroup?.[0] === 'torres' ? 'Torres'
+          : variantGroup?.[0] === 'actyon' ? 'Actyon'
+          : variantGroup?.[0] === 'omoda-5' ? 'Omoda 5'
+          : variantGroup?.[0] === 'omoda-9' ? 'Omoda 9'
+          : variantGroup?.[0] === 'jaecoo-7' ? 'Jaecoo 7'
+          : rawModel.name
+        } {variantModels.length === 3 ? 've třech provedeních' : variantModels.length === 2 ? 've dvou provedeních' : ''}</h2>
         <div class="variants">
           {variantModels.map((vm) => {
             const isActive = vm.slug === slug;
@@ -335,24 +384,33 @@ const introCopy = (rawModel.description ?? '').split(/\n\s*\n/).filter(Boolean);
     <section class="section" id="ceny" style="background: var(--bg-soft);">
       <div class="container">
         <div class="section-eyebrow">Ceny a výbavy</div>
-        <h2 class="section-title">{trims.length === 1 ? 'Výbava' : `${trims.length} výbavové stupně`}, jasná cena.</h2>
-        <div class="trims">
-          {trims.slice(0, 2).map((t, i) => {
-            const isRecommended = i === trims.length - 1; // poslední (nejvyšší) trim = doporučujeme
+        <h2 class="section-title">
+          {trims.length === 1 ? 'Jeden výbavový stupeň' : trims.length === 2 ? 'Dva výbavové stupně' : trims.length === 3 ? 'Tři výbavové stupně' : `${trims.length} výbavových stupňů`}, jasná cena.
+        </h2>
+        <div class={`trims trims-${trims.length}`}>
+          {trims.map((t, i) => {
+            // Nejvyšší trim = "Doporučujeme" tmavý
+            const isRecommended = i === trims.length - 1 && trims.length > 1;
             const cls = isRecommended ? 'trim dark' : 'trim light';
             const price = t.promo_price ?? t.list_price ?? 0;
             return (
               <div class={cls}>
                 {isRecommended && <div class="trim-badge">Doporučujeme</div>}
-                <div class="trim-name">{t.name}{i === 0 ? ' — Základní výbava' : ' — Vyšší výbava'}</div>
+                <div class="trim-name">{t.name}</div>
                 <div class="trim-price">{price.toLocaleString('cs-CZ')} Kč</div>
                 <ul class="trim-list">
-                  {(t.features ?? []).slice(0, 8).map((f) => (
+                  {(t.features ?? []).slice(0, 10).map((f) => (
                     <li>
                       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
                       <span>{f}</span>
                     </li>
                   ))}
+                  {(t.features?.length ?? 0) > 10 && (
+                    <li style="opacity: 0.7; font-size: 13px;">
+                      <span></span>
+                      <span>+ {(t.features?.length ?? 0) - 10} dalších položek</span>
+                    </li>
+                  )}
                 </ul>
                 <a class="btn" href="/kontakt">
                   Konfigurovat
@@ -362,6 +420,37 @@ const introCopy = (rawModel.description ?? '').split(/\n\s*\n/).filter(Boolean);
             );
           })}
         </div>
+
+        {/* ===== Paketové výbavy ===== */}
+        {optionPackages.length > 0 && (
+          <div class="packages-block">
+            <div class="section-eyebrow" style="margin-top: 64px;">Paketové výbavy</div>
+            <h3 style="font-family: var(--font-display); font-weight: 600; font-size: clamp(28px, 2.8vw, 36px); letter-spacing: -0.02em; margin: 0 0 32px;">
+              Doplňkové pakety
+            </h3>
+            <div class="packages-grid">
+              {optionPackages.map((pkg: any) => (
+                <div class="pkg-card">
+                  <div class="pkg-name">{pkg.name}</div>
+                  {pkg.description && <p class="pkg-desc">{pkg.description}</p>}
+                  {Array.isArray(pkg.features) && pkg.features.length > 0 && (
+                    <ul class="pkg-list">
+                      {pkg.features.slice(0, 8).map((f: string) => (
+                        <li>
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                          <span>{f}</span>
+                        </li>
+                      ))}
+                      {pkg.features.length > 8 && (
+                        <li class="pkg-more">+ {pkg.features.length - 8} dalších</li>
+                      )}
+                    </ul>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
     </section>
   )}
@@ -428,6 +517,61 @@ const introCopy = (rawModel.description ?? '').split(/\n\s*\n/).filter(Boolean);
       </div>
     </section>
   )}
+
+  <!-- ===== DALŠÍ MODELY ZNAČKY ===== -->
+  {otherModels.length > 0 && (
+    <section class="section" style="background: var(--bg-cream);">
+      <div class="container">
+        <div class="section-head-row">
+          <div>
+            <div class="section-eyebrow">Další modely {brand.name}</div>
+            <h2 class="section-title" style="margin-bottom: 0;">Možná vás zaujme i…</h2>
+          </div>
+          <a class="head-link" href={`/${brand.slug}`}>
+            Všechny modely {brand.name}
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+          </a>
+        </div>
+        <div class="models-grid" style="margin-top: 40px;">
+          {otherModels.map((m: any) => {
+            const fk = m.fuel_type ?? '';
+            const tagCls = fuelTagClass[fk] ?? 'benzin';
+            const tagLab = fuelTagLabel[fk] ?? '';
+            return (
+              <a class="model-card" href={`/model/${m.slug}`}>
+                <div class="pic">
+                  {tagLab && <span class={`fuel-tag ${tagCls}`}>{tagLab}</span>}
+                  {m.hero_image && <DirectusImage src={m.hero_image} alt={`${brand.name} ${m.name}`} aspectRatio="4/3" />}
+                </div>
+                <div class="model-body">
+                  <div class="model-name">{m.name}</div>
+                  <p class="model-desc">{m.tagline ?? ''}</p>
+                  <div class="model-foot">
+                    <div>
+                      <div class="price-lab">Cena od</div>
+                      <div class="price-val">{m.price_from ? `${m.price_from.toLocaleString('cs-CZ')} Kč` : '—'}</div>
+                    </div>
+                    <span class="more">
+                      Prozkoumat
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                    </span>
+                  </div>
+                </div>
+              </a>
+            );
+          })}
+        </div>
+      </div>
+    </section>
+  )}
+
+  <!-- ===== VIDEA MODELU ===== -->
+  <VideoStrip
+    ids={modelVideoIds}
+    eyebrow={`Videa ${rawModel.name}`}
+    title={`${rawModel.name} v pohybu`}
+    background="white"
+  />
 
   <!-- ===== CLOSING CTA BANNER ===== -->
   <section class="cta-banner">

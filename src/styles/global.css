@@ -1072,10 +1072,17 @@ input, textarea, select { font: inherit; }
   padding: 28px 0 28px;
 }
 .mhero-stats-inner {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, auto)) 1fr auto auto;
+  display: flex;
   align-items: center;
   gap: 32px;
+  flex-wrap: wrap;
+}
+.mhero-spacer { flex: 1; }
+.mhero-stats-inner .btn { margin-left: auto; }
+@media (max-width: 960px) {
+  .mhero-stats-inner { gap: 18px; }
+  .mhero-spacer { display: none; }
+  .mhero-stats-inner .btn { width: 100%; margin: 0; }
 }
 .mstat {
   border-left: 1px solid rgba(255,255,255,0.18);
@@ -1098,14 +1105,7 @@ input, textarea, select { font: inherit; }
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
 }
-.mhero-price {
-  font-family: var(--font-display);
-  font-size: 20px;
-  font-weight: 500;
-  white-space: nowrap;
-  color: #fff;
-}
-.mhero-price strong { font-weight: 600; font-size: 24px; }
+/* .mhero-price — DEPRECATED. Cena od je teď v .mstat statistikách. */
 
 .subnav {
   position: sticky;
@@ -1289,6 +1289,77 @@ input, textarea, select { font: inherit; }
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 22px;
+}
+/* Pro 1 / 3 / 4+ výbavových stupňů — adaptivní grid */
+.trims-1 { grid-template-columns: minmax(0, 560px); justify-content: center; }
+.trims-3 { grid-template-columns: repeat(3, 1fr); }
+.trims-4 { grid-template-columns: repeat(2, 1fr); }
+@media (max-width: 1100px) {
+  .trims-3, .trims-4 { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 700px) {
+  .trims, .trims-1, .trims-3, .trims-4 { grid-template-columns: 1fr; }
+}
+
+/* ===== Paketové výbavy ===== */
+.packages-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px;
+}
+@media (max-width: 1100px) { .packages-grid { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 700px)  { .packages-grid { grid-template-columns: 1fr; } }
+
+.pkg-card {
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 24px 26px;
+  display: flex;
+  flex-direction: column;
+  transition: border-color .15s, transform .15s, box-shadow .15s;
+}
+.pkg-card:hover {
+  border-color: var(--accent);
+  transform: translateY(-2px);
+  box-shadow: 0 10px 24px -12px rgba(0,0,0,0.1);
+}
+.pkg-name {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 17px;
+  letter-spacing: -0.01em;
+  margin-bottom: 8px;
+  color: var(--ink);
+}
+.pkg-desc {
+  font-size: 13.5px;
+  color: var(--text-muted);
+  line-height: 1.5;
+  margin: 0 0 16px;
+}
+.pkg-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 8px;
+}
+.pkg-list li {
+  display: grid;
+  grid-template-columns: 18px 1fr;
+  gap: 10px;
+  font-size: 13.5px;
+  align-items: start;
+  line-height: 1.45;
+}
+.pkg-list li svg { color: var(--ok); margin-top: 3px; }
+.pkg-list .pkg-more {
+  grid-template-columns: 1fr;
+  color: var(--text-muted);
+  font-size: 12.5px;
+  font-style: italic;
+  padding-left: 28px;
 }
 .trim {
   border-radius: var(--radius-lg);
@@ -1709,6 +1780,42 @@ input, textarea, select { font: inherit; }
   margin-bottom: 4px;
 }
 .model-foot .more:hover { color: var(--accent); }
+
+/* Sub-brand separator (Omoda & Jaecoo) */
+.subbrand-block { margin-bottom: 56px; }
+.subbrand-block:last-child { margin-bottom: 0; }
+.subbrand-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 28px;
+  padding-bottom: 16px;
+  border-bottom: 2px solid var(--ink);
+  position: relative;
+}
+.subbrand-head::after {
+  content: "";
+  position: absolute;
+  left: 0; bottom: -2px;
+  width: 80px; height: 2px;
+  background: var(--accent);
+}
+.subbrand-name {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(28px, 3.4vw, 44px);
+  letter-spacing: -0.03em;
+  margin: 0;
+  text-transform: uppercase;
+}
+.subbrand-count {
+  font-family: var(--font-display);
+  font-size: 13px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
 
 .models-banner {
   margin-top: 56px;

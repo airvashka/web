@@ -1,0 +1,116 @@
+---
+/**
+ * VideoStrip — generický pruh YouTube videí.
+ *
+ * Použití:
+ *   <VideoStrip
+ *     ids={brand.youtube_video_ids ?? []}
+ *     title="Videa z KGM"
+ *     eyebrow="YouTube"
+ *     count={4}
+ *     channelUrl="https://www.youtube.com/@sfrmotor"
+ *   />
+ *
+ * Z pole ID náhodně vybere `count` (defaultně 4) a vykreslí jako mřížku karet.
+ * Pokud je pole prázdné, sekce se nevykreslí (`return null`).
+ *
+ * V Directusu pole `youtube_video_ids` je JSON array stringů
+ * (na collections `brands`, `models`, případně globálně přes site_settings).
+ */
+
+interface Props {
+  ids?: string[] | null;
+  title?: string;
+  eyebrow?: string;
+  count?: number;
+  channelUrl?: string;
+  background?: 'white' | 'soft' | 'cream' | 'dark';
+}
+
+const {
+  ids,
+  title = 'Naše videa',
+  eyebrow = 'YouTube',
+  count = 4,
+  channelUrl = 'https://www.youtube.com/@sfrmotor',
+  background = 'white',
+} = Astro.props;
+
+const cleanIds = Array.isArray(ids) ? ids.filter((id): id is string => typeof id === 'string' && id.length > 0) : [];
+
+// Pokud žádné ids, nevykresluj nic
+const hasVideos = cleanIds.length > 0;
+
+// Pseudo-náhodný výběr `count` (build-stable: shuffle Fisher-Yates s vlastním seed)
+function pick(arr: string[], n: number): string[] {
+  const a = [...arr];
+  // Jednoduchý deterministicky-míchaný shuffle (každý build stejný pořadí)
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a.slice(0, n);
+}
+
+const selected = hasVideos ? pick(cleanIds, count) : [];
+
+const bgClass = background === 'soft' ? 'video-strip--soft'
+  : background === 'cream' ? 'video-strip--cream'
+  : background === 'dark' ? 'video-strip--dark'
+  : '';
+---
+
+{hasVideos && (
+  <section class={`video-strip ${bgClass}`}>
+    <div class="container">
+      <div class="magazin-head">
+        <div>
+          <div class="section-eyebrow">{eyebrow}</div>
+          <h2>{title}</h2>
+        </div>
+        <a class="head-link" href={channelUrl} target="_blank" rel="noopener">
+          @sfrmotor kanál
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7"/><polyline points="7 7 17 7 17 17"/></svg>
+        </a>
+      </div>
+      <div class="yt-grid">
+        {selected.map((id) => (
+          <a
+            class="yt-card"
+            href={`https://www.youtube.com/watch?v=${id}`}
+            target="_blank"
+            rel="noopener"
+            aria-label={`Přehrát video ${id}`}
+          >
+            <div class="pic">
+              <img
+                src={`https://img.youtube.com/vi/${id}/hqdefault.jpg`}
+                alt=""
+                loading="lazy"
+              />
+              <span class="play-overlay" aria-hidden="true">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
+                  <polygon points="6 4 20 12 6 20 6 4"/>
+                </svg>
+              </span>
+            </div>
+            <div class="yt-title">Video {id}</div>
+          </a>
+        ))}
+      </div>
+    </div>
+  </section>
+)}
+
+<style>
+  .video-strip {
+    padding: 80px 0;
+    background: #fff;
+  }
+  .video-strip--soft { background: var(--bg-soft); }
+  .video-strip--cream { background: var(--bg-cream); }
+  .video-strip--dark { background: var(--ink); color: #fff; }
+  .video-strip--dark .yt-title { color: #fff; }
+  .video-strip--dark .magazin-head h2 { color: #fff; }
+  .video-strip--dark .head-link { color: #fff; border-bottom-color: #fff; }
+</style>

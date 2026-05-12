@@ -1,6 +1,7 @@
 ---
 import BaseLayout from '@layouts/BaseLayout.astro';
 import DirectusImage from '@components/DirectusImage.astro';
+import VideoStrip from '@components/VideoStrip.astro';
 import { directusGet } from '@lib/directus';
 import type { Brand, Model } from '@lib/types';
 
@@ -54,6 +55,28 @@ const stockOfBrand = await directusGet<{ id: string }>('stock_vehicles', {
   limit: 200,
 });
 const stockCount = stockOfBrand.length;
+
+// Skladové vozy této značky — 4 ukázkové na brand page
+const stockSample = await directusGet<any>('stock_vehicles', {
+  filter: { brand: { _eq: brand.id }, status: { _eq: 'published' }, availability: { _in: ['in_stock', 'on_the_way'] } },
+  sort: ['-listed_at'],
+  limit: 4,
+  fields: [
+    'id', 'condition', 'km', 'list_price', 'promo_price',
+    'highlighted', 'trim_level_snapshot',
+    'photos.directus_files_id',
+    'model.name', 'model.slug', 'model.fuel_type',
+    'model_year.year',
+  ],
+});
+
+// Brand videa (z brand.youtube_video_ids field — pokud existuje)
+const brandVideoIds: string[] = Array.isArray((brand as any).youtube_video_ids)
+  ? (brand as any).youtube_video_ids
+  : [];
+
+const fmtPrice = (n?: number | null) => (n ? `${n.toLocaleString('cs-CZ')} Kč` : '—');
+const fmtKm = (n?: number | null) => (n === 0 || !n ? '0 km' : `${n.toLocaleString('cs-CZ')} km`);
 
 // Ostatní brandy pro BrandStrip
 const otherBrands = await directusGet<Brand>('brands', {
@@ -243,7 +266,83 @@ const activeBrand = Astro.params.brand;
       </div>
       {allModels.length === 0 ? (
         <div class="sklad-empty">Modely pro {brand.name} ještě nejsou připravené.</div>
+      ) : subBrandsById.size > 0 ? (
+        // Brand má sub-brandy (Omoda & Jaecoo) — render po sekcích
+        <>
+          {Array.from(subBrandsById.values()).map((sb) => {
+            const sbModels = allModels.filter((m) => m.sub_brand === sb.id);
+            if (sbModels.length === 0) return null;
+            return (
+              <div class="subbrand-block">
+                <div class="subbrand-head">
+                  <h3 class="subbrand-name">{sb.name}</h3>
+                  <span class="subbrand-count">{sbModels.length} {sbModels.length === 1 ? 'model' : sbModels.length < 5 ? 'modely' : 'modelů'}</span>
+                </div>
+                <div class="models-grid">
+                  {sbModels.map((m) => {
+                    const fuelKey = m.fuel_type ?? '';
+                    const tagClass = fuelTagClass[fuelKey] ?? 'benzin';
+                    const tagLabel = fuelLabel[fuelKey] ?? '';
+                    const body = bodyLabel[m.body_type ?? ''] ?? m.body_type ?? '';
+                    return (
+                      <a class="model-card" href={`/model/${m.slug}`}>
+                        <div class="pic">
+                          {tagLabel && <span class={`fuel-tag ${tagClass}`}>{tagLabel}</span>}
+                          {m.hero_image && <DirectusImage src={m.hero_image} alt={`${brand.name} ${m.name}`} aspectRatio="4/3" />}
+                        </div>
+                        <div class="model-body">
+                          <div class="model-name">{m.name}</div>
+                          <p class="model-desc">{m.tagline ?? ''}</p>
+                          <div class="model-meta">Karoserie: {body || '—'} · Palivo: {tagLabel || '—'}</div>
+                          <div class="model-foot">
+                            <div>
+                              <div class="price-lab">Cena od</div>
+                              <div class="price-val">{m.price_from ? `${m.price_from.toLocaleString('cs-CZ')} Kč` : '—'}</div>
+                            </div>
+                            <span class="more">
+                              Prozkoumat
+                              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                            </span>
+                          </div>
+                        </div>
+                      </a>
+                    );
+                  })}
+                </div>
+              </div>
+            );
+          })}
+          {/* Modely bez sub_brand */}
+          {allModels.filter((m) => !m.sub_brand).length > 0 && (
+            <div class="models-grid">
+              {allModels.filter((m) => !m.sub_brand).map((m) => {
+                const fuelKey = m.fuel_type ?? '';
+                const tagClass = fuelTagClass[fuelKey] ?? 'benzin';
+                const tagLabel = fuelLabel[fuelKey] ?? '';
+                return (
+                  <a class="model-card" href={`/model/${m.slug}`}>
+                    <div class="pic">
+                      {tagLabel && <span class={`fuel-tag ${tagClass}`}>{tagLabel}</span>}
+                      {m.hero_image && <DirectusImage src={m.hero_image} alt={`${brand.name} ${m.name}`} aspectRatio="4/3" />}
+                    </div>
+                    <div class="model-body">
+                      <div class="model-name">{m.name}</div>
+                      <p class="model-desc">{m.tagline ?? ''}</p>
+                      <div class="model-foot">
+                        <div>
+                          <div class="price-lab">Cena od</div>
+                          <div class="price-val">{m.price_from ? `${m.price_from.toLocaleString('cs-CZ')} Kč` : '—'}</div>
+                        </div>
+                      </div>
+                    </div>
+                  </a>
+                );
+              })}
+            </div>
+          )}
+        </>
       ) : (
+        // Brand bez sub-brandů (KGM, Farizon) — jednoduchý grid
         <div class="models-grid">
           {allModels.map((m) => {
             const fuelKey = m.fuel_type ?? '';
@@ -285,6 +384,64 @@ const activeBrand = Astro.params.brand;
       </div>
     </div>
   </section>
+
+  <!-- ===== SKLADOVÉ VOZY TÉTO ZNAČKY ===== -->
+  {stockSample.length > 0 && (
+    <section class="skladovka" data-screen-label="04 Skladovka">
+      <div class="container">
+        <div class="skladovka-head">
+          <div>
+            <div class="section-eyebrow">Skladovka {brand.name}</div>
+            <h2>Vozy {brand.name} skladem</h2>
+          </div>
+          <a class="head-link" href={`/sklad?znacka=${brand.slug}`}>
+            Všech {stockCount} vozů
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+          </a>
+        </div>
+        <div class="skladovka-grid">
+          {stockSample.map((v: any) => {
+            const isNew = v.condition === 'new';
+            const isHl = v.highlighted;
+            const pillLabel = isHl ? 'Novinka' : isNew ? 'Nové' : 'Skladem';
+            const pillClass = isHl || isNew ? ' is-new' : '';
+            const photoId = v.photos?.[0]?.directus_files_id;
+            const trim = v.trim_level_snapshot?.name ?? '';
+            const modelName = v.model?.name ?? 'Vůz';
+            const carYear = v.model_year?.year ?? '';
+            const conditionLabel = v.condition === 'new' ? 'Nové' : v.condition === 'demo' ? 'Předváděcí' : 'Ojeté';
+            const price = v.promo_price ?? v.list_price;
+            return (
+              <a class="scard" href={`/sklad/${v.id}`}>
+                <div class="pic">
+                  {photoId && <DirectusImage src={photoId} alt={`${brand.name} ${modelName}`} aspectRatio="4/3" />}
+                </div>
+                <div class="body">
+                  <span class={`pill${pillClass}`}>{pillLabel}</span>
+                  <div class="nm">{brand.name} {modelName}</div>
+                  <div class="var">{trim}</div>
+                  <div class="meta">
+                    {carYear && <span>{carYear}</span>}
+                    <span class="dot">{fmtKm(v.km)}</span>
+                    <span class="dot">{conditionLabel}</span>
+                  </div>
+                  <div class="price">{fmtPrice(price)}</div>
+                </div>
+              </a>
+            );
+          })}
+        </div>
+      </div>
+    </section>
+  )}
+
+  <!-- ===== BRAND VIDEA ===== -->
+  <VideoStrip
+    ids={brandVideoIds}
+    eyebrow={`Videa ${brand.name}`}
+    title={`${brand.name} v pohybu`}
+    background="soft"
+  />
 
   <!-- ===== BRAND STRIP (jiné značky) ===== -->
   <section class="brand-strip" data-screen-label="04 Ostatní značky">

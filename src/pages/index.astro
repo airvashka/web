@@ -1,7 +1,7 @@
 ---
 import BaseLayout from '@layouts/BaseLayout.astro';
 import DirectusImage from '@components/DirectusImage.astro';
-import YouTubeSection from '@components/YouTubeSection.astro';
+import VideoStrip from '@components/VideoStrip.astro';
 import InstagramStrip from '@components/InstagramStrip.astro';
 import { directusGet } from '@lib/directus';
 import type { Brand, StockVehicle, Model } from '@lib/types';
@@ -79,10 +79,12 @@ const articles = [
   title="SFR Motor"
   description="SFR Motor — autorizovaný dealer KGM, OMODA & JAECOO a Farizon. Skladové vozy, servis pro všechny značky, prodej a doplňkové služby. Praha-Ďáblice."
 >
-  <!-- ===== HERO ===== -->
+  <!-- ===== HERO =====
+       Hero foto: drop file do web/public/hero-home.jpg (rozměr 2400×1200 px, 2:1)
+       Pokud neexistuje, zobrazí se tmavé pozadí (graceful fallback). -->
   <section class="hhero" data-screen-label="01 Hero">
     <div class="hhero-bg">
-      {/* TODO: hero image z Directus (KGM Torres EVX) */}
+      <img src="/hero-home.jpg" alt="" onerror="this.style.display='none'" />
     </div>
     <div class="container hhero-inner">
       <h1 class="hhero-title">
@@ -96,11 +98,6 @@ const articles = [
         </a>
         <a class="btn btn-outline" href="/servis">Objednat servis</a>
       </div>
-    </div>
-    <div class="hhero-counter">
-      <span class="num">{hero.num}</span>
-      <span class="sep">/</span>
-      <span>{hero.label}</span>
     </div>
   </section>
 
@@ -257,8 +254,15 @@ const articles = [
     </div>
   </section>
 
-  <!-- ===== YOUTUBE ===== -->
-  <YouTubeSection />
+  <!-- ===== YOUTUBE =====
+       TODO: až bude v Directusu collection `site_settings` s polem `homepage_youtube_video_ids`,
+       fetchnout odtud. Zatím hardcoded 4 IDs z @sfrmotor kanálu. -->
+  <VideoStrip
+    ids={['piG8UO24WUk', 'eSfJXjNV8Mg', 'SybpHjEJP1s', 'S9tdBpkwX_4']}
+    title="Naše videa"
+    eyebrow="YouTube"
+    count={4}
+  />
 
   <!-- ===== INSTAGRAM ===== -->
   <InstagramStrip />
