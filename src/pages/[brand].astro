@@ -3,7 +3,6 @@ import BaseLayout from '@layouts/BaseLayout.astro';
 import { directusGet } from '@lib/directus';
 import type { Brand, Model } from '@lib/types';
 
-// Pre-renderuj každou značku statickou stránkou
 export async function getStaticPaths() {
   const brands = await directusGet<Brand>('brands', { fields: ['slug'] });
   return brands.map(b => ({ params: { brand: b.slug } }));
@@ -21,42 +20,58 @@ if (!brand) {
   return Astro.redirect('/404');
 }
 
-// Modely této značky
-const models = await directusGet<Model & { sub_brand?: { name: string; slug: string } | null }>('models', {
+type ModelWithSub = Model & {
+  sub_brand?: { name: string; slug: string } | null;
+};
+
+const models = await directusGet<ModelWithSub>('models', {
   filter: { brand: { _eq: brand.id }, status: { _eq: 'published' } },
   sort: ['sort'],
   fields: ['id', 'slug', 'name', 'tagline', 'price_from', 'fuel_type', 'body_type', 'sub_brand.name', 'sub_brand.slug'],
 });
 
 const fuelLabels: Record<string, string> = {
-  'petrol': 'Benzín',
-  'diesel': 'Diesel',
-  'hybrid': 'Hybrid',
-  'phev': 'Plug-in Hybrid',
-  'ev': 'Elektro',
+  petrol: 'Benzín',
+  diesel: 'Diesel',
+  hybrid: 'Hybrid',
+  phev: 'Plug-in Hybrid',
+  ev: 'Elektro',
 };
 
-// Group models by sub-brand (pro OMODA & JAECOO)
-const modelsBySubBrand = new Map<string, typeof models>();
-models.forEach(m => {
+// Group models by sub-brand v frontmatter — vyhneme se destrukturalizaci v JSX
+type ModelGroup = { subBrandName: string | null; models: ModelWithSub[] };
+const modelGroups: ModelGroup[] = [];
+const groupMap = new Map<string, ModelGroup>();
+
+for (const m of models) {
   const key = m.sub_brand?.slug ?? '_main';
-  if (!modelsBySubBrand.has(key)) modelsBySubBrand.set(key, []);
-  modelsBySubBrand.get(key)!.push(m);
-});
+  let group = groupMap.get(key);
+  if (!group) {
+    group = { subBrandName: m.sub_brand?.name ?? null, models: [] };
+    groupMap.set(key, group);
+    modelGroups.push(group);
+  }
+  group.models.push(m);
+}
+
+const brandColor = brand.primary_color ?? '#1a1a1f';
+const heroBgStyle = `--brand-color: ${brandColor};`;
+const cardBgStyle = `background: linear-gradient(135deg, ${brandColor} 0%, #555 100%);`;
+
+const previousNamesStr = brand.previous_names && brand.previous_names.length > 0
+  ? brand.previous_names.join(', ')
+  : '';
 ---
 
 <BaseLayout
   title={`${brand.name} | SFR Motor`}
   description={brand.description ?? brand.tagline ?? `${brand.name} — modely a skladové vozy u SFR Motor.`}
 >
-  <!-- HERO -->
-  <section class="brand-hero" style={`--brand-color: ${brand.primary_color ?? '#1a1a1f'};`}>
+  <section class="brand-hero" style={heroBgStyle}>
     <div class="container">
       <p class="eyebrow eyebrow-accent">Autorizovaný dealer</p>
       <h1 class="brand-hero__title">{brand.name}</h1>
-      {brand.previous_names && brand.previous_names.length > 0 && (
-        <p class="brand-hero__alt">Dříve známé jako {brand.previous_names.join(', ')}</p>
-      )}
+      {previousNamesStr && <p class="brand-hero__alt">Dříve známé jako {previousNamesStr}</p>}
       {brand.tagline && <p class="lead">{brand.tagline}</p>}
       <div class="brand-hero__cta">
         <a href="/sklad" class="btn btn--primary">Skladové vozy {brand.name}</a>
@@ -65,7 +80,6 @@ models.forEach(m => {
     </div>
   </section>
 
-  <!-- MODELY -->
   <section class="section" id="modely">
     <div class="container">
       <header class="section__head">
@@ -79,23 +93,25 @@ models.forEach(m => {
         </div>
       )}
 
-      {[...modelsBySubBrand.entries()].map(([subKey, subModels]) => (
+      {modelGroups.map((group) => (
         <div class="models-group">
-          {subKey !== '_main' && subModels[0]?.sub_brand && (
-            <h3 class="models-group__title">{subModels[0].sub_brand.name}</h3>
+          {group.subBrandName && (
+            <h3 class="models-group__title">{group.subBrandName}</h3>
           )}
           <div class="models__grid">
-            {subModels.map(model => (
-              <a href={`/model/${model.slug}`} class="model-card">
+            {group.models.map((m) => (
+              <a href={`/model/${m.slug}`} class="model-card">
                 <div class="model-card__media" aria-hidden="true">
-                  <div class="model-card__bg" style={`background: linear-gradient(135deg, ${brand.primary_color ?? '#1a1a1f'} 0%, #555 100%);`}></div>
+                  <div class="model-card__bg" style={cardBgStyle}></div>
                 </div>
                 <div class="model-card__body">
-                  <h4>{model.name}</h4>
-                  {model.tagline && <p class="text-muted">{model.tagline}</p>}
+                  <h4>{m.name}</h4>
+                  {m.tagline && <p class="text-muted">{m.tagline}</p>}
                   <div class="model-card__meta">
-                    {model.fuel_type && <span class="chip">{fuelLabels[model.fuel_type] ?? model.fuel_type}</span>}
-                    {model.price_from && <span class="model-card__price">od {model.price_from.toLocaleString('cs-CZ')} Kč</span>}
+                    {m.fuel_type && <span class="chip">{fuelLabels[m.fuel_type] ?? m.fuel_type}</span>}
+                    {m.price_from && (
+                      <span class="model-card__price">od {m.price_from.toLocaleString('cs-CZ')} Kč</span>
+                    )}
                   </div>
                 </div>
               </a>
@@ -106,7 +122,6 @@ models.forEach(m => {
     </div>
   </section>
 
-  <!-- CTA -->
   <section class="section section--soft">
     <div class="container brand-cta">
       <h2>Zaujal vás některý z modelů {brand.name}?</h2>

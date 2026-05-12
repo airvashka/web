@@ -11,7 +11,12 @@ export async function getStaticPaths() {
 
 const { slug } = Astro.params;
 
-const models = await directusGet<Model & { brand: Brand; sub_brand?: { name: string; slug: string } | null }>('models', {
+type ModelWithBrand = Model & {
+  brand: Brand;
+  sub_brand?: { name: string; slug: string } | null;
+};
+
+const models = await directusGet<ModelWithBrand>('models', {
   filter: { slug: { _eq: slug } },
   limit: 1,
   fields: ['*', 'brand.id', 'brand.slug', 'brand.name', 'brand.primary_color', 'brand.previous_names', 'sub_brand.name', 'sub_brand.slug'],
@@ -22,7 +27,6 @@ if (!model) {
   return Astro.redirect('/404');
 }
 
-// Modelové roky + trim levely
 const modelYears = await directusGet<ModelYear>('model_years', {
   filter: { model: { _eq: model.id }, status: { _eq: 'published' } },
   sort: ['-year'],
@@ -39,6 +43,19 @@ const trims = latestYear ? await directusGet<TrimLevel>('trim_levels', {
 const fuelLabels: Record<string, string> = {
   petrol: 'Benzín', diesel: 'Diesel', hybrid: 'Hybrid', phev: 'Plug-in Hybrid', ev: 'Elektro',
 };
+
+// Připravíme tech rows v frontmatter (vyhneme se type castu uvnitř JSX)
+type TechRow = { label: string; value: string };
+const techRows: TechRow[] = Array.isArray(latestYear?.technical_data)
+  ? (latestYear.technical_data as TechRow[])
+  : [];
+
+// Brand color jako proměnná pro CSS
+const brandColor = model.brand.primary_color ?? '#1a1a1f';
+const heroBgStyle = `--brand-color: ${brandColor};`;
+
+// Description s newlines → <br>
+const descriptionHtml = (model.description ?? '').replace(/\n/g, '<br>');
 ---
 
 <BaseLayout
@@ -46,7 +63,7 @@ const fuelLabels: Record<string, string> = {
   description={model.tagline ?? `${model.brand.name} ${model.name} u SFR Motor — autorizovaný dealer v Praze-Ďáblicích.`}
 >
   <!-- HERO -->
-  <section class="model-hero" style={`--brand-color: ${model.brand.primary_color ?? '#1a1a1f'};`}>
+  <section class="model-hero" style={heroBgStyle}>
     <div class="container">
       <nav class="breadcrumbs">
         <a href={`/${model.brand.slug}`}>{model.brand.name}</a>
@@ -66,7 +83,7 @@ const fuelLabels: Record<string, string> = {
         {model.body_type && (
           <div class="kpi">
             <div class="kpi__label">Karoserie</div>
-            <div class="kpi__value" style="text-transform: uppercase;">{model.body_type}</div>
+            <div class="kpi__value uppercase">{model.body_type}</div>
           </div>
         )}
         {model.price_from && (
@@ -90,60 +107,52 @@ const fuelLabels: Record<string, string> = {
     </div>
   </section>
 
-  <!-- POPIS -->
   {model.description && (
     <section class="section">
       <div class="container model-desc">
         <p class="eyebrow">O modelu</p>
         <h2>Představujeme {model.name}</h2>
-        <div class="model-desc__content" set:html={model.description.replace(/\n/g, '<br>')}></div>
+        <div class="model-desc__content" set:html={descriptionHtml}></div>
       </div>
     </section>
   )}
 
-  <!-- TRIM LEVELY -->
   {trims.length > 0 && (
     <section class="section section--soft">
       <div class="container">
         <header class="section__head">
           <p class="eyebrow">Ceny a výbavy</p>
-          <h2>Modelová řada {latestYear?.year ?? ''}</h2>
+          <h2>Modelová řada {latestYear?.year}</h2>
         </header>
         <div class="trims__grid">
-          {trims.map(t => {
-            const hasPromo = t.promo_price && t.list_price && t.promo_price < t.list_price;
-            return (
-              <div class="trim-card">
-                <h3>{t.name}</h3>
-                {t.description && <p class="text-muted">{t.description}</p>}
-                <div class="trim-card__price">
-                  {hasPromo ? (
-                    <>
-                      <span class="trim-card__list">{t.list_price?.toLocaleString('cs-CZ')} Kč</span>
-                      <span class="trim-card__promo">od {t.promo_price?.toLocaleString('cs-CZ')} Kč</span>
-                    </>
-                  ) : (
-                    <span class="trim-card__promo">
-                      {(t.promo_price ?? t.list_price)?.toLocaleString('cs-CZ')} Kč
-                    </span>
-                  )}
-                </div>
-                {t.features && t.features.length > 0 && (
-                  <ul class="trim-card__features">
-                    {t.features.slice(0, 6).map(f => <li>{f}</li>)}
-                    {t.features.length > 6 && <li class="text-muted">+ {t.features.length - 6} dalších</li>}
-                  </ul>
+          {trims.map((t) => (
+            <article class="trim-card">
+              <h3>{t.name}</h3>
+              {t.description && <p class="text-muted">{t.description}</p>}
+              <div class="trim-card__price">
+                {t.promo_price && t.list_price && t.promo_price < t.list_price && (
+                  <span class="trim-card__list">{t.list_price.toLocaleString('cs-CZ')} Kč</span>
                 )}
+                <span class="trim-card__promo">
+                  {(t.promo_price ?? t.list_price ?? 0).toLocaleString('cs-CZ')} Kč
+                </span>
               </div>
-            );
-          })}
+              {t.features && t.features.length > 0 && (
+                <ul class="trim-card__features">
+                  {t.features.slice(0, 6).map((f) => <li>{f}</li>)}
+                  {t.features.length > 6 && (
+                    <li class="text-muted">+ {t.features.length - 6} dalších</li>
+                  )}
+                </ul>
+              )}
+            </article>
+          ))}
         </div>
       </div>
     </section>
   )}
 
-  <!-- TECH DATA -->
-  {latestYear?.technical_data && Array.isArray(latestYear.technical_data) && latestYear.technical_data.length > 0 && (
+  {techRows.length > 0 && (
     <section class="section">
       <div class="container">
         <header class="section__head">
@@ -152,7 +161,7 @@ const fuelLabels: Record<string, string> = {
         </header>
         <table class="tech-table">
           <tbody>
-            {(latestYear.technical_data as Array<{ label: string; value: string }>).map(row => (
+            {techRows.map((row) => (
               <tr>
                 <td>{row.label}</td>
                 <td>{row.value}</td>
@@ -164,10 +173,9 @@ const fuelLabels: Record<string, string> = {
     </section>
   )}
 
-  <!-- LEAD FORM -->
   <section class="section section--soft" id="poptavka">
     <div class="container poptavka-wrap">
-      <LeadForm formType="test_drive" title={`Mám zájem o ${model.name}`} modelId={model.id as unknown as number} />
+      <LeadForm formType="test_drive" title={`Mám zájem o ${model.name}`} modelId={Number(model.id)} />
     </div>
   </section>
 </BaseLayout>
@@ -185,6 +193,7 @@ const fuelLabels: Record<string, string> = {
   .kpi { padding: 14px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); border-radius: var(--radius); }
   .kpi__label { font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted-light); margin-bottom: 6px; }
   .kpi__value { font-size: 1.1rem; font-weight: 600; }
+  .uppercase { text-transform: uppercase; }
 
   .model-hero__cta { display: flex; flex-wrap: wrap; gap: 12px; }
 
