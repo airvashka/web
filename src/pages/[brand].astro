@@ -78,6 +78,14 @@ const cardBgStyle = `background: linear-gradient(135deg, ${brandColor} 0%, #555 
 const previousNamesStr = brand.previous_names && brand.previous_names.length > 0
   ? brand.previous_names.join(', ')
   : '';
+
+// České skloňování modelů: 1 model / 2-4 modely / 5+ modelů
+function pluralizeModels(n: number): string {
+  if (n === 1) return '1 model';
+  if (n >= 2 && n <= 4) return `${n} modely`;
+  return `${n} modelů`;
+}
+const modelsCountLabel = models.length > 0 ? pluralizeModels(models.length) : 'Modely';
 ---
 
 <BaseLayout
@@ -101,7 +109,7 @@ const previousNamesStr = brand.previous_names && brand.previous_names.length > 0
     <div class="container">
       <header class="section__head">
         <p class="eyebrow">Modelová řada</p>
-        <h2>{models.length > 0 ? `${models.length} modelů ${brand.name}` : `Modely ${brand.name}`}</h2>
+        <h2>{modelsCountLabel} {brand.name}</h2>
       </header>
 
       {models.length === 0 && (
