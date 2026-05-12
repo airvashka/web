@@ -241,6 +241,13 @@ const modelVideoIds: string[] = Array.isArray((rawModel as any).youtube_video_id
   ? (rawModel as any).youtube_video_ids
   : [];
 
+// Barvy karoserie + interiéru (z model_year)
+type ColorOpt = { code?: string; name?: string; name_en?: string; hex?: string; type?: string; swatch_image?: string; monotone_only?: boolean };
+type InteriorOpt = { code?: string; name?: string; material?: string; hex?: string; swatch_image?: string };
+const colorOptions: ColorOpt[] = Array.isArray((latestYear as any)?.color_options) ? (latestYear as any).color_options : [];
+const interiorOptions: InteriorOpt[] = Array.isArray((latestYear as any)?.interior_options) ? (latestYear as any).interior_options : [];
+const hasConfigurator = colorOptions.length > 0 || interiorOptions.length > 0;
+
 // Intro foto = první z gallery, nebo hero_image
 const galleryImages: string[] = (rawModel.gallery ?? []).map((g) => g?.directus_files_id).filter(Boolean) as string[];
 const introImg = galleryImages[0] ?? rawModel.hero_image;
@@ -288,6 +295,7 @@ const introCopy = (rawModel.description ?? '').split(/\n\s*\n/).filter(Boolean);
     <div class="container subnav-inner">
       <a class="subnav-link is-active" href="#predstaveni">Představení</a>
       {variantModels.length > 1 && (<><span class="subnav-sep">·</span><a class="subnav-link" href="#varianty">Varianty</a></>)}
+      {hasConfigurator && (<><span class="subnav-sep">·</span><a class="subnav-link" href="#konfigurator">Konfigurátor</a></>)}
       <span class="subnav-sep">·</span>
       <a class="subnav-link" href="#technologie">Technologie</a>
       <span class="subnav-sep">·</span>
@@ -354,6 +362,73 @@ const introCopy = (rawModel.description ?? '').split(/\n\s*\n/).filter(Boolean);
       </div>
     </div>
   </section>
+
+  <!-- ===== KONFIGURÁTOR (color picker + interior) ===== -->
+  {hasConfigurator && (
+    <section class="config" id="konfigurator">
+      <div class="container">
+        <div class="config-head">
+          <div class="section-eyebrow">Konfigurátor</div>
+          <h2 class="section-title" style="margin-bottom: 0;">Vyberte si svou barvu</h2>
+        </div>
+
+        {colorOptions.length > 0 && (
+          <>
+            <div class="config-car" data-config-preview>
+              {rawModel.hero_image && <DirectusImage src={rawModel.hero_image} alt={`${rawModel.name} — náhled`} aspectRatio="16/7" />}
+            </div>
+
+            <div class="color-row">
+              {colorOptions.map((c, i) => (
+                <button
+                  type="button"
+                  class={`swatch-item${i === 0 ? ' is-active' : ''}`}
+                  data-color-btn
+                  data-color-index={i}
+                  data-color-name={c.name ?? ''}
+                  data-color-type={c.type ?? ''}
+                  data-color-hex={c.hex ?? ''}
+                >
+                  <span class="ring">
+                    <span class="swatch-fill" style={`background:${c.hex ?? '#888'}; ${(c.hex ?? '').toLowerCase() === '#f0eee9' || (c.hex ?? '').toLowerCase() === '#f4f1ec' ? 'border:1px solid var(--line-2);' : ''}`}></span>
+                  </span>
+                  <span class="name">{c.name}</span>
+                  <span class="delta">{c.type === 'základní' ? 'V ceně' : 'Příplatek'}</span>
+                </button>
+              ))}
+            </div>
+          </>
+        )}
+
+        {interiorOptions.length > 0 && (
+          <div class="config-bottom">
+            <div class="interior-block">
+              <div class="lab">Barva interiéru:</div>
+              <div class="interior-row">
+                {interiorOptions.map((it, i) => (
+                  <button
+                    type="button"
+                    class={`interior-item${i === 0 ? ' is-active' : ''}`}
+                    data-interior-btn
+                    data-interior-index={i}
+                    data-interior-name={it.name ?? ''}
+                    data-interior-material={it.material ?? ''}
+                  >
+                    <span class="interior-fill" style={`background:${it.hex ?? '#888'}`}></span>
+                    <span class="name">{it.name}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+            <a class="btn btn-primary" href="/kontakt">
+              Poptat tuto konfiguraci
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            </a>
+          </div>
+        )}
+      </div>
+    </section>
+  )}
 
   <!-- ===== TECH GRID (placeholder pro highlights) ===== -->
   {trims.length > 0 && (
@@ -590,4 +665,26 @@ const introCopy = (rawModel.description ?? '').split(/\n\s*\n/).filter(Boolean);
       </div>
     </div>
   </section>
+
+  <script>
+    // ===== Konfigurátor — color & interior picker =====
+    document.querySelectorAll('[data-color-btn]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('[data-color-btn]').forEach((b) => b.classList.remove('is-active'));
+        btn.classList.add('is-active');
+        // Volitelně: změnit hue / overlay na config-preview podle hex (basic vizuální feedback)
+        const preview = document.querySelector('[data-config-preview]');
+        if (preview) {
+          const hex = btn.dataset.colorHex;
+          if (hex) preview.style.boxShadow = `inset 0 0 0 4px ${hex}33`;
+        }
+      });
+    });
+    document.querySelectorAll('[data-interior-btn]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('[data-interior-btn]').forEach((b) => b.classList.remove('is-active'));
+        btn.classList.add('is-active');
+      });
+    });
+  </script>
 </BaseLayout>
