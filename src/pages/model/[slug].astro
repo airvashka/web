@@ -11,21 +11,52 @@ export async function getStaticPaths() {
 
 const { slug } = Astro.params;
 
-type ModelWithBrand = Model & {
-  brand: Brand;
-  sub_brand?: { name: string; slug: string } | null;
+type ModelRaw = Model & {
+  brand?: number | null;
+  sub_brand?: number | null;
 };
 
-const models = await directusGet<ModelWithBrand>('models', {
+// 1) Fetch model bez nested fields
+const rawModels = await directusGet<ModelRaw>('models', {
   filter: { slug: { _eq: slug } },
   limit: 1,
-  fields: ['*', 'brand.id', 'brand.slug', 'brand.name', 'brand.primary_color', 'brand.previous_names', 'sub_brand.name', 'sub_brand.slug'],
+  fields: ['*'],
 });
-const model = models[0];
+const rawModel = rawModels[0];
 
-if (!model) {
+if (!rawModel) {
   return Astro.redirect('/404');
 }
+
+// 2) Fetch brand separátně (jen ID, žádné nesting)
+const brands = rawModel.brand
+  ? await directusGet<Brand>('brands', {
+      filter: { id: { _eq: rawModel.brand } },
+      limit: 1,
+    })
+  : [];
+const brand = brands[0];
+
+if (!brand) {
+  return Astro.redirect('/404');
+}
+
+// 3) Fetch sub_brand pokud existuje (volitelné)
+const subBrands = rawModel.sub_brand
+  ? await directusGet<{ id: number; slug: string; name: string }>('sub_brands', {
+      filter: { id: { _eq: rawModel.sub_brand } },
+      limit: 1,
+      fields: ['id', 'slug', 'name'],
+    })
+  : [];
+const subBrand = subBrands[0] ?? null;
+
+// 4) Sestavíme model objekt s vyřešenými vztahy (pro snadnější použití v JSX)
+const model = {
+  ...rawModel,
+  brand,
+  sub_brand: subBrand,
+};
 
 const modelYears = await directusGet<ModelYear>('model_years', {
   filter: { model: { _eq: model.id }, status: { _eq: 'published' } },
