@@ -56,8 +56,8 @@ const availabilityLabels: Record<string, string> = {
   </section>
 
   <section class="container">
-    <!-- Filtry — zatím statické, brzy interaktivní -->
-    <div class="filters">
+    <!-- Filtry podle značky -->
+    <div class="filters" data-filter-bar>
       <button class="filter-chip is-active" data-filter="all">Všechny</button>
       {brands.map(brand => (
         <button class="filter-chip" data-filter={brand.slug}>{brand.name}</button>
@@ -79,7 +79,7 @@ const availabilityLabels: Record<string, string> = {
           const photoCount = Array.isArray(v.photos) ? v.photos.length : 0;
           const firstPhoto = firstPhotoUuid(v);
           return (
-            <a href={`/sklad/${v.id}`} class="stock-card">
+            <a href={`/sklad/${v.id}`} class="stock-card" data-brand={v.brand.slug}>
               <div class="stock-card__media" aria-hidden="true">
                 <DirectusImage
                   src={firstPhoto}
@@ -106,15 +106,15 @@ const availabilityLabels: Record<string, string> = {
                   {v.color_code && <span class="font-mono">{v.color_code}</span>}
                 </div>
                 <div class="stock-card__price">
-                  {hasPromo ? (
-                    <>
-                      <span class="stock-card__price-list">{v.list_price?.toLocaleString('cs-CZ')} Kč</span>
-                      <span class="stock-card__price-promo">{v.promo_price?.toLocaleString('cs-CZ')} Kč</span>
-                    </>
-                  ) : (
+                  {hasPromo && (
+                    <span class="stock-card__price-list">{v.list_price?.toLocaleString('cs-CZ')} Kč</span>
+                  )}
+                  {(v.promo_price ?? v.list_price) ? (
                     <span class="stock-card__price-promo">
                       {(v.promo_price ?? v.list_price)?.toLocaleString('cs-CZ')} Kč
                     </span>
+                  ) : (
+                    <span class="stock-card__price-promo stock-card__price-promo--ondemand">Cena na dotaz</span>
                   )}
                 </div>
               </div>
@@ -212,4 +212,36 @@ const availabilityLabels: Record<string, string> = {
   .stock-card__price { margin-top: auto; padding-top: 8px; display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
   .stock-card__price-list { font-size: 0.85rem; color: var(--muted); text-decoration: line-through; }
   .stock-card__price-promo { font-size: 1.15rem; font-weight: 700; color: var(--accent); }
+  .stock-card__price-promo--ondemand { color: var(--ink-soft); font-size: 1rem; }
+
+  /* Skryté karty filtrem */
+  .stock-card.is-hidden { display: none; }
 </style>
+
+<script>
+  // Filtr skladovky podle značky — client-side, žádný reload
+  document.querySelectorAll<HTMLButtonElement>('[data-filter-bar] .filter-chip').forEach((chip) => {
+    chip.addEventListener('click', () => {
+      const filter = chip.dataset.filter ?? 'all';
+      // Update aktivní chip
+      document.querySelectorAll('[data-filter-bar] .filter-chip').forEach(c => c.classList.remove('is-active'));
+      chip.classList.add('is-active');
+      // Filtruj karty
+      document.querySelectorAll<HTMLElement>('.stock-card').forEach(card => {
+        const brand = card.dataset.brand;
+        if (filter === 'all' || brand === filter) {
+          card.classList.remove('is-hidden');
+        } else {
+          card.classList.add('is-hidden');
+        }
+      });
+      // GA event
+      if ((window as any).dataLayer) {
+        (window as any).dataLayer.push({
+          event: 'filter_stock',
+          filter_value: filter,
+        });
+      }
+    });
+  });
+</script>

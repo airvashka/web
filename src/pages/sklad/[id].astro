@@ -105,7 +105,11 @@ const title = `${brand?.name ?? ''} ${model?.name ?? ''}${trim ? ' ' + trim.name
             {hasPromo && (
               <span class="stock-detail__list-price">{v.list_price?.toLocaleString('cs-CZ')} Kč</span>
             )}
-            <span class="stock-detail__main-price">{finalPrice?.toLocaleString('cs-CZ')} Kč</span>
+            {finalPrice ? (
+              <span class="stock-detail__main-price">{finalPrice.toLocaleString('cs-CZ')} Kč</span>
+            ) : (
+              <span class="stock-detail__main-price stock-detail__main-price--ondemand">Cena na dotaz</span>
+            )}
             {hasPromo && v.lowest_price_30d && (
               <p class="stock-detail__lowest">
                 Nejnižší cena za posledních 30 dnů: <strong>{v.lowest_price_30d.toLocaleString('cs-CZ')} Kč</strong>
@@ -192,6 +196,7 @@ const title = `${brand?.name ?? ''} ${model?.name ?? ''}${trim ? ' ' + trim.name
   .stock-detail__price { margin-bottom: 24px; padding-block: 16px; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
   .stock-detail__list-price { font-size: 1rem; color: var(--muted); text-decoration: line-through; margin-right: 12px; }
   .stock-detail__main-price { font-size: clamp(1.6rem, 2.5vw, 2rem); font-weight: 700; color: var(--accent); }
+  .stock-detail__main-price--ondemand { color: var(--ink-soft); font-size: clamp(1.2rem, 2vw, 1.6rem); }
   .stock-detail__lowest { font-size: 0.8rem; color: var(--muted); margin-top: 8px; }
   .stock-detail__monthly { font-size: 0.95rem; color: var(--ink-soft); margin-top: 8px; }
 
