@@ -21,14 +21,30 @@ if (!brand) {
 }
 
 type ModelWithSub = Model & {
-  sub_brand?: { name: string; slug: string } | null;
+  sub_brand?: number | null;
 };
 
-const models = await directusGet<ModelWithSub>('models', {
+// Načti všechny modely této značky (zatím bez nested sub_brand expand — kvůli permissions)
+const allModels = await directusGet<ModelWithSub>('models', {
   filter: { brand: { _eq: brand.id }, status: { _eq: 'published' } },
   sort: ['sort'],
-  fields: ['id', 'slug', 'name', 'tagline', 'price_from', 'fuel_type', 'body_type', 'sub_brand.name', 'sub_brand.slug'],
+  fields: ['id', 'slug', 'name', 'tagline', 'price_from', 'fuel_type', 'body_type', 'sub_brand'],
 });
+
+// Pokud máme sub_brand IDs, fetchni je separátně (jednoduchý batch)
+const subBrandIds = [...new Set(allModels.map(m => m.sub_brand).filter(Boolean))] as number[];
+const subBrandsRaw = subBrandIds.length > 0
+  ? await directusGet<{ id: number; slug: string; name: string }>('sub_brands', {
+      filter: { id: { _in: subBrandIds } },
+      fields: ['id', 'slug', 'name'],
+    })
+  : [];
+const subBrandsById = new Map(subBrandsRaw.map(s => [s.id, s]));
+
+const models = allModels.map(m => ({
+  ...m,
+  _subBrand: m.sub_brand ? subBrandsById.get(m.sub_brand) ?? null : null,
+}));
 
 const fuelLabels: Record<string, string> = {
   petrol: 'Benzín',
@@ -38,16 +54,17 @@ const fuelLabels: Record<string, string> = {
   ev: 'Elektro',
 };
 
-// Group models by sub-brand v frontmatter — vyhneme se destrukturalizaci v JSX
-type ModelGroup = { subBrandName: string | null; models: ModelWithSub[] };
+// Group models by sub-brand v frontmatter
+type ResolvedModel = ModelWithSub & { _subBrand: { id: number; slug: string; name: string } | null };
+type ModelGroup = { subBrandName: string | null; models: ResolvedModel[] };
 const modelGroups: ModelGroup[] = [];
 const groupMap = new Map<string, ModelGroup>();
 
 for (const m of models) {
-  const key = m.sub_brand?.slug ?? '_main';
+  const key = m._subBrand?.slug ?? '_main';
   let group = groupMap.get(key);
   if (!group) {
-    group = { subBrandName: m.sub_brand?.name ?? null, models: [] };
+    group = { subBrandName: m._subBrand?.name ?? null, models: [] };
     groupMap.set(key, group);
     modelGroups.push(group);
   }
