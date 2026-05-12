@@ -6,19 +6,30 @@ import type { Brand, StockVehicle } from '@lib/types';
 
 const brands = await directusGet<Brand>('brands', { sort: ['sort'], fields: ['id', 'slug', 'name'] });
 
-const vehicles = await directusGet<StockVehicle & {
+type VehicleListItem = StockVehicle & {
   brand: { name: string; slug: string };
   model: { name: string; slug: string };
-  trim_level?: { name: string };
-}>('stock_vehicles', {
+  trim_level?: { name: string } | null;
+  photos?: Array<{ directus_files_id: string }>;
+};
+
+const vehicles = await directusGet<VehicleListItem>('stock_vehicles', {
   filter: { status: { _eq: 'published' }, availability: { _neq: 'sold' } },
   sort: ['-listed_at', 'sort'],
   fields: [
     'id', 'vin', 'list_price', 'promo_price', 'lowest_price_30d', 'km',
-    'condition', 'availability', 'color_code', 'highlighted', 'photos',
+    'condition', 'availability', 'color_code', 'highlighted',
+    'photos.directus_files_id',
     'brand.name', 'brand.slug', 'model.name', 'model.slug', 'trim_level.name'
   ],
 });
+
+// Helper — extrakt prvního foto UUID z M2M junction
+function firstPhotoUuid(v: VehicleListItem): string | null {
+  if (!Array.isArray(v.photos) || v.photos.length === 0) return null;
+  const first = v.photos[0];
+  return typeof first === 'string' ? first : (first?.directus_files_id ?? null);
+}
 
 const fuelLabels: Record<string, string> = {
   petrol: 'Benzín', diesel: 'Diesel', hybrid: 'Hybrid', phev: 'PHEV', ev: 'Elektro',
@@ -66,11 +77,12 @@ const availabilityLabels: Record<string, string> = {
         {vehicles.map(v => {
           const hasPromo = v.promo_price && v.list_price && v.promo_price < v.list_price;
           const photoCount = Array.isArray(v.photos) ? v.photos.length : 0;
+          const firstPhoto = firstPhotoUuid(v);
           return (
             <a href={`/sklad/${v.id}`} class="stock-card">
               <div class="stock-card__media" aria-hidden="true">
                 <DirectusImage
-                  src={Array.isArray(v.photos) && v.photos.length > 0 ? v.photos[0] : null}
+                  src={firstPhoto}
                   alt={`${v.brand.name} ${v.model.name}`}
                   aspectRatio="4/3"
                   widths={[400, 800]}

@@ -15,11 +15,14 @@ export async function getStaticPaths() {
 
 const { id } = Astro.params;
 
-// 1) Fetch vehicle bez nested fields
-const vehicles = await directusGet<StockVehicle>('stock_vehicles', {
+// 1) Fetch vehicle — photos musíme expandnout přes M2M junction
+type VehicleWithPhotos = StockVehicle & {
+  photos?: Array<{ directus_files_id: string }>;
+};
+const vehicles = await directusGet<VehicleWithPhotos>('stock_vehicles', {
   filter: { id: { _eq: Number(id) }, status: { _eq: 'published' } },
   limit: 1,
-  fields: ['*'],
+  fields: ['*', 'photos.directus_files_id'],
 });
 const v = vehicles[0];
 
@@ -36,7 +39,10 @@ const brand = brands[0];
 const model = models[0];
 const trim = trims[0];
 
-const photoIds: string[] = Array.isArray(v.photos) ? (v.photos as unknown as string[]) : [];
+// Extract UUIDs z M2M junction records (nebo přímé stringy z legacy dat)
+const photoIds: string[] = Array.isArray(v.photos)
+  ? v.photos.map((p: any) => typeof p === 'string' ? p : p?.directus_files_id).filter(Boolean) as string[]
+  : [];
 const heroPhoto = photoIds[0] ?? null;
 const otherPhotos = photoIds.slice(1);
 

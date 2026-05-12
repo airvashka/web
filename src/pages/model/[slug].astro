@@ -17,11 +17,11 @@ type ModelRaw = Model & {
   sub_brand?: number | null;
 };
 
-// 1) Fetch model bez nested fields
-const rawModels = await directusGet<ModelRaw>('models', {
+// 1) Fetch model — gallery musíme explicitně expandnout přes junction (M2M files)
+const rawModels = await directusGet<ModelRaw & { gallery?: Array<{ directus_files_id: string }> }>('models', {
   filter: { slug: { _eq: slug } },
   limit: 1,
-  fields: ['*'],
+  fields: ['*', 'gallery.directus_files_id'],
 });
 const rawModel = rawModels[0];
 
@@ -89,8 +89,11 @@ const heroBgStyle = modelHeroUrl
   ? `--brand-color: ${brandColor}; background-image: linear-gradient(180deg, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.7) 100%), url('${modelHeroUrl}'); background-size: cover; background-position: center;`
   : `--brand-color: ${brandColor};`;
 
-// Gallery (pole URL nebo file IDs)
-const galleryImages: string[] = Array.isArray(model.gallery) ? model.gallery : [];
+// Gallery — M2M files, extract UUIDs z junction records
+const galleryRaw = Array.isArray(rawModel.gallery) ? rawModel.gallery : [];
+const galleryImages: string[] = galleryRaw
+  .map((g: any) => typeof g === 'string' ? g : g?.directus_files_id)
+  .filter(Boolean) as string[];
 
 // Description s newlines → <br>
 const descriptionHtml = (model.description ?? '').replace(/\n/g, '<br>');
