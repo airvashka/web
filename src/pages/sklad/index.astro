@@ -95,7 +95,7 @@ const priceMax = vehicles.length > 0 ? Math.max(...vehicles.map(v => v.promo_pri
         ))}
       </div>
 
-      {availableFuels.length > 1 && (
+      {availableFuels.length >= 1 && (
         <div class="filter-group">
           <h4>Palivo</h4>
           <button class="filter-chip is-active" data-key="fuel" data-value="all">Vše</button>
@@ -105,7 +105,7 @@ const priceMax = vehicles.length > 0 ? Math.max(...vehicles.map(v => v.promo_pri
         </div>
       )}
 
-      {availableTransmissions.length > 1 && (
+      {availableTransmissions.length >= 1 && (
         <div class="filter-group">
           <h4>Převodovka</h4>
           <button class="filter-chip is-active" data-key="transmission" data-value="all">Vše</button>
@@ -115,7 +115,7 @@ const priceMax = vehicles.length > 0 ? Math.max(...vehicles.map(v => v.promo_pri
         </div>
       )}
 
-      {availableDrivetrains.length > 1 && (
+      {availableDrivetrains.length >= 1 && (
         <div class="filter-group">
           <h4>Pohon</h4>
           <button class="filter-chip is-active" data-key="drivetrain" data-value="all">Vše</button>
@@ -125,7 +125,7 @@ const priceMax = vehicles.length > 0 ? Math.max(...vehicles.map(v => v.promo_pri
         </div>
       )}
 
-      {availableColors.length > 1 && (
+      {availableColors.length >= 1 && (
         <div class="filter-group">
           <h4>Barva</h4>
           <button class="filter-chip is-active" data-key="color" data-value="all">Vše</button>
@@ -135,7 +135,7 @@ const priceMax = vehicles.length > 0 ? Math.max(...vehicles.map(v => v.promo_pri
         </div>
       )}
 
-      {availableConditions.length > 1 && (
+      {availableConditions.length >= 1 && (
         <div class="filter-group">
           <h4>Stav</h4>
           <button class="filter-chip is-active" data-key="condition" data-value="all">Vše</button>
