@@ -1,5 +1,6 @@
 ---
 import BaseLayout from '@layouts/BaseLayout.astro';
+import DirectusImage from '@components/DirectusImage.astro';
 import { directusGet } from '@lib/directus';
 import type { Brand } from '@lib/types';
 
@@ -73,7 +74,12 @@ const BRAND_META: Record<string, { eyebrow: string; description: string; bgGradi
           return (
             <a href={`/${brand.slug}`} class={`brand-card ${isFeatured ? 'brand-card--lg' : ''}`}>
               <div class="brand-card__media" aria-hidden="true">
-                <div class="brand-card__bg" style={`background: ${meta.bgGradient};`}></div>
+                <DirectusImage
+                  src={brand.hero_image}
+                  alt={brand.name}
+                  aspectRatio={isFeatured ? '16/10' : '16/9'}
+                  fallbackGradient={meta.bgGradient}
+                />
               </div>
               <div class="brand-card__body">
                 <p class="eyebrow eyebrow-accent">{meta.eyebrow}</p>

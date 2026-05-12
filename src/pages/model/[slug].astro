@@ -1,7 +1,8 @@
 ---
 import BaseLayout from '@layouts/BaseLayout.astro';
 import LeadForm from '@components/LeadForm.astro';
-import { directusGet } from '@lib/directus';
+import DirectusImage from '@components/DirectusImage.astro';
+import { directusGet, directusAsset } from '@lib/directus';
 import type { Brand, Model, ModelYear, TrimLevel } from '@lib/types';
 
 export async function getStaticPaths() {
@@ -83,7 +84,13 @@ const techRows: TechRow[] = Array.isArray(latestYear?.technical_data)
 
 // Brand color jako proměnná pro CSS
 const brandColor = model.brand.primary_color ?? '#1a1a1f';
-const heroBgStyle = `--brand-color: ${brandColor};`;
+const modelHeroUrl = model.hero_image ? directusAsset(model.hero_image, { width: 2400, format: 'webp', quality: 75 }) : null;
+const heroBgStyle = modelHeroUrl
+  ? `--brand-color: ${brandColor}; background-image: linear-gradient(180deg, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.7) 100%), url('${modelHeroUrl}'); background-size: cover; background-position: center;`
+  : `--brand-color: ${brandColor};`;
+
+// Gallery (pole URL nebo file IDs)
+const galleryImages: string[] = Array.isArray(model.gallery) ? model.gallery : [];
 
 // Description s newlines → <br>
 const descriptionHtml = (model.description ?? '').replace(/\n/g, '<br>');
@@ -144,6 +151,30 @@ const descriptionHtml = (model.description ?? '').replace(/\n/g, '<br>');
         <p class="eyebrow">O modelu</p>
         <h2>Představujeme {model.name}</h2>
         <div class="model-desc__content" set:html={descriptionHtml}></div>
+      </div>
+    </section>
+  )}
+
+  {galleryImages.length > 0 && (
+    <section class="section section--soft">
+      <div class="container">
+        <header class="section__head">
+          <p class="eyebrow">Galerie</p>
+          <h2>Detaily a design</h2>
+        </header>
+        <div class="gallery__grid">
+          {galleryImages.map((img, i) => (
+            <div class="gallery__item">
+              <DirectusImage
+                src={img}
+                alt={`${model.brand.name} ${model.name} — foto ${i + 1}`}
+                aspectRatio="4/3"
+                widths={[600, 1200]}
+                sizes="(max-width: 700px) 100vw, 33vw"
+              />
+            </div>
+          ))}
+        </div>
       </div>
     </section>
   )}
@@ -253,4 +284,19 @@ const descriptionHtml = (model.description ?? '').replace(/\n/g, '<br>');
   .tech-table td:last-child { text-align: right; color: var(--ink-soft); font-family: 'JetBrains Mono', monospace; font-size: 0.92rem; }
 
   .poptavka-wrap { max-width: 700px; margin: 0 auto; }
+
+  .gallery__grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: clamp(8px, 1.5vw, 16px);
+  }
+  @media (min-width: 600px) { .gallery__grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (min-width: 1000px) { .gallery__grid { grid-template-columns: repeat(3, 1fr); } }
+  .gallery__item {
+    overflow: hidden;
+    border-radius: var(--radius-lg);
+    background: var(--bg-soft);
+  }
+  .gallery__item :global(img) { transition: transform 400ms ease; }
+  .gallery__item:hover :global(img) { transform: scale(1.04); }
 </style>

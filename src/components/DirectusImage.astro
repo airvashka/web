@@ -1,0 +1,78 @@
+---
+/**
+ * DirectusImage — komponenta pro fotky uložené v Directusu.
+ *
+ * Použití:
+ *   <DirectusImage src={model.hero_image} alt="Korando" />
+ *
+ * Vygeneruje <img> s:
+ *  • srcset (400w, 800w, 1600w) pro responsive obrázky
+ *  • WebP formátem (lehčí o ~40 % proti JPG)
+ *  • lazy loading
+ *  • async decoding
+ *  • Directus transforms — provádí se on-demand na backendu
+ */
+import { directusAsset } from '@lib/directus';
+
+interface Props {
+  src: string | null | undefined;     // UUID souboru v Directusu
+  alt: string;
+  widths?: number[];                  // např. [400, 800, 1600]
+  sizes?: string;                     // CSS sizes hint pro browser
+  aspectRatio?: string;               // "16/10", "4/3", "1/1"
+  fit?: 'cover' | 'contain';
+  loading?: 'lazy' | 'eager';
+  class?: string;
+  fallbackGradient?: string;          // pokud src je null, ukáže gradient
+}
+
+const {
+  src,
+  alt,
+  widths = [480, 960, 1600],
+  sizes = '(max-width: 700px) 100vw, (max-width: 1200px) 50vw, 33vw',
+  aspectRatio,
+  fit = 'cover',
+  loading = 'lazy',
+  class: className = '',
+  fallbackGradient,
+} = Astro.props;
+
+const styleParts: string[] = [];
+if (aspectRatio) styleParts.push(`aspect-ratio: ${aspectRatio}`);
+if (fit) styleParts.push(`object-fit: ${fit}`);
+const style = styleParts.join('; ');
+
+// Pokud chybí Directus src, vykreslíme prázdný div s gradientem (nebo nic)
+const hasSrc = !!src;
+
+const mainSrc = hasSrc ? directusAsset(src!, { width: widths[Math.floor(widths.length / 2)], format: 'webp', quality: 80 }) : '';
+const srcset = hasSrc
+  ? widths.map(w => `${directusAsset(src!, { width: w, format: 'webp', quality: 80 })} ${w}w`).join(', ')
+  : '';
+---
+
+{hasSrc ? (
+  <img
+    src={mainSrc}
+    srcset={srcset}
+    sizes={sizes}
+    alt={alt}
+    loading={loading}
+    decoding="async"
+    class={className}
+    style={style}
+  />
+) : (
+  <div
+    class={`directus-image-placeholder ${className}`}
+    style={`${style}; background: ${fallbackGradient ?? 'linear-gradient(135deg, #2a2a30, #56565d)'};`}
+    aria-label={alt}
+    role="img"
+  />
+)}
+
+<style>
+  img { display: block; width: 100%; height: auto; }
+  .directus-image-placeholder { width: 100%; }
+</style>

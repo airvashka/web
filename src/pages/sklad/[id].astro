@@ -1,0 +1,203 @@
+---
+import BaseLayout from '@layouts/BaseLayout.astro';
+import DirectusImage from '@components/DirectusImage.astro';
+import LeadForm from '@components/LeadForm.astro';
+import { directusGet, directusAsset } from '@lib/directus';
+import type { Brand, Model, StockVehicle, TrimLevel } from '@lib/types';
+
+export async function getStaticPaths() {
+  const vehicles = await directusGet<StockVehicle>('stock_vehicles', {
+    fields: ['id'],
+    filter: { status: { _eq: 'published' } },
+  });
+  return vehicles.map(v => ({ params: { id: String(v.id) } }));
+}
+
+const { id } = Astro.params;
+
+// 1) Fetch vehicle bez nested fields
+const vehicles = await directusGet<StockVehicle>('stock_vehicles', {
+  filter: { id: { _eq: Number(id) }, status: { _eq: 'published' } },
+  limit: 1,
+  fields: ['*'],
+});
+const v = vehicles[0];
+
+if (!v) {
+  return Astro.redirect('/404');
+}
+
+// 2) Fetch souvisejících entit
+const brands = v.brand ? await directusGet<Brand>('brands', { filter: { id: { _eq: Number(v.brand) } }, limit: 1 }) : [];
+const models = v.model ? await directusGet<Model>('models', { filter: { id: { _eq: Number(v.model) } }, limit: 1 }) : [];
+const trims = v.trim_level ? await directusGet<TrimLevel>('trim_levels', { filter: { id: { _eq: Number(v.trim_level) } }, limit: 1 }) : [];
+
+const brand = brands[0];
+const model = models[0];
+const trim = trims[0];
+
+const photoIds: string[] = Array.isArray(v.photos) ? (v.photos as unknown as string[]) : [];
+const heroPhoto = photoIds[0] ?? null;
+const otherPhotos = photoIds.slice(1);
+
+const hasPromo = v.promo_price && v.list_price && v.promo_price < v.list_price;
+const finalPrice = v.promo_price ?? v.list_price;
+
+const conditionLabels: Record<string, string> = { new: 'Nový', demo: 'Předváděcí', used: 'Ojetý' };
+const availabilityLabels: Record<string, string> = { in_stock: 'Skladem', on_the_way: 'Na cestě', reserved: 'Rezervováno', sold: 'Prodáno' };
+
+const title = `${brand?.name ?? ''} ${model?.name ?? ''}${trim ? ' ' + trim.name : ''}`.trim();
+---
+
+<BaseLayout title={title || 'Skladový vůz'} description={`${title} — skladový vůz u SFR Motor Praha-Ďáblice.`}>
+  <section class="stock-detail">
+    <div class="container">
+      <nav class="breadcrumbs">
+        <a href="/sklad">Skladové vozy</a>
+        <span class="text-muted"> / </span>
+        <span>{title}</span>
+      </nav>
+
+      <div class="stock-detail__grid">
+        <div class="stock-detail__gallery">
+          <div class="stock-detail__hero">
+            <DirectusImage
+              src={heroPhoto}
+              alt={title}
+              aspectRatio="4/3"
+              widths={[800, 1600]}
+              fallbackGradient="linear-gradient(135deg, #2a2a30, #56565d)"
+            />
+          </div>
+          {otherPhotos.length > 0 && (
+            <div class="stock-detail__thumbs">
+              {otherPhotos.slice(0, 4).map((p, i) => (
+                <DirectusImage src={p} alt={`${title} foto ${i + 2}`} aspectRatio="1/1" widths={[200, 400]} />
+              ))}
+            </div>
+          )}
+        </div>
+
+        <aside class="stock-detail__info">
+          <div class="stock-detail__chips">
+            {v.condition && <span class="chip">{conditionLabels[v.condition] ?? v.condition}</span>}
+            {v.availability && <span class="chip chip--success">{availabilityLabels[v.availability] ?? v.availability}</span>}
+          </div>
+
+          <h1 class="stock-detail__title">{title}</h1>
+
+          <dl class="stock-detail__specs">
+            {v.km !== undefined && v.km !== null && (
+              <div><dt>Najeto</dt><dd class="font-mono">{v.km.toLocaleString('cs-CZ')} km</dd></div>
+            )}
+            {v.color_code && <div><dt>Barva</dt><dd class="font-mono">{v.color_code}</dd></div>}
+            {v.first_registration && <div><dt>1. registrace</dt><dd class="font-mono">{v.first_registration}</dd></div>}
+            {v.vin && <div><dt>VIN</dt><dd class="font-mono">{v.vin}</dd></div>}
+          </dl>
+
+          <div class="stock-detail__price">
+            {hasPromo && (
+              <span class="stock-detail__list-price">{v.list_price?.toLocaleString('cs-CZ')} Kč</span>
+            )}
+            <span class="stock-detail__main-price">{finalPrice?.toLocaleString('cs-CZ')} Kč</span>
+            {hasPromo && v.lowest_price_30d && (
+              <p class="stock-detail__lowest">
+                Nejnižší cena za posledních 30 dnů: <strong>{v.lowest_price_30d.toLocaleString('cs-CZ')} Kč</strong>
+              </p>
+            )}
+            {v.monthly_payment_from && (
+              <p class="stock-detail__monthly">Splátka od <strong>{v.monthly_payment_from.toLocaleString('cs-CZ')} Kč/měs</strong></p>
+            )}
+          </div>
+
+          <a href="#poptavka" class="btn btn--primary" style="width: 100%; justify-content: center;">Mám zájem o tento vůz</a>
+
+          {model && (
+            <p style="margin-top: 20px; font-size: 0.9rem;">
+              <a href={`/model/${model.slug}`} class="text-muted">Více o modelu {model.name} →</a>
+            </p>
+          )}
+        </aside>
+      </div>
+
+      {v.description && (
+        <div class="stock-detail__desc">
+          <h2>Popis vozu</h2>
+          <div set:html={v.description.replace(/\n/g, '<br>')}></div>
+        </div>
+      )}
+    </div>
+  </section>
+
+  <section class="section section--soft" id="poptavka">
+    <div class="container poptavka-wrap">
+      <LeadForm
+        formType="stock_inquiry"
+        title={`Mám zájem o ${title}`}
+        vehicleId={Number(v.id)}
+        vehicleLabel={`${title} — ${finalPrice?.toLocaleString('cs-CZ')} Kč`}
+      />
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .stock-detail { padding-block: clamp(24px, 4vw, 48px) clamp(40px, 6vw, 80px); }
+  .breadcrumbs { font-size: 0.88rem; margin-bottom: 24px; color: var(--muted); }
+  .breadcrumbs a { color: var(--ink-soft); border-bottom: 1px solid var(--line); }
+  .breadcrumbs a:hover { color: var(--accent); }
+
+  .stock-detail__grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 32px;
+    margin-bottom: 48px;
+  }
+  @media (min-width: 900px) {
+    .stock-detail__grid { grid-template-columns: 1.6fr 1fr; }
+  }
+
+  .stock-detail__hero { border-radius: var(--radius-lg); overflow: hidden; background: var(--bg-soft); }
+  .stock-detail__thumbs {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    margin-top: 12px;
+  }
+  .stock-detail__thumbs > :global(*) { border-radius: var(--radius); overflow: hidden; }
+
+  .stock-detail__info {
+    background: var(--bg-card);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-lg);
+    padding: clamp(20px, 3vw, 32px);
+  }
+  .stock-detail__chips { display: flex; gap: 6px; margin-bottom: 12px; }
+  .chip { font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.06em; background: var(--bg-soft); padding: 4px 8px; border-radius: 4px; color: var(--ink-soft); }
+  .chip--success { background: rgba(30, 123, 95, 0.1); color: var(--success); }
+
+  .stock-detail__title { font-size: clamp(1.6rem, 3vw, 2.4rem); margin-bottom: 20px; }
+
+  .stock-detail__specs { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 24px; }
+  .stock-detail__specs > div { display: flex; flex-direction: column; gap: 2px; }
+  .stock-detail__specs dt { font-size: 0.72rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; }
+  .stock-detail__specs dd { font-size: 0.95rem; font-weight: 500; }
+
+  .stock-detail__price { margin-bottom: 24px; padding-block: 16px; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+  .stock-detail__list-price { font-size: 1rem; color: var(--muted); text-decoration: line-through; margin-right: 12px; }
+  .stock-detail__main-price { font-size: clamp(1.6rem, 2.5vw, 2rem); font-weight: 700; color: var(--accent); }
+  .stock-detail__lowest { font-size: 0.8rem; color: var(--muted); margin-top: 8px; }
+  .stock-detail__monthly { font-size: 0.95rem; color: var(--ink-soft); margin-top: 8px; }
+
+  .stock-detail__desc {
+    background: var(--bg-card);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-lg);
+    padding: clamp(24px, 3vw, 32px);
+    max-width: 80ch;
+  }
+  .stock-detail__desc h2 { margin-bottom: 16px; }
+  .stock-detail__desc div { line-height: 1.7; color: var(--ink-soft); }
+
+  .poptavka-wrap { max-width: 700px; margin: 0 auto; }
+</style>

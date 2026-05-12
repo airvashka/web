@@ -1,6 +1,7 @@
 ---
 import BaseLayout from '@layouts/BaseLayout.astro';
-import { directusGet } from '@lib/directus';
+import DirectusImage from '@components/DirectusImage.astro';
+import { directusGet, directusAsset } from '@lib/directus';
 import type { Brand, Model } from '@lib/types';
 
 export async function getStaticPaths() {
@@ -72,7 +73,10 @@ for (const m of models) {
 }
 
 const brandColor = brand.primary_color ?? '#1a1a1f';
-const heroBgStyle = `--brand-color: ${brandColor};`;
+const heroImageUrl = brand.hero_image ? directusAsset(brand.hero_image, { width: 2400, format: 'webp', quality: 75 }) : null;
+const heroBgStyle = heroImageUrl
+  ? `--brand-color: ${brandColor}; background-image: linear-gradient(180deg, rgba(0,0,0,0.4) 0%, rgba(0,0,0,0.75) 100%), url('${heroImageUrl}'); background-size: cover; background-position: center;`
+  : `--brand-color: ${brandColor};`;
 const cardBgStyle = `background: linear-gradient(135deg, ${brandColor} 0%, #555 100%);`;
 
 const previousNamesStr = brand.previous_names && brand.previous_names.length > 0
@@ -127,7 +131,13 @@ const modelsCountLabel = models.length > 0 ? pluralizeModels(models.length) : 'M
             {group.models.map((m) => (
               <a href={`/model/${m.slug}`} class="model-card">
                 <div class="model-card__media" aria-hidden="true">
-                  <div class="model-card__bg" style={cardBgStyle}></div>
+                  <DirectusImage
+                    src={m.hero_image}
+                    alt={`${brand.name} ${m.name}`}
+                    aspectRatio="16/10"
+                    fallbackGradient={cardBgStyle.replace('background: ', '').replace(';', '')}
+                    class="model-card__img"
+                  />
                 </div>
                 <div class="model-card__body">
                   <h4>{m.name}</h4>

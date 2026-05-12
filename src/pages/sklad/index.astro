@@ -1,5 +1,6 @@
 ---
 import BaseLayout from '@layouts/BaseLayout.astro';
+import DirectusImage from '@components/DirectusImage.astro';
 import { directusGet } from '@lib/directus';
 import type { Brand, StockVehicle } from '@lib/types';
 
@@ -68,7 +69,14 @@ const availabilityLabels: Record<string, string> = {
           return (
             <a href={`/sklad/${v.id}`} class="stock-card">
               <div class="stock-card__media" aria-hidden="true">
-                <div class="stock-card__bg"></div>
+                <DirectusImage
+                  src={Array.isArray(v.photos) && v.photos.length > 0 ? v.photos[0] : null}
+                  alt={`${v.brand.name} ${v.model.name}`}
+                  aspectRatio="4/3"
+                  widths={[400, 800]}
+                  sizes="(max-width: 600px) 100vw, 33vw"
+                  fallbackGradient="linear-gradient(135deg, #2a2a30, #56565d)"
+                />
                 {v.highlighted && <span class="stock-card__badge">⭐ Doporučujeme</span>}
                 {photoCount === 0 && <span class="stock-card__no-photo">Foto brzy</span>}
               </div>
