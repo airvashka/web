@@ -4,12 +4,19 @@ import DirectusImage from '@components/DirectusImage.astro';
 import { directusGet } from '@lib/directus';
 import type { Brand, StockVehicle } from '@lib/types';
 
+/* ============================================================
+   SKLAD LISTING — design extends Skladovka section z home.jsx
+   (samostatná listing page chybí v draftu — vytvořena konzistentně)
+   Sidebar filtrů (vlevo) + .scard grid (vpravo)
+   ============================================================ */
+
 const brands = await directusGet<Brand>('brands', { sort: ['sort'], fields: ['id', 'slug', 'name'] });
 
 type VehicleListItem = StockVehicle & {
-  brand: { name: string; slug: string };
-  model: { name: string; slug: string; fuel_type?: string };
+  brand?: { name: string; slug: string };
+  model?: { name: string; slug: string; fuel_type?: string };
   trim_level?: { name: string } | null;
+  model_year?: { year: number } | null;
   photos?: Array<{ directus_files_id: string }>;
   transmission?: string;
   drivetrain?: string;
@@ -22,408 +29,230 @@ const vehicles = await directusGet<VehicleListItem>('stock_vehicles', {
   fields: [
     'id', 'vin', 'list_price', 'promo_price', 'lowest_price_30d', 'km',
     'condition', 'availability', 'color_code', 'color_category',
-    'transmission', 'drivetrain', 'highlighted',
+    'transmission', 'drivetrain', 'highlighted', 'trim_level_snapshot',
     'photos.directus_files_id',
     'brand.name', 'brand.slug',
     'model.name', 'model.slug', 'model.fuel_type',
-    'trim_level.name'
+    'model_year.year',
+    'trim_level.name',
   ],
 });
 
-// Helper — extrakt prvního foto UUID z M2M junction
-function firstPhotoUuid(v: VehicleListItem): string | null {
+function firstPhoto(v: VehicleListItem): string | null {
   if (!Array.isArray(v.photos) || v.photos.length === 0) return null;
-  const first = v.photos[0];
-  return typeof first === 'string' ? first : (first?.directus_files_id ?? null);
+  const f: any = v.photos[0];
+  return typeof f === 'string' ? f : (f?.directus_files_id ?? null);
 }
 
-const fuelLabels: Record<string, string> = {
-  petrol: 'Benzín', diesel: 'Diesel', hybrid: 'Hybrid', phev: 'PHEV', ev: 'Elektro',
-};
-const conditionLabels: Record<string, string> = {
-  new: 'Nový', demo: 'Předváděcí', used: 'Ojetý',
-};
-const availabilityLabels: Record<string, string> = {
-  in_stock: 'Skladem', on_the_way: 'Na cestě', reserved: 'Rezervováno', sold: 'Prodáno',
-};
-const transmissionLabels: Record<string, string> = {
-  manual: 'Manuál', automatic: 'Automat', dct: 'DCT', cvt: 'CVT', dht: 'Hybridní', reduction: 'Redukční',
-};
-const drivetrainLabels: Record<string, string> = {
-  fwd: 'FWD', rwd: 'RWD', awd: 'AWD', '4wd': '4×4',
-};
+const fuelLabels: Record<string, string> = { petrol: 'Benzín', diesel: 'Diesel', hybrid: 'Hybrid', phev: 'PHEV', ev: 'Elektro' };
+const conditionLabels: Record<string, string> = { new: 'Nové', demo: 'Předváděcí', used: 'Ojeté' };
 const colorCategoryLabels: Record<string, string> = {
   white: 'Bílá', black: 'Černá', gray: 'Šedá', silver: 'Stříbrná',
   blue: 'Modrá', red: 'Červená', green: 'Zelená', yellow: 'Žlutá',
   orange: 'Oranžová', brown: 'Hnědá', other: 'Jiná',
 };
 
-// Spočítej unikátní hodnoty pro filtry
-const availableFuels = [...new Set(vehicles.map(v => v.model?.fuel_type).filter(Boolean))] as string[];
-const availableTransmissions = [...new Set(vehicles.map(v => v.transmission).filter(Boolean))] as string[];
-const availableDrivetrains = [...new Set(vehicles.map(v => v.drivetrain).filter(Boolean))] as string[];
-const availableColors = [...new Set(vehicles.map(v => v.color_category).filter(Boolean))] as string[];
-const availableConditions = [...new Set(vehicles.map(v => v.condition).filter(Boolean))] as string[];
+// Unique values pro filtry
+const availableFuels = [...new Set(vehicles.map((v) => v.model?.fuel_type).filter(Boolean))] as string[];
+const availableColors = [...new Set(vehicles.map((v) => v.color_category).filter(Boolean))] as string[];
+const availableConditions = [...new Set(vehicles.map((v) => v.condition).filter(Boolean))] as string[];
 
-const priceMin = vehicles.length > 0 ? Math.min(...vehicles.map(v => v.promo_price ?? v.list_price ?? 9999999).filter(p => p < 9999999)) : 0;
-const priceMax = vehicles.length > 0 ? Math.max(...vehicles.map(v => v.promo_price ?? v.list_price ?? 0)) : 0;
+const fmtPrice = (n?: number | null) => (n ? `${n.toLocaleString('cs-CZ')} Kč` : '—');
+const fmtKm = (n?: number | null) => (n === 0 || !n ? '0 km' : `${n.toLocaleString('cs-CZ')} km`);
 ---
 
 <BaseLayout title="Skladové vozy" description="Aktuální nabídka skladových vozů KGM, OMODA & JAECOO, Farizon u SFR Motor Praha-Ďáblice.">
-  <section class="section sklad__hero">
+  <section class="sklad-page">
     <div class="container">
-      <p class="eyebrow">Skladové vozy</p>
-      <h1>Vozy ihned k odběru</h1>
-      <p class="lead">
-        {vehicles.length > 0
-          ? `Aktuálně ${vehicles.length} ${vehicles.length === 1 ? 'vůz' : vehicles.length < 5 ? 'vozy' : 'vozů'} skladem v Praze-Ďáblicích.`
-          : 'Skladovka se právě plní. Sleduj nás nebo nám napiš — najdeme ti tu pravou.'}
-      </p>
+      <div class="crumbs">
+        <a href="/">Domů</a>
+        <span class="sep">/</span>
+        <span class="here">Skladové vozy</span>
+      </div>
+
+      <div class="sklad-head">
+        <div>
+          <div class="section-eyebrow">Skladovka</div>
+          <h1>Vozy ihned k odběru</h1>
+        </div>
+        <div class="sklad-count" data-result-count>
+          {vehicles.length > 0
+            ? `${vehicles.length} ${vehicles.length === 1 ? 'vůz' : vehicles.length < 5 ? 'vozy' : 'vozů'} skladem`
+            : 'Skladovka se právě plní'}
+        </div>
+      </div>
+
+      {vehicles.length === 0 ? (
+        <div class="sklad-empty">
+          <p>Žádné vozy v adminu zatím nejsou. Napište nám, najdeme tu pravou.</p>
+          <a href="/kontakt" class="btn btn-primary" style="margin-top: 16px;">Napište nám</a>
+        </div>
+      ) : (
+        <div class="sklad-layout">
+          <!-- ===== FILTERS SIDEBAR ===== -->
+          <aside class="sklad-filters" data-filters>
+            <h3>Filtry</h3>
+
+            <div class="fblock">
+              <h4>Značka</h4>
+              <label><input type="radio" name="brand" value="all" checked /> Všechny</label>
+              {brands.map((b) => (
+                <label><input type="radio" name="brand" value={b.slug} /> {b.name}</label>
+              ))}
+            </div>
+
+            {availableFuels.length > 0 && (
+              <div class="fblock">
+                <h4>Palivo</h4>
+                <label><input type="radio" name="fuel" value="all" checked /> Vše</label>
+                {availableFuels.map((f) => (
+                  <label><input type="radio" name="fuel" value={f} /> {fuelLabels[f] ?? f}</label>
+                ))}
+              </div>
+            )}
+
+            {availableConditions.length > 0 && (
+              <div class="fblock">
+                <h4>Stav</h4>
+                <label><input type="radio" name="condition" value="all" checked /> Vše</label>
+                {availableConditions.map((c) => (
+                  <label><input type="radio" name="condition" value={c} /> {conditionLabels[c] ?? c}</label>
+                ))}
+              </div>
+            )}
+
+            {availableColors.length > 0 && (
+              <div class="fblock">
+                <h4>Barva</h4>
+                <label><input type="radio" name="color" value="all" checked /> Vše</label>
+                {availableColors.map((c) => (
+                  <label><input type="radio" name="color" value={c} /> {colorCategoryLabels[c] ?? c}</label>
+                ))}
+              </div>
+            )}
+
+            <button type="button" class="btn btn-outline" data-reset style="width:100%; margin-top:8px;">Resetovat</button>
+          </aside>
+
+          <!-- ===== GRID ===== -->
+          <div>
+            <div class="skladovka-grid" data-grid>
+              {vehicles.map((v) => {
+                const isNew = v.condition === 'new';
+                const isHighlighted = v.highlighted;
+                const pillLabel = isHighlighted ? 'Novinka' : isNew ? 'Nové' : 'Skladem';
+                const pillClass = isHighlighted || isNew ? ' is-new' : '';
+                const photoId = firstPhoto(v);
+                const trimName = v.trim_level?.name ?? (v.trim_level_snapshot as any)?.name ?? '';
+                const carYear = v.model_year?.year ?? '';
+                const conditionLabel = conditionLabels[v.condition ?? ''] ?? '';
+                const fuelLabel = fuelLabels[v.model?.fuel_type ?? ''] ?? '';
+                const price = v.promo_price ?? v.list_price;
+                return (
+                  <a
+                    class="scard"
+                    href={`/sklad/${v.id}`}
+                    data-brand={v.brand?.slug ?? ''}
+                    data-fuel={v.model?.fuel_type ?? ''}
+                    data-color={v.color_category ?? ''}
+                    data-condition={v.condition ?? ''}
+                  >
+                    <div class="pic">
+                      {photoId && <DirectusImage src={photoId} alt={`${v.brand?.name ?? ''} ${v.model?.name ?? ''}`} aspectRatio="4/3" />}
+                    </div>
+                    <div class="body">
+                      <span class={`pill${pillClass}`}>{pillLabel}</span>
+                      <div class="nm">{v.brand?.name ?? ''} {v.model?.name ?? ''}</div>
+                      <div class="var">{trimName}</div>
+                      <div class="meta">
+                        {fuelLabel && <span>{fuelLabel}</span>}
+                        {carYear && <span class="dot">{carYear}</span>}
+                        <span class="dot">{fmtKm(v.km)}</span>
+                        {conditionLabel && <span class="dot">{conditionLabel}</span>}
+                      </div>
+                      <div class="price">{fmtPrice(price)}</div>
+                    </div>
+                  </a>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   </section>
 
-  <section class="container sklad-layout">
-    <!-- SIDEBAR FILTRY -->
-    <aside class="filters-sidebar" data-filter-bar>
-      <h3 class="filters-sidebar__title">Filtry</h3>
+  <script>
+    // ===== Klient-side multi-filtr =====
+    const filters = {
+      brand: 'all', fuel: 'all', color: 'all', condition: 'all',
+    };
 
-      <div class="filter-group">
-        <h4>Značka</h4>
-        <button class="filter-chip is-active" data-key="brand" data-value="all">Všechny</button>
-        {brands.map(brand => (
-          <button class="filter-chip" data-key="brand" data-value={brand.slug}>{brand.name}</button>
-        ))}
-      </div>
-
-      {availableFuels.length >= 1 && (
-        <div class="filter-group">
-          <h4>Palivo</h4>
-          <button class="filter-chip is-active" data-key="fuel" data-value="all">Vše</button>
-          {availableFuels.map(f => (
-            <button class="filter-chip" data-key="fuel" data-value={f}>{fuelLabels[f] ?? f}</button>
-          ))}
-        </div>
-      )}
-
-      {availableTransmissions.length >= 1 && (
-        <div class="filter-group">
-          <h4>Převodovka</h4>
-          <button class="filter-chip is-active" data-key="transmission" data-value="all">Vše</button>
-          {availableTransmissions.map(t => (
-            <button class="filter-chip" data-key="transmission" data-value={t}>{transmissionLabels[t] ?? t}</button>
-          ))}
-        </div>
-      )}
-
-      {availableDrivetrains.length >= 1 && (
-        <div class="filter-group">
-          <h4>Pohon</h4>
-          <button class="filter-chip is-active" data-key="drivetrain" data-value="all">Vše</button>
-          {availableDrivetrains.map(d => (
-            <button class="filter-chip" data-key="drivetrain" data-value={d}>{drivetrainLabels[d] ?? d}</button>
-          ))}
-        </div>
-      )}
-
-      {availableColors.length >= 1 && (
-        <div class="filter-group">
-          <h4>Barva</h4>
-          <button class="filter-chip is-active" data-key="color" data-value="all">Vše</button>
-          {availableColors.map(c => (
-            <button class="filter-chip" data-key="color" data-value={c}>{colorCategoryLabels[c] ?? c}</button>
-          ))}
-        </div>
-      )}
-
-      {availableConditions.length >= 1 && (
-        <div class="filter-group">
-          <h4>Stav</h4>
-          <button class="filter-chip is-active" data-key="condition" data-value="all">Vše</button>
-          {availableConditions.map(c => (
-            <button class="filter-chip" data-key="condition" data-value={c}>{conditionLabels[c] ?? c}</button>
-          ))}
-        </div>
-      )}
-
-      <button type="button" class="filter-reset" data-reset>Resetovat filtry</button>
-    </aside>
-
-    <div class="sklad-content">
-
-    {vehicles.length === 0 ? (
-      <div class="empty-stock">
-        <h3>Zatím žádné vozy v adminu</h3>
-        <p class="text-muted">
-          Skladovka je momentálně prázdná. Po přidání prvních vozů do Directus adminu se objeví zde automaticky.
-        </p>
-        <a href="/kontakt" class="btn btn--primary" style="margin-top: 16px;">Napište nám</a>
-      </div>
-    ) : (
-      <div class="stock__grid">
-        {vehicles.map(v => {
-          const hasPromo = v.promo_price && v.list_price && v.promo_price < v.list_price;
-          const photoCount = Array.isArray(v.photos) ? v.photos.length : 0;
-          const firstPhoto = firstPhotoUuid(v);
-          return (
-            <a
-              href={`/sklad/${v.id}`}
-              class="stock-card"
-              data-brand={v.brand.slug}
-              data-fuel={v.model.fuel_type ?? ''}
-              data-transmission={v.transmission ?? ''}
-              data-drivetrain={v.drivetrain ?? ''}
-              data-color={v.color_category ?? ''}
-              data-condition={v.condition ?? ''}
-            >
-              <div class="stock-card__media" aria-hidden="true">
-                <DirectusImage
-                  src={firstPhoto}
-                  alt={`${v.brand.name} ${v.model.name}`}
-                  aspectRatio="4/3"
-                  widths={[400, 800]}
-                  sizes="(max-width: 600px) 100vw, 33vw"
-                  fallbackGradient="linear-gradient(135deg, #2a2a30, #56565d)"
-                />
-                {v.highlighted && <span class="stock-card__badge">⭐ Doporučujeme</span>}
-                {photoCount === 0 && <span class="stock-card__no-photo">Foto brzy</span>}
-              </div>
-              <div class="stock-card__body">
-                <div class="stock-card__meta">
-                  <span class="chip">{conditionLabels[v.condition] ?? v.condition}</span>
-                  <span class="chip chip--success">{availabilityLabels[v.availability] ?? v.availability}</span>
-                </div>
-                <h4>{v.brand.name} {v.model.name}</h4>
-                {v.trim_level?.name && <p class="text-muted">{v.trim_level.name}</p>}
-                <div class="stock-card__details">
-                  {v.km !== undefined && v.km !== null && (
-                    <span class="font-mono">{v.km.toLocaleString('cs-CZ')} km</span>
-                  )}
-                  {v.color_code && <span class="font-mono">{v.color_code}</span>}
-                </div>
-                <div class="stock-card__price">
-                  {hasPromo && (
-                    <span class="stock-card__price-list">{v.list_price?.toLocaleString('cs-CZ')} Kč</span>
-                  )}
-                  {(v.promo_price ?? v.list_price) ? (
-                    <span class="stock-card__price-promo">
-                      {(v.promo_price ?? v.list_price)?.toLocaleString('cs-CZ')} Kč
-                    </span>
-                  ) : (
-                    <span class="stock-card__price-promo stock-card__price-promo--ondemand">Cena na dotaz</span>
-                  )}
-                </div>
-              </div>
-            </a>
-          );
-        })}
-      </div>
-    )}
-    </div>
-  </section>
-</BaseLayout>
-
-<style>
-  .sklad__hero { padding-block: clamp(40px, 6vw, 80px) clamp(24px, 4vw, 40px); }
-  .sklad__hero h1 { margin: 8px 0 16px; }
-  .sklad__hero .lead { max-width: 60ch; }
-
-  .sklad-layout {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 32px;
-  }
-  @media (min-width: 900px) {
-    .sklad-layout { grid-template-columns: 260px 1fr; align-items: flex-start; }
-  }
-
-  .filters-sidebar {
-    background: var(--bg-card);
-    border: 1px solid var(--line);
-    border-radius: var(--radius-lg);
-    padding: 20px;
-    position: sticky;
-    top: 80px;
-    max-height: calc(100vh - 100px);
-    overflow-y: auto;
-  }
-  .filters-sidebar__title { font-size: 1rem; margin-bottom: 16px; }
-
-  .filter-group { margin-bottom: 20px; }
-  .filter-group h4 {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 0.7rem;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    color: var(--muted);
-    margin-bottom: 8px;
-    font-weight: 500;
-  }
-  .filter-group .filter-chip {
-    margin-right: 6px;
-    margin-bottom: 6px;
-  }
-
-  .filter-chip {
-    padding: 5px 10px;
-    border-radius: var(--radius);
-    border: 1px solid var(--line);
-    background: white;
-    font-size: 0.82rem;
-    font-weight: 500;
-    color: var(--ink-soft);
-    cursor: pointer;
-    transition: all 160ms ease;
-    display: inline-flex;
-    align-items: center;
-  }
-  .filter-chip:hover { border-color: var(--ink); }
-  .filter-chip.is-active { background: var(--ink); color: white; border-color: var(--ink); }
-
-  .filter-reset {
-    margin-top: 12px;
-    width: 100%;
-    padding: 8px;
-    border: 1px solid var(--line);
-    border-radius: var(--radius);
-    background: white;
-    font-size: 0.85rem;
-    color: var(--muted);
-    cursor: pointer;
-  }
-  .filter-reset:hover { background: var(--bg-soft); color: var(--ink); }
-
-  .sklad-content { min-width: 0; }
-
-  .empty-stock {
-    padding: clamp(40px, 6vw, 80px);
-    text-align: center;
-    background: var(--bg-soft);
-    border-radius: var(--radius-lg);
-    border: 1px dashed var(--line);
-    margin-bottom: var(--section-pad);
-  }
-  .empty-stock h3 { margin-bottom: 8px; }
-
-  .stock__grid {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 16px;
-    padding-bottom: var(--section-pad);
-  }
-  @media (min-width: 600px) { .stock__grid { grid-template-columns: repeat(2, 1fr); gap: 20px; } }
-  @media (min-width: 1000px) { .stock__grid { grid-template-columns: repeat(3, 1fr); } }
-
-  .stock-card {
-    display: flex;
-    flex-direction: column;
-    background: var(--bg-card);
-    border: 1px solid var(--line);
-    border-radius: var(--radius-lg);
-    overflow: hidden;
-    transition: transform 200ms ease, box-shadow 200ms ease;
-  }
-  .stock-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
-
-  .stock-card__media { aspect-ratio: 4/3; position: relative; overflow: hidden; }
-  .stock-card__bg {
-    width: 100%; height: 100%;
-    background: linear-gradient(135deg, #2a2a30, #56565d);
-  }
-  .stock-card__badge {
-    position: absolute; top: 12px; left: 12px;
-    background: var(--accent); color: white;
-    padding: 4px 10px; border-radius: var(--radius);
-    font-size: 0.75rem; font-weight: 600;
-  }
-  .stock-card__no-photo {
-    position: absolute; bottom: 12px; left: 12px;
-    background: rgba(0,0,0,0.6); color: white;
-    padding: 4px 10px; border-radius: var(--radius);
-    font-size: 0.7rem;
-  }
-
-  .stock-card__body { padding: 16px; display: flex; flex-direction: column; gap: 8px; flex: 1; }
-  .stock-card__meta { display: flex; gap: 6px; flex-wrap: wrap; }
-  .chip { font-family: 'JetBrains Mono', monospace; font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.06em; background: var(--bg-soft); padding: 4px 8px; border-radius: 4px; color: var(--ink-soft); }
-  .chip--success { background: rgba(30, 123, 95, 0.1); color: var(--success); }
-
-  .stock-card h4 { font-size: 1.05rem; margin-top: 2px; }
-  .stock-card__details { display: flex; gap: 12px; flex-wrap: wrap; font-size: 0.85rem; color: var(--muted); }
-
-  .stock-card__price { margin-top: auto; padding-top: 8px; display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
-  .stock-card__price-list { font-size: 0.85rem; color: var(--muted); text-decoration: line-through; }
-  .stock-card__price-promo { font-size: 1.15rem; font-weight: 700; color: var(--accent); }
-  .stock-card__price-promo--ondemand { color: var(--ink-soft); font-size: 1rem; }
-
-  /* Skryté karty filtrem */
-  .stock-card.is-hidden { display: none; }
-</style>
-
-<script>
-  // Multi-filter skladovky — sleduje aktivní hodnotu pro každý klíč (brand, fuel, transmission, drivetrain, color, condition)
-  const activeFilters: Record<string, string> = {
-    brand: 'all', fuel: 'all', transmission: 'all', drivetrain: 'all', color: 'all', condition: 'all',
-  };
-
-  function applyFilters() {
-    let visibleCount = 0;
-    document.querySelectorAll<HTMLElement>('.stock-card').forEach(card => {
-      const match =
-        (activeFilters.brand === 'all' || card.dataset.brand === activeFilters.brand) &&
-        (activeFilters.fuel === 'all' || card.dataset.fuel === activeFilters.fuel) &&
-        (activeFilters.transmission === 'all' || card.dataset.transmission === activeFilters.transmission) &&
-        (activeFilters.drivetrain === 'all' || card.dataset.drivetrain === activeFilters.drivetrain) &&
-        (activeFilters.color === 'all' || card.dataset.color === activeFilters.color) &&
-        (activeFilters.condition === 'all' || card.dataset.condition === activeFilters.condition);
-
-      if (match) {
-        card.classList.remove('is-hidden');
-        visibleCount++;
-      } else {
-        card.classList.add('is-hidden');
+    function applyFilters() {
+      const cards = document.querySelectorAll('.scard');
+      let visible = 0;
+      cards.forEach((c) => {
+        const el = c;
+        const ok =
+          (filters.brand === 'all' || el.dataset.brand === filters.brand) &&
+          (filters.fuel === 'all' || el.dataset.fuel === filters.fuel) &&
+          (filters.color === 'all' || el.dataset.color === filters.color) &&
+          (filters.condition === 'all' || el.dataset.condition === filters.condition);
+        if (ok) {
+          el.style.display = '';
+          visible++;
+        } else {
+          el.style.display = 'none';
+        }
+      });
+      const count = document.querySelector('[data-result-count]');
+      if (count) {
+        const noun = visible === 1 ? 'vůz' : visible < 5 ? 'vozy' : 'vozů';
+        count.textContent = visible === 0 ? 'Žádné vozy nesplňují filtr' : `${visible} ${noun} skladem`;
       }
+    }
+
+    document.querySelectorAll('[data-filters] input[type=radio]').forEach((input) => {
+      input.addEventListener('change', (e) => {
+        const t = e.target;
+        if (t.name in filters) {
+          filters[t.name] = t.value;
+          applyFilters();
+        }
+      });
     });
 
-    // Update header count (if exists)
-    const headerEl = document.querySelector('.sklad__hero .lead');
-    if (headerEl) {
-      const noun = visibleCount === 1 ? 'vůz' : visibleCount < 5 ? 'vozy' : 'vozů';
-      headerEl.textContent = visibleCount === 0
-        ? 'Žádné vozy nesplňují zvolené filtry — zkus změnit kritéria.'
-        : `Zobrazeno ${visibleCount} ${noun} z aktivní nabídky.`;
-    }
-
-    if ((window as any).dataLayer) {
-      (window as any).dataLayer.push({
-        event: 'filter_stock',
-        filters: { ...activeFilters },
-        results: visibleCount,
-      });
-    }
-  }
-
-  document.querySelectorAll<HTMLButtonElement>('[data-filter-bar] .filter-chip').forEach((chip) => {
-    chip.addEventListener('click', () => {
-      const key = chip.dataset.key ?? '';
-      const value = chip.dataset.value ?? 'all';
-      if (!key) return;
-
-      activeFilters[key] = value;
-
-      // Update aktivní chip v rámci své skupiny
-      document.querySelectorAll(`[data-filter-bar] .filter-chip[data-key="${key}"]`)
-        .forEach(c => c.classList.remove('is-active'));
-      chip.classList.add('is-active');
-
+    document.querySelector('[data-reset]')?.addEventListener('click', () => {
+      Object.keys(filters).forEach((k) => { filters[k] = 'all'; });
+      document.querySelectorAll('[data-filters] input[value=all]').forEach((i) => (i.checked = true));
       applyFilters();
     });
-  });
 
-  // Reset button
-  document.querySelector<HTMLButtonElement>('[data-filter-bar] [data-reset]')?.addEventListener('click', () => {
-    for (const k in activeFilters) activeFilters[k] = 'all';
-    document.querySelectorAll('[data-filter-bar] .filter-chip').forEach(c => c.classList.remove('is-active'));
-    document.querySelectorAll('[data-filter-bar] .filter-chip[data-value="all"]').forEach(c => c.classList.add('is-active'));
-    applyFilters();
-  });
-</script>
+    // Aplikuj URL query params (?znacka=kgm)
+    const params = new URLSearchParams(window.location.search);
+    const brandParam = params.get('znacka') ?? params.get('brand');
+    if (brandParam) {
+      const radio = document.querySelector(`[data-filters] input[name=brand][value="${brandParam}"]`);
+      if (radio) { radio.checked = true; filters.brand = brandParam; applyFilters(); }
+    }
+    const modelParam = params.get('model');
+    if (modelParam) {
+      // Filtr podle modelu — jednoduše skryj karty které nematchují
+      document.querySelectorAll('.scard').forEach((c) => {
+        const href = c.getAttribute('href') ?? '';
+        // TODO: lepší filtr by potřeboval data-model atribut. Pro teď přeskočit
+      });
+    }
+  </script>
+
+  <style>
+    .sklad-filters label {
+      display: flex; align-items: center; gap: 10px;
+      padding: 6px 0;
+      font-size: 14px;
+      cursor: pointer;
+      color: var(--text);
+    }
+    .sklad-filters label:hover { color: var(--accent); }
+  </style>
+</BaseLayout>

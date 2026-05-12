@@ -1,12 +1,17 @@
 ---
 import BaseLayout from '@layouts/BaseLayout.astro';
 import DirectusImage from '@components/DirectusImage.astro';
-import { directusGet, directusAsset } from '@lib/directus';
+import { directusGet } from '@lib/directus';
 import type { Brand, Model } from '@lib/types';
+
+/* ============================================================
+   BRAND PAGE — 1:1 podle _design-draft/kgm.jsx
+   Sections: BrandHero · WhyBrand · ModelGrid · BrandStrip
+   ============================================================ */
 
 export async function getStaticPaths() {
   const brands = await directusGet<Brand>('brands', { fields: ['slug'] });
-  return brands.map(b => ({ params: { brand: b.slug } }));
+  return brands.map((b) => ({ params: { brand: b.slug } }));
 }
 
 const { brand: brandSlug } = Astro.params;
@@ -21,197 +26,288 @@ if (!brand) {
   return Astro.redirect('/404');
 }
 
-type ModelWithSub = Model & {
-  sub_brand?: number | null;
-};
-
-// Načti všechny modely této značky (zatím bez nested sub_brand expand — kvůli permissions)
+// Modely této značky
+type ModelWithSub = Model & { sub_brand?: number | null; hero_image?: string; fuel_type?: string };
 const allModels = await directusGet<ModelWithSub>('models', {
   filter: { brand: { _eq: brand.id }, status: { _eq: 'published' } },
   sort: ['sort'],
-  fields: ['id', 'slug', 'name', 'tagline', 'price_from', 'fuel_type', 'body_type', 'sub_brand'],
+  fields: [
+    'id', 'slug', 'name', 'tagline', 'price_from', 'fuel_type', 'body_type',
+    'sub_brand', 'hero_image',
+  ],
 });
 
-// Pokud máme sub_brand IDs, fetchni je separátně (jednoduchý batch)
-const subBrandIds = [...new Set(allModels.map(m => m.sub_brand).filter(Boolean))] as number[];
+// Sub-brandy
+const subBrandIds = [...new Set(allModels.map((m) => m.sub_brand).filter(Boolean))] as number[];
 const subBrandsRaw = subBrandIds.length > 0
   ? await directusGet<{ id: number; slug: string; name: string }>('sub_brands', {
       filter: { id: { _in: subBrandIds } },
       fields: ['id', 'slug', 'name'],
     })
   : [];
-const subBrandsById = new Map(subBrandsRaw.map(s => [s.id, s]));
+const subBrandsById = new Map(subBrandsRaw.map((s) => [s.id, s]));
 
-const models = allModels.map(m => ({
-  ...m,
-  _subBrand: m.sub_brand ? subBrandsById.get(m.sub_brand) ?? null : null,
-}));
+// Skladové vozy této značky — počet
+const stockOfBrand = await directusGet<{ id: string }>('stock_vehicles', {
+  filter: { brand: { _eq: brand.id }, status: { _eq: 'published' }, availability: { _in: ['in_stock', 'on_the_way'] } },
+  fields: ['id'],
+  limit: 200,
+});
+const stockCount = stockOfBrand.length;
 
-const fuelLabels: Record<string, string> = {
+// Ostatní brandy pro BrandStrip
+const otherBrands = await directusGet<Brand>('brands', {
+  filter: { status: { _eq: 'published' }, slug: { _neq: brandSlug } },
+  sort: ['sort'],
+  fields: ['id', 'slug', 'name', 'tagline'],
+  limit: 3,
+});
+
+// Fuel mapping pro fuel-tag třídu
+const fuelTagClass: Record<string, string> = {
+  petrol: 'benzin',
+  diesel: 'diesel',
+  hybrid: 'hybrid',
+  phev: 'phev',
+  ev: 'elektro',
+};
+const fuelLabel: Record<string, string> = {
   petrol: 'Benzín',
   diesel: 'Diesel',
   hybrid: 'Hybrid',
-  phev: 'Plug-in Hybrid',
+  phev: 'PHEV',
   ev: 'Elektro',
 };
+const bodyLabel: Record<string, string> = {
+  suv: 'SUV',
+  hatchback: 'Hatchback',
+  sedan: 'Sedan',
+  pickup: 'Pick-up',
+  van: 'Dodávka',
+  mpv: 'MPV',
+};
 
-// Group models by sub-brand v frontmatter
-type ResolvedModel = ModelWithSub & { _subBrand: { id: number; slug: string; name: string } | null };
-type ModelGroup = { subBrandName: string | null; models: ResolvedModel[] };
-const modelGroups: ModelGroup[] = [];
-const groupMap = new Map<string, ModelGroup>();
+// "Why this brand" — TODO: časem do Directus brand fields. Zatím hardcoded mapping.
+type WhyItem = { ic: 'shield' | 'axle' | 'bolt' | 'hook' | 'spark' | 'globe' | 'cargo'; t: string; s: string };
+type WhyConfig = {
+  displayName?: string;
+  eyebrow: [string, string];
+  tagline: [string, string];
+  whyEyebrow: string;
+  whyTitle: string;
+  whyIntro: string;
+  why: WhyItem[];
+  modelsHeadline: string;
+  bannerTitle: string;
+};
+const WHY: Record<string, WhyConfig> = {
+  kgm: {
+    eyebrow: ['KGM Mobility', 'Dříve SsangYong'],
+    tagline: [
+      'Korejský charakter, evropský komfort.',
+      'Od kompaktního Tivoli po flagship Rexton.',
+    ],
+    whyEyebrow: 'Proč KGM?',
+    whyTitle: 'Auta, která pracují stejně dobře, jako vy.',
+    whyIntro:
+      'KGM (KG Mobility) je nástupce SsangYong — značky s 70letou historií výroby SUV a pickupů. Spolehlivé pohony 4×4, štědrá základní výbava a servisní síť, na kterou se dá spolehnout.',
+    why: [
+      { ic: 'shield', t: '5letá záruka', s: 'Bez omezení nájezdu na vybrané modely' },
+      { ic: 'axle', t: 'Pohon 4×4', s: 'U Korando, Torres, Rextonu i Musso Grand' },
+      { ic: 'bolt', t: 'Elektrifikace', s: 'Torres EVX a HEV varianty' },
+      { ic: 'hook', t: 'Tažné až 3,5 t', s: 'Rexton a Musso Grand jako pracovní partneři' },
+    ],
+    modelsHeadline: '9 modelů. Od městského SUV po pickup.',
+    bannerTitle: 'Vidíte vybraný model? Pojďte ho vyzkoušet.',
+  },
+  'omoda-jaecoo': {
+    displayName: 'OMODA & JAECOO',
+    eyebrow: ['Chery Group', 'Nová generace'],
+    tagline: [
+      'Dvě tváře jednoho moderního pohledu na SUV.',
+      'Omoda pro město, Jaecoo pro dobrodružství.',
+    ],
+    whyEyebrow: 'Proč Omoda & Jaecoo?',
+    whyTitle: 'Nová značka. Štědrá výbava od první ceny.',
+    whyIntro:
+      'Omoda & Jaecoo přicházejí jako svěží alternativa s odvážným designem a velkorysou výbavou. V základu dostanete to, co konkurence prodává v drahých příplatcích.',
+    why: [
+      { ic: 'shield', t: '7letá záruka', s: 'Nebo 150 000 km — co nastane dřív' },
+      { ic: 'bolt', t: 'Plug-in i elektro', s: 'SHS hybrid s dojezdem přes 1 100 km' },
+      { ic: 'spark', t: 'Odvážný design', s: 'Diamantová maska a LED architektura' },
+      { ic: 'globe', t: 'Globální značka', s: 'Chery — 4. největší výrobce v Číně' },
+    ],
+    modelsHeadline: '4 modely. Městský crossover i opravdové SUV.',
+    bannerTitle: 'Líbí se vám Omoda nebo Jaecoo? Domluvíme jízdu.',
+  },
+  farizon: {
+    eyebrow: ['Geely Group', 'Užitková elektromobilita'],
+    tagline: [
+      'Elektrická dodávka pro práci od pondělí do pátku.',
+      'Žádný kompromis. Žádné palivo.',
+    ],
+    whyEyebrow: 'Proč Farizon?',
+    whyTitle: 'Užitkové vozy, které se počítají.',
+    whyIntro:
+      'Farizon je užitková značka skupiny Geely — největšího čínského výrobce automobilů. SuperVan kombinuje nákladový prostor evropského formátu s plně elektrickým pohonem a 7letou zárukou.',
+    why: [
+      { ic: 'bolt', t: '100% elektro', s: 'Dojezd až 247 km v městském cyklu' },
+      { ic: 'cargo', t: 'Náklad 1 350 kg', s: 'Objem 13 m³ ve verzi L3H2' },
+      { ic: 'shield', t: '7letá záruka', s: 'Na baterii i pohon. Nula starostí.' },
+      { ic: 'globe', t: 'Geely Group', s: 'Globální zázemí, evropská homologace' },
+    ],
+    modelsHeadline: 'Užitková řada. Dodávka i podvozek.',
+    bannerTitle: 'Hledáte flotilové řešení? Probereme to.',
+  },
+};
+const why = WHY[brandSlug] ?? WHY.kgm;
+const displayName = why.displayName ?? brand.name;
 
-for (const m of models) {
-  const key = m._subBrand?.slug ?? '_main';
-  let group = groupMap.get(key);
-  if (!group) {
-    group = { subBrandName: m._subBrand?.name ?? null, models: [] };
-    groupMap.set(key, group);
-    modelGroups.push(group);
-  }
-  group.models.push(m);
-}
+// Brand strip mapping (other brands)
+const STRIP: Record<string, { tag: string; ds: string }> = {
+  kgm: { tag: 'Korejské SUV', ds: '9 modelů. Spolehlivé pohony 4×4 a štědrá záruka.' },
+  'omoda-jaecoo': { tag: 'Nová generace', ds: 'Odvážný design a velkorysá výbava v základu.' },
+  farizon: { tag: 'Užitkové elektro', ds: 'Geely Group. SuperVan pro každodenní práci.' },
+};
 
-const brandColor = brand.primary_color ?? '#1a1a1f';
-const heroImageUrl = brand.hero_image ? directusAsset(brand.hero_image, { width: 2400, format: 'webp', quality: 75 }) : null;
-const heroBgStyle = heroImageUrl
-  ? `--brand-color: ${brandColor}; background-image: linear-gradient(180deg, rgba(0,0,0,0.4) 0%, rgba(0,0,0,0.75) 100%), url('${heroImageUrl}'); background-size: cover; background-position: center;`
-  : `--brand-color: ${brandColor};`;
-const cardBgStyle = `background: linear-gradient(135deg, ${brandColor} 0%, #555 100%);`;
-
-const previousNamesStr = brand.previous_names && brand.previous_names.length > 0
-  ? brand.previous_names.join(', ')
-  : '';
-
-// České skloňování modelů: 1 model / 2-4 modely / 5+ modelů
-function pluralizeModels(n: number): string {
-  if (n === 1) return '1 model';
-  if (n >= 2 && n <= 4) return `${n} modely`;
-  return `${n} modelů`;
-}
-const modelsCountLabel = models.length > 0 ? pluralizeModels(models.length) : 'Modely';
+const activeBrand = Astro.params.brand;
 ---
 
 <BaseLayout
   title={`${brand.name} | SFR Motor`}
   description={brand.description ?? brand.tagline ?? `${brand.name} — modely a skladové vozy u SFR Motor.`}
 >
-  <section class="brand-hero" style={heroBgStyle}>
-    <div class="container">
-      <p class="eyebrow eyebrow-accent">Autorizovaný dealer</p>
-      <h1 class="brand-hero__title">{brand.name}</h1>
-      {previousNamesStr && <p class="brand-hero__alt">Dříve známé jako {previousNamesStr}</p>}
-      {brand.tagline && <p class="lead">{brand.tagline}</p>}
-      <div class="brand-hero__cta">
-        <a href="/sklad" class="btn btn--primary">Skladové vozy {brand.name}</a>
-        <a href="#modely" class="btn btn--ghost">Modelová řada</a>
+  <!-- ===== BRAND HERO ===== -->
+  <section class="bhero" data-screen-label="01 Hero">
+    <div class="bhero-bg">
+      {brand.hero_image && <DirectusImage src={brand.hero_image} alt={`${brand.name} — hero`} aspectRatio="auto" />}
+    </div>
+    <div class="container bhero-inner">
+      <div class="bhero-eyebrow">
+        <span>{why.eyebrow[0]}</span>
+        <span class="sep">·</span>
+        <span>{why.eyebrow[1]}</span>
+      </div>
+      <h1 class="bhero-title">{displayName}</h1>
+      <p class="bhero-tagline">
+        {why.tagline[0]}<br />
+        {why.tagline[1]}
+      </p>
+      <div class="bhero-actions">
+        <a class="btn btn-primary" href={`/sklad?znacka=${brand.slug}`}>
+          Vozy {brand.name} skladem ({stockCount})
+        </a>
+        {/* TODO: ceník PDF link (až bude price_list_pdf_url na úrovni brand nebo model_year) */}
       </div>
     </div>
   </section>
 
-  <section class="section" id="modely">
-    <div class="container">
-      <header class="section__head">
-        <p class="eyebrow">Modelová řada</p>
-        <h2>{modelsCountLabel} {brand.name}</h2>
-      </header>
-
-      {models.length === 0 && (
-        <div class="empty-state">
-          <p>Modely pro {brand.name} zatím nejsou v adminu. Přidej je v Directusu → Models → Create Item.</p>
+  <!-- ===== WHY BRAND ===== -->
+  <section class="why" data-screen-label="02 Why">
+    <div class="container why-grid">
+      <div>
+        <div class="section-eyebrow">{why.whyEyebrow}</div>
+        <h2 class="why-title">{why.whyTitle}</h2>
+      </div>
+      <div>
+        <p class="why-intro">{why.whyIntro}</p>
+        <div class="why-cards">
+          {why.why.map((w) => (
+            <div class="why-card">
+              <div class="icbox">
+                {w.ic === 'shield' && <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg>}
+                {w.ic === 'axle' && <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="5" cy="6" r="2"/><circle cx="19" cy="6" r="2"/><circle cx="5" cy="18" r="2"/><circle cx="19" cy="18" r="2"/><line x1="7" y1="6" x2="17" y2="6"/><line x1="7" y1="18" x2="17" y2="18"/><line x1="12" y1="6" x2="12" y2="18"/></svg>}
+                {w.ic === 'bolt' && <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>}
+                {w.ic === 'hook' && <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v4"/><circle cx="12" cy="8" r="2"/><path d="M12 10v8a4 4 0 0 1-4 4 4 4 0 0 1-4-4"/></svg>}
+                {w.ic === 'spark' && <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9.94 14.06 2 22"/><path d="m13.94 10.06 8-8"/><path d="m17 5 2 2"/><path d="M14 8h6a2 2 0 0 1 2 2v6"/><path d="M8 14H2v6"/></svg>}
+                {w.ic === 'globe' && <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>}
+                {w.ic === 'cargo' && <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M16 3h5v5"/><path d="M21 3l-7 7"/><rect x="3" y="11" width="18" height="10" rx="1"/><line x1="9" y1="11" x2="9" y2="21"/></svg>}
+              </div>
+              <div>
+                <div class="t">{w.t}</div>
+                <div class="s">{w.s}</div>
+              </div>
+            </div>
+          ))}
         </div>
-      )}
-
-      {modelGroups.map((group) => (
-        <div class="models-group">
-          {group.subBrandName && (
-            <h3 class="models-group__title">{group.subBrandName}</h3>
-          )}
-          <div class="models__grid">
-            {group.models.map((m) => (
-              <a href={`/model/${m.slug}`} class="model-card">
-                <div class="model-card__media" aria-hidden="true">
-                  <DirectusImage
-                    src={m.hero_image}
-                    alt={`${brand.name} ${m.name}`}
-                    aspectRatio="16/10"
-                    fallbackGradient={cardBgStyle.replace('background: ', '').replace(';', '')}
-                    class="model-card__img"
-                  />
-                </div>
-                <div class="model-card__body">
-                  <h4>{m.name}</h4>
-                  {m.tagline && <p class="text-muted">{m.tagline}</p>}
-                  <div class="model-card__meta">
-                    {m.fuel_type && <span class="chip">{fuelLabels[m.fuel_type] ?? m.fuel_type}</span>}
-                    {m.price_from && (
-                      <span class="model-card__price">od {m.price_from.toLocaleString('cs-CZ')} Kč</span>
-                    )}
-                  </div>
-                </div>
-              </a>
-            ))}
-          </div>
-        </div>
-      ))}
+      </div>
     </div>
   </section>
 
-  <section class="section section--soft">
-    <div class="container brand-cta">
-      <h2>Zaujal vás některý z modelů {brand.name}?</h2>
-      <p class="lead">Domluvte si testovací jízdu nebo navštivte showroom v Praze-Ďáblicích.</p>
-      <div class="brand-cta__buttons">
-        <a href="/kontakt" class="btn btn--primary">Testovací jízda</a>
-        <a href="/sklad" class="btn btn--ghost">Skladové vozy</a>
+  <!-- ===== MODELS GRID ===== -->
+  <section class="models" data-screen-label="03 Modely">
+    <div class="container">
+      <div class="models-head">
+        <div class="section-eyebrow">Modelová řada</div>
+        <h2 class="lead">{why.modelsHeadline}</h2>
+      </div>
+      {allModels.length === 0 ? (
+        <div class="sklad-empty">Modely pro {brand.name} ještě nejsou připravené.</div>
+      ) : (
+        <div class="models-grid">
+          {allModels.map((m) => {
+            const fuelKey = m.fuel_type ?? '';
+            const tagClass = fuelTagClass[fuelKey] ?? 'benzin';
+            const tagLabel = fuelLabel[fuelKey] ?? '';
+            const body = bodyLabel[m.body_type ?? ''] ?? m.body_type ?? '';
+            return (
+              <a class="model-card" href={`/model/${m.slug}`}>
+                <div class="pic">
+                  {tagLabel && <span class={`fuel-tag ${tagClass}`}>{tagLabel}</span>}
+                  {m.hero_image && <DirectusImage src={m.hero_image} alt={`${brand.name} ${m.name}`} aspectRatio="4/3" />}
+                </div>
+                <div class="model-body">
+                  <div class="model-name">{m.name}</div>
+                  <p class="model-desc">{m.tagline ?? ''}</p>
+                  <div class="model-meta">Karoserie: {body || '—'} · Palivo: {tagLabel || '—'}</div>
+                  <div class="model-foot">
+                    <div>
+                      <div class="price-lab">Cena od</div>
+                      <div class="price-val">{m.price_from ? `${m.price_from.toLocaleString('cs-CZ')} Kč` : '—'}</div>
+                    </div>
+                    <span class="more">
+                      Prozkoumat
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                    </span>
+                  </div>
+                </div>
+              </a>
+            );
+          })}
+        </div>
+      )}
+      <div class="models-banner">
+        <h3>{why.bannerTitle}</h3>
+        <div class="models-banner-actions">
+          <a class="btn btn-primary" href="/kontakt">Testovací jízda</a>
+          <a class="btn btn-outline" href="/kontakt">Poptat vůz</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== BRAND STRIP (jiné značky) ===== -->
+  <section class="brand-strip" data-screen-label="04 Ostatní značky">
+    <div class="container">
+      <div class="section-eyebrow">Další značky u SFR Motor</div>
+      <h2 class="why-title" style="margin-bottom: 40px;">Tři značky pod jednou střechou.</h2>
+      <div class="brand-strip-grid">
+        {[brand, ...otherBrands].slice(0, 3).map((b) => {
+          const strip = STRIP[b.slug] ?? { tag: '', ds: b.tagline ?? '' };
+          const isActive = b.slug === activeBrand;
+          return (
+            <a class={`brand-tile${isActive ? ' is-active' : ''}`} href={`/${b.slug}`}>
+              <div class="tag">{strip.tag}</div>
+              <div class="nm">{b.name}</div>
+              <div class="ds">{strip.ds}</div>
+              <span class="more">
+                {isActive ? 'Aktuální značka' : 'Prozkoumat'}
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+              </span>
+            </a>
+          );
+        })}
       </div>
     </div>
   </section>
 </BaseLayout>
-
-<style>
-  .brand-hero {
-    padding-block: clamp(60px, 10vw, 120px) clamp(48px, 7vw, 80px);
-    background: linear-gradient(180deg, var(--brand-color) 0%, var(--ink) 100%);
-    color: var(--bg);
-  }
-  .brand-hero__title { margin-block: 8px 4px; font-size: clamp(2.6rem, 7vw, 5.5rem); }
-  .brand-hero__alt { color: var(--muted-light); font-size: 0.95rem; margin-bottom: 20px; }
-  .brand-hero .lead { color: rgba(255,255,255,0.85); margin-bottom: 28px; }
-  .brand-hero__cta { display: flex; flex-wrap: wrap; gap: 12px; }
-
-  .empty-state { padding: 32px; background: var(--bg-soft); border: 1px dashed var(--line); border-radius: var(--radius-lg); text-align: center; color: var(--muted); }
-
-  .models-group { margin-bottom: 48px; }
-  .models-group:last-child { margin-bottom: 0; }
-  .models-group__title { margin-bottom: 20px; font-size: clamp(1.2rem, 2vw, 1.8rem); color: var(--ink-soft); }
-
-  .models__grid {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: clamp(16px, 2vw, 24px);
-  }
-  @media (min-width: 600px) { .models__grid { grid-template-columns: repeat(2, 1fr); } }
-  @media (min-width: 1000px) { .models__grid { grid-template-columns: repeat(3, 1fr); } }
-
-  .model-card {
-    background: var(--bg-card);
-    border: 1px solid var(--line);
-    border-radius: var(--radius-lg);
-    overflow: hidden;
-    transition: transform 200ms ease, box-shadow 200ms ease;
-  }
-  .model-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
-  .model-card__media { aspect-ratio: 16/10; overflow: hidden; }
-  .model-card__bg { width: 100%; height: 100%; }
-  .model-card__body { padding: 18px; }
-  .model-card__body h4 { font-size: 1.1rem; margin-bottom: 6px; }
-  .model-card__meta { display: flex; align-items: center; justify-content: space-between; margin-top: 14px; gap: 8px; flex-wrap: wrap; }
-  .chip { font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.08em; background: var(--bg-soft); padding: 4px 8px; border-radius: 4px; color: var(--ink-soft); }
-  .model-card__price { font-weight: 600; color: var(--accent); }
-
-  .brand-cta { text-align: center; max-width: 700px; margin: 0 auto; }
-  .brand-cta h2 { margin-bottom: 12px; }
-  .brand-cta .lead { margin: 0 auto 24px; }
-  .brand-cta__buttons { display: flex; justify-content: center; gap: 12px; flex-wrap: wrap; }
-</style>

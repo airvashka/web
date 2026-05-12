@@ -2,181 +2,290 @@
 import BaseLayout from '@layouts/BaseLayout.astro';
 import DirectusImage from '@components/DirectusImage.astro';
 import { directusGet } from '@lib/directus';
-import type { Brand } from '@lib/types';
+import type { Brand, StockVehicle, Model } from '@lib/types';
 
-// Načti značky z Directusu (build time)
+/* ============================================================
+   HOMEPAGE — 1:1 podle _design-draft/home.jsx
+   Sections: Hero · BrandTiles · Skladovka · ServisEshop · Magazín
+   ============================================================ */
+
+// Brandy
 const brands = await directusGet<Brand>('brands', {
   sort: ['sort'],
-  fields: ['id', 'slug', 'name', 'tagline', 'description', 'primary_color', 'previous_names', 'status'],
+  fields: ['id', 'slug', 'name', 'tagline', 'description', 'hero_image', 'status'],
+  filter: { status: { _eq: 'published' } },
 });
 
-// Spočítej KPI texty pro brand cards (zatím hard-coded, časem z DB)
-const BRAND_META: Record<string, { eyebrow: string; description: string; bgGradient: string }> = {
-  'kgm': {
-    eyebrow: '9 modelů · benzín · hybrid · elektro',
-    description: 'Korejské SUV s charakterem — Korando, Torres, Rexton, Musso Grand, Actyon.',
-    bgGradient: 'linear-gradient(135deg, #1a1a1f, #3a3a45)',
-  },
-  'omoda-jaecoo': {
-    eyebrow: '7 modelů · hybrid · PHEV · elektro',
-    description: 'Nová generace prémiových SUV s pokročilou hybridní technologií.',
-    bgGradient: 'linear-gradient(135deg, #2a2d3a, #5a5e75)',
-  },
-  'farizon': {
-    eyebrow: 'elektrické užitkové',
-    description: 'Elektrické dodávky pro moderní podnikatele — SuperVan a V6E.',
-    bgGradient: 'linear-gradient(135deg, #1e2a3a, #3e5a75)',
-  },
+// Skladové vozy (4 nejnovější)
+const stockVehicles = await directusGet<any>('stock_vehicles', {
+  limit: 4,
+  sort: ['-listed_at'],
+  fields: [
+    'id', 'condition', 'availability', 'km', 'list_price', 'promo_price',
+    'highlighted', 'listed_at', 'trim_level_snapshot',
+    'photos.directus_files_id',
+    'model.id', 'model.name', 'model.slug',
+    'brand.id', 'brand.name', 'brand.slug',
+    'model_year.year',
+  ],
+  filter: { status: { _eq: 'published' }, availability: { _in: ['in_stock', 'on_the_way'] } },
+});
+
+const totalStockResult = await directusGet<StockVehicle>('stock_vehicles', {
+  fields: ['id', 'condition'],
+  filter: { status: { _eq: 'published' }, availability: { _in: ['in_stock', 'on_the_way'] } },
+  limit: 200,
+});
+const totalStockCount = totalStockResult.length;
+const demoStockCount = totalStockResult.filter((v) => v.condition === 'demo').length;
+
+const BRAND_DISPLAY: Record<string, { name: string; tag: string }> = {
+  'kgm': { name: 'KGM', tag: 'Korejský charakter, evropský komfort' },
+  'omoda-jaecoo': { name: 'Omoda & Jaecoo', tag: 'Nová éra SUV' },
+  'farizon': { name: 'Farizon', tag: 'Elektrická logistika' },
 };
+
+const fmtPrice = (n?: number | null) => (n ? `${n.toLocaleString('cs-CZ')} Kč` : '—');
+const fmtKm = (n?: number | null) => (n === 0 || !n ? '0 km' : `${n.toLocaleString('cs-CZ')} km`);
+
+// Hero — Zima varianta
+const hero = {
+  num: '01',
+  label: 'KGM Torres EVX',
+  title: ['Tři značky.', 'Jeden servis.', 'Bez kompromisů.'],
+  sub: 'Autorizovaný prodej a servis vozů KGM, OMODA & JAECOO a FARIZON.',
+};
+
+// Servis split — TODO: load from a "service_pricing" collection in Directus
+const services = [
+  { nm: 'Servis klimatizace', price: '1 590 Kč' },
+  { nm: 'Výměna oleje vč. filtru', price: '2 490 Kč' },
+  { nm: 'Geometrie náprav', price: '1 190 Kč' },
+  { nm: 'Přezutí a uskladnění', price: '1 490 Kč' },
+];
+
+// Magazín placeholder (TODO: vytvořit CMS collection "articles")
+const articles = [
+  { date: '28. 4. 2026', tag: 'Test', title: 'KGM Torres EVX: Elektrický outdoor bez kompromisů' },
+  { date: '12. 4. 2026', tag: 'Servis', title: 'Jak často měnit olej a proč na tom záleží' },
+  { date: '10. 4. 2026', tag: 'Novinky', title: 'Omoda 9 & Jaecoo 7: Technologie, které posouvají hranice' },
+  { date: '3. 4. 2026', tag: 'Tipy', title: 'Přezutí včas: bezpečnost začíná u pneumatik' },
+];
 ---
 
 <BaseLayout
   title="SFR Motor"
   description="SFR Motor — autorizovaný dealer KGM, OMODA & JAECOO a Farizon. Skladové vozy, servis pro všechny značky, prodej a doplňkové služby. Praha-Ďáblice."
 >
-  <!-- HERO -->
-  <section class="hero">
-    <div class="container hero__inner">
-      <p class="eyebrow eyebrow-accent">Autorizovaný dealer</p>
-      <h1 class="hero__title">
-        Auta, která <em>posouvají hranice</em>
+  <!-- ===== HERO ===== -->
+  <section class="hhero" data-screen-label="01 Hero">
+    <div class="hhero-bg">
+      {/* TODO: hero image z Directus (KGM Torres EVX) */}
+    </div>
+    <div class="container hhero-inner">
+      <h1 class="hhero-title">
+        {hero.title.map((line) => (<Fragment>{line}<br /></Fragment>))}
       </h1>
-      <p class="lead hero__lead">
-        KGM, OMODA &amp; JAECOO a Farizon na jednom místě. Skladové vozy ihned k odběru,
-        autorizovaný servis pro všechny značky, doplňkové služby pod jednou střechou v Praze-Ďáblicích.
-      </p>
-      <div class="hero__cta">
-        <a href="/sklad" class="btn btn--primary">Skladové vozy</a>
-        <a href="/servis" class="btn btn--ghost">Objednat servis</a>
+      <p class="hhero-sub">{hero.sub}</p>
+      <div class="hhero-actions">
+        <a class="btn btn-primary" href="/sklad">
+          Prohlédnout skladovku
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </a>
+        <a class="btn btn-outline" href="/servis">Objednat servis</a>
       </div>
+    </div>
+    <div class="hhero-counter">
+      <span class="num">{hero.num}</span>
+      <span class="sep">/</span>
+      <span>{hero.label}</span>
     </div>
   </section>
 
-  <!-- BRAND HUB — z Directusu -->
-  <section class="section brands">
+  <!-- ===== BRAND TILES (2x2) ===== -->
+  <section class="brand-tiles" data-screen-label="02 Značky">
     <div class="container">
-      <header class="section__head">
-        <p class="eyebrow">Naše značky</p>
-        <h2>Tři moderní rodiny vozů</h2>
-      </header>
-
-      {brands.length === 0 && (
-        <div class="empty-state">
-          <p>⚠️ Načtení značek z Directusu selhalo. Zkontroluj <code>PUBLIC_DIRECTUS_URL</code> env variable a deploy znovu.</p>
+      <div class="brand-tiles-head">
+        <div>
+          <div class="section-eyebrow">Naše značky</div>
+          <h2>Auta, která dávají smysl pro každý styl jízdy</h2>
         </div>
-      )}
-
-      <div class="brands__grid">
-        {brands.map((brand, idx) => {
-          const meta = BRAND_META[brand.slug] ?? { eyebrow: '', description: brand.tagline ?? '', bgGradient: '#1a1a1f' };
-          const isFeatured = idx === 0; // První značka má větší kartu
-          const altName = brand.previous_names && brand.previous_names.length > 0 ? ` (dříve ${brand.previous_names[0]})` : '';
+        <a class="head-link" href="/sklad">
+          Všechny vozy skladem
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </a>
+      </div>
+      <div class="brand-tiles-grid">
+        {brands.map((b) => {
+          const meta = BRAND_DISPLAY[b.slug] ?? { name: b.name, tag: b.tagline ?? '' };
           return (
-            <a href={`/${brand.slug}`} class={`brand-card ${isFeatured ? 'brand-card--lg' : ''}`}>
-              <div class="brand-card__media" aria-hidden="true">
-                <DirectusImage
-                  src={brand.hero_image}
-                  alt={brand.name}
-                  aspectRatio={isFeatured ? '16/10' : '16/9'}
-                  fallbackGradient={meta.bgGradient}
-                />
+            <div class="btile">
+              <div class="btile-bg">
+                {b.hero_image && <DirectusImage src={b.hero_image} alt={`${b.name} — hero`} aspectRatio="16/10" />}
               </div>
-              <div class="brand-card__body">
-                <p class="eyebrow eyebrow-accent">{meta.eyebrow}</p>
-                <h3>{brand.name}{altName && <span class="brand-card__alt">{altName}</span>}</h3>
-                <p>{meta.description}</p>
-                <span class="brand-card__cta">Prozkoumat {brand.name} →</span>
+              <div class="btile-body">
+                <div class="btile-name">{meta.name}</div>
+                <div class="btile-tag">{meta.tag}</div>
+                <div class="btile-actions">
+                  <a href={`/${b.slug}`}>
+                    Modely
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                  </a>
+                  <a href={`/sklad?znacka=${b.slug}`}>
+                    Skladem
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                  </a>
+                </div>
               </div>
-            </a>
+            </div>
           );
         })}
-      </div>
-    </div>
-  </section>
-
-  <!-- SKLADOVKA TEASER -->
-  <section class="section section--soft">
-    <div class="container">
-      <header class="section__head section__head--row">
-        <div>
-          <p class="eyebrow">Skladové vozy</p>
-          <h2>Vozy ihned k odběru</h2>
+        <!-- 4. dlaždice — Promo skladovka -->
+        <div class="btile is-promo">
+          <div class="btile-body">
+            <div class="btile-eyebrow">Skladové &amp; předváděcí vozy</div>
+            <div class="btile-name">K odjezdu dnes.</div>
+            <p class="btile-lead">Přes {totalStockCount} vozů na skladu napříč všemi značkami. Kompletně připravené.</p>
+            <div class="btile-stats">
+              <div>
+                <div class="v">{totalStockCount}</div>
+                <div class="l">vozů skladem</div>
+              </div>
+              <div>
+                <div class="v">{demoStockCount}</div>
+                <div class="l">předváděcích</div>
+              </div>
+            </div>
+            <div class="btile-actions">
+              <a href="/sklad">
+                Prohlédnout skladovku
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+              </a>
+            </div>
+          </div>
         </div>
-        <a href="/sklad" class="btn btn--ghost">Všechny skladové vozy →</a>
-      </header>
-
-      <div class="stock-placeholder">
-        <p class="text-muted">
-          Naskladnění zatím probíhá. Sleduj sekci skladových vozů — brzy zde budou aktuální nabídky.
-        </p>
-        <a href="/sklad" class="btn btn--dark" style="margin-top: 16px;">Přejít na skladovku</a>
       </div>
     </div>
   </section>
 
-  <!-- SERVIS -->
-  <section class="section servis">
-    <div class="container servis__grid">
-      <div>
-        <p class="eyebrow">Servis</p>
-        <h2>Autorizovaný servis pro&nbsp;všechny&nbsp;značky</h2>
-        <p class="lead">
-          KGM, OMODA &amp; JAECOO, Farizon — a navíc specializovaně Dacia a Renault.
-          Online objednání, pneuservis, karosárna, lakovna, originální díly.
-        </p>
-        <a href="/servis" class="btn btn--dark">Objednat termín</a>
+  <!-- ===== SKLADOVKA ===== -->
+  <section class="skladovka" data-screen-label="03 Skladovka">
+    <div class="container">
+      <div class="skladovka-head">
+        <div>
+          <div class="section-eyebrow">Skladovka</div>
+          <h2>Odjet můžete dnes</h2>
+        </div>
+        <a class="head-link" href="/sklad">
+          Všech {totalStockCount}+ vozů
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </a>
       </div>
-      <div class="servis__visual">
-        <div class="servis__chip">+420 771 259 323</div>
-        <p class="text-muted">Servisní oddělení · Po–Pá 8:00–17:00</p>
+      {stockVehicles.length === 0 ? (
+        <div class="sklad-empty">Skladovka se právě plní — koukněte se za chvíli, nebo nám zavolejte +420 771 235 458.</div>
+      ) : (
+        <div class="skladovka-grid">
+          {stockVehicles.map((v: any) => {
+            const isNew = v.condition === 'new';
+            const isHighlighted = v.highlighted;
+            const pillLabel = isHighlighted ? 'Novinka' : isNew ? 'Nové' : 'Skladem';
+            const pillClass = isHighlighted || isNew ? ' is-new' : '';
+            const photoId = v.photos?.[0]?.directus_files_id;
+            const trim = v.trim_level_snapshot?.name ?? '';
+            const modelName = v.model?.name ?? 'Vůz';
+            const brandName = v.brand?.name ?? '';
+            const carYear = v.model_year?.year ?? '';
+            const conditionLabel = v.condition === 'new' ? 'Nové' : v.condition === 'demo' ? 'Předváděcí' : 'Ojeté';
+            const fuelLabel = v.trim_level_snapshot?.fuel_label ?? '';
+            const price = v.promo_price ?? v.list_price;
+            return (
+              <a class="scard" href={`/sklad/${v.id}`}>
+                <div class="pic">
+                  {photoId && <DirectusImage src={photoId} alt={`${brandName} ${modelName}`} aspectRatio="4/3" />}
+                </div>
+                <div class="body">
+                  <span class={`pill${pillClass}`}>{pillLabel}</span>
+                  <div class="nm">{brandName} {modelName}</div>
+                  <div class="var">{trim}</div>
+                  <div class="meta">
+                    {fuelLabel && <span>{fuelLabel}</span>}
+                    {carYear && <span class="dot">{carYear}</span>}
+                    <span class="dot">{fmtKm(v.km)}</span>
+                    <span class="dot">{conditionLabel}</span>
+                  </div>
+                  <div class="price">{fmtPrice(price)}</div>
+                </div>
+              </a>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  </section>
+
+  <!-- ===== SERVIS + E-SHOP SPLIT ===== -->
+  <section class="split" data-screen-label="04 Servis a E-shop">
+    <div class="container split-grid">
+      <div class="split-card is-dark">
+        <div class="eyebrow">Servis pro všechny značky</div>
+        <h3>Online objednání servisu</h3>
+        <div class="svc-list">
+          {services.map((s) => (
+            <div class="svc-row">
+              <span class="svc-name">{s.nm}</span>
+              <span class="dots"></span>
+              <span class="svc-price">{s.price}</span>
+            </div>
+          ))}
+        </div>
+        <a class="btn btn-primary" href="/servis">Online objednání</a>
+      </div>
+      <div class="split-card is-cream">
+        <div class="eyebrow">E-shop</div>
+        <h3>Originální příslušenství</h3>
+        <p class="lead">Objevte širokou nabídku originálního příslušenství, doplňků a lifestyle produktů pro váš vůz i každodenní život.</p>
+        <div class="eshop-pic">
+          {/* TODO: foto příslušenství */}
+        </div>
+        <a class="btn-ghost-dark" href="#">
+          Otevřít e-shop
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7"/><polyline points="7 7 17 7 17 17"/></svg>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== MAGAZÍN ===== -->
+  <section class="magazin" data-screen-label="05 Magazín">
+    <div class="container">
+      <div class="magazin-head">
+        <div>
+          <div class="section-eyebrow">Magazín</div>
+          <h2>Co u nás právě jede</h2>
+        </div>
+        <a class="head-link" href="#">
+          Všechny články
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </a>
+      </div>
+      <div class="mag-grid">
+        {articles.map((a) => (
+          <a class="mag-card" href="#">
+            <div class="pic">
+              {/* TODO: foto k článku */}
+            </div>
+            <div class="mag-meta">
+              <span>{a.date}</span>
+              <span class="tag">{a.tag}</span>
+            </div>
+            <div class="mag-title">{a.title}</div>
+            <span class="mag-link">
+              Číst článek
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            </span>
+          </a>
+        ))}
       </div>
     </div>
   </section>
 </BaseLayout>
-
-<style>
-  .hero {
-    padding-block: clamp(48px, 8vw, 96px) clamp(60px, 9vw, 120px);
-    background: linear-gradient(180deg, var(--bg) 0%, var(--bg-soft) 100%);
-  }
-  .hero__inner { max-width: 900px; }
-  .hero__title { margin-block: 12px 20px; }
-  .hero__title em { font-style: normal; color: var(--accent); }
-  .hero__lead { margin-bottom: 28px; max-width: 64ch; }
-  .hero__cta { display: flex; flex-wrap: wrap; gap: 12px; }
-
-  .section__head { margin-bottom: clamp(28px, 4vw, 48px); }
-  .section__head--row { display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 16px; }
-  .section__head h2 { margin-top: 8px; }
-
-  .empty-state { padding: 32px; background: #FEF3C7; border: 1px solid #F59E0B; border-radius: var(--radius-lg); color: #92400E; }
-  .empty-state code { background: rgba(0,0,0,0.1); padding: 2px 6px; border-radius: 4px; font-family: 'JetBrains Mono', monospace; }
-
-  .brands__grid { display: grid; grid-template-columns: 1fr; gap: clamp(16px, 2vw, 28px); }
-  @media (min-width: 700px) {
-    .brands__grid { grid-template-columns: 1.6fr 1fr; grid-template-rows: 1fr 1fr; }
-    .brand-card--lg { grid-row: 1 / 3; }
-  }
-  .brand-card { display: flex; flex-direction: column; background: var(--bg-card); border-radius: var(--radius-lg); overflow: hidden; border: 1px solid var(--line); transition: transform 200ms ease, box-shadow 200ms ease; }
-  .brand-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
-  .brand-card__media { aspect-ratio: 16/9; overflow: hidden; }
-  .brand-card--lg .brand-card__media { aspect-ratio: 16/10; }
-  .brand-card__bg { width: 100%; height: 100%; }
-  .brand-card__body { padding: clamp(20px, 2.5vw, 32px); flex: 1; display: flex; flex-direction: column; gap: 10px; }
-  .brand-card__body h3 { font-size: clamp(1.2rem, 2vw, 1.6rem); }
-  .brand-card__alt { font-size: 0.65em; color: var(--muted); font-weight: 400; margin-left: 6px; }
-  .brand-card__body p { color: var(--ink-soft); font-size: 0.95rem; }
-  .brand-card__cta { margin-top: auto; color: var(--accent); font-weight: 600; font-size: 0.92rem; }
-
-  .stock-placeholder { padding: 48px; background: var(--bg-card); border: 1px dashed var(--line); border-radius: var(--radius-lg); text-align: center; }
-
-  .servis__grid { display: grid; grid-template-columns: 1fr; gap: 40px; align-items: center; }
-  @media (min-width: 900px) {
-    .servis__grid { grid-template-columns: 1.4fr 1fr; }
-  }
-  .servis__visual { background: var(--ink); color: var(--bg); padding: clamp(28px, 4vw, 48px); border-radius: var(--radius-lg); }
-  .servis__chip { font-family: 'JetBrains Mono', monospace; font-size: clamp(1.3rem, 2.4vw, 1.8rem); font-weight: 500; letter-spacing: -0.02em; margin-bottom: 12px; }
-  .servis__visual .text-muted { color: var(--muted-light); }
-  .servis h2 { margin-block: 6px 16px; }
-  .servis .btn--dark { margin-top: 16px; }
-</style>

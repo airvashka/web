@@ -1,272 +1,635 @@
 ---
 import BaseLayout from '@layouts/BaseLayout.astro';
 import DirectusImage from '@components/DirectusImage.astro';
-import LeadForm from '@components/LeadForm.astro';
-import { directusGet, directusAsset } from '@lib/directus';
-import { getNonEmptyCategories } from '@lib/features';
-import type { Brand, Model, StockVehicle, TrimLevel } from '@lib/types';
+import { directusGet } from '@lib/directus';
+import { getNonEmptyCategories, CATEGORY_LABELS } from '@lib/features';
+import type { Brand, Model, StockVehicle, TrimLevel, ModelYear } from '@lib/types';
+
+/* ============================================================
+   STOCK DETAIL — 1:1 podle _design-draft/app.jsx
+   Sections: Hero gallery + info · TrustStrip · About + highlights ·
+   Equipment (grouped 4 cols) · Specs · Finance · Similar cars ·
+   Contact form · Sticky CTA
+   ============================================================ */
 
 export async function getStaticPaths() {
   const vehicles = await directusGet<StockVehicle>('stock_vehicles', {
     fields: ['id'],
     filter: { status: { _eq: 'published' } },
   });
-  return vehicles.map(v => ({ params: { id: String(v.id) } }));
+  return vehicles.map((v) => ({ params: { id: String(v.id) } }));
 }
 
 const { id } = Astro.params;
 
-// 1) Fetch vehicle — photos musíme expandnout přes M2M junction
-type VehicleWithPhotos = StockVehicle & {
+type VehicleFull = StockVehicle & {
   photos?: Array<{ directus_files_id: string }>;
   transmission?: string;
   drivetrain?: string;
   color_category?: string;
 };
-const vehicles = await directusGet<VehicleWithPhotos>('stock_vehicles', {
+const vehicles = await directusGet<VehicleFull>('stock_vehicles', {
   filter: { id: { _eq: Number(id) }, status: { _eq: 'published' } },
   limit: 1,
   fields: ['*', 'photos.directus_files_id'],
 });
 const v = vehicles[0];
+if (!v) return Astro.redirect('/404');
 
-if (!v) {
-  return Astro.redirect('/404');
-}
-
-// 2) Fetch souvisejících entit
+// Souvislé entity
 const brands = v.brand ? await directusGet<Brand>('brands', { filter: { id: { _eq: Number(v.brand) } }, limit: 1 }) : [];
 const models = v.model ? await directusGet<Model>('models', { filter: { id: { _eq: Number(v.model) } }, limit: 1 }) : [];
 const trims = v.trim_level ? await directusGet<TrimLevel>('trim_levels', { filter: { id: { _eq: Number(v.trim_level) } }, limit: 1 }) : [];
+const modelYears = v.model_year ? await directusGet<ModelYear>('model_years', { filter: { id: { _eq: Number(v.model_year) } }, limit: 1 }) : [];
 
 const brand = brands[0];
 const model = models[0];
 const trim = trims[0];
+const modelYear = modelYears[0];
 
-// Extract UUIDs z M2M junction records (nebo přímé stringy z legacy dat)
+// Fotky M2M junction
 const photoIds: string[] = Array.isArray(v.photos)
-  ? v.photos.map((p: any) => typeof p === 'string' ? p : p?.directus_files_id).filter(Boolean) as string[]
+  ? (v.photos as any[]).map((p) => typeof p === 'string' ? p : p?.directus_files_id).filter(Boolean) as string[]
   : [];
 const heroPhoto = photoIds[0] ?? null;
-const otherPhotos = photoIds.slice(1);
+const thumbIds = photoIds.slice(1, 5);
+const extraPhotos = Math.max(0, photoIds.length - 5);
 
-const hasPromo = v.promo_price && v.list_price && v.promo_price < v.list_price;
+// Cena
+const hasPromo = !!(v.promo_price && v.list_price && v.promo_price < v.list_price);
 const finalPrice = v.promo_price ?? v.list_price;
+const monthlyPayment = v.monthly_payment_from ?? null;
 
+// Labels
 const conditionLabels: Record<string, string> = { new: 'Nový', demo: 'Předváděcí', used: 'Ojetý' };
 const availabilityLabels: Record<string, string> = { in_stock: 'Skladem', on_the_way: 'Na cestě', reserved: 'Rezervováno', sold: 'Prodáno' };
+const transmissionLabels: Record<string, string> = { manual: 'Manuál', automatic: 'Automat', dct: 'DCT', cvt: 'CVT', dht: 'Hybridní' };
+const drivetrainLabels: Record<string, string> = { fwd: 'FWD', rwd: 'RWD', awd: 'AWD', '4wd': '4×4' };
+const fuelLabels: Record<string, string> = { petrol: 'Benzín', diesel: 'Diesel', hybrid: 'Hybrid', phev: 'PHEV', ev: 'Elektro' };
 
 const title = `${brand?.name ?? ''} ${model?.name ?? ''}${trim ? ' ' + trim.name : ''}`.trim();
-
-const transmissionLabels: Record<string, string> = {
-  manual: 'Manuál', automatic: 'Automat', dct: 'DCT', cvt: 'CVT', dht: 'Hybridní', reduction: 'Redukční',
-};
-const drivetrainLabels: Record<string, string> = {
-  fwd: 'FWD', rwd: 'RWD', awd: 'AWD', '4wd': '4×4',
-};
+const fuelLabel = model ? (fuelLabels[(model as any).fuel_type] ?? '—') : '—';
 const transmissionLabel = v.transmission ? (transmissionLabels[v.transmission] ?? v.transmission) : null;
 const drivetrainLabel = v.drivetrain ? (drivetrainLabels[v.drivetrain] ?? v.drivetrain) : null;
+const year = modelYear?.year ?? (v.first_registration ? new Date(v.first_registration).getFullYear() : null);
+
+// Status badge
+const statusBadge = v.availability === 'in_stock' ? { cls: 'dark', label: 'Skladem' }
+  : v.availability === 'reserved' ? { cls: 'outline', label: 'Rezervováno' }
+  : v.availability === 'sold' ? { cls: 'outline', label: 'Prodáno' }
+  : { cls: 'outline', label: 'Na cestě' };
+
+// Equipment grouped (z trim features)
+const features: string[] = Array.isArray(trim?.features) ? (trim!.features as string[]) : [];
+const grouped = getNonEmptyCategories(features);
+
+// Specs — z trim_level_snapshot nebo model_year.technical_data
+const snapshot = (v.trim_level_snapshot as any) ?? {};
+const td: any = modelYear?.technical_data ?? {};
+const specsLeft: Array<[string, string]> = [
+  ['Motor', td.motor ?? td.Motor ?? snapshot.engine ?? '—'],
+  ['Převodovka', transmissionLabel ?? '—'],
+  ['Palivo', fuelLabel],
+  ['Výkon', td.vykon ?? td['Výkon'] ?? td['Čistý výkon motoru (kW)'] ?? '—'],
+  ['Točivý moment', td.tocivy_moment ?? td['Točivý moment'] ?? td['Maximální točivý moment (Nm)'] ?? '—'],
+  ['Pohon', drivetrainLabel ?? '—'],
+];
+const specsRight: Array<[string, string]> = [
+  ['Spotřeba (komb.)', td.spotreba ?? td['Spotřeba'] ?? td['Průměrná spotřeba paliva (l/100km)'] ?? '—'],
+  ['Emise CO₂ (komb.)', td.co2 ?? td['Emise CO₂'] ?? td['Emise CO₂ - kombinované (g/km)'] ?? '—'],
+  ['Rozměry (D × Š × V)', td.rozmery ?? td['Délka × Šířka × Výška (mm)'] ?? '—'],
+  ['Rozvor', td.rozvor ?? td['Rozvor kol (mm)'] ?? '—'],
+  ['Objem kufru', td.kufr ?? td['Objem zavazadlového prostoru (l)'] ?? '—'],
+  ['Počet míst', td.mista ?? td['Počet sedadel'] ?? '—'],
+];
+
+// Highlights — extract 4 z TD nebo features
+const highlights: Array<{ num: string; lab: string }> = [];
+if (td['Objem zavazadlového prostoru (l)']) highlights.push({ num: `${td['Objem zavazadlového prostoru (l)']} l`, lab: 'Objem zavazadlového prostoru — místo pro celou rodinu i bagáž.' });
+if (features.find((f) => f.toLowerCase().includes('12,3'))) highlights.push({ num: '12,3"', lab: 'Dvojitý digitální displej — přístrojový štít i infotainment.' });
+if (features.find((f) => f.toLowerCase().includes('airbag'))) highlights.push({ num: '5★', lab: 'Bezpečnost — 7 airbagů a kompletní ADAS asistenty v ceně.' });
+if (td['Průměrná spotřeba paliva (l/100km)']) highlights.push({ num: `${td['Průměrná spotřeba paliva (l/100km)']} l`, lab: 'Kombinovaná spotřeba na 100 km — nízké provozní náklady.' });
+if (td['Dojezd WLTP'] && !td['Průměrná spotřeba paliva (l/100km)']) highlights.push({ num: `${td['Dojezd WLTP']}`, lab: 'Dojezd WLTP — dlouhé cesty bez stresu.' });
+while (highlights.length < 4) highlights.push({ num: '✓', lab: 'Připravený k převzetí v Praze-Ďáblicích.' });
+
+// Similar cars (stejný model, jiné ID)
+const similar = await directusGet<any>('stock_vehicles', {
+  filter: {
+    id: { _neq: Number(v.id) },
+    model: { _eq: Number(v.model) },
+    status: { _eq: 'published' },
+    availability: { _in: ['in_stock', 'on_the_way'] },
+  },
+  limit: 3,
+  fields: [
+    'id', 'condition', 'km', 'list_price', 'promo_price', 'color_code',
+    'trim_level_snapshot', 'photos.directus_files_id',
+  ],
+});
+
+const conditionLabel = v.condition ? conditionLabels[v.condition] : '—';
+const availabilityLabel = v.availability ? availabilityLabels[v.availability] : '—';
+const description = (v.description ?? '').split(/\n\s*\n/).filter(Boolean);
 ---
 
 <BaseLayout title={title || 'Skladový vůz'} description={`${title} — skladový vůz u SFR Motor Praha-Ďáblice.`}>
-  <section class="stock-detail">
+  <main>
     <div class="container">
-      <nav class="breadcrumbs">
+      <!-- Breadcrumbs -->
+      <div class="crumbs">
         <a href="/sklad">Skladové vozy</a>
-        <span class="text-muted"> / </span>
-        <span>{title}</span>
-      </nav>
+        <span class="sep">/</span>
+        {brand && <><a href={`/${brand.slug}`}>{brand.name}</a><span class="sep">/</span></>}
+        {model && <><a href={`/model/${model.slug}`}>{model.name}</a><span class="sep">/</span></>}
+        <span class="here">{trim?.name ?? title}</span>
+      </div>
 
-      <div class="stock-detail__grid">
-        <div class="stock-detail__gallery">
-          <div class="stock-detail__hero">
-            <DirectusImage
-              src={heroPhoto}
-              alt={title}
-              aspectRatio="4/3"
-              widths={[800, 1600]}
-              fallbackGradient="linear-gradient(135deg, #2a2a30, #56565d)"
-            />
+      <!-- ===== HERO ===== -->
+      <section class="hero" data-screen-label="Hero">
+        <div>
+          <div class="gallery-main">
+            <div class="badges">
+              <span class={`badge ${statusBadge.cls}`}>{statusBadge.label}</span>
+              {v.highlighted && <span class="badge accent">Novinka</span>}
+              {year && <span class="badge outline">Model {year}</span>}
+            </div>
+            <button class="gallery-nav prev" type="button" aria-label="Předchozí foto">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+            </button>
+            <button class="gallery-nav next" type="button" aria-label="Další foto">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+            </button>
+            {photoIds.length > 0 && <div class="gallery-counter">01 / {String(photoIds.length).padStart(2, '0')}</div>}
+            {v.gallery_360_url && (
+              <a class="gallery-360" href={v.gallery_360_url} target="_blank" rel="noopener">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"/><path d="M16 16h5v5"/></svg>
+                360° pohled
+              </a>
+            )}
+            {heroPhoto ? (
+              <DirectusImage src={heroPhoto} alt={title} aspectRatio="auto" widths={[800, 1600]} />
+            ) : (
+              <div style="padding: 40px; text-align: center; color: var(--text-dim);">Foto bude doplněno</div>
+            )}
           </div>
-          {otherPhotos.length > 0 && (
-            <div class="stock-detail__thumbs">
-              {otherPhotos.slice(0, 4).map((p, i) => (
-                <DirectusImage src={p} alt={`${title} foto ${i + 2}`} aspectRatio="1/1" widths={[200, 400]} />
+          {(thumbIds.length > 0 || extraPhotos > 0) && (
+            <div class="thumbs">
+              {thumbIds.map((id, i) => (
+                <button class={`thumb${i === 0 ? ' active' : ''}`} type="button" aria-label={`Foto ${i + 2}`}>
+                  <DirectusImage src={id} alt={`Foto ${i + 2}`} aspectRatio="4/3" widths={[200, 400]} />
+                </button>
               ))}
+              {extraPhotos > 0 && <div class="thumb thumb-more">+{extraPhotos} fotek</div>}
             </div>
           )}
         </div>
 
-        <aside class="stock-detail__info">
-          <div class="stock-detail__chips">
-            {v.condition && <span class="chip">{conditionLabels[v.condition] ?? v.condition}</span>}
-            {v.availability && <span class="chip chip--success">{availabilityLabels[v.availability] ?? v.availability}</span>}
+        <!-- Info side -->
+        <div class="info">
+          <div class="info-eyebrow">
+            <span>{brand?.name ?? ''} {model?.name ?? ''}</span>
+            {fuelLabel !== '—' && <><span class="dot">·</span><span>{fuelLabel}</span></>}
           </div>
-
-          <h1 class="stock-detail__title">{title}</h1>
-
-          <dl class="stock-detail__specs">
-            {v.km !== undefined && v.km !== null && (
-              <div><dt>Najeto</dt><dd class="font-mono">{v.km.toLocaleString('cs-CZ')} km</dd></div>
-            )}
-            {transmissionLabel && <div><dt>Převodovka</dt><dd>{transmissionLabel}</dd></div>}
-            {drivetrainLabel && <div><dt>Pohon</dt><dd>{drivetrainLabel}</dd></div>}
-            {v.color_code && <div><dt>Barva</dt><dd class="font-mono">{v.color_code}</dd></div>}
-            {v.first_registration && <div><dt>1. registrace</dt><dd class="font-mono">{v.first_registration}</dd></div>}
-            {v.vin && <div><dt>VIN</dt><dd class="font-mono">{v.vin}</dd></div>}
-          </dl>
-
-          <div class="stock-detail__price">
-            {hasPromo && (
-              <span class="stock-detail__list-price">{v.list_price?.toLocaleString('cs-CZ')} Kč</span>
-            )}
+          <h1 class="info-title">{trim?.name ?? model?.name ?? title}</h1>
+          <div class="info-subtitle">
+            {v.color_code && <><span class="swatch" style={`background:${v.color_code}`}></span>{v.color_code}</>}
+            {trim && <> · {trim.name}</>}
+          </div>
+          <div class="info-price">
             {finalPrice ? (
-              <span class="stock-detail__main-price">{finalPrice.toLocaleString('cs-CZ')} Kč</span>
+              <span class="amount">{finalPrice.toLocaleString('cs-CZ')} Kč</span>
             ) : (
-              <span class="stock-detail__main-price stock-detail__main-price--ondemand">Cena na dotaz</span>
+              <span class="amount">Cena na dotaz</span>
             )}
-            {hasPromo && v.lowest_price_30d && (
-              <p class="stock-detail__lowest">
-                Nejnižší cena za posledních 30 dnů: <strong>{v.lowest_price_30d.toLocaleString('cs-CZ')} Kč</strong>
-              </p>
+            <span class="vat">vč. DPH</span>
+          </div>
+          {monthlyPayment && (
+            <div class="info-finance">
+              Financování od <strong style="color: var(--text);">{monthlyPayment.toLocaleString('cs-CZ')} Kč / měsíc</strong> &nbsp;—&nbsp;
+              <a href="#finance">kalkulačka →</a>
+            </div>
+          )}
+
+          <div class="spec-grid">
+            {year && (
+              <div class="spec-card">
+                <span class="ic">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                </span>
+                <div>
+                  <span class="lab">Rok</span>
+                  <span class="val">{year}</span>
+                </div>
+              </div>
             )}
-            {v.monthly_payment_from && (
-              <p class="stock-detail__monthly">Splátka od <strong>{v.monthly_payment_from.toLocaleString('cs-CZ')} Kč/měs</strong></p>
+            <div class="spec-card">
+              <span class="ic">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 14v-4"/><path d="M3.69 17A9 9 0 1 1 20.31 17"/><circle cx="12" cy="14" r="2"/></svg>
+              </span>
+              <div>
+                <span class="lab">Nájezd</span>
+                <span class="val">{(v.km ?? 0).toLocaleString('cs-CZ')} km</span>
+              </div>
+            </div>
+            <div class="spec-card">
+              <span class="ic">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="22" x2="15" y2="22"/><line x1="4" y1="9" x2="14" y2="9"/><path d="M14 22V4a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v18"/><path d="M14 13h2a2 2 0 0 1 2 2v2a2 2 0 0 0 2 2 2 2 0 0 0 2-2V9.83a2 2 0 0 0-.59-1.42L18 5"/></svg>
+              </span>
+              <div>
+                <span class="lab">Palivo</span>
+                <span class="val">{fuelLabel}</span>
+              </div>
+            </div>
+            {td['Čistý výkon motoru (kW)'] && (
+              <div class="spec-card">
+                <span class="ic">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                </span>
+                <div>
+                  <span class="lab">Výkon</span>
+                  <span class="val">{td['Čistý výkon motoru (kW)']} kW</span>
+                </div>
+              </div>
             )}
           </div>
 
-          <a href="#poptavka" class="btn btn--primary" style="width: 100%; justify-content: center;">Mám zájem o tento vůz</a>
+          <div class="cta-stack">
+            <a class="btn btn-primary" href="#poptavka">
+              Mám zájem
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            </a>
+            <div class="cta-row">
+              <a class="btn btn-outline" href="#poptavka">Rezervovat</a>
+              <a class="btn btn-outline" href="tel:+420771235458">Zavolat +420 771 235 458</a>
+            </div>
+          </div>
 
-          {model && (
-            <p style="margin-top: 20px; font-size: 0.9rem;">
-              <a href={`/model/${model.slug}`} class="text-muted">Více o modelu {model.name} →</a>
-            </p>
+          {v.availability === 'in_stock' && (
+            <div class="stock-line">
+              <span class="dot"></span>
+              Vozidlo v Praze, ihned k převzetí
+            </div>
           )}
-        </aside>
-      </div>
-
-      {v.description && (
-        <div class="stock-detail__desc">
-          <h2>Popis vozu</h2>
-          <div set:html={v.description.replace(/\n/g, '<br>')}></div>
         </div>
-      )}
+      </section>
+    </div>
 
-      {trim?.features && Array.isArray(trim.features) && trim.features.length > 0 && (
-        <div class="stock-detail__features">
-          <h2>Výbava trim levelu {trim.name}</h2>
-          <div class="features-grid">
-            {getNonEmptyCategories(trim.features).map((cat) => (
-              <section class="feature-cat">
-                <header class="feature-cat__head">
-                  <span class="feature-cat__icon">{cat.icon}</span>
-                  <h3>{cat.label}</h3>
-                </header>
-                <ul>
-                  {cat.items.map((it) => <li>{it}</li>)}
-                </ul>
-              </section>
+    <!-- ===== TRUST STRIP ===== -->
+    <div class="trust">
+      <div class="container trust-inner">
+        <div class="trust-item">
+          <span class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></span>
+          <div>
+            <div class="t">Záruka výrobce</div>
+            <div class="s">5–7 let dle modelu</div>
+          </div>
+        </div>
+        <div class="trust-item">
+          <span class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg></span>
+          <div>
+            <div class="t">Doprava po ČR</div>
+            <div class="s">Zdarma do 50 km</div>
+          </div>
+        </div>
+        <div class="trust-item">
+          <span class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20.59 13.41 13.42 20.58a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg></span>
+          <div>
+            <div class="t">Výkup vašeho vozu</div>
+            <div class="s">Online ocenění do hodiny</div>
+          </div>
+        </div>
+        <div class="trust-item">
+          <span class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="7"/><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/></svg></span>
+          <div>
+            <div class="t">Autorizovaný prodejce</div>
+            <div class="s">KGM · Omoda · Farizon</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== ABOUT ===== -->
+    <section class="section">
+      <div class="container">
+        <div class="about-grid" data-screen-label="About">
+          <div>
+            <div class="section-eyebrow">O tomto voze</div>
+            <h2 class="section-title">Připravený k převzetí</h2>
+            <div class="about-copy">
+              {description.length > 0 ? (
+                description.map((p) => <p>{p}</p>)
+              ) : (
+                <>
+                  <p>{title} v provedení skladem a ihned k převzetí v Praze. {year ? `Modelový rok ${year}.` : ''} Bohatá výbava, vysoká úroveň komfortu i bezpečnosti.</p>
+                  <p>Tento model spojuje výrazný design s praktickým prostorem a moderními technologiemi pro každodenní radost z jízdy.</p>
+                  <p>Exkluzivně skladem v Praze — připravený k okamžitému převzetí a první jízdě.</p>
+                </>
+              )}
+            </div>
+            <dl class="about-meta">
+              {v.vin && <div><dt>VIN</dt><dd>{v.vin}</dd></div>}
+              <div><dt>Stav</dt><dd>{conditionLabel}</dd></div>
+              <div><dt>Dostupnost</dt><dd>{availabilityLabel}</dd></div>
+              <div><dt>Záruka</dt><dd>Dle modelu</dd></div>
+            </dl>
+          </div>
+          <div class="about-highlights">
+            {highlights.slice(0, 4).map((h) => (
+              <div class="highlight">
+                <div class="num">{h.num}</div>
+                <div class="lab">{h.lab}</div>
+              </div>
             ))}
           </div>
         </div>
-      )}
-    </div>
-  </section>
+      </div>
+    </section>
 
-  <section class="section section--soft" id="poptavka">
-    <div class="container poptavka-wrap">
-      <LeadForm
-        formType="stock_inquiry"
-        title={`Mám zájem o ${title}`}
-        vehicleId={Number(v.id)}
-        vehicleLabel={`${title} — ${finalPrice?.toLocaleString('cs-CZ')} Kč`}
-      />
-    </div>
-  </section>
+    <!-- ===== EQUIPMENT (grouped) ===== -->
+    {grouped.length > 0 && (
+      <section class="section equip">
+        <div class="container">
+          <div class="section-eyebrow">Výbava</div>
+          <h2 class="section-title">Co je v ceně</h2>
+          <div class="equip-grid">
+            {grouped.slice(0, 4).map((cat) => (
+              <div class="equip-col">
+                <h4>{cat.label}</h4>
+                <ul>
+                  {cat.items.slice(0, 12).map((it) => (
+                    <li>
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                      <span>{it}</span>
+                    </li>
+                  ))}
+                  {cat.items.length > 12 && <li><span>+ {cat.items.length - 12} dalších</span></li>}
+                </ul>
+              </div>
+            ))}
+          </div>
+          {grouped.length > 4 && (
+            <p style="text-align: center; margin-top: 32px; color: var(--text-muted); font-size: 13px;">
+              + {grouped.slice(4).map((c) => CATEGORY_LABELS[c.key]).join(', ')} ({grouped.slice(4).reduce((sum, c) => sum + c.items.length, 0)} dalších položek)
+            </p>
+          )}
+        </div>
+      </section>
+    )}
+
+    <!-- ===== SPECS ===== -->
+    <section class="section">
+      <div class="container">
+        <div class="section-eyebrow">Technická data</div>
+        <h2 class="section-title">Specifikace</h2>
+        <div class="specs-grid">
+          <div>
+            {specsLeft.map(([k, val]) => (
+              <div class="spec-row"><span class="k">{k}</span><span class="v">{val}</span></div>
+            ))}
+          </div>
+          <div>
+            {specsRight.map(([k, val]) => (
+              <div class="spec-row"><span class="k">{k}</span><span class="v">{val}</span></div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== FINANCE (dark) ===== -->
+    <section class="section finance" id="finance">
+      <div class="container">
+        <div class="section-eyebrow">Financování</div>
+        <h2 class="section-title">Spočítáme za 30 vteřin</h2>
+        <div class="finance-grid">
+          <div class="calc">
+            <div class="calc-row">
+              <div class="calc-label">Doba splácení</div>
+              <div class="chips" data-duration-chips>
+                <button type="button" class="chip" data-duration="24">24 měs</button>
+                <button type="button" class="chip active" data-duration="48">48 měs</button>
+                <button type="button" class="chip" data-duration="60">60 měs</button>
+                <button type="button" class="chip" data-duration="72">72 měs</button>
+              </div>
+            </div>
+            <div class="calc-row">
+              <div class="calc-head">
+                <div class="calc-label" style="margin: 0;">Akontace (%)</div>
+                <div class="val" data-dp-percent>20 %</div>
+              </div>
+              <input type="range" min="0" max="60" value="20" step="5" data-dp-slider style="width:100%;" />
+              <div class="ticks">
+                <span>0 %</span><span>15 %</span><span>30 %</span><span>45 %</span><span>60 %</span>
+              </div>
+            </div>
+          </div>
+          <div class="calc-summary">
+            <div class="eyebrow">Měsíční splátka od</div>
+            <div class="price" data-monthly>{monthlyPayment ? monthlyPayment.toLocaleString('cs-CZ') : '—'} Kč</div>
+            <hr />
+            <div class="sub">Akontace (<span data-dp-percent-sub>20 %</span>)</div>
+            <div class="sub-amount" data-dp-amount>{finalPrice ? Math.round(finalPrice * 0.2).toLocaleString('cs-CZ') : '—'} Kč</div>
+            <a class="btn btn-outline" style="background:transparent; color:#fff; border-color:#3A3A40;" href="#poptavka">
+              Požádat o financování
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            </a>
+          </div>
+        </div>
+        <div class="finance-note">
+          Orientační kalkulace, nejedná se o nabídku na uzavření smlouvy. Konečné podmínky financování stanoví poskytovatel po individuálním posouzení.
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== SIMILAR CARS ===== -->
+    {similar.length > 0 && (
+      <section class="section">
+        <div class="container">
+          <div class="section-head-row">
+            <div>
+              <div class="section-eyebrow">Podobné vozy</div>
+              <h2 class="section-title">Také vás může zajímat</h2>
+            </div>
+            <a class="section-link" href={`/sklad?model=${model?.slug ?? ''}`}>
+              Všechny {model?.name ?? 'vozy'} skladem
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            </a>
+          </div>
+          <div class="cars">
+            {similar.map((s: any) => {
+              const photoId = s.photos?.[0]?.directus_files_id;
+              const trimName = s.trim_level_snapshot?.name ?? '';
+              const price = s.promo_price ?? s.list_price;
+              return (
+                <a class="car-card" href={`/sklad/${s.id}`}>
+                  <div class="pic">
+                    <span class="tag">Skladem</span>
+                    {photoId && <DirectusImage src={photoId} alt={`${model?.name ?? ''} ${trimName}`} aspectRatio="4/3" />}
+                  </div>
+                  <div class="car-body">
+                    <div class="car-name">{brand?.name ?? ''} {model?.name ?? ''} {trimName}</div>
+                    <div class="car-meta">
+                      {s.color_code && <span class="colordot" style={`background:${s.color_code}`}></span>}
+                      {(s.km ?? 0).toLocaleString('cs-CZ')} km
+                    </div>
+                    <hr />
+                    <div class="car-price">{price ? `${price.toLocaleString('cs-CZ')} Kč` : '—'}</div>
+                    <div class="car-stock"><span class="dot"></span>Skladem v Praze</div>
+                  </div>
+                </a>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+    )}
+
+    <!-- ===== CONTACT ===== -->
+    <section class="contact" id="poptavka">
+      <div class="container">
+        <div class="contact-grid" data-screen-label="Contact">
+          <div class="contact-copy">
+            <div class="section-eyebrow">Poptat vůz</div>
+            <h2 class="section-title">Mám zájem o tento vůz</h2>
+            <p>Rádi vám poskytneme více informací, připravíme nabídku na míru nebo domluvíme zkušební jízdu. Ozveme se vám co nejdříve.</p>
+            <div class="contact-list">
+              <div class="item">
+                <span class="ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.86 19.86 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.86 19.86 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg></span>
+                <a href="tel:+420771235458">+420 771 235 458</a>
+              </div>
+              <div class="item">
+                <span class="ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 6L2 7"/></svg></span>
+                <a href="mailto:info@sfr-motor.cz">info@sfr-motor.cz</a>
+              </div>
+              <div class="item">
+                <span class="ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></span>
+                Ďáblická 553/2, Praha 8
+              </div>
+            </div>
+          </div>
+          <form class="form-card" data-lead-form data-form-type="stock_inquiry" data-vehicle-id={String(v.id)} data-vehicle-label={`${title}${finalPrice ? ` — ${finalPrice.toLocaleString('cs-CZ')} Kč` : ''}`}>
+            <div class="form-row">
+              <input class="input" name="customer_name" placeholder="Jméno" required minlength="2" maxlength="200" />
+              <input class="input" name="customer_phone" placeholder="Telefon" type="tel" maxlength="50" pattern="[+0-9\s\-()]+" />
+            </div>
+            <input class="input" name="customer_email" type="email" placeholder="E-mail" required maxlength="200" />
+            <textarea class="textarea" name="message" placeholder="Zpráva (nepovinné)" maxlength="2000"></textarea>
+            <input type="text" name="_hp_website" tabindex="-1" autocomplete="off" class="honeypot" />
+            <label class="check">
+              <input type="checkbox" required />
+              Souhlasím se zpracováním osobních údajů dle <a href="/informace/ochrana-udaju">GDPR</a>
+            </label>
+            <button class="btn btn-primary" type="submit">Odeslat poptávku</button>
+            <div class="lead-status" data-lead-status></div>
+          </form>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ===== STICKY CTA ===== -->
+  <div class="sticky-cta" data-sticky-cta>
+    <span class="name">{title}</span>
+    <span class="price">{finalPrice ? `${finalPrice.toLocaleString('cs-CZ')} Kč` : 'Cena na dotaz'}</span>
+    <a class="btn" href="#poptavka" style="color:#fff;">
+      Mám zájem
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+    </a>
+  </div>
+
+  <script define:vars={{ vehiclePrice: finalPrice ?? 0 }}>
+    // Finance kalkulačka — orientační (TODO: napojit na real úrokovou sazbu)
+    // Vzorec: anuita = (cena - akontace) * (i / (1 - (1+i)^-n)), kde i = roční úrok / 12
+    const ANNUAL_RATE = 0.069; // 6,9 % p.a. orientačně
+    const dpPct = document.querySelector('[data-dp-percent]');
+    const dpPctSub = document.querySelector('[data-dp-percent-sub]');
+    const dpAmount = document.querySelector('[data-dp-amount]');
+    const monthlyEl = document.querySelector('[data-monthly]');
+    const slider = document.querySelector('[data-dp-slider]');
+    const chips = document.querySelectorAll('[data-duration-chips] .chip');
+
+    let duration = 48;
+    let dpPercent = 20;
+
+    function recalc() {
+      const dpAmt = Math.round(vehiclePrice * dpPercent / 100);
+      const financed = vehiclePrice - dpAmt;
+      const monthlyRate = ANNUAL_RATE / 12;
+      let monthly = 0;
+      if (financed > 0 && duration > 0) {
+        monthly = Math.round(financed * (monthlyRate / (1 - Math.pow(1 + monthlyRate, -duration))));
+      }
+      if (dpPct) dpPct.textContent = dpPercent + ' %';
+      if (dpPctSub) dpPctSub.textContent = dpPercent + ' %';
+      if (dpAmount) dpAmount.textContent = dpAmt.toLocaleString('cs-CZ') + ' Kč';
+      if (monthlyEl) monthlyEl.textContent = monthly.toLocaleString('cs-CZ') + ' Kč';
+    }
+    if (slider) {
+      slider.addEventListener('input', (e) => {
+        dpPercent = Number(e.target.value);
+        recalc();
+      });
+    }
+    chips.forEach((chip) => {
+      chip.addEventListener('click', () => {
+        chips.forEach((c) => c.classList.remove('active'));
+        chip.classList.add('active');
+        duration = Number(chip.dataset.duration);
+        recalc();
+      });
+    });
+    if (vehiclePrice > 0) recalc();
+
+    // Sticky CTA — zobrazit po 700px scrollu
+    const sticky = document.querySelector('[data-sticky-cta]');
+    if (sticky) {
+      const onScroll = () => {
+        if (window.scrollY > 700) sticky.classList.add('is-visible');
+        else sticky.classList.remove('is-visible');
+      };
+      window.addEventListener('scroll', onScroll, { passive: true });
+      onScroll();
+    }
+
+    // Lead form submit
+    const DIRECTUS_URL = import.meta.env.PUBLIC_DIRECTUS_URL;
+    document.querySelectorAll('[data-lead-form]').forEach((form) => {
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const statusEl = form.querySelector('[data-lead-status]');
+        const hp = form.querySelector('[name=_hp_website]')?.value;
+        if (hp) {
+          if (statusEl) statusEl.textContent = 'Děkujeme! Brzy se ozveme.';
+          form.reset();
+          return;
+        }
+        const data = new FormData(form);
+        const payload = {
+          form_type: form.dataset.formType,
+          customer_name: data.get('customer_name'),
+          customer_email: data.get('customer_email'),
+          customer_phone: data.get('customer_phone'),
+          message: data.get('message'),
+          source_page: window.location.pathname,
+        };
+        if (form.dataset.vehicleId) payload.source_vehicle = Number(form.dataset.vehicleId);
+        try {
+          const res = await fetch(`${DIRECTUS_URL}/items/leads`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload),
+          });
+          if (!res.ok) throw new Error(`HTTP ${res.status}`);
+          if (statusEl) { statusEl.textContent = '✓ Děkujeme! Brzy se vám ozveme.'; statusEl.style.color = 'var(--ok)'; }
+          form.querySelector('button[type=submit]').disabled = true;
+          if (window.dataLayer) window.dataLayer.push({ event: 'generate_lead', form_name: form.dataset.formType });
+        } catch (err) {
+          if (statusEl) { statusEl.textContent = 'Něco se nepodařilo. Zkuste znovu, nebo zavolejte +420 771 235 458.'; statusEl.style.color = 'var(--danger)'; }
+        }
+      });
+    });
+  </script>
+  <style>
+    .lead-status { min-height: 24px; font-size: 13px; margin-top: 8px; }
+  </style>
 </BaseLayout>
-
-<style>
-  .stock-detail { padding-block: clamp(24px, 4vw, 48px) clamp(40px, 6vw, 80px); }
-  .breadcrumbs { font-size: 0.88rem; margin-bottom: 24px; color: var(--muted); }
-  .breadcrumbs a { color: var(--ink-soft); border-bottom: 1px solid var(--line); }
-  .breadcrumbs a:hover { color: var(--accent); }
-
-  .stock-detail__grid {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 32px;
-    margin-bottom: 48px;
-  }
-  @media (min-width: 900px) {
-    .stock-detail__grid { grid-template-columns: 1.6fr 1fr; }
-  }
-
-  .stock-detail__hero { border-radius: var(--radius-lg); overflow: hidden; background: var(--bg-soft); }
-  .stock-detail__thumbs {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 8px;
-    margin-top: 12px;
-  }
-  .stock-detail__thumbs > :global(*) { border-radius: var(--radius); overflow: hidden; }
-
-  .stock-detail__info {
-    background: var(--bg-card);
-    border: 1px solid var(--line);
-    border-radius: var(--radius-lg);
-    padding: clamp(20px, 3vw, 32px);
-  }
-  .stock-detail__chips { display: flex; gap: 6px; margin-bottom: 12px; }
-  .chip { font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.06em; background: var(--bg-soft); padding: 4px 8px; border-radius: 4px; color: var(--ink-soft); }
-  .chip--success { background: rgba(30, 123, 95, 0.1); color: var(--success); }
-
-  .stock-detail__title { font-size: clamp(1.6rem, 3vw, 2.4rem); margin-bottom: 20px; }
-
-  .stock-detail__specs { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 24px; }
-  .stock-detail__specs > div { display: flex; flex-direction: column; gap: 2px; }
-  .stock-detail__specs dt { font-size: 0.72rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; }
-  .stock-detail__specs dd { font-size: 0.95rem; font-weight: 500; }
-
-  .stock-detail__price { margin-bottom: 24px; padding-block: 16px; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
-  .stock-detail__list-price { font-size: 1rem; color: var(--muted); text-decoration: line-through; margin-right: 12px; }
-  .stock-detail__main-price { font-size: clamp(1.6rem, 2.5vw, 2rem); font-weight: 700; color: var(--accent); }
-  .stock-detail__main-price--ondemand { color: var(--ink-soft); font-size: clamp(1.2rem, 2vw, 1.6rem); }
-  .stock-detail__lowest { font-size: 0.8rem; color: var(--muted); margin-top: 8px; }
-  .stock-detail__monthly { font-size: 0.95rem; color: var(--ink-soft); margin-top: 8px; }
-
-  .stock-detail__desc {
-    background: var(--bg-card);
-    border: 1px solid var(--line);
-    border-radius: var(--radius-lg);
-    padding: clamp(24px, 3vw, 32px);
-    max-width: 80ch;
-  }
-  .stock-detail__desc h2 { margin-bottom: 16px; }
-  .stock-detail__desc div { line-height: 1.7; color: var(--ink-soft); }
-
-  .poptavka-wrap { max-width: 700px; margin: 0 auto; }
-
-  .stock-detail__features {
-    margin-top: 40px;
-    background: var(--bg-card);
-    border: 1px solid var(--line);
-    border-radius: var(--radius-lg);
-    padding: clamp(24px, 3vw, 40px);
-  }
-  .stock-detail__features h2 { margin-bottom: 24px; }
-  .features-grid {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 24px;
-  }
-  @media (min-width: 700px) { .features-grid { grid-template-columns: repeat(2, 1fr); } }
-  @media (min-width: 1100px) { .features-grid { grid-template-columns: repeat(3, 1fr); } }
-
-  .feature-cat { display: flex; flex-direction: column; gap: 8px; }
-  .feature-cat__head { display: flex; align-items: center; gap: 8px; padding-bottom: 8px; border-bottom: 1px solid var(--line); }
-  .feature-cat__icon { font-size: 1.2rem; }
-  .feature-cat__head h3 { font-size: 0.85rem; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; color: var(--ink-soft); }
-  .feature-cat ul { list-style: none; padding: 0; display: flex; flex-direction: column; gap: 4px; font-size: 0.88rem; line-height: 1.5; }
-  .feature-cat li { padding-left: 14px; position: relative; color: var(--ink-soft); }
-  .feature-cat li::before { content: '·'; position: absolute; left: 4px; color: var(--accent); font-weight: 700; font-size: 1.2em; line-height: 1; }
-</style>

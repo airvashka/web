@@ -1,107 +1,265 @@
 ---
 import BaseLayout from '@layouts/BaseLayout.astro';
-import LeadForm from '@components/LeadForm.astro';
 import { directusGet } from '@lib/directus';
 import type { Branch, Employee } from '@lib/types';
+
+// KONTAKT — 1:1 podle _design-draft/kontakt.jsx
+// Sections: Hero + ContactInfo (map + card) + Team (Prodej/Servis) + MessageForm
 
 const branches = await directusGet<Branch>('branches');
 const branch = branches[0];
 
 const employees = await directusGet<Employee>('employees', { sort: ['department', 'full_name'] });
-const sales = employees.filter(e => e.department === 'sales');
-const service = employees.filter(e => e.department === 'service');
+const salesFromDirectus = employees.filter((e) => e.department === 'sales');
+const serviceFromDirectus = employees.filter((e) => e.department === 'service');
+
+// Fallback data z _design-draft/kontakt.jsx (pokud Directus zatím nemá employees)
+const PRODEJ_FALLBACK = [
+  { id: 'petr-paseka', full_name: 'Petr Paseka', role: 'Vedoucí prodeje', department: 'sales', phone: '+420 771 235 458', email: 'petr.paseka@sfr-motor.cz' },
+  { id: 'lukas-jiranek', full_name: 'Lukáš Jiránek', role: 'Prodejce KGM', department: 'sales', phone: '+420 771 235 460', email: 'lukas.jiranek@sfr-motor.cz' },
+  { id: 'marek-safarcik', full_name: 'Marek Šafarčík', role: 'Prodejce Omoda & Jaecoo', department: 'sales', phone: '+420 771 235 461', email: 'marek.safarcik@sfr-motor.cz' },
+  { id: 'michal-hlavac', full_name: 'Michal Hlaváč', role: 'Prodejce Farizon', department: 'sales', phone: '+420 771 235 462', email: 'michal.hlavac@sfr-motor.cz' },
+] as Employee[];
+
+const SERVIS_FALLBACK = [
+  { id: 'jiri-hertl', full_name: 'Jiří Hertl', role: 'Vedoucí servisu', department: 'service', phone: '+420 771 259 320', email: 'jiri.hertl@sfr-motor.cz' },
+  { id: 'jiri-patzelt', full_name: 'Jiří Patzelt', role: 'Servisní poradce', department: 'service', phone: '+420 771 259 321', email: 'jiri.patzelt@sfr-motor.cz' },
+  { id: 'karel-marik', full_name: 'Karel Mařík', role: 'Servisní poradce', department: 'service', phone: '+420 771 259 322', email: 'karel.marik@sfr-motor.cz' },
+  { id: 'karel-zelenka', full_name: 'Karel Zelenka', role: 'Servisní technik', department: 'service', phone: '+420 771 259 323', email: 'karel.zelenka@sfr-motor.cz' },
+  { id: 'radek-melisek', full_name: 'Radek Mělíšek', role: 'Servisní technik', department: 'service', phone: '+420 771 259 324', email: 'radek.melisek@sfr-motor.cz' },
+  { id: 'stepan-zaruba', full_name: 'Štěpán Záruba', role: 'Servisní technik', department: 'service', phone: '+420 771 259 325', email: 'stepan.zaruba@sfr-motor.cz' },
+  { id: 'zdenek-bursik', full_name: 'Zdeněk Buršík', role: 'Pneuservis & karosárna', department: 'service', phone: '+420 771 259 326', email: 'zdenek.bursik@sfr-motor.cz' },
+] as Employee[];
+
+const sales = salesFromDirectus.length > 0 ? salesFromDirectus : PRODEJ_FALLBACK;
+const service = serviceFromDirectus.length > 0 ? serviceFromDirectus : SERVIS_FALLBACK;
+
+const branchName = branch?.name ?? 'SFR Motor s.r.o.';
+const branchAddress = branch?.address ?? 'Ďáblická 553/2';
+const branchPostal = branch?.postal_code ?? '182 00';
+const branchCity = branch?.city ?? 'Praha 8';
+
+const mapEmbedUrl = 'https://maps.google.com/maps?q=%C4%8Eablicka+553%2F2%2C+182+00+Praha+8&output=embed';
 ---
 
 <BaseLayout title="Kontakt" description="Kontaktujte SFR Motor — autorizovaný dealer v Praze-Ďáblicích. Prodej, servis, doplňkové služby.">
-  <section class="section">
-    <div class="container kontakt__hero">
-      <p class="eyebrow">Kontakt</p>
-      <h1>Najdete nás v&nbsp;Praze-Ďáblicích</h1>
+  <section class="phero" data-screen-label="01 Hero">
+    <div class="container">
+      <div class="section-eyebrow">Kontakt</div>
+      <h1>Najdete nás v Praze-Ďáblicích</h1>
+      <p class="lead">Prodej, servis i e-shop pod jednou střechou. Stavte se osobně, nebo nám rovnou napište — odpovídáme do 24 hodin.</p>
     </div>
   </section>
 
-  <section class="container kontakt__grid">
-    <div class="kontakt__info">
-      {branch && (
-        <div class="info-card">
-          <h3>{branch.name}</h3>
-          <p>
-            {branch.address}<br />
-            {branch.postal_code} {branch.city}
-          </p>
-          <ul class="info-card__list">
-            <li><span class="text-muted">Prodej:</span> <a class="font-mono" href={`tel:${branch.phone?.replace(/\s/g, '')}`}>{branch.phone}</a></li>
-            <li><span class="text-muted">Servis:</span> <a class="font-mono" href="tel:+420771259323">+420 771 259 323</a></li>
-            <li><span class="text-muted">Email:</span> <a href={`mailto:${branch.email}`}>{branch.email}</a></li>
-            <li><span class="text-muted">Servisní:</span> <a href="mailto:servis@sfr-motor.cz">servis@sfr-motor.cz</a></li>
-          </ul>
+  <section class="kinfo" data-screen-label="02 Adresa">
+    <div class="container kinfo-grid">
+      <div class="kinfo-map">
+        <iframe
+          src={mapEmbedUrl}
+          width="100%"
+          height="100%"
+          style="border:0; min-height:420px;"
+          allowfullscreen=""
+          loading="lazy"
+          referrerpolicy="no-referrer-when-downgrade"
+          title="Mapa SFR Motor"
+        ></iframe>
+      </div>
+      <div class="kinfo-card">
+        <h3>{branchName}</h3>
+        <div class="kinfo-row">
+          <span class="icbox">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          </span>
+          <div>
+            <div class="lab">Adresa</div>
+            <div class="val">{branchAddress}<br />{branchPostal} {branchCity}</div>
+          </div>
         </div>
-      )}
-
-      {sales.length > 0 && (
-        <div class="info-card">
-          <h3>Prodej</h3>
-          <ul class="people">
-            {sales.map(p => (
-              <li>
-                <span class="people__name">{p.full_name}</span>
-                {p.email && <a href={`mailto:${p.email}`} class="people__contact">{p.email}</a>}
-                {p.phone && <a href={`tel:${p.phone.replace(/\s/g, '')}`} class="people__contact font-mono">{p.phone}</a>}
-              </li>
-            ))}
-          </ul>
+        <div class="kinfo-row">
+          <span class="icbox">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.86 19.86 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.86 19.86 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+          </span>
+          <div>
+            <div class="lab">Telefon</div>
+            <div class="val">
+              <a href="tel:+420771235458">+420 771 235 458</a> · prodej<br />
+              <a href="tel:+420771259323">+420 771 259 323</a> · servis
+            </div>
+          </div>
         </div>
-      )}
-
-      {service.length > 0 && (
-        <div class="info-card">
-          <h3>Servis</h3>
-          <ul class="people">
-            {service.map(p => (
-              <li>
-                <span class="people__name">{p.full_name}</span>
-                {p.email && <a href={`mailto:${p.email}`} class="people__contact">{p.email}</a>}
-                {p.phone && <a href={`tel:${p.phone.replace(/\s/g, '')}`} class="people__contact font-mono">{p.phone}</a>}
-              </li>
-            ))}
-          </ul>
+        <div class="kinfo-row">
+          <span class="icbox">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><polyline points="2 6 12 13 22 6"/></svg>
+          </span>
+          <div>
+            <div class="lab">E-mail</div>
+            <div class="val"><a href="mailto:info@sfr-motor.cz">info@sfr-motor.cz</a></div>
+          </div>
         </div>
-      )}
-    </div>
-
-    <div class="kontakt__form">
-      <LeadForm formType="contact" title="Napište nám" />
+        <div class="kinfo-row" id="otevreni">
+          <span class="icbox">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          </span>
+          <div>
+            <div class="lab">Otevírací doba</div>
+            <div class="val">Po–Pá 8:00–18:00<br />So 9:00–13:00 · Ne zavřeno</div>
+          </div>
+        </div>
+      </div>
     </div>
   </section>
+
+  <section class="team" data-screen-label="03 Tym">
+    <div class="container">
+      <div class="team-block">
+        <div class="team-head">
+          <h2>Prodej</h2>
+          <span class="count">{sales.length} {sales.length === 1 ? 'člověk' : 'lidé'}</span>
+        </div>
+        <div class="team-grid">
+          {sales.map((p) => (
+            <div class="tcard">
+              <div class="face">
+                <span class="role-tag is-sales">Prodej</span>
+                {p.photo_url && <img src={p.photo_url} alt={p.full_name} />}
+              </div>
+              <div class="body">
+                <div class="nm">{p.full_name}</div>
+                <div class="pos">{p.role}</div>
+                <div class="contact">
+                  {p.phone && (
+                    <a href={`tel:${p.phone.replace(/\s/g, '')}`}>
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.86 19.86 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.86 19.86 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                      {p.phone}
+                    </a>
+                  )}
+                  {p.email && (
+                    <a href={`mailto:${p.email}`}>
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><polyline points="2 6 12 13 22 6"/></svg>
+                      {p.email}
+                    </a>
+                  )}
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div class="team-block">
+        <div class="team-head">
+          <h2>Servis a technici</h2>
+          <span class="count">{service.length} lidé</span>
+        </div>
+        <div class="team-grid">
+          {service.map((p) => (
+            <div class="tcard">
+              <div class="face">
+                <span class="role-tag">Servis</span>
+                {p.photo_url && <img src={p.photo_url} alt={p.full_name} />}
+              </div>
+              <div class="body">
+                <div class="nm">{p.full_name}</div>
+                <div class="pos">{p.role}</div>
+                <div class="contact">
+                  {p.phone && (
+                    <a href={`tel:${p.phone.replace(/\s/g, '')}`}>
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.86 19.86 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.86 19.86 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                      {p.phone}
+                    </a>
+                  )}
+                  {p.email && (
+                    <a href={`mailto:${p.email}`}>
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><polyline points="2 6 12 13 22 6"/></svg>
+                      {p.email}
+                    </a>
+                  )}
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="formpanel" data-screen-label="04 Form">
+    <div class="container formpanel-grid">
+      <div>
+        <div class="section-eyebrow">Napište nám</div>
+        <h2>Máte dotaz nebo poptávku?</h2>
+        <p class="lead">Vyplňte krátký formulář — ozveme se do 24 hodin. Nebo zvolte konkrétního prodejce / technika výše a napište mu přímo.</p>
+      </div>
+      <form class="fcard" data-lead-form data-form-type="contact">
+        <h3>Kontaktní formulář</h3>
+        <div class="fgrid">
+          <div class="field full">
+            <label>Vaše jméno <span class="req">*</span></label>
+            <input type="text" name="customer_name" required minlength="2" maxlength="200" />
+          </div>
+          <div class="field">
+            <label>E-mail <span class="req">*</span></label>
+            <input type="email" name="customer_email" required maxlength="200" />
+          </div>
+          <div class="field">
+            <label>Telefon</label>
+            <input type="tel" name="customer_phone" maxlength="50" pattern="[+0-9\s\-()]+" />
+          </div>
+          <div class="field full">
+            <label>Téma zprávy</label>
+            <input type="text" name="subject" placeholder="Např. zájem o Torres EVX" maxlength="200" />
+          </div>
+          <div class="field full">
+            <label>Zpráva (nepovinné)</label>
+            <textarea name="message" maxlength="2000"></textarea>
+          </div>
+        </div>
+        <input type="text" name="_hp_website" tabindex="-1" autocomplete="off" class="honeypot" />
+        <div class="fnote">Odesláním souhlasíte se zpracováním osobních údajů.</div>
+        <button class="btn btn-primary" type="submit">Odeslat zprávu</button>
+        <div class="lead-status" data-lead-status></div>
+      </form>
+    </div>
+  </section>
+
+  <script>
+    const DIRECTUS_URL = import.meta.env.PUBLIC_DIRECTUS_URL;
+    document.querySelectorAll('[data-lead-form]').forEach((form) => {
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const statusEl = form.querySelector('[data-lead-status]');
+        const hp = form.querySelector('[name=_hp_website]')?.value;
+        if (hp) { if (statusEl) statusEl.textContent = 'Děkujeme! Brzy se ozveme.'; form.reset(); return; }
+        const data = new FormData(form);
+        const subj = data.get('subject');
+        const msg = data.get('message');
+        const payload = {
+          form_type: form.dataset.formType,
+          customer_name: data.get('customer_name'),
+          customer_email: data.get('customer_email'),
+          customer_phone: data.get('customer_phone'),
+          message: subj ? '[' + subj + '] ' + (msg ?? '') : msg,
+          source_page: window.location.pathname,
+        };
+        try {
+          const res = await fetch(DIRECTUS_URL + '/items/leads', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload),
+          });
+          if (!res.ok) throw new Error('HTTP ' + res.status);
+          if (statusEl) { statusEl.textContent = 'Děkujeme! Ozveme se do 24 hodin.'; statusEl.style.color = 'var(--ok)'; }
+          form.querySelector('button[type=submit]').disabled = true;
+          if (window.dataLayer) window.dataLayer.push({ event: 'generate_lead', form_name: form.dataset.formType });
+        } catch (err) {
+          if (statusEl) { statusEl.textContent = 'Něco se nepodařilo. Zkuste znovu nebo zavolejte +420 771 235 458.'; statusEl.style.color = 'var(--danger)'; }
+        }
+      });
+    });
+  </script>
+
+  <style>
+    .lead-status { min-height: 24px; font-size: 13px; margin-top: 8px; }
+  </style>
 </BaseLayout>
-
-<style>
-  .kontakt__hero { max-width: 800px; }
-  .kontakt__hero h1 { margin-top: 8px; }
-
-  .kontakt__grid {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 40px;
-    margin-bottom: var(--section-pad);
-  }
-  @media (min-width: 900px) {
-    .kontakt__grid { grid-template-columns: 1fr 1fr; }
-  }
-
-  .kontakt__info { display: flex; flex-direction: column; gap: 24px; }
-  .info-card { background: var(--bg-card); border: 1px solid var(--line); border-radius: var(--radius-lg); padding: 24px; }
-  .info-card h3 { margin-bottom: 12px; }
-  .info-card p { margin-bottom: 12px; }
-  .info-card__list { list-style: none; display: flex; flex-direction: column; gap: 8px; }
-  .info-card__list li { font-size: 0.95rem; }
-  .info-card__list a { color: var(--ink); border-bottom: 1px solid var(--line); }
-  .info-card__list a:hover { color: var(--accent); border-bottom-color: var(--accent); }
-
-  .people { list-style: none; display: flex; flex-direction: column; gap: 12px; }
-  .people li { display: flex; flex-direction: column; gap: 4px; padding-bottom: 12px; border-bottom: 1px solid var(--line); }
-  .people li:last-child { border-bottom: 0; }
-  .people__name { font-weight: 600; }
-  .people__contact { font-size: 0.88rem; color: var(--ink-soft); }
-  .people__contact:hover { color: var(--accent); }
-</style>
