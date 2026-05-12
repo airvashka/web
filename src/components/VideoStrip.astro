@@ -54,6 +54,19 @@ function pick(arr: string[], n: number): string[] {
 
 const selected = hasVideos ? pick(cleanIds, count) : [];
 
+// Fetch titlu z YouTube oembed API (build-time, žádný API key)
+async function fetchTitle(id: string): Promise<string | null> {
+  try {
+    const r = await fetch(`https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v=${id}&format=json`);
+    if (!r.ok) return null;
+    const j = await r.json();
+    return (j?.title as string) ?? null;
+  } catch {
+    return null;
+  }
+}
+const titles = await Promise.all(selected.map((id) => fetchTitle(id)));
+
 const bgClass = background === 'soft' ? 'video-strip--soft'
   : background === 'cream' ? 'video-strip--cream'
   : background === 'dark' ? 'video-strip--dark'
@@ -74,29 +87,34 @@ const bgClass = background === 'soft' ? 'video-strip--soft'
         </a>
       </div>
       <div class="yt-grid">
-        {selected.map((id) => (
-          <a
-            class="yt-card"
-            href={`https://www.youtube.com/watch?v=${id}`}
-            target="_blank"
-            rel="noopener"
-            aria-label={`Přehrát video ${id}`}
-          >
-            <div class="pic">
-              <img
-                src={`https://img.youtube.com/vi/${id}/hqdefault.jpg`}
-                alt=""
-                loading="lazy"
-              />
-              <span class="play-overlay" aria-hidden="true">
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
-                  <polygon points="6 4 20 12 6 20 6 4"/>
-                </svg>
-              </span>
-            </div>
-            <div class="yt-title">Video {id}</div>
-          </a>
-        ))}
+        {selected.map((id, i) => {
+          const t = titles[i];
+          return (
+            <a
+              class="yt-card"
+              href={`https://www.youtube.com/watch?v=${id}`}
+              target="_blank"
+              rel="noopener"
+              aria-label={t ? `Přehrát video: ${t}` : `Přehrát video`}
+            >
+              <div class="pic">
+                <img
+                  src={`https://i.ytimg.com/vi/${id}/mqdefault.jpg`}
+                  srcset={`https://i.ytimg.com/vi/${id}/mqdefault.jpg 320w, https://i.ytimg.com/vi/${id}/hqdefault.jpg 480w, https://i.ytimg.com/vi/${id}/maxresdefault.jpg 1280w`}
+                  sizes="(max-width: 600px) 100vw, (max-width: 1100px) 50vw, 25vw"
+                  alt={t ?? ''}
+                  loading="lazy"
+                />
+                <span class="play-overlay" aria-hidden="true">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
+                    <polygon points="6 4 20 12 6 20 6 4"/>
+                  </svg>
+                </span>
+              </div>
+              <div class="yt-title">{t ?? `Video ${id}`}</div>
+            </a>
+          );
+        })}
       </div>
     </div>
   </section>
