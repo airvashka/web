@@ -57,6 +57,15 @@ const conditionLabels: Record<string, string> = { new: 'Nový', demo: 'Předvád
 const availabilityLabels: Record<string, string> = { in_stock: 'Skladem', on_the_way: 'Na cestě', reserved: 'Rezervováno', sold: 'Prodáno' };
 
 const title = `${brand?.name ?? ''} ${model?.name ?? ''}${trim ? ' ' + trim.name : ''}`.trim();
+
+const transmissionLabels: Record<string, string> = {
+  manual: 'Manuál', automatic: 'Automat', dct: 'DCT', cvt: 'CVT', dht: 'Hybridní', reduction: 'Redukční',
+};
+const drivetrainLabels: Record<string, string> = {
+  fwd: 'FWD', rwd: 'RWD', awd: 'AWD', '4wd': '4×4',
+};
+const transmissionLabel = v.transmission ? (transmissionLabels[v.transmission] ?? v.transmission) : null;
+const drivetrainLabel = v.drivetrain ? (drivetrainLabels[v.drivetrain] ?? v.drivetrain) : null;
 ---
 
 <BaseLayout title={title || 'Skladový vůz'} description={`${title} — skladový vůz u SFR Motor Praha-Ďáblice.`}>
@@ -100,8 +109,8 @@ const title = `${brand?.name ?? ''} ${model?.name ?? ''}${trim ? ' ' + trim.name
             {v.km !== undefined && v.km !== null && (
               <div><dt>Najeto</dt><dd class="font-mono">{v.km.toLocaleString('cs-CZ')} km</dd></div>
             )}
-            {(v as any).transmission && <div><dt>Převodovka</dt><dd>{({manual:'Manuál',automatic:'Automat',dct:'DCT',cvt:'CVT',dht:'Hybridní',reduction:'Redukční'} as Record<string,string>)[(v as any).transmission] ?? (v as any).transmission}</dd></div>}
-            {(v as any).drivetrain && <div><dt>Pohon</dt><dd>{({fwd:'FWD',rwd:'RWD',awd:'AWD','4wd':'4×4'} as Record<string,string>)[(v as any).drivetrain] ?? (v as any).drivetrain}</dd></div>}
+            {transmissionLabel && <div><dt>Převodovka</dt><dd>{transmissionLabel}</dd></div>}
+            {drivetrainLabel && <div><dt>Pohon</dt><dd>{drivetrainLabel}</dd></div>}
             {v.color_code && <div><dt>Barva</dt><dd class="font-mono">{v.color_code}</dd></div>}
             {v.first_registration && <div><dt>1. registrace</dt><dd class="font-mono">{v.first_registration}</dd></div>}
             {v.vin && <div><dt>VIN</dt><dd class="font-mono">{v.vin}</dd></div>}
