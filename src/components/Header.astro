@@ -1,145 +1,67 @@
 ---
-const navItems = [
-  { label: 'KGM', href: '/kgm' },
-  { label: 'OMODA & JAECOO', href: '/omoda-jaecoo' },
-  { label: 'Farizon', href: '/farizon' },
-  { label: 'Skladové vozy', href: '/sklad' },
-  { label: 'Servis', href: '/servis' },
-  { label: 'Kontakt', href: '/kontakt' },
+interface Props {
+  active?: 'kgm' | 'omoda-jaecoo' | 'farizon' | 'sklad' | 'servis' | 'magazin' | 'kontakt';
+}
+
+const { active } = Astro.props;
+
+const navItems: Array<{ label: string; href: string; key: NonNullable<Props['active']> }> = [
+  { label: 'KGM', href: '/kgm', key: 'kgm' },
+  { label: 'Omoda & Jaecoo', href: '/omoda-jaecoo', key: 'omoda-jaecoo' },
+  { label: 'Farizon', href: '/farizon', key: 'farizon' },
+  { label: 'Skladové vozy', href: '/sklad', key: 'sklad' },
+  { label: 'Servis', href: '/servis', key: 'servis' },
+  { label: 'Magazín', href: '/magazin', key: 'magazin' },
+  { label: 'Kontakt', href: '/kontakt', key: 'kontakt' },
 ];
 ---
 
-<header class="site-header">
-  <div class="container header__inner">
-    <a href="/" class="header__brand" aria-label="SFR Motor — homepage">
-      <span class="brand__mark">SFR</span>
-      <span class="brand__rest">Motor</span>
+<!-- Topbar -->
+<div class="topbar">
+  <div class="container topbar-inner">
+    <span class="topbar-item">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+      Ďáblická 553/2, Praha 8
+    </span>
+    <span class="topbar-item">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+      Po–Pá 8–18 · So 9–13
+    </span>
+    <span class="topbar-item">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.86 19.86 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.86 19.86 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+      +420 771 235 458
+    </span>
+    <span class="topbar-spacer"></span>
+    <span class="topbar-right">
+      <a href="/servis">Servis 24/7</a>
+      <a href="#" aria-label="Změnit jazyk">CZ / EN</a>
+    </span>
+  </div>
+</div>
+
+<!-- Main nav -->
+<header class="nav">
+  <div class="container nav-inner">
+    <a class="nav-logo" href="/" aria-label="SFR Motor — domů">
+      <img src="/sfr-logo.svg" alt="SFR Motor" />
     </a>
-
-    <nav class="header__nav" aria-label="Hlavní navigace">
-      <ul>
-        {navItems.map(({ label, href }) => (
-          <li><a href={href}>{label}</a></li>
-        ))}
-      </ul>
+    <nav class="nav-links" aria-label="Hlavní navigace">
+      {navItems.map((item, i) => (
+        <Fragment>
+          {i > 0 && <span class="nav-sep">·</span>}
+          <a
+            class={`nav-link${active === item.key ? ' is-active' : ''}`}
+            href={item.href}
+          >{item.label}</a>
+        </Fragment>
+      ))}
     </nav>
-
-    <div class="header__cta">
-      <a href="tel:+420771235458" class="header__phone" aria-label="Zavolat na +420 771 235 458">
-        +420 771 235 458
-      </a>
-    </div>
-
-    <button class="header__menu-toggle" aria-label="Otevřít menu" data-menu-toggle>
-      <span></span><span></span><span></span>
+    <a class="nav-cta" href="/servis">Objednat servis</a>
+    <a class="nav-icon" href="tel:+420771235458" aria-label="Zavolat">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.86 19.86 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.86 19.86 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+    </a>
+    <button class="nav-menu-toggle" aria-label="Otevřít menu" data-menu-toggle>
+      <span></span>
     </button>
   </div>
 </header>
-
-<style>
-  .site-header {
-    position: sticky;
-    top: 0;
-    z-index: 100;
-    background: rgba(250, 250, 247, 0.92);
-    backdrop-filter: saturate(180%) blur(12px);
-    -webkit-backdrop-filter: saturate(180%) blur(12px);
-    border-bottom: 1px solid var(--line);
-  }
-  .header__inner {
-    display: flex;
-    align-items: center;
-    gap: clamp(16px, 4vw, 48px);
-    height: 64px;
-  }
-  .header__brand {
-    display: flex;
-    align-items: baseline;
-    gap: 4px;
-    font-weight: 700;
-    letter-spacing: -0.02em;
-    font-size: 1.2rem;
-  }
-  .brand__mark {
-    background: var(--accent);
-    color: white;
-    padding: 4px 8px;
-    border-radius: 4px;
-    font-family: 'JetBrains Mono', monospace;
-    font-weight: 700;
-    font-size: 0.95rem;
-  }
-  .brand__rest {
-    font-weight: 600;
-    color: var(--ink);
-  }
-
-  .header__nav {
-    flex: 1;
-    display: none;
-  }
-  .header__nav ul {
-    list-style: none;
-    display: flex;
-    gap: clamp(12px, 2vw, 28px);
-    align-items: center;
-  }
-  .header__nav a {
-    font-size: 0.92rem;
-    font-weight: 500;
-    color: var(--ink-soft);
-    padding: 8px 0;
-    border-bottom: 2px solid transparent;
-    transition: all 160ms ease;
-  }
-  .header__nav a:hover {
-    color: var(--ink);
-    border-bottom-color: var(--accent);
-  }
-
-  .header__cta {
-    display: none;
-  }
-  .header__phone {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 0.85rem;
-    font-weight: 500;
-    color: var(--ink);
-    padding: 8px 14px;
-    border: 1px solid var(--line);
-    border-radius: var(--radius);
-    transition: all 160ms ease;
-  }
-  .header__phone:hover {
-    background: var(--ink);
-    color: var(--bg);
-    border-color: var(--ink);
-  }
-
-  .header__menu-toggle {
-    margin-left: auto;
-    width: 40px;
-    height: 40px;
-    display: inline-flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    gap: 5px;
-    border-radius: var(--radius);
-    border: 1px solid var(--line);
-    background: white;
-  }
-  .header__menu-toggle span {
-    display: block;
-    width: 18px;
-    height: 2px;
-    background: var(--ink);
-    border-radius: 1px;
-  }
-
-  @media (min-width: 900px) {
-    .header__nav { display: block; }
-    .header__cta { display: block; }
-    .header__menu-toggle { display: none; }
-  }
-</style>

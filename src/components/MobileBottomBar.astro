@@ -1,5 +1,6 @@
 ---
 // Sticky mobile bottom bar — kritické pro 75 % mobil traffic
+// Styly v global.css (.mbb / .mbb__item / .mbb__item--accent)
 ---
 
 <div class="mbb" aria-label="Rychlé akce">
@@ -22,37 +23,3 @@
     <span>Skladovka</span>
   </a>
 </div>
-
-<style>
-  .mbb {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    z-index: 99;
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
-    background: white;
-    border-top: 1px solid var(--line);
-    box-shadow: 0 -2px 12px rgba(0,0,0,0.04);
-  }
-  .mbb__item {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 4px;
-    padding: 10px 8px;
-    font-size: 0.72rem;
-    font-weight: 600;
-    color: var(--ink-soft);
-    border-right: 1px solid var(--line);
-  }
-  .mbb__item:last-child { border-right: 0; }
-  .mbb__item--accent { background: var(--accent); color: white; }
-  .mbb__item--accent:hover { background: var(--accent-deep); }
-
-  @media (min-width: 900px) {
-    .mbb { display: none; }
-  }
-</style>
