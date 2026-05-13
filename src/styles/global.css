@@ -1300,6 +1300,74 @@ input, textarea, select { font: inherit; }
 }
 .interior-row { display: flex; gap: 20px; }
 .interior-item { display: flex; flex-direction: column; align-items: center; gap: 10px; cursor: pointer; }
+
+/* ===== Interior — velké karty (landscape preview) ===== */
+.interior-row--big {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 20px;
+  align-items: stretch;
+}
+.interior-item--big {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0;
+  padding: 0;
+  border: 2px solid transparent;
+  border-radius: var(--radius);
+  background: #fff;
+  overflow: hidden;
+  cursor: pointer;
+  transition: border-color .15s, transform .15s, box-shadow .15s;
+  text-align: left;
+}
+.interior-item--big:hover {
+  border-color: var(--line-2);
+  transform: translateY(-2px);
+  box-shadow: 0 10px 24px -12px rgba(0,0,0,0.18);
+}
+.interior-item--big.is-active {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 1px var(--accent), 0 14px 30px -14px rgba(242,92,27,0.4);
+  transform: translateY(-2px);
+}
+.interior-item--big .interior-preview {
+  display: block;
+  aspect-ratio: 16 / 9;
+  background: var(--bg-cream);
+  overflow: hidden;
+  position: relative;
+}
+.interior-item--big .interior-preview img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.interior-item--big .interior-fill-fallback {
+  display: block;
+  width: 100%; height: 100%;
+}
+.interior-item--big .interior-meta {
+  padding: 14px 18px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.interior-item--big .name {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 15px;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+}
+.interior-item--big .material {
+  font-size: 12.5px;
+  color: var(--text-muted);
+}
+@media (max-width: 520px) {
+  .interior-row--big { grid-template-columns: 1fr; }
+}
 .interior-fill {
   width: 64px; height: 64px;
   border-radius: 12px;

@@ -145,19 +145,35 @@ async function main() {
       }
     }
 
-    // Interiér
+    // Interiér — uploadujeme 2 obrázky:
+    //  • swatch_image (malý vzorek materiálu, ~30 KB)
+    //  • preview_image (velká fotka interiéru, ~300 KB) → preview_file
     const newInterior = [];
     for (const c of colors.interior_colors ?? []) {
-      if (!c.swatch_image) { newInterior.push(c); continue; }
-      try {
-        const r = await uploadSwatch(c.swatch_image, slug, 'interior', folderId);
-        if (r.reused) reused++; else uploaded++;
-        newInterior.push({ ...c, swatch_file: r.id });
-      } catch (e) {
-        errors++;
-        warn(`  int ${c.swatch_image}: ${e.message}`);
-        newInterior.push(c);
+      const updated = { ...c };
+      // Small swatch
+      if (c.swatch_image) {
+        try {
+          const r = await uploadSwatch(c.swatch_image, slug, 'interior', folderId);
+          if (r.reused) reused++; else uploaded++;
+          updated.swatch_file = r.id;
+        } catch (e) {
+          errors++;
+          warn(`  int swatch ${c.swatch_image}: ${e.message}`);
+        }
       }
+      // Big preview
+      if (c.preview_image) {
+        try {
+          const r = await uploadSwatch(c.preview_image, slug, 'interior-preview', folderId);
+          if (r.reused) reused++; else uploaded++;
+          updated.preview_file = r.id;
+        } catch (e) {
+          errors++;
+          warn(`  int preview ${c.preview_image}: ${e.message}`);
+        }
+      }
+      newInterior.push(updated);
     }
 
     // Transform do formátu co je v Directus (zachovat strukturu kompatibilní s předchozím seedem)
@@ -178,6 +194,8 @@ async function main() {
       hex: c.hex ?? null,
       swatch_image: c.swatch_image ?? null,
       swatch_file: c.swatch_file ?? null,
+      preview_image: c.preview_image ?? null,
+      preview_file: c.preview_file ?? null,
     }));
 
     try {
