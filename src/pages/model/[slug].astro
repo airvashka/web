@@ -76,19 +76,24 @@ const fuelLabels: Record<string, string> = {
   petrol: 'Benzín', diesel: 'Diesel', hybrid: 'Hybrid', phev: 'PHEV', ev: 'Elektro',
 };
 
-// Technická data — Directus může držet buď array of {label,value} nebo object
+// Technická data — priorita models.technical_data > model_years.technical_data (legacy)
+// Akceptujeme array [{label, value}] (nový formát) i object {key: value} (legacy)
 type TechRow = [string, string];
-let tdataRows: TechRow[] = [];
-if (latestYear?.technical_data) {
-  const td: any = latestYear.technical_data;
+function parseTdata(td: any): TechRow[] {
+  if (!td) return [];
   if (Array.isArray(td)) {
-    tdataRows = td.map((r: any) =>
+    return td.map((r: any) =>
       Array.isArray(r) ? (r as TechRow) : [r.label ?? r.k ?? '', String(r.value ?? r.v ?? '')]
     ).filter(([k]) => !!k);
-  } else if (typeof td === 'object') {
-    tdataRows = Object.entries(td).map(([k, v]) => [k, String(v)]);
   }
+  if (typeof td === 'object') {
+    return Object.entries(td).map(([k, v]) => [k, String(v)] as TechRow);
+  }
+  return [];
 }
+const modelTdata = parseTdata((rawModel as any)?.technical_data);
+const yearTdata = parseTdata(latestYear?.technical_data);
+const tdataRows: TechRow[] = modelTdata.length > 0 ? modelTdata : yearTdata;
 
 const fuelKey = (rawModel as any).fuel_type ?? '';
 const badgeText = fuelKey === 'ev' ? 'Elektrické SUV'
@@ -275,18 +280,23 @@ const galleryFileIds: string[] = Array.isArray((rawModel as any).gallery)
   ? (rawModel as any).gallery.map((g: any) => typeof g === 'string' ? g : g?.directus_files_id).filter(Boolean) as string[]
   : [];
 
-// PDF ke stažení (z latestYear)
+// PDF ke stažení — priorita models > latestYear (legacy fallback)
 const DIRECTUS_BASE = import.meta.env.PUBLIC_DIRECTUS_URL ?? '';
-const brochureFile: string | null = (latestYear as any)?.brochure_file ?? null;
-const priceListFile: string | null = (latestYear as any)?.price_list_file ?? null;
+const brochureFile: string | null = (rawModel as any)?.brochure_file ?? (latestYear as any)?.brochure_file ?? null;
+const priceListFile: string | null = (rawModel as any)?.price_list_file ?? (latestYear as any)?.price_list_file ?? null;
 const brochureUrl = brochureFile ? `${DIRECTUS_BASE}/assets/${brochureFile}?download` : null;
 const priceListUrl = priceListFile ? `${DIRECTUS_BASE}/assets/${priceListFile}?download` : null;
 
 // Barvy karoserie + interiéru (z model_year)
 type ColorOpt = { code?: string; name?: string; name_en?: string; hex?: string; type?: string; swatch_image?: string; swatch_file?: string; photo_file?: string; monotone_only?: boolean };
 type InteriorOpt = { code?: string; name?: string; material?: string; hex?: string; swatch_image?: string; swatch_file?: string; preview_image?: string; preview_file?: string; photo_file?: string };
-const colorOptions: ColorOpt[] = Array.isArray((latestYear as any)?.color_options) ? (latestYear as any).color_options : [];
-const interiorOptions: InteriorOpt[] = Array.isArray((latestYear as any)?.interior_options) ? (latestYear as any).interior_options : [];
+// Priorita: models > model_years (legacy fallback)
+const colorOptions: ColorOpt[] = Array.isArray((rawModel as any)?.color_options) && (rawModel as any).color_options.length > 0
+  ? (rawModel as any).color_options
+  : Array.isArray((latestYear as any)?.color_options) ? (latestYear as any).color_options : [];
+const interiorOptions: InteriorOpt[] = Array.isArray((rawModel as any)?.interior_options) && (rawModel as any).interior_options.length > 0
+  ? (rawModel as any).interior_options
+  : Array.isArray((latestYear as any)?.interior_options) ? (latestYear as any).interior_options : [];
 const hasConfigurator = colorOptions.length > 0 || interiorOptions.length > 0;
 
 // Intro foto = první z gallery, nebo hero_image
