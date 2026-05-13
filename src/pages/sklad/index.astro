@@ -31,7 +31,9 @@ const vehicles = await directusGet<VehicleListItem>('stock_vehicles', {
   fields: [
     'id', 'vin', 'list_price', 'promo_price', 'lowest_price_30d', 'km',
     'condition', 'availability', 'color_code', 'color_category',
-    'transmission', 'drivetrain', 'highlighted', 'trim_level_snapshot',
+    'transmission', 'drivetrain',
+    'highlighted', 'highlight_label',
+    'trim_level_snapshot',
     'photos.directus_files_id',
     'brand.name', 'brand.slug',
     'model.name', 'model.slug', 'model.fuel_type',
@@ -138,7 +140,10 @@ const fmtKm = (n?: number | null) => (n === 0 || !n ? '0 km' : `${n.toLocaleStri
               {vehicles.map((v) => {
                 const isNew = v.condition === 'new';
                 const isHighlighted = v.highlighted;
-                const pillLabel = isHighlighted ? 'Novinka' : isNew ? 'Nové' : 'Skladem';
+                const customLabel = ((v as any).highlight_label ?? '').toString().trim();
+                const pillLabel = isHighlighted
+                  ? (customLabel || 'Novinka')
+                  : isNew ? 'Nové' : 'Skladem';
                 const pillClass = isHighlighted || isNew ? ' is-new' : '';
                 const photoId = firstPhoto(v);
                 const trimName = v.trim_level?.name ?? (v.trim_level_snapshot as any)?.name ?? '';

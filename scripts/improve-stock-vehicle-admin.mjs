@@ -96,7 +96,7 @@ async function patchHighlighted() {
   ok('highlighted patched (label + note)');
 }
 
-// ─── 3) color_ref M2O s cascading ────────────────────────────
+// ─── 3) color_ref M2O s cascading (exterior) ─────────────────
 async function ensureColorRef() {
   if (await fieldExists('color_ref')) {
     info('color_ref už existuje, jen patchnu meta');
@@ -116,7 +116,6 @@ async function ensureColorRef() {
     ok('color_ref field přidán');
   }
 
-  // Patch meta s cascading filterem (idempotentní)
   await api('PATCH', '/fields/stock_vehicles/color_ref', {
     meta: {
       interface: 'select-dropdown-m2o',
@@ -132,7 +131,6 @@ async function ensureColorRef() {
   });
   ok('color_ref meta updated (cascade filter)');
 
-  // Vytvoř relation pokud neexistuje
   if (!(await relationExists('color_ref'))) {
     await api('POST', '/relations', {
       collection: 'stock_vehicles',
@@ -141,6 +139,52 @@ async function ensureColorRef() {
       schema: { on_delete: 'SET NULL' },
     });
     ok('relation stock_vehicles.color_ref → model_color_exterior');
+  }
+}
+
+// ─── 3b) interior_color_ref M2O s cascading ──────────────────
+async function ensureInteriorColorRef() {
+  if (await fieldExists('interior_color_ref')) {
+    info('interior_color_ref už existuje, jen patchnu meta');
+  } else {
+    await api('POST', '/fields/stock_vehicles', {
+      field: 'interior_color_ref',
+      type: 'integer',
+      schema: { foreign_key_table: 'model_color_interior', is_nullable: true },
+      meta: {
+        interface: 'select-dropdown-m2o',
+        special: ['m2o'],
+        width: 'half',
+        sort: 57,
+        note: 'Barva interiéru — vyber z čalounění tohoto modelu. (Filtr podle Modelu nahoře.)',
+      },
+    });
+    ok('interior_color_ref field přidán');
+  }
+
+  await api('PATCH', '/fields/stock_vehicles/interior_color_ref', {
+    meta: {
+      interface: 'select-dropdown-m2o',
+      special: ['m2o'],
+      width: 'half',
+      sort: 57,
+      note: 'Barva interiéru — vyber z čalounění tohoto modelu. (Filtr podle Modelu nahoře.)',
+      options: {
+        template: '{{name}}{{#material}} · {{material}}{{/material}}',
+        filter: { model: { _eq: '{{model}}' } },
+      },
+    },
+  });
+  ok('interior_color_ref meta updated (cascade filter)');
+
+  if (!(await relationExists('interior_color_ref'))) {
+    await api('POST', '/relations', {
+      collection: 'stock_vehicles',
+      field: 'interior_color_ref',
+      related_collection: 'model_color_interior',
+      schema: { on_delete: 'SET NULL' },
+    });
+    ok('relation stock_vehicles.interior_color_ref → model_color_interior');
   }
 }
 
@@ -180,6 +224,7 @@ const SORT_PLAN = [
   // Sekce 2: Identifikace + tech specs
   { field: 'vin', sort: 50, width: 'half' },
   { field: 'color_ref', sort: 55, width: 'half' },
+  { field: 'interior_color_ref', sort: 57, width: 'half' },
   { field: 'color_code', sort: 60, width: 'half' },
   { field: 'color_category', sort: 65, width: 'half' },
   { field: 'transmission', sort: 70, width: 'half' },
@@ -267,8 +312,11 @@ async function main() {
   console.log('\nKrok 2: patch highlighted (note + label)');
   await patchHighlighted();
 
-  console.log('\nKrok 3: color_ref M2O s cascade');
+  console.log('\nKrok 3: color_ref M2O s cascade (karoserie)');
   await ensureColorRef();
+
+  console.log('\nKrok 3b: interior_color_ref M2O s cascade (interiér)');
+  await ensureInteriorColorRef();
 
   console.log('\nKrok 4: tech data info notice');
   await ensureTechDataNote();

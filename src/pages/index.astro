@@ -25,7 +25,7 @@ const stockVehicles = await directusGet<any>('stock_vehicles', {
   sort: ['-listed_at'],
   fields: [
     'id', 'condition', 'availability', 'km', 'list_price', 'promo_price',
-    'highlighted', 'listed_at', 'trim_level_snapshot',
+    'highlighted', 'highlight_label', 'listed_at', 'trim_level_snapshot',
     'color_code', 'color_category',
     'photos.directus_files_id',
     'model.id', 'model.name', 'model.slug',
@@ -205,7 +205,10 @@ const articles = [
           {stockVehicles.map((v: any) => {
             const isNew = v.condition === 'new';
             const isHighlighted = v.highlighted;
-            const pillLabel = isHighlighted ? 'Novinka' : isNew ? 'Nové' : 'Skladem';
+            const customLabel = (v.highlight_label ?? '').toString().trim();
+            const pillLabel = isHighlighted
+              ? (customLabel || 'Novinka')
+              : isNew ? 'Nové' : 'Skladem';
             const pillClass = isHighlighted || isNew ? ' is-new' : '';
             const photoId = v.photos?.[0]?.directus_files_id;
             const trim = v.trim_level_snapshot?.name ?? '';

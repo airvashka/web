@@ -65,7 +65,7 @@ const stockSample = await directusGet<any>('stock_vehicles', {
   limit: 4,
   fields: [
     'id', 'condition', 'km', 'list_price', 'promo_price',
-    'highlighted', 'trim_level_snapshot',
+    'highlighted', 'highlight_label', 'trim_level_snapshot',
     'color_code', 'color_category',
     'photos.directus_files_id',
     'model.name', 'model.slug', 'model.fuel_type',
@@ -353,7 +353,10 @@ const activeBrand = Astro.params.brand;
           {stockSample.map((v: any) => {
             const isNew = v.condition === 'new';
             const isHl = v.highlighted;
-            const pillLabel = isHl ? 'Novinka' : isNew ? 'Nové' : 'Skladem';
+            const customLabel = (v.highlight_label ?? '').toString().trim();
+            const pillLabel = isHl
+              ? (customLabel || 'Novinka')
+              : isNew ? 'Nové' : 'Skladem';
             const pillClass = isHl || isNew ? ' is-new' : '';
             const photoId = v.photos?.[0]?.directus_files_id;
             const trim = v.trim_level_snapshot?.name ?? '';

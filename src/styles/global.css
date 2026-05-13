@@ -857,19 +857,31 @@ button.thumb-more {
 }
 
 .chips { display: flex; gap: 10px; flex-wrap: wrap; }
-.chip {
-  background: #1F1F23;
-  border: 1px solid #2F2F35;
-  color: #fff;
+.calc .chip,
+.chips .chip {
+  background: #26262B;
+  border: 1px solid #3D3D44;
+  color: #F3F2EE;
   font-family: var(--font-display);
-  font-weight: 500;
+  font-weight: 600;
   font-size: 14px;
   padding: 12px 22px;
   border-radius: 10px;
   transition: all .15s;
+  cursor: pointer;
 }
-.chip:hover { border-color: #4A4A52; }
-.chip.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+.calc .chip:hover,
+.chips .chip:hover {
+  background: #34343A;
+  border-color: #5A5A62;
+  color: #fff;
+}
+.calc .chip.active,
+.chips .chip.active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
 
 .slider {
   position: relative;
@@ -3681,7 +3693,7 @@ button.thumb-more {
 }
 .mag-more:hover { color: var(--accent); }
 .mag-filters { display: flex; flex-wrap: wrap; gap: 8px; }
-.chip {
+.mag-filters .chip {
   background: transparent;
   border: 1px solid var(--line);
   color: var(--ink);
@@ -3692,8 +3704,8 @@ button.thumb-more {
   cursor: pointer;
   transition: all .15s;
 }
-.chip:hover { border-color: var(--ink); }
-.chip.is-active { background: var(--ink); color: #fff; border-color: var(--ink); }
+.mag-filters .chip:hover { border-color: var(--ink); }
+.mag-filters .chip.is-active { background: var(--ink); color: #fff; border-color: var(--ink); }
 
 .mag-grid {
   display: grid;
