@@ -82,11 +82,18 @@ async function main() {
   ok('Auth OK\n');
 
   // ============================================================
+  // Pozn.: Directus 11 chce Mustache syntaxi {{field}} pro reference
+  // na sourozenecké hodnoty ve formuláři (NIKOLIV $FIELDS.field — to je
+  // legacy syntaxe, která se nevyhodnotí a vrátí prázdnou množinu).
+  // Viz https://ctdevltd.com/directus-conditional-dropdowns/
+  // ============================================================
+
+  // ============================================================
   // 1) stock_vehicles.model — filtr podle brand
   // ============================================================
   console.log('Krok 1: stock_vehicles.model (filtr brand → model)');
   await patchField('stock_vehicles', 'model', {
-    filter: { brand: { _eq: '$FIELDS.brand' } },
+    filter: { brand: { _eq: '{{brand}}' } },
     template: '{{name}} ({{brand.name}})',
     note: 'Model auta. Filtruje se podle vybrané značky — vyber nejdřív Brand.',
   });
@@ -96,7 +103,7 @@ async function main() {
   // ============================================================
   console.log('\nKrok 2: stock_vehicles.model_year (filtr model → year)');
   await patchField('stock_vehicles', 'model_year', {
-    filter: { model: { _eq: '$FIELDS.model' } },
+    filter: { model: { _eq: '{{model}}' } },
     template: '{{model.name}} {{year}} {{version}}',
     note: 'Modelový rok / verze ceníku. Filtruje se podle vybraného modelu — vyber nejdřív Model.',
   });
@@ -106,7 +113,7 @@ async function main() {
   // ============================================================
   console.log('\nKrok 3: stock_vehicles.trim_level (filtr year → trim)');
   await patchField('stock_vehicles', 'trim_level', {
-    filter: { model_year: { _eq: '$FIELDS.model_year' } },
+    filter: { model_year: { _eq: '{{model_year}}' } },
     template: '{{name}} ({{model_year.year}}{{model_year.version}})',
     note: 'Výbavový stupeň. Filtruje se podle vybraného Model year — vyber nejdřív rok.',
   });
@@ -116,7 +123,7 @@ async function main() {
   // ============================================================
   console.log('\nKrok 4: stock_vehicles.option_packages (filtr year → packages)');
   await patchField('stock_vehicles', 'option_packages', {
-    filter: { model_year: { _eq: '$FIELDS.model_year' } },
+    filter: { model_year: { _eq: '{{model_year}}' } },
     template: '{{option_packages_id.name}}',
     note: 'Volitelné balíčky. Filtruje se podle Model year — vyber nejdřív rok.',
   });
