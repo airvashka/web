@@ -170,7 +170,9 @@ async function ensureInteriorColorRef() {
       sort: 57,
       note: 'Barva interiéru — vyber z čalounění tohoto modelu. (Filtr podle Modelu nahoře.)',
       options: {
-        template: '{{name}}{{#material}} · {{material}}{{/material}}',
+        // Directus template engine NEUMÍ Mustache sekce {{#x}}...{{/x}}.
+        // Jen plain references. Holé "{{material}}" by ukazovalo "null" když je prázdné.
+        template: '{{name}}',
         filter: { model: { _eq: '{{model}}' } },
       },
     },
