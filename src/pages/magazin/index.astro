@@ -1,0 +1,182 @@
+---
+import BaseLayout from '@layouts/BaseLayout.astro';
+import DirectusImage from '@components/DirectusImage.astro';
+import { directusGet } from '@lib/directus';
+
+/* ============================================================
+   MAGAZÍN — listing článků (1:1 podle _design-draft-blog/magazin.jsx)
+   Sections: Hero · Featured · Listing s filtry · Newsletter CTA
+   ============================================================ */
+
+interface Article {
+  id: number;
+  slug: string;
+  title: string;
+  excerpt?: string;
+  category?: string;
+  author?: string;
+  read_time?: string;
+  date_published?: string;
+  cover_image?: string;
+  featured?: boolean;
+  status?: string;
+}
+
+const articles = await directusGet<Article>('articles', {
+  filter: { status: { _eq: 'published' } },
+  sort: ['-date_published'],
+  fields: ['*'],
+  limit: 50,
+});
+
+const featured = articles.find((a) => a.featured) ?? articles[0];
+const rest = articles.filter((a) => a.id !== featured?.id);
+
+const CATEGORY_LABELS: Record<string, string> = {
+  recenze: 'Recenze',
+  test: 'Test',
+  novinka: 'Novinka',
+  srovnani: 'Srovnání',
+  technologie: 'Technologie',
+  servis: 'Servisní tipy',
+  znacka: 'Značka',
+  zpravy: 'Zprávy',
+};
+
+const allCategories = ['Vše', ...Object.values(CATEGORY_LABELS)];
+
+function formatDate(iso?: string): string {
+  if (!iso) return '';
+  try {
+    const d = new Date(iso);
+    return d.toLocaleDateString('cs-CZ', { day: 'numeric', month: 'long', year: 'numeric' });
+  } catch {
+    return iso;
+  }
+}
+---
+
+<BaseLayout title="Magazín" description="Magazín SFR Motor — recenze, testy, novinky, srovnání. Příběhy a tipy z naší garáže.">
+  <!-- ===== HERO ===== -->
+  <section class="phero" data-screen-label="01 Hero">
+    <div class="container">
+      <div class="section-eyebrow">Magazín SFR Motor</div>
+      <h1>Příběhy, testy a tipy z naší garáže</h1>
+      <p class="lead">Recenze, srovnání modelů, servisní rady a novinky ze světa KGM, OMODA & JAECOO a Farizon — píší naši prodejci a servisní specialisté.</p>
+    </div>
+  </section>
+
+  {featured && (
+    <!-- ===== FEATURED ARTICLE ===== -->
+    <section class="mag-featured" data-screen-label="02 Featured">
+      <div class="container">
+        <a class="feat" href={`/magazin/${featured.slug}`}>
+          <div class="feat-media">
+            <span class="feat-tag">Doporučujeme</span>
+            {featured.cover_image && <DirectusImage src={featured.cover_image} alt={featured.title} aspectRatio="4/3" widths={[800, 1600]} />}
+          </div>
+          <div class="feat-body">
+            <div class="feat-meta">
+              {featured.category && <span class="cat">{CATEGORY_LABELS[featured.category] ?? featured.category}</span>}
+              {featured.date_published && <><span class="dot">·</span><span>{formatDate(featured.date_published)}</span></>}
+              {featured.read_time && <><span class="dot">·</span><span>{featured.read_time}</span></>}
+            </div>
+            <h2>{featured.title}</h2>
+            {featured.excerpt && <p>{featured.excerpt}</p>}
+            <div class="feat-author">
+              <span class="ava"></span>
+              <div>
+                <div class="nm">{featured.author ?? 'SFR Motor'}</div>
+                <div class="pos">Autor článku</div>
+              </div>
+              <span class="go">
+                Přečíst
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+              </span>
+            </div>
+          </div>
+        </a>
+      </div>
+    </section>
+  )}
+
+  <!-- ===== LISTING ===== -->
+  <section class="mag-list" data-screen-label="03 Listing">
+    <div class="container">
+      <div class="mag-head">
+        <h2>Všechny články</h2>
+        <div class="mag-filters" data-filters>
+          {allCategories.map((cat, i) => (
+            <button type="button" class={`chip${i === 0 ? ' is-active' : ''}`} data-cat={cat === 'Vše' ? 'all' : cat}>
+              {cat}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {rest.length === 0 ? (
+        <div class="mag-empty">Zatím tady žádný článek není. Brzy doplníme.</div>
+      ) : (
+        <div class="mag-grid" data-grid>
+          {rest.map((a) => {
+            const catLabel = a.category ? (CATEGORY_LABELS[a.category] ?? a.category) : '';
+            return (
+              <a class="acard" href={`/magazin/${a.slug}`} data-cat={catLabel}>
+                <div class="acard-media">
+                  {catLabel && <span class="acard-cat">{catLabel}</span>}
+                  {a.cover_image && <DirectusImage src={a.cover_image} alt={a.title} aspectRatio="16/10" widths={[400, 800]} />}
+                </div>
+                <div class="acard-body">
+                  <div class="acard-meta">
+                    {a.date_published && <span>{formatDate(a.date_published)}</span>}
+                    {a.read_time && <><span class="dot">·</span><span>{a.read_time}</span></>}
+                  </div>
+                  <h3>{a.title}</h3>
+                  {a.excerpt && <p>{a.excerpt}</p>}
+                  <div class="acard-author">{a.author ?? 'SFR Motor'}</div>
+                </div>
+              </a>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  </section>
+
+  <!-- ===== NEWSLETTER CTA ===== -->
+  <section class="mag-cta" data-screen-label="04 Newsletter">
+    <div class="container mag-cta-inner">
+      <div>
+        <div class="section-eyebrow light">Newsletter</div>
+        <h2>Novinky rovnou do schránky</h2>
+        <p>Jednou měsíčně shrneme novinky ze showroomu, akce a tipy. Žádný spam, kdykoli odhlásíte.</p>
+      </div>
+      <form class="news-form" onsubmit="event.preventDefault(); this.querySelector('button').textContent='Děkujeme!'; this.querySelector('button').disabled=true;">
+        <input type="email" placeholder="vas@email.cz" required maxlength="200" />
+        <button type="submit" class="btn btn-primary">Přihlásit</button>
+      </form>
+    </div>
+  </section>
+
+  <script>
+    // Klient-side filtr chips
+    let active = 'all';
+    const cards = document.querySelectorAll('[data-grid] .acard');
+
+    function apply() {
+      cards.forEach((c) => {
+        const cat = c.dataset.cat ?? '';
+        c.style.display = active === 'all' || cat === active ? '' : 'none';
+      });
+    }
+
+    document.querySelectorAll('[data-filters] .chip').forEach((chip) => {
+      chip.addEventListener('click', () => {
+        document.querySelectorAll('[data-filters] .chip').forEach((c) => c.classList.remove('is-active'));
+        chip.classList.add('is-active');
+        active = chip.dataset.cat ?? 'all';
+        apply();
+      });
+    });
+  </script>
+</BaseLayout>

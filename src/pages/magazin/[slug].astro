@@ -1,0 +1,186 @@
+---
+import BaseLayout from '@layouts/BaseLayout.astro';
+import DirectusImage from '@components/DirectusImage.astro';
+import { directusGet } from '@lib/directus';
+import { marked } from 'marked';
+
+/* ============================================================
+   MAGAZÍN — detail článku (1:1 podle _design-draft-blog/clanek.jsx)
+   Hero + Cover + Body (markdown render) + Sdílení + Related
+   ============================================================ */
+
+interface Article {
+  id: number;
+  slug: string;
+  title: string;
+  excerpt?: string;
+  body?: string;
+  category?: string;
+  author?: string;
+  read_time?: string;
+  date_published?: string;
+  cover_image?: string;
+  featured?: boolean;
+  status?: string;
+}
+
+export async function getStaticPaths() {
+  const articles = await directusGet<Article>('articles', {
+    filter: { status: { _eq: 'published' } },
+    fields: ['slug'],
+    limit: 500,
+  });
+  return articles.map((a) => ({ params: { slug: a.slug } }));
+}
+
+const { slug } = Astro.params;
+
+const articles = await directusGet<Article>('articles', {
+  filter: { slug: { _eq: slug }, status: { _eq: 'published' } },
+  limit: 1,
+  fields: ['*'],
+});
+const article = articles[0];
+if (!article) return Astro.redirect('/magazin');
+
+// Related (3 ostatní)
+const related = await directusGet<Article>('articles', {
+  filter: { status: { _eq: 'published' }, slug: { _neq: slug } },
+  sort: ['-date_published'],
+  fields: ['id', 'slug', 'title', 'excerpt', 'category', 'author', 'date_published', 'read_time', 'cover_image'],
+  limit: 3,
+});
+
+const CATEGORY_LABELS: Record<string, string> = {
+  recenze: 'Recenze',
+  test: 'Test',
+  novinka: 'Novinka',
+  srovnani: 'Srovnání',
+  technologie: 'Technologie',
+  servis: 'Servisní tipy',
+  znacka: 'Značka',
+  zpravy: 'Zprávy',
+};
+
+function formatDate(iso?: string): string {
+  if (!iso) return '';
+  try {
+    const d = new Date(iso);
+    return d.toLocaleDateString('cs-CZ', { day: 'numeric', month: 'long', year: 'numeric' });
+  } catch {
+    return iso;
+  }
+}
+
+// Markdown → HTML
+marked.setOptions({ gfm: true, breaks: false });
+const bodyHtml = article.body ? marked.parse(article.body) : '';
+
+// Custom render — wrap blockquotes na .pull
+const wrappedHtml = String(bodyHtml)
+  .replace(/<blockquote>/g, '<blockquote class="pull">')
+  .replace(/<ul>/g, '<ul class="art-list">')
+  .replace(/<ol>/g, '<ol class="art-list">')
+  .replace(/<figure>/g, '<figure class="art-fig">');
+
+const catLabel = article.category ? (CATEGORY_LABELS[article.category] ?? article.category) : '';
+---
+
+<BaseLayout
+  title={article.title}
+  description={article.excerpt ?? `${article.title} — magazín SFR Motor.`}
+  ogImage={article.cover_image ? `${import.meta.env.PUBLIC_DIRECTUS_URL ?? ''}/assets/${article.cover_image}?width=1200&height=630&fit=cover` : undefined}
+>
+  <!-- ===== HERO ===== -->
+  <section class="art-hero">
+    <div class="container">
+      <a class="art-back" href="/magazin">← Zpět na magazín</a>
+      <div class="art-meta">
+        {catLabel && <span class="cat">{catLabel}</span>}
+        {article.date_published && <><span class="dot">·</span><span>{formatDate(article.date_published)}</span></>}
+        {article.read_time && <><span class="dot">·</span><span>{article.read_time}</span></>}
+      </div>
+      <h1>{article.title}</h1>
+      {article.excerpt && <p class="lead">{article.excerpt}</p>}
+      <div class="art-author">
+        <span class="ava"></span>
+        <div>
+          <div class="nm">{article.author ?? 'SFR Motor'}</div>
+          <div class="pos">Autor článku</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== COVER ===== -->
+  {article.cover_image && (
+    <div class="art-cover-wrap">
+      <div class="container">
+        <div class="art-cover">
+          <DirectusImage src={article.cover_image} alt={article.title} aspectRatio="16/9" widths={[1200, 1920]} loading="eager" />
+        </div>
+      </div>
+    </div>
+  )}
+
+  <!-- ===== BODY ===== -->
+  <article class="art-body">
+    <div class="art-col">
+      {article.excerpt && <p class="art-intro">{article.excerpt}</p>}
+      <div set:html={wrappedHtml}></div>
+
+      <!-- Share -->
+      <div class="art-foot">
+        <span>Líbil se vám článek? Sdílejte ho.</span>
+        <div class="share">
+          <a href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(Astro.url.toString())}`} target="_blank" rel="noopener" aria-label="Sdílet na Facebooku">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M22 12a10 10 0 1 0-11.56 9.88v-6.99H7.9V12h2.54V9.8c0-2.5 1.5-3.9 3.78-3.9 1.1 0 2.24.2 2.24.2v2.47H15.2c-1.24 0-1.63.77-1.63 1.56V12h2.78l-.45 2.89h-2.33v6.99A10 10 0 0 0 22 12z"/></svg>
+          </a>
+          <a href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(Astro.url.toString())}`} target="_blank" rel="noopener" aria-label="Sdílet na LinkedIn">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M19 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2zM8.3 18.3H5.7V9.7h2.6v8.6zM7 8.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm11.3 9.8h-2.6v-4.2c0-1-.4-1.7-1.3-1.7-.7 0-1.1.5-1.3 1-.1.2-.1.4-.1.7v4.2H10.3V9.7h2.6v1.1c.3-.5 1-1.3 2.4-1.3 1.7 0 3 1.1 3 3.5v5.3z"/></svg>
+          </a>
+          <a href={`mailto:?subject=${encodeURIComponent(article.title)}&body=${encodeURIComponent(Astro.url.toString())}`} aria-label="Sdílet e-mailem">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><polyline points="2 6 12 13 22 6"/></svg>
+          </a>
+        </div>
+      </div>
+    </div>
+  </article>
+
+  <!-- ===== RELATED ===== -->
+  {related.length > 0 && (
+    <section class="mag-related mag-list" style="padding-top: 80px;">
+      <div class="container">
+        <div class="mag-head">
+          <h2>Čtěte dál</h2>
+          <a class="mag-more" href="/magazin">
+            Všechny články
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+          </a>
+        </div>
+        <div class="mag-grid">
+          {related.map((a) => {
+            const cl = a.category ? (CATEGORY_LABELS[a.category] ?? a.category) : '';
+            return (
+              <a class="acard" href={`/magazin/${a.slug}`}>
+                <div class="acard-media">
+                  {cl && <span class="acard-cat">{cl}</span>}
+                  {a.cover_image && <DirectusImage src={a.cover_image} alt={a.title} aspectRatio="16/10" widths={[400, 800]} />}
+                </div>
+                <div class="acard-body">
+                  <div class="acard-meta">
+                    {a.date_published && <span>{formatDate(a.date_published)}</span>}
+                    {a.read_time && <><span class="dot">·</span><span>{a.read_time}</span></>}
+                  </div>
+                  <h3>{a.title}</h3>
+                  {a.excerpt && <p>{a.excerpt}</p>}
+                  <div class="acard-author">{a.author ?? 'SFR Motor'}</div>
+                </div>
+              </a>
+            );
+          })}
+        </div>
+      </div>
+    </section>
+  )}
+</BaseLayout>
