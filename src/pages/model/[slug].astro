@@ -27,7 +27,8 @@ type ModelRaw = Model & {
   gallery?: Array<{ directus_files_id: string }>;
   color_exterior?: Array<any>;
   color_interior?: Array<any>;
-  highlights?: Array<any>; // O2M na model_highlights collection (po refactoru)
+  highlights?: Array<any>;
+  documents?: Array<any>; // O2M na model_documents collection (brožury + ceníky)
 };
 
 const rawModels = await directusGet<ModelRaw>('models', {
@@ -39,6 +40,15 @@ const rawModels = await directusGet<ModelRaw>('models', {
     'color_exterior.*',
     'color_interior.*',
     'highlights.*',
+    // Explicitní expand polí pro documents O2M (některé Directus instance neexpand přes .*)
+    'documents.id',
+    'documents.title',
+    'documents.type',
+    'documents.file',
+    'documents.valid_from',
+    'documents.valid_to',
+    'documents.featured',
+    'documents.sort',
   ],
 });
 const rawModel = rawModels[0];
@@ -296,10 +306,43 @@ const galleryFileIds: string[] = Array.isArray((rawModel as any).gallery)
 
 // PDF ke stažení — priorita models > latestYear (legacy fallback)
 const DIRECTUS_BASE = import.meta.env.PUBLIC_DIRECTUS_URL ?? '';
+// Dokumenty — priorita O2M `documents` (multi), fallback na legacy single fieldy
+const TYPE_LABELS: Record<string, string> = {
+  brochure: 'Brožura',
+  price_list: 'Ceník',
+  price_list_promo: 'Akční ceník',
+  datasheet: 'Technický list',
+  other: 'Dokument',
+};
+type DocItem = { type: string; title: string; url: string; valid_from?: string; valid_to?: string; featured?: boolean };
+const today = new Date().toISOString().slice(0, 10);
+const docsRaw = Array.isArray((rawModel as any)?.documents) ? (rawModel as any).documents : [];
+const docsList: DocItem[] = docsRaw
+  .filter((d: any) => d?.file)
+  // Filter platnost — pokud má valid_from > today, schovat; valid_to < today, schovat
+  .filter((d: any) => {
+    if (d.valid_from && d.valid_from > today) return false;
+    if (d.valid_to && d.valid_to < today) return false;
+    return true;
+  })
+  .map((d: any) => ({
+    type: d.type ?? 'other',
+    title: d.title ?? TYPE_LABELS[d.type] ?? 'Dokument',
+    url: `${DIRECTUS_BASE}/assets/${d.file}?download`,
+    valid_from: d.valid_from,
+    valid_to: d.valid_to,
+    featured: !!d.featured,
+  }))
+  // Sort: featured první, pak podle type group
+  .sort((a: DocItem, b: DocItem) => (b.featured ? 1 : 0) - (a.featured ? 1 : 0));
+
+// Legacy fallback (pro modely co ještě nemají documents records)
 const brochureFile: string | null = (rawModel as any)?.brochure_file ?? (latestYear as any)?.brochure_file ?? null;
 const priceListFile: string | null = (rawModel as any)?.price_list_file ?? (latestYear as any)?.price_list_file ?? null;
-const brochureUrl = brochureFile ? `${DIRECTUS_BASE}/assets/${brochureFile}?download` : null;
-const priceListUrl = priceListFile ? `${DIRECTUS_BASE}/assets/${priceListFile}?download` : null;
+if (docsList.length === 0) {
+  if (brochureFile) docsList.push({ type: 'brochure', title: 'Brožura', url: `${DIRECTUS_BASE}/assets/${brochureFile}?download` });
+  if (priceListFile) docsList.push({ type: 'price_list', title: 'Aktuální ceník', url: `${DIRECTUS_BASE}/assets/${priceListFile}?download` });
+}
 
 // Barvy karoserie + interiéru (z model_year)
 type ColorOpt = { code?: string; name?: string; name_en?: string; hex?: string; type?: string; price_type?: string; swatch_image?: string; swatch_file?: string; photo_file?: string; photo?: string; monotone_only?: boolean };
@@ -365,37 +408,6 @@ const introCopy = (rawModel.description ?? '').split(/\n\s*\n/).filter(Boolean);
       </div>
     )}
   </section>
-
-  <!-- ===== DOWNLOADS STRIP ===== -->
-  <div class="downloads-strip">
-    <div class="container downloads-inner">
-      <div class="downloads-label">Ke stažení</div>
-      <div class="downloads-items">
-        {brochureUrl ? (
-          <a class="dl-btn" href={brochureUrl} target="_blank" rel="noopener">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><polyline points="9 15 12 18 15 15"/></svg>
-            <span>Brožura modelu (PDF)</span>
-          </a>
-        ) : (
-          <span class="dl-btn dl-btn-disabled" title="Brožura zatím není nahraná">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-            <span>Brožura — připravujeme</span>
-          </span>
-        )}
-        {priceListUrl ? (
-          <a class="dl-btn" href={priceListUrl} target="_blank" rel="noopener">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><polyline points="9 15 12 18 15 15"/></svg>
-            <span>Aktuální ceník (PDF)</span>
-          </a>
-        ) : (
-          <span class="dl-btn dl-btn-disabled" title="Ceník zatím není nahraný">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-            <span>Ceník — připravujeme</span>
-          </span>
-        )}
-      </div>
-    </div>
-  </div>
 
   <!-- ===== SUBNAV ===== -->
   <div class="subnav">
@@ -856,6 +868,48 @@ const introCopy = (rawModel.description ?? '').split(/\n\s*\n/).filter(Boolean);
       </div>
     </div>
   </section>
+
+  <!-- ===== KE STAŽENÍ — multi-dokumenty (brožury + ceníky) ===== -->
+  {docsList.length > 0 && (
+    <section class="section downloads-section" id="ke-stazeni" style="background: var(--bg-soft); padding: 60px 0;">
+      <div class="container">
+        <div class="downloads-header">
+          <div class="section-eyebrow">Ke stažení</div>
+          <h2 class="downloads-title">Brožura, ceník a další dokumenty</h2>
+        </div>
+        <div class="downloads-grid">
+          {docsList.map((d) => (
+            <a class={`dl-card dl-card--${d.type.replace('_', '-')}`} href={d.url} target="_blank" rel="noopener">
+              <span class="dl-card-icon">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                  <polyline points="14 2 14 8 20 8"/>
+                  <line x1="12" y1="18" x2="12" y2="12"/>
+                  <polyline points="9 15 12 18 15 15"/>
+                </svg>
+              </span>
+              <span class="dl-card-body">
+                <span class="dl-card-type">
+                  {TYPE_LABELS[d.type] ?? 'Dokument'}
+                  {d.type === 'price_list_promo' && <span class="dl-badge">Akce</span>}
+                </span>
+                <span class="dl-card-title">{d.title}</span>
+                {(d.valid_from || d.valid_to) && (
+                  <span class="dl-card-validity">
+                    Platí{d.valid_from ? ` od ${new Date(d.valid_from).toLocaleDateString('cs-CZ')}` : ''}
+                    {d.valid_to ? ` do ${new Date(d.valid_to).toLocaleDateString('cs-CZ')}` : ''}
+                  </span>
+                )}
+              </span>
+              <span class="dl-card-action">PDF
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+              </span>
+            </a>
+          ))}
+        </div>
+      </div>
+    </section>
+  )}
 
   <script>
     // ===== Konfigurátor — color & interior picker =====

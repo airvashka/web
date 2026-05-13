@@ -1184,6 +1184,121 @@ input, textarea, select { font: inherit; }
   cursor: default;
 }
 .dl-btn-disabled:hover { border-color: var(--line-2); color: var(--text-dim); transform: none; }
+
+/* Variant per typ — akční ceník má accent border + barvu */
+.dl-btn--price-list-promo {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+.dl-btn--price-list-promo:hover { background: var(--accent-soft); }
+.dl-badge {
+  display: inline-block;
+  background: var(--accent);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 2px 6px;
+  border-radius: 4px;
+  margin-left: 8px;
+  vertical-align: middle;
+}
+
+/* ===== Downloads section — pod CTA banner, multi-dokumenty ===== */
+.downloads-section .downloads-header { margin-bottom: 28px; }
+.downloads-title {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: clamp(28px, 3vw, 40px);
+  letter-spacing: -0.02em;
+  margin: 12px 0 0;
+}
+.downloads-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 16px;
+}
+.dl-card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 20px 22px;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  text-decoration: none;
+  color: var(--ink);
+  transition: border-color .15s, transform .15s, box-shadow .15s;
+}
+.dl-card:hover {
+  border-color: var(--accent);
+  transform: translateY(-2px);
+  box-shadow: 0 12px 28px -14px rgba(0,0,0,0.16);
+}
+.dl-card--price-list-promo {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
+.dl-card--price-list-promo:hover { box-shadow: 0 12px 28px -14px rgba(242,92,27,0.3); }
+
+.dl-card-icon {
+  width: 48px; height: 48px;
+  display: grid; place-items: center;
+  flex-shrink: 0;
+  border-radius: 12px;
+  background: var(--bg-soft);
+  color: var(--ink);
+}
+.dl-card--price-list-promo .dl-card-icon {
+  background: var(--accent);
+  color: #fff;
+}
+
+.dl-card-body { flex: 1; min-width: 0; }
+.dl-card-type {
+  display: block;
+  font-family: var(--font-display);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 4px;
+}
+.dl-card-title {
+  display: block;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 15px;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+  margin-bottom: 2px;
+}
+.dl-card-validity {
+  display: block;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+.dl-card-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+  font-family: var(--font-display);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+.dl-card:hover .dl-card-action { color: var(--accent); }
+
+@media (max-width: 520px) {
+  .dl-card { padding: 16px; }
+  .dl-card-icon { width: 40px; height: 40px; }
+  .dl-card-action span { display: none; }
+}
 @media (max-width: 600px) {
   .downloads-inner { padding: 14px 0; }
   .downloads-label { width: 100%; margin-bottom: 2px; }
