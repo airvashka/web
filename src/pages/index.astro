@@ -50,13 +50,24 @@ const BRAND_DISPLAY: Record<string, { name: string; tag: string }> = {
 const fmtPrice = (n?: number | null) => (n ? `${n.toLocaleString('cs-CZ')} Kč` : '—');
 const fmtKm = (n?: number | null) => (n === 0 || !n ? '0 km' : `${n.toLocaleString('cs-CZ')} km`);
 
-// Hero — Zima varianta
-const hero = {
-  num: '01',
-  label: 'KGM Torres EVX',
-  title: ['Tři značky.', 'Jeden servis.', 'Bez kompromisů.'],
-  sub: 'Autorizovaný prodej a servis vozů KGM, OMODA & JAECOO a FARIZON.',
-};
+// Site settings — admin editovatelná titulka
+const settingsList = await directusGet<any>('site_settings', { limit: 1, fields: ['*'] });
+const settings = settingsList?.[0] ?? {};
+
+// Hero — priorita admin (Site Settings) > hardcoded fallback
+const heroTitleLines = (settings.homepage_hero_title ?? 'Tři značky.\nJeden servis.\nBez kompromisů.')
+  .split(/\n/).filter((l: string) => l.trim());
+const heroSub = settings.homepage_hero_subtitle ?? 'Autorizovaný prodej a servis vozů KGM, OMODA & JAECOO a FARIZON.';
+const heroCtaLabel = settings.homepage_hero_cta_label ?? 'Prohlédnout skladovku';
+const heroCtaUrl = settings.homepage_hero_cta_url ?? '/sklad';
+const heroCtaSecondaryLabel = settings.homepage_hero_cta_secondary_label ?? 'Objednat servis';
+const heroCtaSecondaryUrl = settings.homepage_hero_cta_secondary_url ?? '/servis';
+const heroImageId: string | null = settings.homepage_hero_image ?? null;
+const youtubeIds: string[] = Array.isArray(settings.homepage_youtube_video_ids)
+  ? settings.homepage_youtube_video_ids
+  : ['piG8UO24WUk', 'eSfJXjNV8Mg', 'SybpHjEJP1s', 'S9tdBpkwX_4'];
+const youtubeChannelUrl = settings.youtube_channel_url ?? 'https://www.youtube.com/@sfrmotor';
+const instagramUrl = settings.instagram_url ?? 'https://www.instagram.com/sfrmotor/';
 
 // Servis split — TODO: load from a "service_pricing" collection in Directus
 const services = [
@@ -80,23 +91,27 @@ const articles = [
   description="SFR Motor — autorizovaný dealer KGM, OMODA & JAECOO a Farizon. Skladové vozy, servis pro všechny značky, prodej a doplňkové služby. Praha-Ďáblice."
 >
   <!-- ===== HERO =====
-       Hero foto: drop file do web/public/hero-home.jpg (rozměr 2400×1200 px, 2:1)
-       Pokud neexistuje, zobrazí se tmavé pozadí (graceful fallback). -->
+       Foto + texty z Directus Site Settings (admin → Site Settings).
+       Fallback: /hero-home.jpg pokud nic v adminu. -->
   <section class="hhero" data-screen-label="01 Hero">
     <div class="hhero-bg">
-      <img src="/hero-home.jpg" alt="" onerror="this.style.display='none'" />
+      {heroImageId ? (
+        <DirectusImage src={heroImageId} alt="" aspectRatio="auto" widths={[1200, 2000, 2400]} loading="eager" />
+      ) : (
+        <img src="/hero-home.jpg" alt="" onerror="this.style.display='none'" />
+      )}
     </div>
     <div class="container hhero-inner">
       <h1 class="hhero-title">
-        {hero.title.map((line) => (<Fragment>{line}<br /></Fragment>))}
+        {heroTitleLines.map((line: string) => (<Fragment>{line}<br /></Fragment>))}
       </h1>
-      <p class="hhero-sub">{hero.sub}</p>
+      <p class="hhero-sub">{heroSub}</p>
       <div class="hhero-actions">
-        <a class="btn btn-primary" href="/sklad">
-          Prohlédnout skladovku
+        <a class="btn btn-primary" href={heroCtaUrl}>
+          {heroCtaLabel}
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
         </a>
-        <a class="btn btn-outline" href="/servis">Objednat servis</a>
+        <a class="btn btn-outline" href={heroCtaSecondaryUrl}>{heroCtaSecondaryLabel}</a>
       </div>
     </div>
   </section>
@@ -254,14 +269,13 @@ const articles = [
     </div>
   </section>
 
-  <!-- ===== YOUTUBE =====
-       TODO: až bude v Directusu collection `site_settings` s polem `homepage_youtube_video_ids`,
-       fetchnout odtud. Zatím hardcoded 4 IDs z @sfrmotor kanálu. -->
+  <!-- ===== YOUTUBE — IDs z Site Settings ===== -->
   <VideoStrip
-    ids={['piG8UO24WUk', 'eSfJXjNV8Mg', 'SybpHjEJP1s', 'S9tdBpkwX_4']}
+    ids={youtubeIds}
     title="Naše videa"
     eyebrow="YouTube"
     count={4}
+    channelUrl={youtubeChannelUrl}
   />
 
   <!-- ===== INSTAGRAM ===== -->
