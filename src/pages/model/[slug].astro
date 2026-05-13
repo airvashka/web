@@ -339,13 +339,8 @@ const docsList: DocItem[] = docsRaw
   // Sort: featured první, pak podle type group
   .sort((a: DocItem, b: DocItem) => (b.featured ? 1 : 0) - (a.featured ? 1 : 0));
 
-// Legacy fallback (pro modely co ještě nemají documents records)
-const brochureFile: string | null = (rawModel as any)?.brochure_file ?? (latestYear as any)?.brochure_file ?? null;
-const priceListFile: string | null = (rawModel as any)?.price_list_file ?? (latestYear as any)?.price_list_file ?? null;
-if (docsList.length === 0) {
-  if (brochureFile) docsList.push({ type: 'brochure', title: 'Brožura', url: `${DIRECTUS_BASE}/assets/${brochureFile}?download` });
-  if (priceListFile) docsList.push({ type: 'price_list', title: 'Aktuální ceník', url: `${DIRECTUS_BASE}/assets/${priceListFile}?download` });
-}
+// Legacy fallback odstraněn — staré single-file fieldy brochure_file/price_list_file
+// jsou pryč, vše jde přes model_documents O2M collection.
 
 // Barvy karoserie + interiéru (z model_year)
 type ColorOpt = { code?: string; name?: string; name_en?: string; hex?: string; type?: string; price_type?: string; swatch_image?: string; swatch_file?: string; photo_file?: string; photo?: string; monotone_only?: boolean };
