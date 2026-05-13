@@ -75,6 +75,11 @@ const vehicles = await directusGet<VehicleFull>('stock_vehicles', {
   fields: [
     '*',
     'photos.directus_files_id',
+    // M2O na konkrétní barvu modelu (cascading dropdown)
+    'color_ref.id',
+    'color_ref.name',
+    'color_ref.hex',
+    'color_ref.photo',
     // M2M na option_packages (přes junction)
     'option_packages.option_packages_id.id',
     'option_packages.option_packages_id.name',
@@ -145,6 +150,14 @@ const fuelLabel = model ? (fuelLabels[(model as any).fuel_type] ?? '—') : '—
 const transmissionLabel = v.transmission ? (transmissionLabels[v.transmission] ?? v.transmission) : null;
 const drivetrainLabel = v.drivetrain ? (drivetrainLabels[v.drivetrain] ?? v.drivetrain) : null;
 const year = modelYear?.year ?? (v.first_registration ? new Date(v.first_registration).getFullYear() : null);
+
+// Barva — priorita: color_ref (M2O na model_color_exterior) > color_code (legacy text)
+const colorRef = (v as any).color_ref ?? null;
+const colorName = colorRef?.name ?? v.color_code ?? null;
+const colorHex = colorRef?.hex ?? (v.color_code && /^#[0-9a-fA-F]{6}$/.test(v.color_code) ? v.color_code : null);
+
+// Custom badge text (highlight_label override)
+const highlightLabel: string = ((v as any).highlight_label ?? '').toString().trim() || 'Novinka';
 
 // Status badge
 const statusBadge = v.availability === 'in_stock' ? { cls: 'dark', label: 'Skladem' }
@@ -248,7 +261,7 @@ const description = (v.description ?? '').split(/\n\s*\n/).filter(Boolean);
           <button class="gallery-main" type="button" data-gallery-trigger data-index="0" aria-label="Otevřít galerii">
             <div class="badges">
               <span class={`badge ${statusBadge.cls}`}>{statusBadge.label}</span>
-              {v.highlighted && <span class="badge accent">Novinka</span>}
+              {v.highlighted && <span class="badge accent">{highlightLabel}</span>}
               {year && <span class="badge outline">Model {year}</span>}
             </div>
             {photoIds.length > 0 && <div class="gallery-counter">01 / {String(photoIds.length).padStart(2, '0')}</div>}
@@ -309,10 +322,12 @@ const description = (v.description ?? '').split(/\n\s*\n/).filter(Boolean);
                 <span>{drivetrainLabel}</span>
               </li>
             )}
-            {v.color_code && (
+            {colorName && (
               <li>
-                <span class="color-dot" style={`background:${v.color_code}`}></span>
-                <span>{v.color_code}</span>
+                {colorHex
+                  ? <span class="color-dot" style={`background:${colorHex}`}></span>
+                  : <span class="color-dot" style="background:var(--bg-cream); border-color:var(--line-2);"></span>}
+                <span>{colorName}</span>
               </li>
             )}
           </ul>
@@ -324,6 +339,12 @@ const description = (v.description ?? '').split(/\n\s*\n/).filter(Boolean);
             )}
             <span class="vat">vč. DPH</span>
           </div>
+          {hasPromo && v.list_price && (
+            <div class="info-price-before">
+              <span class="strike">{v.list_price.toLocaleString('cs-CZ')} Kč</span>
+              <span class="save">Ušetříte {(v.list_price - (v.promo_price ?? 0)).toLocaleString('cs-CZ')} Kč</span>
+            </div>
+          )}
           {monthlyPayment && (
             <div class="info-finance">
               Financování od <strong style="color: var(--text);">{monthlyPayment.toLocaleString('cs-CZ')} Kč / měsíc</strong> &nbsp;—&nbsp;
@@ -361,17 +382,30 @@ const description = (v.description ?? '').split(/\n\s*\n/).filter(Boolean);
                 <span class="val">{fuelLabel}</span>
               </div>
             </div>
-            {td['Čistý výkon motoru (kW)'] && (
-              <div class="spec-card">
-                <span class="ic">
-                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-                </span>
-                <div>
-                  <span class="lab">Výkon</span>
-                  <span class="val">{td['Čistý výkon motoru (kW)']} kW</span>
+            {(() => {
+              // Robustní lookup výkonu — různé možné klíče v technical_data
+              const powerKw = td['Výkon (kW)'] ?? td['Čistý výkon motoru (kW)'] ?? td['vykon_kw'] ?? td['Výkon'];
+              const powerKs = td['Výkon (k)'] ?? td['Výkon (PS)'] ?? td['vykon_ks'];
+              const powerDisplay = powerKw && powerKs
+                ? `${powerKw} kW / ${powerKs} k`
+                : powerKw
+                  ? `${powerKw} kW`
+                  : powerKs
+                    ? `${powerKs} k`
+                    : null;
+              if (!powerDisplay) return null;
+              return (
+                <div class="spec-card">
+                  <span class="ic">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                  </span>
+                  <div>
+                    <span class="lab">Výkon</span>
+                    <span class="val">{powerDisplay}</span>
+                  </div>
                 </div>
-              </div>
-            )}
+              );
+            })()}
           </div>
 
           <div class="cta-stack">
@@ -486,6 +520,24 @@ const description = (v.description ?? '').split(/\n\s*\n/).filter(Boolean);
               </div>
             ))}
           </div>
+
+          {/* Extra features — konkrétní výbava TOHOTO vozu, mimo trim a packety */}
+          {Array.isArray((v as any).extra_features) && (v as any).extra_features.length > 0 && (
+            <div class="extra-features">
+              <div class="extra-features-head">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+                <h3>Tento konkrétní vůz má navíc</h3>
+              </div>
+              <ul class="extra-features-list">
+                {((v as any).extra_features as string[]).map((f) => (
+                  <li>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                    <span>{f}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
         </div>
       </section>
     )}

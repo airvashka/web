@@ -394,6 +394,28 @@ input, textarea, select { font: inherit; }
   letter-spacing: 0.06em;
   text-transform: uppercase;
 }
+.info-price-before {
+  display: flex; align-items: center; gap: 12px;
+  margin-top: -4px;
+  margin-bottom: 12px;
+  font-size: 14px;
+}
+.info-price-before .strike {
+  color: var(--text-muted);
+  text-decoration: line-through;
+  text-decoration-thickness: 1.5px;
+  font-family: var(--font-display);
+}
+.info-price-before .save {
+  background: rgba(31, 138, 77, 0.12);
+  color: var(--ok, #1F8A4D);
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 12px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  letter-spacing: 0.02em;
+}
 .info-finance {
   font-size: 14px;
   color: var(--text-muted);
@@ -406,6 +428,43 @@ input, textarea, select { font: inherit; }
   text-underline-offset: 3px;
   text-decoration-thickness: 1.5px;
 }
+
+/* Extra features tohoto vozu (mimo standardní výbavu) */
+.extra-features {
+  margin-top: 48px;
+  padding: 28px 32px;
+  background: linear-gradient(180deg, rgba(242, 92, 27, 0.05) 0%, rgba(242, 92, 27, 0.02) 100%);
+  border: 1px solid var(--accent-soft, rgba(242, 92, 27, 0.2));
+  border-radius: var(--radius);
+}
+.extra-features-head {
+  display: flex; align-items: center; gap: 10px;
+  margin-bottom: 16px;
+}
+.extra-features-head svg { color: var(--accent); flex-shrink: 0; }
+.extra-features-head h3 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 16px;
+  letter-spacing: -0.01em;
+  margin: 0;
+  color: var(--ink);
+}
+.extra-features-list {
+  list-style: none; margin: 0; padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 8px 24px;
+}
+.extra-features-list li {
+  display: grid;
+  grid-template-columns: 18px 1fr;
+  gap: 8px;
+  font-size: 14px;
+  line-height: 1.45;
+  align-items: start;
+}
+.extra-features-list li svg { color: var(--accent); margin-top: 3px; flex-shrink: 0; }
 
 .spec-grid {
   display: grid;
