@@ -98,18 +98,36 @@ const badgeText = fuelKey === 'ev' ? 'Elektrické SUV'
   : 'SUV';
 
 // ===== Hero stats — extrakce 4 nejdůležitějších s aliasy + jednotky =====
-// Najde podle více alternativních klíčů, normalizuje hodnotu (přidá jednotku pokud chybí)
+// Najde podle více alternativních klíčů, normalizuje a ZKRÁTÍ hodnotu (jen klíčové číslo + jednotka)
+function shortenStat(raw: string, preferUnit?: string): string {
+  const val = raw.trim();
+  // 1) Pokud máme preferUnit, hledej "číslo + jednotka" a vrať jen to
+  if (preferUnit) {
+    // Pattern: number (with optional space/comma/dot) + optional spaces + unit
+    const re = new RegExp(`([0-9]+[\\s.,0-9]*?)\\s*${preferUnit.replace(/[.*+?^${}()|[\\]\\\\]/g, '\\\\$&')}`, 'i');
+    const m = val.match(re);
+    if (m) return `${m[1].replace(/\s+$/, '').trim()} ${preferUnit}`;
+  }
+  // 2) Pokud obsahuje závorky / lomítka, vzít jen první kus
+  const beforeSlash = val.split(/\s*\/\s*/)[0];
+  const beforeParen = beforeSlash.replace(/\s*\([^)]*\)/g, '').trim();
+  // 3) Max 18 znaků, jinak truncate
+  if (beforeParen.length > 18) return beforeParen.substring(0, 16) + '…';
+  return beforeParen;
+}
+
 function findStat(aliases: string[], unit?: string): string | null {
   const lowerAliases = aliases.map((a) => a.toLowerCase());
   for (const [k, v] of tdataRows) {
     const lk = k.toLowerCase();
     if (lowerAliases.some((a) => lk.includes(a))) {
       const val = String(v).trim();
-      // Přidat jednotku, pokud zatím není v hodnotě
+      // Přidat jednotku, pokud zatím není v hodnotě a hodnota je čistě číselná
       if (unit && val && !val.includes(unit) && /^[0-9.,\s]+$/.test(val)) {
         return `${val} ${unit}`;
       }
-      return val;
+      // Jinak zkrátit (oříznout závorky, vzít před lomítkem)
+      return shortenStat(val, unit);
     }
   }
   return null;
@@ -158,24 +176,33 @@ const STAT_SETS: Record<string, StatDef[]> = {
 };
 const statsForFuel = STAT_SETS[fuelKey] ?? STAT_SETS.petrol;
 
-// Pravidlo: vždy max 3 stats z STAT_SETS a 4. je vždy "Cena od" (pokud existuje).
-const heroStats: Array<{ lab: string; val: string }> = [];
-for (const def of statsForFuel) {
-  let val = findStat(def.aliases, def.unit);
-  if (!val && def.label === 'Záruka') val = WARRANTY_BY_BRAND[brand.slug] ?? null;
-  if (val) heroStats.push({ lab: def.label, val });
-  if (heroStats.length >= 3) break;
-}
-// Fallback pokud chybí data: doplň palivo + karoserie
-if (heroStats.length < 2) {
-  const fuelLabel = fuelLabels[fuelKey] ?? '—';
-  const bodyType = (rawModel as any).body_type;
-  if (fuelLabel !== '—') heroStats.push({ lab: 'Palivo', val: fuelLabel });
-  if (bodyType) heroStats.push({ lab: 'Karoserie', val: String(bodyType).toUpperCase() });
-}
-// Cena od — vždy poslední stat (pokud máme price_from)
-if (rawModel.price_from) {
-  heroStats.push({ lab: 'Cena od', val: `${rawModel.price_from.toLocaleString('cs-CZ')} Kč` });
+// ===== PRIMARY: admin-editovatelné latestYear.hero_stats; FALLBACK: auto-extract =====
+type AdminStat = { label?: string; value?: string };
+const adminHeroStats: AdminStat[] = Array.isArray((latestYear as any)?.hero_stats) ? (latestYear as any).hero_stats : [];
+let heroStats: Array<{ lab: string; val: string }> = [];
+
+if (adminHeroStats.length > 0) {
+  // Admin upravil → použij hodnoty 1:1
+  heroStats = adminHeroStats
+    .filter((s) => s && s.label && s.value)
+    .map((s) => ({ lab: String(s.label), val: String(s.value) }));
+} else {
+  // Fallback: auto-extract z technical_data
+  for (const def of statsForFuel) {
+    let val = findStat(def.aliases, def.unit);
+    if (!val && def.label === 'Záruka') val = WARRANTY_BY_BRAND[brand.slug] ?? null;
+    if (val) heroStats.push({ lab: def.label, val });
+    if (heroStats.length >= 3) break;
+  }
+  if (heroStats.length < 2) {
+    const fuelLabel = fuelLabels[fuelKey] ?? '—';
+    const bodyType = (rawModel as any).body_type;
+    if (fuelLabel !== '—') heroStats.push({ lab: 'Palivo', val: fuelLabel });
+    if (bodyType) heroStats.push({ lab: 'Karoserie', val: String(bodyType).toUpperCase() });
+  }
+  if (rawModel.price_from) {
+    heroStats.push({ lab: 'Cena od', val: `${rawModel.price_from.toLocaleString('cs-CZ')} Kč` });
+  }
 }
 
 const priceFrom = rawModel.price_from ? `${rawModel.price_from.toLocaleString('cs-CZ')} Kč` : '—';
@@ -241,9 +268,21 @@ const modelVideoIds: string[] = Array.isArray((rawModel as any).youtube_video_id
   ? (rawModel as any).youtube_video_ids
   : [];
 
+// Galerie modelu — M2M relace `gallery` na directus_files (zatím už načítáme přes fields=['*', 'gallery.directus_files_id'])
+const galleryFileIds: string[] = Array.isArray((rawModel as any).gallery)
+  ? (rawModel as any).gallery.map((g: any) => typeof g === 'string' ? g : g?.directus_files_id).filter(Boolean) as string[]
+  : [];
+
+// PDF ke stažení (z latestYear)
+const DIRECTUS_BASE = import.meta.env.PUBLIC_DIRECTUS_URL ?? '';
+const brochureFile: string | null = (latestYear as any)?.brochure_file ?? null;
+const priceListFile: string | null = (latestYear as any)?.price_list_file ?? null;
+const brochureUrl = brochureFile ? `${DIRECTUS_BASE}/assets/${brochureFile}?download` : null;
+const priceListUrl = priceListFile ? `${DIRECTUS_BASE}/assets/${priceListFile}?download` : null;
+
 // Barvy karoserie + interiéru (z model_year)
-type ColorOpt = { code?: string; name?: string; name_en?: string; hex?: string; type?: string; swatch_image?: string; monotone_only?: boolean };
-type InteriorOpt = { code?: string; name?: string; material?: string; hex?: string; swatch_image?: string };
+type ColorOpt = { code?: string; name?: string; name_en?: string; hex?: string; type?: string; swatch_image?: string; swatch_file?: string; monotone_only?: boolean };
+type InteriorOpt = { code?: string; name?: string; material?: string; hex?: string; swatch_image?: string; swatch_file?: string };
 const colorOptions: ColorOpt[] = Array.isArray((latestYear as any)?.color_options) ? (latestYear as any).color_options : [];
 const interiorOptions: InteriorOpt[] = Array.isArray((latestYear as any)?.interior_options) ? (latestYear as any).interior_options : [];
 const hasConfigurator = colorOptions.length > 0 || interiorOptions.length > 0;
@@ -290,6 +329,37 @@ const introCopy = (rawModel.description ?? '').split(/\n\s*\n/).filter(Boolean);
     )}
   </section>
 
+  <!-- ===== DOWNLOADS STRIP ===== -->
+  <div class="downloads-strip">
+    <div class="container downloads-inner">
+      <div class="downloads-label">Ke stažení</div>
+      <div class="downloads-items">
+        {brochureUrl ? (
+          <a class="dl-btn" href={brochureUrl} target="_blank" rel="noopener">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><polyline points="9 15 12 18 15 15"/></svg>
+            <span>Brožura modelu (PDF)</span>
+          </a>
+        ) : (
+          <span class="dl-btn dl-btn-disabled" title="Brožura zatím není nahraná">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            <span>Brožura — připravujeme</span>
+          </span>
+        )}
+        {priceListUrl ? (
+          <a class="dl-btn" href={priceListUrl} target="_blank" rel="noopener">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><polyline points="9 15 12 18 15 15"/></svg>
+            <span>Aktuální ceník (PDF)</span>
+          </a>
+        ) : (
+          <span class="dl-btn dl-btn-disabled" title="Ceník zatím není nahraný">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            <span>Ceník — připravujeme</span>
+          </span>
+        )}
+      </div>
+    </div>
+  </div>
+
   <!-- ===== SUBNAV ===== -->
   <div class="subnav">
     <div class="container subnav-inner">
@@ -298,6 +368,7 @@ const introCopy = (rawModel.description ?? '').split(/\n\s*\n/).filter(Boolean);
       {hasConfigurator && (<><span class="subnav-sep">·</span><a class="subnav-link" href="#konfigurator">Konfigurátor</a></>)}
       <span class="subnav-sep">·</span>
       <a class="subnav-link" href="#technologie">Technologie</a>
+      {galleryFileIds.length > 0 && (<><span class="subnav-sep">·</span><a class="subnav-link" href="#galerie">Galerie</a></>)}
       <span class="subnav-sep">·</span>
       <a class="subnav-link" href="#ceny">Ceny a výbavy</a>
       <span class="subnav-sep">·</span>
@@ -390,7 +461,13 @@ const introCopy = (rawModel.description ?? '').split(/\n\s*\n/).filter(Boolean);
                   data-color-hex={c.hex ?? ''}
                 >
                   <span class="ring">
-                    <span class="swatch-fill" style={`background:${c.hex ?? '#888'}; ${(c.hex ?? '').toLowerCase() === '#f0eee9' || (c.hex ?? '').toLowerCase() === '#f4f1ec' ? 'border:1px solid var(--line-2);' : ''}`}></span>
+                    {c.swatch_file ? (
+                      <span class="swatch-fill swatch-fill--img">
+                        <DirectusImage src={c.swatch_file} alt={c.name ?? ''} aspectRatio="1/1" widths={[140, 280]} />
+                      </span>
+                    ) : (
+                      <span class="swatch-fill" style={`background:${c.hex ?? '#888'}; ${(c.hex ?? '').toLowerCase() === '#f0eee9' || (c.hex ?? '').toLowerCase() === '#f4f1ec' ? 'border:1px solid var(--line-2);' : ''}`}></span>
+                    )}
                   </span>
                   <span class="name">{c.name}</span>
                   <span class="delta">{c.type === 'základní' ? 'V ceně' : 'Příplatek'}</span>
@@ -414,7 +491,13 @@ const introCopy = (rawModel.description ?? '').split(/\n\s*\n/).filter(Boolean);
                     data-interior-name={it.name ?? ''}
                     data-interior-material={it.material ?? ''}
                   >
-                    <span class="interior-fill" style={`background:${it.hex ?? '#888'}`}></span>
+                    {it.swatch_file ? (
+                      <span class="interior-fill interior-fill--img">
+                        <DirectusImage src={it.swatch_file} alt={it.name ?? ''} aspectRatio="1/1" widths={[120, 240]} />
+                      </span>
+                    ) : (
+                      <span class="interior-fill" style={`background:${it.hex ?? '#888'}`}></span>
+                    )}
                     <span class="name">{it.name}</span>
                   </button>
                 ))}
@@ -459,6 +542,51 @@ const introCopy = (rawModel.description ?? '').split(/\n\s*\n/).filter(Boolean);
       </section>
     );
   })()}
+
+  <!-- ===== GALERIE ===== -->
+  {galleryFileIds.length > 0 && (
+    <section class="section" id="galerie" style="background: var(--bg-soft);">
+      <div class="container">
+        <div class="section-head-row">
+          <div>
+            <div class="section-eyebrow">Galerie</div>
+            <h2 class="section-title" style="margin-bottom: 0;">{rawModel.name} v detailech</h2>
+          </div>
+          <span class="head-link" style="cursor: default; border: none;">{galleryFileIds.length} fotek</span>
+        </div>
+        <div class="gallery-grid" data-gallery>
+          {galleryFileIds.map((id, i) => (
+            <button type="button" class="gallery-item" data-gallery-trigger data-index={i} aria-label={`Foto ${i + 1}`}>
+              <DirectusImage src={id} alt={`${rawModel.name} — foto ${i + 1}`} aspectRatio="4/3" widths={[400, 800, 1600]} />
+            </button>
+          ))}
+        </div>
+      </div>
+    </section>
+  )}
+
+  <!-- Gallery lightbox modal -->
+  {galleryFileIds.length > 0 && (
+    <div class="gallery-modal" data-gallery-modal aria-hidden="true">
+      <button type="button" class="gallery-modal-close" data-gallery-close aria-label="Zavřít">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+      <button type="button" class="gallery-modal-nav prev" data-gallery-prev aria-label="Předchozí">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+      </button>
+      <button type="button" class="gallery-modal-nav next" data-gallery-next aria-label="Další">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+      </button>
+      <div class="gallery-modal-counter" data-gallery-counter></div>
+      <div class="gallery-modal-image" data-gallery-image>
+        {galleryFileIds.map((id, i) => (
+          <div class="gallery-modal-slide" data-slide-index={i} hidden={i !== 0}>
+            <DirectusImage src={id} alt={`${rawModel.name} — foto ${i + 1}`} aspectRatio="auto" widths={[1200, 2000]} loading="eager" />
+          </div>
+        ))}
+      </div>
+    </div>
+  )}
 
   <!-- ===== TRIMS / CENY A VÝBAVY ===== -->
   {trims.length > 0 && (
@@ -691,6 +819,49 @@ const introCopy = (rawModel.description ?? '').split(/\n\s*\n/).filter(Boolean);
         document.querySelectorAll('[data-interior-btn]').forEach((b) => b.classList.remove('is-active'));
         btn.classList.add('is-active');
       });
+    });
+
+    // ===== Gallery lightbox =====
+    const modal = document.querySelector('[data-gallery-modal]');
+    const counter = document.querySelector('[data-gallery-counter]');
+    const slides = document.querySelectorAll('[data-slide-index]');
+    const total = slides.length;
+    let current = 0;
+
+    function showSlide(idx) {
+      if (!modal || total === 0) return;
+      current = ((idx % total) + total) % total;
+      slides.forEach((s) => (s.hidden = Number(s.dataset.slideIndex) !== current));
+      if (counter) counter.textContent = `${String(current + 1).padStart(2, '0')} / ${String(total).padStart(2, '0')}`;
+    }
+
+    function openModal(idx) {
+      if (!modal) return;
+      modal.classList.add('is-open');
+      modal.setAttribute('aria-hidden', 'false');
+      document.body.style.overflow = 'hidden';
+      showSlide(idx);
+    }
+
+    function closeModal() {
+      if (!modal) return;
+      modal.classList.remove('is-open');
+      modal.setAttribute('aria-hidden', 'true');
+      document.body.style.overflow = '';
+    }
+
+    document.querySelectorAll('[data-gallery-trigger]').forEach((btn) => {
+      btn.addEventListener('click', () => openModal(Number(btn.dataset.index)));
+    });
+    document.querySelector('[data-gallery-close]')?.addEventListener('click', closeModal);
+    document.querySelector('[data-gallery-prev]')?.addEventListener('click', () => showSlide(current - 1));
+    document.querySelector('[data-gallery-next]')?.addEventListener('click', () => showSlide(current + 1));
+    modal?.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
+    document.addEventListener('keydown', (e) => {
+      if (!modal?.classList.contains('is-open')) return;
+      if (e.key === 'Escape') closeModal();
+      if (e.key === 'ArrowLeft') showSlide(current - 1);
+      if (e.key === 'ArrowRight') showSlide(current + 1);
     });
   </script>
 </BaseLayout>
