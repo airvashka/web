@@ -283,8 +283,8 @@ const brochureUrl = brochureFile ? `${DIRECTUS_BASE}/assets/${brochureFile}?down
 const priceListUrl = priceListFile ? `${DIRECTUS_BASE}/assets/${priceListFile}?download` : null;
 
 // Barvy karoserie + interiéru (z model_year)
-type ColorOpt = { code?: string; name?: string; name_en?: string; hex?: string; type?: string; swatch_image?: string; swatch_file?: string; monotone_only?: boolean };
-type InteriorOpt = { code?: string; name?: string; material?: string; hex?: string; swatch_image?: string; swatch_file?: string; preview_image?: string; preview_file?: string };
+type ColorOpt = { code?: string; name?: string; name_en?: string; hex?: string; type?: string; swatch_image?: string; swatch_file?: string; photo_file?: string; monotone_only?: boolean };
+type InteriorOpt = { code?: string; name?: string; material?: string; hex?: string; swatch_image?: string; swatch_file?: string; preview_image?: string; preview_file?: string; photo_file?: string };
 const colorOptions: ColorOpt[] = Array.isArray((latestYear as any)?.color_options) ? (latestYear as any).color_options : [];
 const interiorOptions: InteriorOpt[] = Array.isArray((latestYear as any)?.interior_options) ? (latestYear as any).interior_options : [];
 const hasConfigurator = colorOptions.length > 0 || interiorOptions.length > 0;
@@ -452,29 +452,33 @@ const introCopy = (rawModel.description ?? '').split(/\n\s*\n/).filter(Boolean);
             </div>
 
             <div class="color-row">
-              {colorOptions.map((c, i) => (
-                <button
-                  type="button"
-                  class={`swatch-item${i === 0 ? ' is-active' : ''}`}
-                  data-color-btn
-                  data-color-index={i}
-                  data-color-name={c.name ?? ''}
-                  data-color-type={c.type ?? ''}
-                  data-color-hex={c.hex ?? ''}
-                >
-                  <span class="ring">
-                    {c.swatch_file ? (
-                      <span class="swatch-fill swatch-fill--img">
-                        <DirectusImage src={c.swatch_file} alt={c.name ?? ''} aspectRatio="1/1" widths={[140, 280]} />
-                      </span>
-                    ) : (
-                      <span class="swatch-fill" style={`background:${c.hex ?? '#888'}; ${(c.hex ?? '').toLowerCase() === '#f0eee9' || (c.hex ?? '').toLowerCase() === '#f4f1ec' ? 'border:1px solid var(--line-2);' : ''}`}></span>
-                    )}
-                  </span>
-                  <span class="name">{c.name}</span>
-                  <span class="delta">{c.type === 'základní' ? 'V ceně' : 'Příplatek'}</span>
-                </button>
-              ))}
+              {colorOptions.map((c, i) => {
+                const photoId = c.photo_file ?? c.swatch_file ?? null;
+                const isWhite = (c.hex ?? '').toLowerCase() === '#f0eee9' || (c.hex ?? '').toLowerCase() === '#f4f1ec';
+                return (
+                  <button
+                    type="button"
+                    class={`swatch-item${i === 0 ? ' is-active' : ''}`}
+                    data-color-btn
+                    data-color-index={i}
+                    data-color-name={c.name ?? ''}
+                    data-color-type={c.type ?? ''}
+                    data-color-hex={c.hex ?? ''}
+                  >
+                    <span class="ring">
+                      {photoId ? (
+                        <span class="swatch-fill swatch-fill--img">
+                          <DirectusImage src={photoId} alt={c.name ?? ''} aspectRatio="1/1" widths={[140, 280]} />
+                        </span>
+                      ) : (
+                        <span class="swatch-fill" style={`background:${c.hex ?? '#888'}; ${isWhite ? 'border:1px solid var(--line-2);' : ''}`}></span>
+                      )}
+                    </span>
+                    <span class="name">{c.name}</span>
+                    {c.type && <span class="delta">{c.type === 'základní' ? 'V ceně' : 'Příplatek'}</span>}
+                  </button>
+                );
+              })}
             </div>
           </>
         )}
@@ -484,30 +488,31 @@ const introCopy = (rawModel.description ?? '').split(/\n\s*\n/).filter(Boolean);
             <div class="interior-block">
               <div class="lab">Barva interiéru:</div>
               <div class="interior-row interior-row--big">
-                {interiorOptions.map((it, i) => (
-                  <button
-                    type="button"
-                    class={`interior-item interior-item--big${i === 0 ? ' is-active' : ''}`}
-                    data-interior-btn
-                    data-interior-index={i}
-                    data-interior-name={it.name ?? ''}
-                    data-interior-material={it.material ?? ''}
-                  >
-                    <span class="interior-preview">
-                      {it.preview_file ? (
-                        <DirectusImage src={it.preview_file} alt={it.name ?? ''} aspectRatio="16/9" widths={[400, 800, 1200]} />
-                      ) : it.swatch_file ? (
-                        <DirectusImage src={it.swatch_file} alt={it.name ?? ''} aspectRatio="16/9" widths={[400, 800]} />
-                      ) : (
-                        <span class="interior-fill-fallback" style={`background:${it.hex ?? '#888'}`}></span>
-                      )}
-                    </span>
-                    <span class="interior-meta">
-                      <span class="name">{it.name}</span>
-                      {it.material && <span class="material">{it.material}</span>}
-                    </span>
-                  </button>
-                ))}
+                {interiorOptions.map((it, i) => {
+                  const photoId = it.photo_file ?? it.preview_file ?? it.swatch_file ?? null;
+                  return (
+                    <button
+                      type="button"
+                      class={`interior-item interior-item--big${i === 0 ? ' is-active' : ''}`}
+                      data-interior-btn
+                      data-interior-index={i}
+                      data-interior-name={it.name ?? ''}
+                      data-interior-material={it.material ?? ''}
+                    >
+                      <span class="interior-preview">
+                        {photoId ? (
+                          <DirectusImage src={photoId} alt={it.name ?? ''} aspectRatio="16/9" widths={[400, 800, 1200]} />
+                        ) : (
+                          <span class="interior-fill-fallback" style={`background:${it.hex ?? '#888'}`}></span>
+                        )}
+                      </span>
+                      <span class="interior-meta">
+                        <span class="name">{it.name}</span>
+                        {it.material && <span class="material">{it.material}</span>}
+                      </span>
+                    </button>
+                  );
+                })}
               </div>
             </div>
             <a class="btn btn-primary" href="/kontakt">
