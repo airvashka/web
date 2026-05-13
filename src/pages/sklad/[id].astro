@@ -581,7 +581,7 @@ const description = (v.description ?? '').split(/\n\s*\n/).filter(Boolean);
     </a>
   </div>
 
-  <script define:vars={{ vehiclePrice: finalPrice ?? 0 }}>
+  <script define:vars={{ vehiclePrice: finalPrice ?? 0, DIRECTUS_URL: import.meta.env.PUBLIC_DIRECTUS_URL ?? '' }}>
     // ===== Finance kalkulačka =====
     // Vzorec anuita: M = (P × r) / (1 - (1+r)^-n)
     //   P = financovaná částka (cena - akontace)
@@ -672,8 +672,7 @@ const description = (v.description ?? '').split(/\n\s*\n/).filter(Boolean);
       onScroll();
     }
 
-    // Lead form submit
-    const DIRECTUS_URL = import.meta.env.PUBLIC_DIRECTUS_URL;
+    // Lead form submit — DIRECTUS_URL je injektováno přes define:vars nahoře
     document.querySelectorAll('[data-lead-form]').forEach((form) => {
       form.addEventListener('submit', async (e) => {
         e.preventDefault();
