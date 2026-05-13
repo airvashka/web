@@ -414,7 +414,7 @@ const introCopy = (rawModel.description ?? '').split(/\n\s*\n/).filter(Boolean);
     <div class="container subnav-inner">
       <a class="subnav-link is-active" href="#predstaveni">Představení</a>
       {variantModels.length > 1 && (<><span class="subnav-sep">·</span><a class="subnav-link" href="#varianty">Varianty</a></>)}
-      {hasConfigurator && (<><span class="subnav-sep">·</span><a class="subnav-link" href="#konfigurator">Konfigurátor</a></>)}
+      {hasConfigurator && (<><span class="subnav-sep">·</span><a class="subnav-link" href="#barvy">Barvy</a></>)}
       <span class="subnav-sep">·</span>
       <a class="subnav-link" href="#technologie">Technologie</a>
       {galleryFileIds.length > 0 && (<><span class="subnav-sep">·</span><a class="subnav-link" href="#galerie">Galerie</a></>)}
@@ -483,95 +483,85 @@ const introCopy = (rawModel.description ?? '').split(/\n\s*\n/).filter(Boolean);
     </div>
   </section>
 
-  <!-- ===== KONFIGURÁTOR (color picker + interior) ===== -->
+  <!-- ===== BARVY (read-only gallery, žádný konfigurátor) ===== -->
   {hasConfigurator && (
-    <section class="config" id="konfigurator">
+    <section class="config" id="barvy">
       <div class="container">
         <div class="config-head">
-          <div class="section-eyebrow">Konfigurátor</div>
-          <h2 class="section-title" style="margin-bottom: 0;">Vyberte si svou barvu</h2>
+          <div class="section-eyebrow">Barevné kombinace</div>
+          <h2 class="section-title" style="margin-bottom: 0;">Barvy</h2>
         </div>
 
         {colorOptions.length > 0 && (
-          <>
-            <div class="config-car" data-config-preview>
-              {rawModel.hero_image && <DirectusImage src={rawModel.hero_image} alt={`${rawModel.name} — náhled`} aspectRatio="16/7" />}
+          <div class="colors-block">
+            <div class="colors-block-head">
+              <h3>Exteriér</h3>
+              <span class="count">{
+                colorOptions.length === 1 ? '1 barva'
+                : colorOptions.length < 5 ? `${colorOptions.length} barvy`
+                : `${colorOptions.length} barev`
+              }</span>
             </div>
-
-            <div class="color-row">
-              {colorOptions.map((c, i) => {
-                // Priorita: photo (nová collection) > photo_file (JSON migration) > swatch_file (původní)
+            <div class="ext-grid" data-count={Math.min(colorOptions.length, 6)}>
+              {colorOptions.map((c) => {
                 const photoId = c.photo ?? c.photo_file ?? c.swatch_file ?? null;
-                const isWhite = (c.hex ?? '').toLowerCase() === '#f0eee9' || (c.hex ?? '').toLowerCase() === '#f4f1ec';
-                const priceLabel = c.price_type === 'free' || c.type === 'základní'
-                  ? 'V ceně'
-                  : c.price_type === 'metallic' || c.price_type === 'pearl' || c.type
-                    ? 'Příplatek'
-                    : '';
+                const hex = (c.hex ?? '').trim();
+                const isLight = hex && /^#[fF][0-9a-fA-F]{5}$/.test(hex);
+                const secondary = c.code ?? (hex ? hex.toUpperCase() : '');
                 return (
-                  <button
-                    type="button"
-                    class={`swatch-item${i === 0 ? ' is-active' : ''}`}
-                    data-color-btn
-                    data-color-index={i}
-                    data-color-name={c.name ?? ''}
-                    data-color-hex={c.hex ?? ''}
-                  >
-                    <span class="ring">
+                  <div class="ext-card">
+                    <div class="ext-pic">
                       {photoId ? (
-                        <span class="swatch-fill swatch-fill--img">
-                          <DirectusImage src={photoId} alt={c.name ?? ''} aspectRatio="1/1" widths={[140, 280]} />
-                        </span>
+                        <DirectusImage src={photoId} alt={c.name ?? ''} aspectRatio="4/3" widths={[300, 600, 900]} />
                       ) : (
-                        <span class="swatch-fill" style={`background:${c.hex ?? '#888'}; ${isWhite ? 'border:1px solid var(--line-2);' : ''}`}></span>
+                        <span class="ext-pic-fallback" style={hex ? `background:${hex}` : ''}></span>
                       )}
-                    </span>
-                    <span class="name">{c.name}</span>
-                    {priceLabel && <span class="delta">{priceLabel}</span>}
-                  </button>
+                    </div>
+                    {hex && (
+                      <div class="ext-strip" style={`background:${hex}; ${isLight ? 'border-top:1px solid var(--line-2);' : ''}`}></div>
+                    )}
+                    <div class="ext-label">
+                      <span class="nm">{c.name}</span>
+                      {secondary && <span class="cd">{secondary}</span>}
+                    </div>
+                  </div>
                 );
               })}
             </div>
-          </>
+          </div>
         )}
 
         {interiorOptions.length > 0 && (
-          <div class="config-bottom">
-            <div class="interior-block">
-              <div class="lab">Barva interiéru:</div>
-              <div class="interior-row interior-row--big">
-                {interiorOptions.map((it, i) => {
-                  // Priorita: photo (nová collection) > photo_file > preview_file > swatch_file
-                  const photoId = it.photo ?? it.photo_file ?? it.preview_file ?? it.swatch_file ?? null;
-                  return (
-                    <button
-                      type="button"
-                      class={`interior-item interior-item--big${i === 0 ? ' is-active' : ''}`}
-                      data-interior-btn
-                      data-interior-index={i}
-                      data-interior-name={it.name ?? ''}
-                      data-interior-material={it.material ?? ''}
-                    >
-                      <span class="interior-preview">
-                        {photoId ? (
-                          <DirectusImage src={photoId} alt={it.name ?? ''} aspectRatio="16/9" widths={[400, 800, 1200]} />
-                        ) : (
-                          <span class="interior-fill-fallback" style={`background:${it.hex ?? '#888'}`}></span>
-                        )}
-                      </span>
-                      <span class="interior-meta">
-                        <span class="name">{it.name}</span>
-                        {it.material && <span class="material">{it.material}</span>}
-                      </span>
-                    </button>
-                  );
-                })}
-              </div>
+          <div class="colors-block">
+            <div class="colors-block-head">
+              <h3>Interiér</h3>
+              <span class="count">{
+                interiorOptions.length === 1 ? '1 čalounění'
+                : interiorOptions.length < 5 ? `${interiorOptions.length} čalounění`
+                : `${interiorOptions.length} čalounění`
+              }</span>
             </div>
-            <a class="btn btn-primary" href="/kontakt">
-              Poptat tuto konfiguraci
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
-            </a>
+            <div class="int-grid" data-count={Math.min(interiorOptions.length, 3)}>
+              {interiorOptions.map((it) => {
+                const photoId = it.photo ?? it.photo_file ?? it.preview_file ?? it.swatch_file ?? null;
+                const secondary = it.code ?? it.material ?? '';
+                return (
+                  <div class="int-card">
+                    <div class="int-pic">
+                      {photoId ? (
+                        <DirectusImage src={photoId} alt={it.name ?? ''} aspectRatio={interiorOptions.length === 1 ? '21/9' : '16/10'} widths={[400, 800, 1400]} />
+                      ) : (
+                        <span class="int-pic-fallback" style={it.hex ? `background:${it.hex}` : ''}></span>
+                      )}
+                    </div>
+                    <div class="ext-label">
+                      <span class="nm">{it.name}</span>
+                      {secondary && <span class="cd">{secondary}</span>}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
           </div>
         )}
       </div>
@@ -912,26 +902,6 @@ const introCopy = (rawModel.description ?? '').split(/\n\s*\n/).filter(Boolean);
   )}
 
   <script>
-    // ===== Konfigurátor — color & interior picker =====
-    document.querySelectorAll('[data-color-btn]').forEach((btn) => {
-      btn.addEventListener('click', () => {
-        document.querySelectorAll('[data-color-btn]').forEach((b) => b.classList.remove('is-active'));
-        btn.classList.add('is-active');
-        // Volitelně: změnit hue / overlay na config-preview podle hex (basic vizuální feedback)
-        const preview = document.querySelector('[data-config-preview]');
-        if (preview) {
-          const hex = btn.dataset.colorHex;
-          if (hex) preview.style.boxShadow = `inset 0 0 0 4px ${hex}33`;
-        }
-      });
-    });
-    document.querySelectorAll('[data-interior-btn]').forEach((btn) => {
-      btn.addEventListener('click', () => {
-        document.querySelectorAll('[data-interior-btn]').forEach((b) => b.classList.remove('is-active'));
-        btn.classList.add('is-active');
-      });
-    });
-
     // ===== Gallery lightbox =====
     const modal = document.querySelector('[data-gallery-modal]');
     const counter = document.querySelector('[data-gallery-counter]');
