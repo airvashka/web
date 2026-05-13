@@ -1,23 +1,22 @@
 #!/usr/bin/env node
 /**
- * SFR Motor — Cascading dropdown filtry na stock_vehicles.
+ * SFR Motor — Cascading dropdown filtry + display templates na stock_vehicles.
  *
- * Když admin přidá skladový vůz a vybere model_year (např. Korando 2024),
- * dropdown pro trim_level + option_packages se sám filtruje a ukáže
- * JEN trimy/pakety vázané na ten model_year.
+ * Full cascade: brand → model → model_year → (trim_level + option_packages)
  *
- * Bez tohohle filtru admin vidí všechny trimy všech modelů a roků dohromady
- * a musí trefovat ručně — což je matoucí a vedlo by k chybnému párování.
+ * Co skript dělá:
+ *   1) stock_vehicles.model       — filtr podle brand
+ *   2) stock_vehicles.model_year  — filtr podle model + správný display template
+ *   3) stock_vehicles.trim_level  — filtr podle model_year
+ *   4) stock_vehicles.option_packages — filtr podle model_year
  *
- * Implementace: PATCH meta.options.filter na fields:
- *   - stock_vehicles.trim_level    (M2O)
- *   - stock_vehicles.option_packages (M2M alias)
- *
- * Filtr: { model_year: { _eq: "$FIELDS.model_year" } }
- *   "$FIELDS.model_year" = reference na sourozeneckou hodnotu v editovaném itemu
+ * Plus si volitelně sám aktualizuje meta.options.template aby ve výběru
+ * a chip byla čitelná informace (např. "Korando 2026 H1" místo UUID).
  *
  * Použití:
  *   cd web && node scripts/setup-cascading-filters.mjs
+ *
+ * Idempotentní — můžeš spustit opakovaně.
  */
 import readline from 'node:readline/promises';
 import { stdin as input, stdout as output } from 'node:process';
@@ -43,47 +42,33 @@ async function api(method, path, body) {
 const ok = (m) => console.log(`  ✓  ${m}`);
 const info = (m) => console.log(`  ℹ  ${m}`);
 
-const CASCADE_FILTER = {
-  model_year: { _eq: '$FIELDS.model_year' },
-};
-
-async function patchFieldFilter(collection, field, opts = {}) {
+async function patchField(collection, field, { filter, template, note } = {}) {
   const current = await api('GET', `/fields/${collection}/${field}`);
   const meta = current.data?.meta ?? {};
   const currentOptions = meta.options ?? {};
 
-  // Merge — neztratíme existující options jako template, enableSelect atd.
-  const newOptions = {
-    ...currentOptions,
-    filter: CASCADE_FILTER,
-    ...opts,
-  };
+  const newOptions = { ...currentOptions };
+  if (filter !== undefined) newOptions.filter = filter;
+  if (template !== undefined) newOptions.template = template;
 
-  // Skip pokud už je nastavené správně
-  if (JSON.stringify(currentOptions.filter ?? null) === JSON.stringify(CASCADE_FILTER)) {
-    info(`${collection}.${field} už má cascading filter`);
+  const newMeta = { ...meta, options: newOptions };
+  if (note !== undefined) newMeta.note = note;
+
+  // Skip jen pokud nic se nemění
+  const sameOptions = JSON.stringify(currentOptions) === JSON.stringify(newOptions);
+  const sameNote = note === undefined || meta.note === note;
+  if (sameOptions && sameNote) {
+    info(`${collection}.${field} už správně nastaveno`);
     return;
   }
 
-  await api('PATCH', `/fields/${collection}/${field}`, {
-    meta: { ...meta, options: newOptions },
-  });
-  ok(`${collection}.${field} → filter podle model_year`);
-}
-
-async function patchFieldNote(collection, field, note) {
-  const current = await api('GET', `/fields/${collection}/${field}`);
-  const meta = current.data?.meta ?? {};
-  if (meta.note === note) return;
-  await api('PATCH', `/fields/${collection}/${field}`, {
-    meta: { ...meta, note },
-  });
-  ok(`${collection}.${field} → note updated`);
+  await api('PATCH', `/fields/${collection}/${field}`, { meta: newMeta });
+  ok(`${collection}.${field} updated`);
 }
 
 async function main() {
   console.log('═══════════════════════════════════════════════');
-  console.log('  Setup cascading dropdown filtry');
+  console.log('  Setup cascading filtry + display templates');
   console.log('═══════════════════════════════════════════════\n');
 
   URL = (await prompt('Directus URL [https://directus-production-3e67.up.railway.app]: ')).trim()
@@ -96,25 +81,64 @@ async function main() {
   TOKEN = auth.data.access_token;
   ok('Auth OK\n');
 
-  console.log('Krok 1: stock_vehicles.trim_level (M2O)');
-  await patchFieldFilter('stock_vehicles', 'trim_level');
-  await patchFieldNote('stock_vehicles', 'trim_level',
-    'Výbavový stupeň. Filtr se napojí na vybraný "Model year" výše — vyber napřed rok.');
+  // ============================================================
+  // 1) stock_vehicles.model — filtr podle brand
+  // ============================================================
+  console.log('Krok 1: stock_vehicles.model (filtr brand → model)');
+  await patchField('stock_vehicles', 'model', {
+    filter: { brand: { _eq: '$FIELDS.brand' } },
+    template: '{{name}} ({{brand.name}})',
+    note: 'Model auta. Filtruje se podle vybrané značky — vyber nejdřív Brand.',
+  });
 
-  console.log('\nKrok 2: stock_vehicles.option_packages (M2M alias)');
-  await patchFieldFilter('stock_vehicles', 'option_packages');
-  await patchFieldNote('stock_vehicles', 'option_packages',
-    'Volitelné balíčky. Filtruje se podle "Model year" — vyber napřed rok.');
+  // ============================================================
+  // 2) stock_vehicles.model_year — filtr podle model + display template
+  // ============================================================
+  console.log('\nKrok 2: stock_vehicles.model_year (filtr model → year)');
+  await patchField('stock_vehicles', 'model_year', {
+    filter: { model: { _eq: '$FIELDS.model' } },
+    template: '{{model.name}} {{year}} {{version}}',
+    note: 'Modelový rok / verze ceníku. Filtruje se podle vybraného modelu — vyber nejdřív Model.',
+  });
+
+  // ============================================================
+  // 3) stock_vehicles.trim_level — filtr podle model_year
+  // ============================================================
+  console.log('\nKrok 3: stock_vehicles.trim_level (filtr year → trim)');
+  await patchField('stock_vehicles', 'trim_level', {
+    filter: { model_year: { _eq: '$FIELDS.model_year' } },
+    template: '{{name}} ({{model_year.year}}{{model_year.version}})',
+    note: 'Výbavový stupeň. Filtruje se podle vybraného Model year — vyber nejdřív rok.',
+  });
+
+  // ============================================================
+  // 4) stock_vehicles.option_packages — filtr podle model_year (M2M alias)
+  // ============================================================
+  console.log('\nKrok 4: stock_vehicles.option_packages (filtr year → packages)');
+  await patchField('stock_vehicles', 'option_packages', {
+    filter: { model_year: { _eq: '$FIELDS.model_year' } },
+    template: '{{option_packages_id.name}}',
+    note: 'Volitelné balíčky. Filtruje se podle Model year — vyber nejdřív rok.',
+  });
 
   console.log('\n═══════════════════════════════════════════════');
-  console.log('  Hotovo. V adminu (Ctrl+Shift+R):');
-  console.log('  stock_vehicles → editor:');
-  console.log('    1) Vyber Model year (např. Korando 2026 H1)');
-  console.log('    2) Dropdown "Trim level" ukáže jen trimy toho roku');
-  console.log('    3) Dropdown "Option packages" také');
+  console.log('  Hotovo. Postup v adminu:');
+  console.log('  ───────────────────────────────────────────');
+  console.log('  1) Ctrl+Shift+R (refresh, ať se schema cachuje)');
+  console.log('  2) Stock Vehicles → Create item');
+  console.log('  3) Vyber Brand (povinné, je to první v dropdownech)');
+  console.log('  4) Model dropdown — ukáže jen modely té značky');
+  console.log('  5) Vyber Model year (filtr podle modelu)');
+  console.log('  6) Vyber Trim level + Option packages (filtr podle roku)');
   console.log('');
-  console.log('  POZOR: Pokud změníš Model year POTOM, co už máš vybraný trim,');
-  console.log('  trim se sám neresetuje. Musíš si ho překliknout ručně.');
+  console.log('  POZOR: Když změníš výběr výše, dolní hodnoty se NEresetují.');
+  console.log('  Pokud např. změníš Model, musíš si Model year přepnout ručně.');
+  console.log('');
+  console.log('  POZN. k pickeru: Pokud se v dropdownu Model year stále zobrazují');
+  console.log('  rozházené sloupce (Brochure PDF, Technical Data atd.), je to');
+  console.log('  per-user uložená Layout preference. Klikni v draweru na Layout');
+  console.log('  Options (ikona vlevo dole) → změň visible columns na "model",');
+  console.log('  "year", "version". Uloží se to v user prefs.');
   console.log('═══════════════════════════════════════════════');
   rl.close();
 }
