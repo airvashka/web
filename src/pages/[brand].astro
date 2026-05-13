@@ -110,81 +110,23 @@ const bodyLabel: Record<string, string> = {
   mpv: 'MPV',
 };
 
-// "Why this brand" — TODO: časem do Directus brand fields. Zatím hardcoded mapping.
-type WhyItem = { ic: 'shield' | 'axle' | 'bolt' | 'hook' | 'spark' | 'globe' | 'cargo'; t: string; s: string };
-type WhyConfig = {
-  displayName?: string;
-  eyebrow: [string, string];
-  tagline: [string, string];
-  whyEyebrow: string;
-  whyTitle: string;
-  whyIntro: string;
-  why: WhyItem[];
-  modelsHeadline: string;
-  bannerTitle: string;
+// "Why this brand" — primárně z admin brands fieldů, fallback prázdné/defaultní
+type WhyItem = { icon: string; title: string; subtitle: string };
+const b = brand as any;
+const why = {
+  eyebrow: [b.eyebrow_line1 ?? '', b.eyebrow_line2 ?? ''] as [string, string],
+  tagline: [b.tagline_line1 ?? '', b.tagline_line2 ?? ''] as [string, string],
+  whyEyebrow: b.why_eyebrow ?? `Proč ${brand.name}?`,
+  whyTitle: b.why_title ?? '',
+  whyIntro: b.why_intro ?? '',
+  why: (Array.isArray(b.why_cards) ? b.why_cards : []) as WhyItem[],
+  modelsHeadline: b.models_headline ?? `Modely ${brand.name}`,
+  bannerTitle: b.banner_title ?? 'Pojďte si vůz vyzkoušet.',
+  ctaSecondaryLabel: b.hero_cta_secondary_label ?? 'Modely',
+  ctaSecondaryUrl: b.hero_cta_secondary_url ?? '#modely',
 };
-const WHY: Record<string, WhyConfig> = {
-  kgm: {
-    eyebrow: ['KGM Mobility', 'Dříve SsangYong'],
-    tagline: [
-      'Korejský charakter, evropský komfort.',
-      'Od kompaktního Tivoli po flagship Rexton.',
-    ],
-    whyEyebrow: 'Proč KGM?',
-    whyTitle: 'Auta, která pracují stejně dobře, jako vy.',
-    whyIntro:
-      'KGM (KG Mobility) je nástupce SsangYong — značky s 70letou historií výroby SUV a pickupů. Spolehlivé pohony 4×4, štědrá základní výbava a servisní síť, na kterou se dá spolehnout.',
-    why: [
-      { ic: 'shield', t: '5letá záruka', s: 'Bez omezení nájezdu na vybrané modely' },
-      { ic: 'axle', t: 'Pohon 4×4', s: 'U Korando, Torres, Rextonu i Musso Grand' },
-      { ic: 'bolt', t: 'Elektrifikace', s: 'Torres EVX a HEV varianty' },
-      { ic: 'hook', t: 'Tažné až 3,5 t', s: 'Rexton a Musso Grand jako pracovní partneři' },
-    ],
-    modelsHeadline: '9 modelů. Od městského SUV po pickup.',
-    bannerTitle: 'Vidíte vybraný model? Pojďte ho vyzkoušet.',
-  },
-  'omoda-jaecoo': {
-    displayName: 'OMODA & JAECOO',
-    eyebrow: ['Chery Group', 'Nová generace'],
-    tagline: [
-      'Dvě tváře jednoho moderního pohledu na SUV.',
-      'Omoda pro město, Jaecoo pro dobrodružství.',
-    ],
-    whyEyebrow: 'Proč Omoda & Jaecoo?',
-    whyTitle: 'Nová značka. Štědrá výbava od první ceny.',
-    whyIntro:
-      'Omoda & Jaecoo přicházejí jako svěží alternativa s odvážným designem a velkorysou výbavou. V základu dostanete to, co konkurence prodává v drahých příplatcích.',
-    why: [
-      { ic: 'shield', t: '7letá záruka', s: 'Nebo 150 000 km — co nastane dřív' },
-      { ic: 'bolt', t: 'Plug-in i elektro', s: 'SHS hybrid s dojezdem přes 1 100 km' },
-      { ic: 'spark', t: 'Odvážný design', s: 'Diamantová maska a LED architektura' },
-      { ic: 'globe', t: 'Globální značka', s: 'Chery — 4. největší výrobce v Číně' },
-    ],
-    modelsHeadline: '4 modely. Městský crossover i opravdové SUV.',
-    bannerTitle: 'Líbí se vám Omoda nebo Jaecoo? Domluvíme jízdu.',
-  },
-  farizon: {
-    eyebrow: ['Geely Group', 'Užitková elektromobilita'],
-    tagline: [
-      'Elektrická dodávka pro práci od pondělí do pátku.',
-      'Žádný kompromis. Žádné palivo.',
-    ],
-    whyEyebrow: 'Proč Farizon?',
-    whyTitle: 'Užitkové vozy, které se počítají.',
-    whyIntro:
-      'Farizon je užitková značka skupiny Geely — největšího čínského výrobce automobilů. SuperVan kombinuje nákladový prostor evropského formátu s plně elektrickým pohonem a 7letou zárukou.',
-    why: [
-      { ic: 'bolt', t: '100% elektro', s: 'Dojezd až 247 km v městském cyklu' },
-      { ic: 'cargo', t: 'Náklad 1 350 kg', s: 'Objem 13 m³ ve verzi L3H2' },
-      { ic: 'shield', t: '7letá záruka', s: 'Na baterii i pohon. Nula starostí.' },
-      { ic: 'globe', t: 'Geely Group', s: 'Globální zázemí, evropská homologace' },
-    ],
-    modelsHeadline: 'Užitková řada. Dodávka i podvozek.',
-    bannerTitle: 'Hledáte flotilové řešení? Probereme to.',
-  },
-};
-const why = WHY[brandSlug] ?? WHY.kgm;
-const displayName = why.displayName ?? brand.name;
+// Display name (např. "OMODA & JAECOO" velkými ručně)
+const displayName = brand.name;
 
 // Brand strip mapping (other brands)
 const STRIP: Record<string, { tag: string; ds: string }> = {
@@ -220,7 +162,9 @@ const activeBrand = Astro.params.brand;
         <a class="btn btn-primary" href={`/sklad?znacka=${brand.slug}`}>
           Vozy {brand.name} skladem ({stockCount})
         </a>
-        {/* TODO: ceník PDF link (až bude price_list_pdf_url na úrovni brand nebo model_year) */}
+        {why.ctaSecondaryLabel && why.ctaSecondaryUrl && (
+          <a class="btn btn-outline" href={why.ctaSecondaryUrl}>{why.ctaSecondaryLabel}</a>
+        )}
       </div>
     </div>
   </section>
@@ -238,17 +182,17 @@ const activeBrand = Astro.params.brand;
           {why.why.map((w) => (
             <div class="why-card">
               <div class="icbox">
-                {w.ic === 'shield' && <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg>}
-                {w.ic === 'axle' && <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="5" cy="6" r="2"/><circle cx="19" cy="6" r="2"/><circle cx="5" cy="18" r="2"/><circle cx="19" cy="18" r="2"/><line x1="7" y1="6" x2="17" y2="6"/><line x1="7" y1="18" x2="17" y2="18"/><line x1="12" y1="6" x2="12" y2="18"/></svg>}
-                {w.ic === 'bolt' && <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>}
-                {w.ic === 'hook' && <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v4"/><circle cx="12" cy="8" r="2"/><path d="M12 10v8a4 4 0 0 1-4 4 4 4 0 0 1-4-4"/></svg>}
-                {w.ic === 'spark' && <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9.94 14.06 2 22"/><path d="m13.94 10.06 8-8"/><path d="m17 5 2 2"/><path d="M14 8h6a2 2 0 0 1 2 2v6"/><path d="M8 14H2v6"/></svg>}
-                {w.ic === 'globe' && <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>}
-                {w.ic === 'cargo' && <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M16 3h5v5"/><path d="M21 3l-7 7"/><rect x="3" y="11" width="18" height="10" rx="1"/><line x1="9" y1="11" x2="9" y2="21"/></svg>}
+                {w.icon === 'shield' && <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg>}
+                {w.icon === 'axle' && <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="5" cy="6" r="2"/><circle cx="19" cy="6" r="2"/><circle cx="5" cy="18" r="2"/><circle cx="19" cy="18" r="2"/><line x1="7" y1="6" x2="17" y2="6"/><line x1="7" y1="18" x2="17" y2="18"/><line x1="12" y1="6" x2="12" y2="18"/></svg>}
+                {w.icon === 'bolt' && <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>}
+                {w.icon === 'hook' && <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v4"/><circle cx="12" cy="8" r="2"/><path d="M12 10v8a4 4 0 0 1-4 4 4 4 0 0 1-4-4"/></svg>}
+                {w.icon === 'spark' && <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9.94 14.06 2 22"/><path d="m13.94 10.06 8-8"/><path d="m17 5 2 2"/><path d="M14 8h6a2 2 0 0 1 2 2v6"/><path d="M8 14H2v6"/></svg>}
+                {w.icon === 'globe' && <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>}
+                {w.icon === 'cargo' && <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M16 3h5v5"/><path d="M21 3l-7 7"/><rect x="3" y="11" width="18" height="10" rx="1"/><line x1="9" y1="11" x2="9" y2="21"/></svg>}
               </div>
               <div>
-                <div class="t">{w.t}</div>
-                <div class="s">{w.s}</div>
+                <div class="t">{w.title}</div>
+                <div class="s">{w.subtitle}</div>
               </div>
             </div>
           ))}
@@ -258,7 +202,7 @@ const activeBrand = Astro.params.brand;
   </section>
 
   <!-- ===== MODELS GRID ===== -->
-  <section class="models" data-screen-label="03 Modely">
+  <section class="models" id="modely" data-screen-label="03 Modely">
     <div class="container">
       <div class="models-head">
         <div class="section-eyebrow">Modelová řada</div>
