@@ -20,12 +20,26 @@ export async function getStaticPaths() {
 
 const { slug } = Astro.params;
 
-type ModelRaw = Model & { brand?: number | null; sub_brand?: number | null; hero_image?: string; gallery?: Array<{ directus_files_id: string }> };
+type ModelRaw = Model & {
+  brand?: number | null;
+  sub_brand?: number | null;
+  hero_image?: string;
+  gallery?: Array<{ directus_files_id: string }>;
+  color_exterior?: Array<any>;
+  color_interior?: Array<any>;
+  highlights?: Array<any>; // O2M na model_highlights collection (po refactoru)
+};
 
 const rawModels = await directusGet<ModelRaw>('models', {
   filter: { slug: { _eq: slug } },
   limit: 1,
-  fields: ['*', 'gallery.directus_files_id'],
+  fields: [
+    '*',
+    'gallery.directus_files_id',
+    'color_exterior.*',
+    'color_interior.*',
+    'highlights.*',
+  ],
 });
 const rawModel = rawModels[0];
 if (!rawModel) return Astro.redirect('/404');
@@ -288,15 +302,26 @@ const brochureUrl = brochureFile ? `${DIRECTUS_BASE}/assets/${brochureFile}?down
 const priceListUrl = priceListFile ? `${DIRECTUS_BASE}/assets/${priceListFile}?download` : null;
 
 // Barvy karoserie + interiéru (z model_year)
-type ColorOpt = { code?: string; name?: string; name_en?: string; hex?: string; type?: string; swatch_image?: string; swatch_file?: string; photo_file?: string; monotone_only?: boolean };
-type InteriorOpt = { code?: string; name?: string; material?: string; hex?: string; swatch_image?: string; swatch_file?: string; preview_image?: string; preview_file?: string; photo_file?: string };
-// Priorita: models > model_years (legacy fallback)
-const colorOptions: ColorOpt[] = Array.isArray((rawModel as any)?.color_options) && (rawModel as any).color_options.length > 0
-  ? (rawModel as any).color_options
-  : Array.isArray((latestYear as any)?.color_options) ? (latestYear as any).color_options : [];
-const interiorOptions: InteriorOpt[] = Array.isArray((rawModel as any)?.interior_options) && (rawModel as any).interior_options.length > 0
-  ? (rawModel as any).interior_options
-  : Array.isArray((latestYear as any)?.interior_options) ? (latestYear as any).interior_options : [];
+type ColorOpt = { code?: string; name?: string; name_en?: string; hex?: string; type?: string; price_type?: string; swatch_image?: string; swatch_file?: string; photo_file?: string; photo?: string; monotone_only?: boolean };
+type InteriorOpt = { code?: string; name?: string; material?: string; hex?: string; swatch_image?: string; swatch_file?: string; preview_image?: string; preview_file?: string; photo_file?: string; photo?: string };
+
+// Priorita: nové O2M collections > legacy JSON na models > legacy JSON na model_years
+// Nové collections (color_exterior/color_interior) mají field 'photo' (M2O na directus_files)
+const colorExteriorNew: ColorOpt[] = Array.isArray((rawModel as any)?.color_exterior) ? (rawModel as any).color_exterior : [];
+const colorInteriorNew: InteriorOpt[] = Array.isArray((rawModel as any)?.color_interior) ? (rawModel as any).color_interior : [];
+
+const colorOptions: ColorOpt[] = colorExteriorNew.length > 0
+  ? colorExteriorNew
+  : Array.isArray((rawModel as any)?.color_options) && (rawModel as any).color_options.length > 0
+    ? (rawModel as any).color_options
+    : Array.isArray((latestYear as any)?.color_options) ? (latestYear as any).color_options : [];
+
+const interiorOptions: InteriorOpt[] = colorInteriorNew.length > 0
+  ? colorInteriorNew
+  : Array.isArray((rawModel as any)?.interior_options) && (rawModel as any).interior_options.length > 0
+    ? (rawModel as any).interior_options
+    : Array.isArray((latestYear as any)?.interior_options) ? (latestYear as any).interior_options : [];
+
 const hasConfigurator = colorOptions.length > 0 || interiorOptions.length > 0;
 
 // Intro foto = první z gallery, nebo hero_image
@@ -463,8 +488,14 @@ const introCopy = (rawModel.description ?? '').split(/\n\s*\n/).filter(Boolean);
 
             <div class="color-row">
               {colorOptions.map((c, i) => {
-                const photoId = c.photo_file ?? c.swatch_file ?? null;
+                // Priorita: photo (nová collection) > photo_file (JSON migration) > swatch_file (původní)
+                const photoId = c.photo ?? c.photo_file ?? c.swatch_file ?? null;
                 const isWhite = (c.hex ?? '').toLowerCase() === '#f0eee9' || (c.hex ?? '').toLowerCase() === '#f4f1ec';
+                const priceLabel = c.price_type === 'free' || c.type === 'základní'
+                  ? 'V ceně'
+                  : c.price_type === 'metallic' || c.price_type === 'pearl' || c.type
+                    ? 'Příplatek'
+                    : '';
                 return (
                   <button
                     type="button"
@@ -472,7 +503,6 @@ const introCopy = (rawModel.description ?? '').split(/\n\s*\n/).filter(Boolean);
                     data-color-btn
                     data-color-index={i}
                     data-color-name={c.name ?? ''}
-                    data-color-type={c.type ?? ''}
                     data-color-hex={c.hex ?? ''}
                   >
                     <span class="ring">
@@ -485,7 +515,7 @@ const introCopy = (rawModel.description ?? '').split(/\n\s*\n/).filter(Boolean);
                       )}
                     </span>
                     <span class="name">{c.name}</span>
-                    {c.type && <span class="delta">{c.type === 'základní' ? 'V ceně' : 'Příplatek'}</span>}
+                    {priceLabel && <span class="delta">{priceLabel}</span>}
                   </button>
                 );
               })}
@@ -499,7 +529,8 @@ const introCopy = (rawModel.description ?? '').split(/\n\s*\n/).filter(Boolean);
               <div class="lab">Barva interiéru:</div>
               <div class="interior-row interior-row--big">
                 {interiorOptions.map((it, i) => {
-                  const photoId = it.photo_file ?? it.preview_file ?? it.swatch_file ?? null;
+                  // Priorita: photo (nová collection) > photo_file > preview_file > swatch_file
+                  const photoId = it.photo ?? it.photo_file ?? it.preview_file ?? it.swatch_file ?? null;
                   return (
                     <button
                       type="button"
@@ -535,12 +566,12 @@ const introCopy = (rawModel.description ?? '').split(/\n\s*\n/).filter(Boolean);
     </section>
   )}
 
-  <!-- ===== TECH GRID — z model.highlights, nebo fallback z trim features ===== -->
+  <!-- ===== TECH GRID — z model.highlights O2M collection, nebo fallback ===== -->
   {(() => {
     const modelHighlights = Array.isArray((rawModel as any).highlights) ? (rawModel as any).highlights : [];
     const hasHighlights = modelHighlights.length > 0;
-    const fallbackFromTrim = (trims[0]?.features ?? []).slice(0, 4).map((f) => ({ title: f, subtitle: 'Součást základní výbavy', photo: null, photo_file: null }));
-    const tech = hasHighlights ? modelHighlights : fallbackFromTrim; // bez limitu, admin si volí kolik
+    const fallbackFromTrim = (trims[0]?.features ?? []).slice(0, 4).map((f) => ({ title: f, subtitle: 'Součást základní výbavy', photo: null }));
+    const tech = hasHighlights ? modelHighlights : fallbackFromTrim;
     if (tech.length === 0) return null;
     return (
       <section class="section" id="technologie">
@@ -548,17 +579,21 @@ const introCopy = (rawModel.description ?? '').split(/\n\s*\n/).filter(Boolean);
           <div class="section-eyebrow">Technologie</div>
           <h2 class="section-title">Co umí {rawModel.name}</h2>
           <div class="tech-grid">
-            {tech.map((h: any) => (
-              <div class="tech-card">
-                <div class="pic">
-                  {h.photo_file && <DirectusImage src={h.photo_file} alt={h.title ?? ''} aspectRatio="4/3" widths={[400, 800]} />}
+            {tech.map((h: any) => {
+              // Priorita: photo (nová O2M collection — UUID) > photo_file (legacy JSON migration)
+              const photoId = h.photo ?? h.photo_file ?? null;
+              return (
+                <div class="tech-card">
+                  <div class="pic">
+                    {photoId && <DirectusImage src={photoId} alt={h.title ?? ''} aspectRatio="4/3" widths={[400, 800]} />}
+                  </div>
+                  <div class="tech-card-body">
+                    <div class="t">{h.title ?? h.t ?? ''}</div>
+                    <div class="s">{h.subtitle ?? h.s ?? ''}</div>
+                  </div>
                 </div>
-                <div class="tech-card-body">
-                  <div class="t">{h.title ?? h.t ?? ''}</div>
-                  <div class="s">{h.subtitle ?? h.s ?? ''}</div>
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       </section>
