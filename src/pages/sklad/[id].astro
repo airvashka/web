@@ -197,22 +197,26 @@ const snapshot = (v.trim_level_snapshot as any) ?? {};
 const modelTd = tdToMap((model as any)?.technical_data);
 const yearTd = tdToMap((modelYear as any)?.technical_data);
 const td: any = { ...modelTd, ...yearTd };
-const specsLeft: Array<[string, string]> = [
-  ['Motor', td.motor ?? td.Motor ?? snapshot.engine ?? '—'],
-  ['Převodovka', transmissionLabel ?? '—'],
-  ['Palivo', fuelLabel],
-  ['Výkon', td.vykon ?? td['Výkon'] ?? td['Čistý výkon motoru (kW)'] ?? '—'],
-  ['Točivý moment', td.tocivy_moment ?? td['Točivý moment'] ?? td['Maximální točivý moment (Nm)'] ?? '—'],
-  ['Pohon', drivetrainLabel ?? '—'],
-];
-const specsRight: Array<[string, string]> = [
-  ['Spotřeba (komb.)', td.spotreba ?? td['Spotřeba'] ?? td['Průměrná spotřeba paliva (l/100km)'] ?? '—'],
-  ['Emise CO₂ (komb.)', td.co2 ?? td['Emise CO₂'] ?? td['Emise CO₂ - kombinované (g/km)'] ?? '—'],
-  ['Rozměry (D × Š × V)', td.rozmery ?? td['Délka × Šířka × Výška (mm)'] ?? '—'],
-  ['Rozvor', td.rozvor ?? td['Rozvor kol (mm)'] ?? '—'],
-  ['Objem kufru', td.kufr ?? td['Objem zavazadlového prostoru (l)'] ?? '—'],
-  ['Počet míst', td.mista ?? td['Počet sedadel'] ?? '—'],
-];
+
+// Dynamický výpis: vezmi všechno co user vyplnil v Models → Technical Data,
+// plus přidej "Převodovka", "Palivo", "Pohon" z odznaků na konkrétním voze
+// (pokud nejsou v td už uvedené).
+const tdEntries: Array<[string, string]> = Object.entries(td)
+  .filter(([, v]) => v !== null && v !== undefined && String(v).trim() !== '')
+  .map(([k, v]) => [k, String(v)] as [string, string]);
+
+// Vehicle-specific specs (jen pokud nejsou už v td)
+const vehicleSpecs: Array<[string, string]> = [];
+const hasKey = (re: RegExp) => tdEntries.some(([k]) => re.test(k));
+if (transmissionLabel && !hasKey(/převod|transmiss/i)) vehicleSpecs.push(['Převodovka', transmissionLabel]);
+if (fuelLabel && fuelLabel !== '—' && !hasKey(/palivo|fuel/i)) vehicleSpecs.push(['Palivo', fuelLabel]);
+if (drivetrainLabel && !hasKey(/pohon|drivetrain/i)) vehicleSpecs.push(['Pohon', drivetrainLabel]);
+
+const allSpecs = [...tdEntries, ...vehicleSpecs];
+// Rozděl na dva sloupce zhruba půl na půl
+const half = Math.ceil(allSpecs.length / 2);
+const specsLeft = allSpecs.slice(0, half);
+const specsRight = allSpecs.slice(half);
 
 // Highlights — fetch z site_settings (editovatelné v adminu), fallback na hardcoded.
 type Highlight = { icon: string; title: string; subtitle: string };
@@ -407,16 +411,25 @@ const description = (v.description ?? '').split(/\n\s*\n/).filter(Boolean);
               </div>
             </div>
             {(() => {
-              // Robustní lookup výkonu — různé možné klíče v technical_data
-              const powerKw = td['Výkon (kW)'] ?? td['Čistý výkon motoru (kW)'] ?? td['vykon_kw'] ?? td['Výkon'];
-              const powerKs = td['Výkon (k)'] ?? td['Výkon (PS)'] ?? td['vykon_ks'];
+              // Robustní lookup výkonu — projedu td a najdu cokoli co se týká výkonu
+              const findValue = (re: RegExp): string | null => {
+                for (const [k, val] of Object.entries(td)) {
+                  if (re.test(k) && val != null && String(val).trim() !== '') return String(val);
+                }
+                return null;
+              };
+              // První zkusíme jednotlivé klíče (kW/k zvlášť), pak souhrnný
+              const powerKw = findValue(/výkon.*\(?kw\)?/i) ?? findValue(/^výkon.*kw/i) ?? findValue(/^kw$/i);
+              const powerKs = findValue(/výkon.*\(?[kp]s?\)?$/i) ?? findValue(/^výkon.*[kp]s/i);
+              // Souhrnný "Max. výkon" jako fallback
+              const powerCombined = findValue(/max.*výkon|^výkon$/i);
               const powerDisplay = powerKw && powerKs
                 ? `${powerKw} kW / ${powerKs} k`
                 : powerKw
                   ? `${powerKw} kW`
                   : powerKs
                     ? `${powerKs} k`
-                    : null;
+                    : powerCombined;
               if (!powerDisplay) return null;
               return (
                 <div class="spec-card">
