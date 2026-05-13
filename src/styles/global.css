@@ -729,11 +729,40 @@ input, textarea, select { font: inherit; }
 .calc-summary .sub-amount {
   font-family: var(--font-display);
   font-weight: 600;
-  font-size: 32px;
-  letter-spacing: -0.02em;
+  font-size: 18px;
+  letter-spacing: -0.01em;
   font-variant-numeric: tabular-nums;
 }
 .calc-summary .btn { margin-top: 32px; }
+
+/* Finance summary rows — overview pod hlavní splátkou */
+.finance-summary-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.fsr {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+  padding: 6px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+.fsr:last-child { border-bottom: 0; }
+.fsr .sub {
+  font-family: var(--font-display);
+  font-size: 13px;
+  color: #C6C6CC;
+  margin: 0;
+}
+.fsr .sub-amount {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 15px;
+  color: #fff;
+  font-variant-numeric: tabular-nums;
+}
 
 .finance-note {
   margin-top: 18px;
