@@ -2,7 +2,9 @@
 import BaseLayout from '@layouts/BaseLayout.astro';
 import DirectusImage from '@components/DirectusImage.astro';
 import VideoStrip from '@components/VideoStrip.astro';
+import Breadcrumbs from '@components/Breadcrumbs.astro';
 import { directusGet } from '@lib/directus';
+import { buildStockSlug } from '@lib/stockSlug';
 import type { Brand, Model } from '@lib/types';
 
 /* ============================================================
@@ -64,8 +66,10 @@ const stockSample = await directusGet<any>('stock_vehicles', {
   fields: [
     'id', 'condition', 'km', 'list_price', 'promo_price',
     'highlighted', 'trim_level_snapshot',
+    'color_code', 'color_category',
     'photos.directus_files_id',
     'model.name', 'model.slug', 'model.fuel_type',
+    'trim_level.name',
     'model_year.year',
   ],
 });
@@ -142,6 +146,8 @@ const activeBrand = Astro.params.brand;
   title={`${brand.name} | SFR Motor`}
   description={brand.description ?? brand.tagline ?? `${brand.name} — modely a skladové vozy u SFR Motor.`}
 >
+  <Breadcrumbs items={[{ label: brand.name }]} />
+
   <!-- ===== BRAND HERO ===== -->
   <section class="bhero" data-screen-label="01 Hero">
     <div class="bhero-bg">
@@ -356,7 +362,7 @@ const activeBrand = Astro.params.brand;
             const conditionLabel = v.condition === 'new' ? 'Nové' : v.condition === 'demo' ? 'Předváděcí' : 'Ojeté';
             const price = v.promo_price ?? v.list_price;
             return (
-              <a class="scard" href={`/sklad/${v.id}`}>
+              <a class="scard" href={`/sklad/${buildStockSlug(v, brand, v.model, v.trim_level ?? { name: trim })}`}>
                 <div class="pic">
                   {photoId && <DirectusImage src={photoId} alt={`${brand.name} ${modelName}`} aspectRatio="4/3" />}
                 </div>

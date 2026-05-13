@@ -1,6 +1,7 @@
 ---
 import BaseLayout from '@layouts/BaseLayout.astro';
 import DirectusImage from '@components/DirectusImage.astro';
+import Breadcrumbs from '@components/Breadcrumbs.astro';
 import { directusGet } from '@lib/directus';
 import { marked } from 'marked';
 
@@ -91,6 +92,11 @@ const catLabel = article.category ? (CATEGORY_LABELS[article.category] ?? articl
   description={article.excerpt ?? `${article.title} — magazín SFR Motor.`}
   ogImage={article.cover_image ? `${import.meta.env.PUBLIC_DIRECTUS_URL ?? ''}/assets/${article.cover_image}?width=1200&height=630&fit=cover` : undefined}
 >
+  <Breadcrumbs items={[
+    { label: 'Magazín', href: '/magazin' },
+    { label: article.title },
+  ]} />
+
   <!-- ===== HERO ===== -->
   <section class="art-hero">
     <div class="container">

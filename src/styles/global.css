@@ -181,15 +181,19 @@ input, textarea, select { font: inherit; }
 
 /* ===== Breadcrumb ===== */
 .crumbs {
-  padding: 22px 0 4px;
+  padding: 18px 0 2px;
   font-size: 13px;
   color: var(--text-muted);
+  background: transparent;
+}
+.crumbs-inner {
   display: flex; gap: 10px; align-items: center;
   flex-wrap: wrap;
 }
+.crumbs a { color: var(--text-muted); transition: color .15s; }
 .crumbs a:hover { color: var(--accent); }
 .crumbs .sep { color: var(--line-2); }
-.crumbs .here { color: var(--text); }
+.crumbs .here { color: var(--text); font-weight: 500; }
 
 /* ===== Hero (sklad detail) ===== */
 .hero {

@@ -1,7 +1,9 @@
 ---
 import BaseLayout from '@layouts/BaseLayout.astro';
 import DirectusImage from '@components/DirectusImage.astro';
+import Breadcrumbs from '@components/Breadcrumbs.astro';
 import { directusGet } from '@lib/directus';
+import { buildStockSlug } from '@lib/stockSlug';
 import type { Brand, StockVehicle } from '@lib/types';
 
 /* ============================================================
@@ -62,13 +64,9 @@ const fmtKm = (n?: number | null) => (n === 0 || !n ? '0 km' : `${n.toLocaleStri
 ---
 
 <BaseLayout title="Skladové vozy" description="Aktuální nabídka skladových vozů KGM, OMODA & JAECOO, Farizon u SFR Motor Praha-Ďáblice.">
+  <Breadcrumbs items={[{ label: 'Skladové vozy' }]} />
   <section class="sklad-page">
     <div class="container">
-      <div class="crumbs">
-        <a href="/">Domů</a>
-        <span class="sep">/</span>
-        <span class="here">Skladové vozy</span>
-      </div>
 
       <div class="sklad-head">
         <div>
@@ -151,7 +149,7 @@ const fmtKm = (n?: number | null) => (n === 0 || !n ? '0 km' : `${n.toLocaleStri
                 return (
                   <a
                     class="scard"
-                    href={`/sklad/${v.id}`}
+                    href={`/sklad/${buildStockSlug(v, v.brand, v.model, v.trim_level ?? { name: trimName })}`}
                     data-brand={v.brand?.slug ?? ''}
                     data-fuel={v.model?.fuel_type ?? ''}
                     data-color={v.color_category ?? ''}

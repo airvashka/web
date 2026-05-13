@@ -1,0 +1,60 @@
+---
+/**
+ * Breadcrumbs — drobečková navigace.
+ *
+ * Použití:
+ *   <Breadcrumbs items={[
+ *     { label: 'KGM', href: '/kgm' },
+ *     { label: 'Tivoli' }, // poslední bez href = aktuální stránka
+ *   ]} />
+ *
+ * "Domů" se přidává automaticky jako první.
+ */
+export interface BreadcrumbItem {
+  label: string;
+  href?: string;
+}
+
+interface Props {
+  items: BreadcrumbItem[];
+  /** Pokud true, nezobrazí "Domů" jako první. Default: false */
+  hideHome?: boolean;
+}
+
+const { items, hideHome = false } = Astro.props;
+
+const allItems: BreadcrumbItem[] = hideHome ? items : [{ label: 'Domů', href: '/' }, ...items];
+
+// JSON-LD schema pro SEO
+const siteUrl = 'https://sfrmotor.cz';
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: allItems.map((it, i) => ({
+    '@type': 'ListItem',
+    position: i + 1,
+    name: it.label,
+    ...(it.href ? { item: `${siteUrl}${it.href}` } : {}),
+  })),
+};
+---
+
+<nav class="crumbs" aria-label="Drobečková navigace">
+  <div class="container crumbs-inner">
+    {allItems.map((it, i) => {
+      const isLast = i === allItems.length - 1;
+      return (
+        <>
+          {isLast || !it.href ? (
+            <span class="here" aria-current={isLast ? 'page' : undefined}>{it.label}</span>
+          ) : (
+            <a href={it.href}>{it.label}</a>
+          )}
+          {!isLast && <span class="sep">/</span>}
+        </>
+      );
+    })}
+  </div>
+</nav>
+
+<script type="application/ld+json" set:html={JSON.stringify(jsonLd)}></script>

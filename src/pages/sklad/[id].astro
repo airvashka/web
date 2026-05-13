@@ -1,8 +1,10 @@
 ---
 import BaseLayout from '@layouts/BaseLayout.astro';
 import DirectusImage from '@components/DirectusImage.astro';
+import Breadcrumbs from '@components/Breadcrumbs.astro';
 import { directusGet } from '@lib/directus';
 import { getNonEmptyCategories, CATEGORY_LABELS } from '@lib/features';
+import { buildStockSlug, parseStockId } from '@lib/stockSlug';
 import type { Brand, Model, StockVehicle, TrimLevel, ModelYear } from '@lib/types';
 
 /* ============================================================
@@ -10,17 +12,55 @@ import type { Brand, Model, StockVehicle, TrimLevel, ModelYear } from '@lib/type
    Sections: Hero gallery + info · TrustStrip · About + highlights ·
    Equipment (grouped 4 cols) · Specs · Finance · Similar cars ·
    Contact form · Sticky CTA
+
+   URL: /sklad/{brand}-{model}-{trim}-{color}-{id}
+   ID je vždy na konci (last numeric segment).
    ============================================================ */
 
 export async function getStaticPaths() {
-  const vehicles = await directusGet<StockVehicle>('stock_vehicles', {
-    fields: ['id'],
+  const vehicles = await directusGet<any>('stock_vehicles', {
+    fields: ['id', 'brand', 'model', 'trim_level', 'color_code', 'color_category'],
     filter: { status: { _eq: 'published' } },
   });
-  return vehicles.map((v) => ({ params: { id: String(v.id) } }));
+  // Načti brand/model/trim mapping najednou (build-time, omezený počet)
+  const brandIds = [...new Set(vehicles.map((v) => v.brand).filter(Boolean))];
+  const modelIds = [...new Set(vehicles.map((v) => v.model).filter(Boolean))];
+  const trimIds = [...new Set(vehicles.map((v) => v.trim_level).filter(Boolean))];
+
+  const brandMap = new Map<number, any>();
+  const modelMap = new Map<number, any>();
+  const trimMap = new Map<number, any>();
+
+  if (brandIds.length) {
+    const bs = await directusGet<any>('brands', { filter: { id: { _in: brandIds } }, fields: ['id', 'slug', 'name'] });
+    bs.forEach((b) => brandMap.set(b.id, b));
+  }
+  if (modelIds.length) {
+    const ms = await directusGet<any>('models', { filter: { id: { _in: modelIds } }, fields: ['id', 'slug', 'name'] });
+    ms.forEach((m) => modelMap.set(m.id, m));
+  }
+  if (trimIds.length) {
+    const ts = await directusGet<any>('trim_levels', { filter: { id: { _in: trimIds } }, fields: ['id', 'name'] });
+    ts.forEach((t) => trimMap.set(t.id, t));
+  }
+
+  return vehicles.map((v) => {
+    const slug = buildStockSlug(
+      v,
+      v.brand ? brandMap.get(v.brand) : null,
+      v.model ? modelMap.get(v.model) : null,
+      v.trim_level ? trimMap.get(v.trim_level) : null,
+    );
+    return { params: { id: slug } };
+  });
 }
 
-const { id } = Astro.params;
+// POZN.: filename je [id].astro (legacy), ale hodnota je teď SLUG string
+// (např. "kgm-tivoli-style-bila-3"). Skutečné numerické ID parsujeme z konce.
+const { id: slug } = Astro.params;
+const numericId = parseStockId(slug ?? '');
+if (Number.isNaN(numericId)) return Astro.redirect('/404');
+const id = String(numericId);
 
 type VehicleFull = StockVehicle & {
   photos?: Array<{ directus_files_id: string }>;
@@ -122,8 +162,8 @@ const similar = await directusGet<any>('stock_vehicles', {
   },
   limit: 3,
   fields: [
-    'id', 'condition', 'km', 'list_price', 'promo_price', 'color_code',
-    'trim_level_snapshot', 'photos.directus_files_id',
+    'id', 'condition', 'km', 'list_price', 'promo_price', 'color_code', 'color_category',
+    'trim_level_snapshot', 'photos.directus_files_id', 'trim_level.name',
   ],
 });
 
@@ -133,16 +173,14 @@ const description = (v.description ?? '').split(/\n\s*\n/).filter(Boolean);
 ---
 
 <BaseLayout title={title || 'Skladový vůz'} description={`${title} — skladový vůz u SFR Motor Praha-Ďáblice.`}>
+  <Breadcrumbs items={[
+    { label: 'Skladové vozy', href: '/sklad' },
+    ...(brand ? [{ label: brand.name, href: `/${brand.slug}` }] : []),
+    ...(model ? [{ label: model.name, href: `/model/${model.slug}` }] : []),
+    { label: trim?.name ?? title },
+  ]} />
   <main>
     <div class="container">
-      <!-- Breadcrumbs -->
-      <div class="crumbs">
-        <a href="/sklad">Skladové vozy</a>
-        <span class="sep">/</span>
-        {brand && <><a href={`/${brand.slug}`}>{brand.name}</a><span class="sep">/</span></>}
-        {model && <><a href={`/model/${model.slug}`}>{model.name}</a><span class="sep">/</span></>}
-        <span class="here">{trim?.name ?? title}</span>
-      </div>
 
       <!-- ===== HERO ===== -->
       <section class="hero" data-screen-label="Hero">
@@ -502,10 +540,10 @@ const description = (v.description ?? '').split(/\n\s*\n/).filter(Boolean);
           <div class="cars">
             {similar.map((s: any) => {
               const photoId = s.photos?.[0]?.directus_files_id;
-              const trimName = s.trim_level_snapshot?.name ?? '';
+              const trimName = s.trim_level?.name ?? s.trim_level_snapshot?.name ?? '';
               const price = s.promo_price ?? s.list_price;
               return (
-                <a class="car-card" href={`/sklad/${s.id}`}>
+                <a class="car-card" href={`/sklad/${buildStockSlug(s, brand, model, s.trim_level ?? { name: trimName })}`}>
                   <div class="pic">
                     <span class="tag">Skladem</span>
                     {photoId && <DirectusImage src={photoId} alt={`${model?.name ?? ''} ${trimName}`} aspectRatio="4/3" />}

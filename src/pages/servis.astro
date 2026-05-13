@@ -1,5 +1,6 @@
 ---
 import BaseLayout from '@layouts/BaseLayout.astro';
+import Breadcrumbs from '@components/Breadcrumbs.astro';
 
 /* ============================================================
    SERVIS — 1:1 podle _design-draft/servis.jsx
@@ -19,6 +20,8 @@ const SERVICES = [
 ---
 
 <BaseLayout title="Servis" description="Autorizovaný servis pro KGM, OMODA & JAECOO, Farizon, Dacia, Renault. Praha-Ďáblice.">
+  <Breadcrumbs items={[{ label: 'Servis' }]} />
+
   <!-- ===== HERO ===== -->
   <section class="phero" data-screen-label="01 Hero">
     <div class="container">

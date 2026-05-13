@@ -1,6 +1,7 @@
 ---
 import BaseLayout from '@layouts/BaseLayout.astro';
 import DirectusImage from '@components/DirectusImage.astro';
+import Breadcrumbs from '@components/Breadcrumbs.astro';
 import { directusGet } from '@lib/directus';
 
 /* ============================================================
@@ -57,6 +58,8 @@ function formatDate(iso?: string): string {
 ---
 
 <BaseLayout title="Magazín" description="Magazín SFR Motor — recenze, testy, novinky, srovnání. Příběhy a tipy z naší garáže.">
+  <Breadcrumbs items={[{ label: 'Magazín' }]} />
+
   <!-- ===== HERO ===== -->
   <section class="phero" data-screen-label="01 Hero">
     <div class="container">

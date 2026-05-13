@@ -2,7 +2,9 @@
 import BaseLayout from '@layouts/BaseLayout.astro';
 import DirectusImage from '@components/DirectusImage.astro';
 import VideoStrip from '@components/VideoStrip.astro';
+import Breadcrumbs from '@components/Breadcrumbs.astro';
 import { directusGet } from '@lib/directus';
+import { buildStockSlug } from '@lib/stockSlug';
 import type { Brand, Model, ModelYear, TrimLevel } from '@lib/types';
 
 /* ============================================================
@@ -91,7 +93,8 @@ const stockOfModel = await directusGet<any>('stock_vehicles', {
   limit: 3,
   fields: [
     'id', 'condition', 'km', 'list_price', 'promo_price', 'trim_level_snapshot',
-    'photos.directus_files_id', 'model_year.year', 'color_code',
+    'photos.directus_files_id', 'model_year.year', 'color_code', 'color_category',
+    'trim_level.name',
   ],
 });
 
@@ -379,6 +382,11 @@ const introCopy = (rawModel.description ?? '').split(/\n\s*\n/).filter(Boolean);
   title={`${brand.name} ${rawModel.name}`}
   description={rawModel.tagline ?? `${brand.name} ${rawModel.name} u SFR Motor — autorizovaný dealer v Praze-Ďáblicích.`}
 >
+  <Breadcrumbs items={[
+    { label: brand.name, href: `/${brand.slug}` },
+    { label: rawModel.name },
+  ]} />
+
   <!-- ===== MODEL HERO (dark, full-bleed) ===== -->
   <section class="mhero" data-screen-label="01 Hero">
     <div class="mhero-bg">
@@ -424,6 +432,7 @@ const introCopy = (rawModel.description ?? '').split(/\n\s*\n/).filter(Boolean);
       <a class="subnav-link" href="#skladem">Skladem</a>
       <span class="subnav-sep">·</span>
       <a class="subnav-link" href="#data">Technické údaje</a>
+      {docsList.length > 0 && (<><span class="subnav-sep">·</span><a class="subnav-link" href="#ke-stazeni">Ke stažení</a></>)}
     </div>
   </div>
 
@@ -755,7 +764,7 @@ const introCopy = (rawModel.description ?? '').split(/\n\s*\n/).filter(Boolean);
                   <div class="car-meta">{meta}</div>
                   <hr />
                   <div class="car-price">{price ? `${price.toLocaleString('cs-CZ')} Kč` : '—'}</div>
-                  <a class="btn btn-outline" style="padding: 12px 20px; font-size: 12px;" href={`/sklad/${v.id}`}>
+                  <a class="btn btn-outline" style="padding: 12px 20px; font-size: 12px;" href={`/sklad/${buildStockSlug(v, brand, rawModel, v.trim_level ?? { name: trim })}`}>
                     Detail vozu
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
                   </a>
