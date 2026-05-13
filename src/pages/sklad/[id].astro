@@ -3,7 +3,7 @@ import BaseLayout from '@layouts/BaseLayout.astro';
 import DirectusImage from '@components/DirectusImage.astro';
 import Breadcrumbs from '@components/Breadcrumbs.astro';
 import { directusGet } from '@lib/directus';
-import { getNonEmptyCategories, CATEGORY_LABELS } from '@lib/features';
+import { getGroupedFeatures, CATEGORY_LABELS } from '@lib/features';
 import { buildStockSlug, parseStockId } from '@lib/stockSlug';
 import type { Brand, Model, StockVehicle, TrimLevel, ModelYear } from '@lib/types';
 
@@ -119,13 +119,19 @@ const statusBadge = v.availability === 'in_stock' ? { cls: 'dark', label: 'Sklad
   : v.availability === 'sold' ? { cls: 'outline', label: 'Prodáno' }
   : { cls: 'outline', label: 'Na cestě' };
 
-// Equipment grouped (z trim features)
-const features: string[] = Array.isArray(trim?.features) ? (trim!.features as string[]) : [];
-const grouped = getNonEmptyCategories(features);
+// Equipment grouped — funguje pro nové groupy ({category, items}) i legacy flat array
+const rawFeatures = (trim as any)?.features ?? [];
+const grouped = getGroupedFeatures(rawFeatures);
+// Flat seznam pro highlights heuristiku (čte se napříč skupinami)
+const features: string[] = grouped.flatMap((g) => g.items);
 
-// Specs — z trim_level_snapshot nebo model_year.technical_data
+// Specs — dědičnost: models.technical_data (base) ← model_year.technical_data (override)
+// Base = aktuální spec modelu. Year-specific data jen přepisují odlišnosti
+// (např. starší emisní normu pro 2024 oproti 2026).
 const snapshot = (v.trim_level_snapshot as any) ?? {};
-const td: any = modelYear?.technical_data ?? {};
+const modelTd = (model as any)?.technical_data ?? {};
+const yearTd = (modelYear as any)?.technical_data ?? {};
+const td: any = { ...modelTd, ...yearTd };
 const specsLeft: Array<[string, string]> = [
   ['Motor', td.motor ?? td.Motor ?? snapshot.engine ?? '—'],
   ['Převodovka', transmissionLabel ?? '—'],

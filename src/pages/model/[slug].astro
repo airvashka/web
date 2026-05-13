@@ -5,6 +5,7 @@ import VideoStrip from '@components/VideoStrip.astro';
 import Breadcrumbs from '@components/Breadcrumbs.astro';
 import { directusGet } from '@lib/directus';
 import { buildStockSlug } from '@lib/stockSlug';
+import { getGroupedFeatures, countFeatures } from '@lib/features';
 import type { Brand, Model, ModelYear, TrimLevel } from '@lib/types';
 
 /* ============================================================
@@ -661,31 +662,43 @@ const introCopy = (rawModel.description ?? '').split(/\n\s*\n/).filter(Boolean);
         </h2>
         <div class={`trims trims-${trims.length}`}>
           {trims.map((t, i) => {
-            // Nejvyšší trim = "Doporučujeme" tmavý
             const isRecommended = i === trims.length - 1 && trims.length > 1;
             const cls = isRecommended ? 'trim dark' : 'trim light';
             const price = t.promo_price ?? t.list_price ?? 0;
+            const trimGroups = getGroupedFeatures((t as any).features);
+            const trimFeatureCount = countFeatures((t as any).features);
             return (
               <div class={cls}>
                 {isRecommended && <div class="trim-badge">Doporučujeme</div>}
                 <div class="trim-name">{t.name}</div>
                 <div class="trim-price">{price.toLocaleString('cs-CZ')} Kč</div>
-                <ul class="trim-list">
-                  {(t.features ?? []).slice(0, 10).map((f) => (
-                    <li>
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-                      <span>{f}</span>
-                    </li>
-                  ))}
-                  {(t.features?.length ?? 0) > 10 && (
-                    <li style="opacity: 0.7; font-size: 13px;">
-                      <span></span>
-                      <span>+ {(t.features?.length ?? 0) - 10} dalších položek</span>
-                    </li>
+                <div class="trim-features">
+                  {trimGroups.length > 0 ? (
+                    trimGroups.map((g) => (
+                      <div class="trim-feature-group">
+                        <div class="trim-feature-cat">{g.label}</div>
+                        <ul class="trim-list">
+                          {g.items.slice(0, 6).map((f) => (
+                            <li>
+                              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                              <span>{f}</span>
+                            </li>
+                          ))}
+                          {g.items.length > 6 && (
+                            <li class="trim-list-more">+ {g.items.length - 6} dalších</li>
+                          )}
+                        </ul>
+                      </div>
+                    ))
+                  ) : (
+                    <div class="trim-feature-empty">Specifikace doplníme.</div>
                   )}
-                </ul>
+                  {trimFeatureCount > 0 && (
+                    <div class="trim-feature-total">Celkem {trimFeatureCount} výbavových prvků</div>
+                  )}
+                </div>
                 <a class="btn" href="/kontakt">
-                  Konfigurovat
+                  Mám zájem
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
                 </a>
               </div>
