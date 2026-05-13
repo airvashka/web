@@ -155,7 +155,9 @@ async function patchFeaturesField() {
     note: 'Výbavové prvky seskupené po kategoriích. Přidej "+ Add group", vyber kategorii a naťukej položky jako tagy. Z PDF ceníku tahej řádky s "S" do správné kategorie.',
     options: {
       ...(meta.options ?? {}),
-      template: '{{category}} ({{items.length}} položek)',
+      // Pozn: {{items.length}} nefunguje — Directus iteruje array a sčítá .length
+      // jednotlivých stringů. Jen {{category}}.
+      template: '{{category}}',
       addLabel: 'Přidat kategorii',
       fields: [
         {
