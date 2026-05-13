@@ -5,6 +5,7 @@ import Breadcrumbs from '@components/Breadcrumbs.astro';
 import { directusGet } from '@lib/directus';
 import { getGroupedFeatures, CATEGORY_LABELS } from '@lib/features';
 import { buildStockSlug, parseStockId } from '@lib/stockSlug';
+import { tdToMap } from '@lib/technicalData';
 import type { Brand, Model, StockVehicle, TrimLevel, ModelYear } from '@lib/types';
 
 /* ============================================================
@@ -161,8 +162,9 @@ const features: string[] = grouped.flatMap((g) => g.items);
 // Base = aktuální spec modelu. Year-specific data jen přepisují odlišnosti
 // (např. starší emisní normu pro 2024 oproti 2026).
 const snapshot = (v.trim_level_snapshot as any) ?? {};
-const modelTd = (model as any)?.technical_data ?? {};
-const yearTd = (modelYear as any)?.technical_data ?? {};
+// Normalizace: tdToMap zvládne flat JSON objekt I new {label, value} repeater
+const modelTd = tdToMap((model as any)?.technical_data);
+const yearTd = tdToMap((modelYear as any)?.technical_data);
 const td: any = { ...modelTd, ...yearTd };
 const specsLeft: Array<[string, string]> = [
   ['Motor', td.motor ?? td.Motor ?? snapshot.engine ?? '—'],
@@ -181,30 +183,34 @@ const specsRight: Array<[string, string]> = [
   ['Počet míst', td.mista ?? td['Počet sedadel'] ?? '—'],
 ];
 
-// Highlights — pevné 4 (TODO: později editovatelné v adminu)
+// Highlights — fetch z site_settings (editovatelné v adminu), fallback na hardcoded.
 type Highlight = { icon: string; title: string; subtitle: string };
-const highlights: Highlight[] = [
-  {
-    icon: 'shield',
-    title: 'Záruka výrobce',
-    subtitle: 'Plná tovární záruka 5–7 let dle modelu, kompletní servisní historie.',
-  },
-  {
-    icon: 'swap',
-    title: 'Výkup vašeho vozu',
-    subtitle: 'Protiúčtem zaplatíte jen rozdíl. Online ocenění do hodiny.',
-  },
-  {
-    icon: 'wallet',
-    title: 'Financování a pojištění',
-    subtitle: 'Zařídíme leasing, úvěr i pojištění na míru. Vy si jen vyzvednete klíče.',
-  },
-  {
-    icon: 'badge',
-    title: 'Autorizovaný prodejce',
-    subtitle: 'KGM · OMODA & JAECOO · FARIZON. Originální díly a servis ve vlastní dílně.',
-  },
+const HARDCODED_HIGHLIGHTS: Highlight[] = [
+  { icon: 'shield', title: 'Záruka výrobce', subtitle: 'Plná tovární záruka 5–7 let dle modelu, kompletní servisní historie.' },
+  { icon: 'swap', title: 'Výkup vašeho vozu', subtitle: 'Protiúčtem zaplatíte jen rozdíl. Online ocenění do hodiny.' },
+  { icon: 'wallet', title: 'Financování a pojištění', subtitle: 'Zařídíme leasing, úvěr i pojištění na míru. Vy si jen vyzvednete klíče.' },
+  { icon: 'badge', title: 'Autorizovaný prodejce', subtitle: 'KGM · OMODA & JAECOO · FARIZON. Originální díly a servis ve vlastní dílně.' },
 ];
+
+let highlights: Highlight[] = HARDCODED_HIGHLIGHTS;
+try {
+  const siteSettings = await directusGet<any>('site_settings', {
+    fields: ['stock_highlights'],
+    limit: 1,
+  });
+  const fromAdmin = siteSettings?.[0]?.stock_highlights;
+  if (Array.isArray(fromAdmin) && fromAdmin.length > 0) {
+    highlights = fromAdmin
+      .filter((h: any) => h?.title)
+      .map((h: any) => ({
+        icon: String(h.icon ?? 'star'),
+        title: String(h.title),
+        subtitle: String(h.subtitle ?? ''),
+      }));
+  }
+} catch {
+  // site_settings nebo field neexistuje — fallback je už nastavený
+}
 
 // Similar cars (stejný model, jiné ID)
 const similar = await directusGet<any>('stock_vehicles', {
@@ -430,6 +436,21 @@ const description = (v.description ?? '').split(/\n\s*\n/).filter(Boolean);
                   {h.icon === 'badge' && (
                     <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="7"/><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/></svg>
                   )}
+                  {h.icon === 'star' && (
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                  )}
+                  {h.icon === 'key' && (
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg>
+                  )}
+                  {h.icon === 'car' && (
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 17h14M5 17v3M19 17v3M5 17l-1.5-5.5h17L19 17M3.5 11.5L5 7h14l1.5 4.5"/><circle cx="7.5" cy="14.5" r="1"/><circle cx="16.5" cy="14.5" r="1"/></svg>
+                  )}
+                  {h.icon === 'phone' && (
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.86 19.86 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.86 19.86 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                  )}
+                  {h.icon === 'clock' && (
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                  )}
                 </div>
                 <div class="highlight-body">
                   <div class="highlight-title">{h.title}</div>
@@ -534,9 +555,9 @@ const description = (v.description ?? '').split(/\n\s*\n/).filter(Boolean);
               <div class="chips" data-duration-chips>
                 <button type="button" class="chip" data-duration="24">24 měs</button>
                 <button type="button" class="chip" data-duration="36">36 měs</button>
-                <button type="button" class="chip active" data-duration="48">48 měs</button>
+                <button type="button" class="chip" data-duration="48">48 měs</button>
                 <button type="button" class="chip" data-duration="60">60 měs</button>
-                <button type="button" class="chip" data-duration="72">72 měs</button>
+                <button type="button" class="chip active" data-duration="72">72 měs</button>
               </div>
             </div>
 
@@ -544,8 +565,8 @@ const description = (v.description ?? '').split(/\n\s*\n/).filter(Boolean);
             <div class="calc-row">
               <div class="calc-label">Úroková sazba (p.a.)</div>
               <div class="chips" data-rate-chips>
-                <button type="button" class="chip" data-rate="4.9">4,9 %</button>
-                <button type="button" class="chip active" data-rate="6.9">6,9 %</button>
+                <button type="button" class="chip active" data-rate="4.9">4,9 %</button>
+                <button type="button" class="chip" data-rate="6.9">6,9 %</button>
                 <button type="button" class="chip" data-rate="8.9">8,9 %</button>
               </div>
             </div>
@@ -555,7 +576,7 @@ const description = (v.description ?? '').split(/\n\s*\n/).filter(Boolean);
               <div class="calc-head">
                 <div class="calc-label" style="margin: 0;">Akontace</div>
                 <div class="val">
-                  <span data-dp-percent>20 %</span>
+                  <span data-dp-percent>60 %</span>
                   <span style="opacity:0.6; font-size:14px; margin-left:8px;">
                     (<span data-dp-amount-inline>—</span> Kč)
                   </span>
@@ -564,14 +585,14 @@ const description = (v.description ?? '').split(/\n\s*\n/).filter(Boolean);
               <input
                 type="range"
                 min="0"
-                max="60"
-                value="20"
+                max="80"
+                value="60"
                 step="5"
                 data-dp-slider
                 style="width:100%; accent-color: var(--accent);"
               />
               <div class="ticks">
-                <span>0 %</span><span>15 %</span><span>30 %</span><span>45 %</span><span>60 %</span>
+                <span>0 %</span><span>20 %</span><span>40 %</span><span>60 %</span><span>80 %</span>
               </div>
             </div>
           </div>
@@ -586,8 +607,8 @@ const description = (v.description ?? '').split(/\n\s*\n/).filter(Boolean);
                 <span class="sub-amount" data-vehicle-price>{finalPrice ? finalPrice.toLocaleString('cs-CZ') : '—'} Kč</span>
               </div>
               <div class="fsr">
-                <span class="sub">Akontace (<span data-dp-percent-sub>20 %</span>)</span>
-                <span class="sub-amount" data-dp-amount>{finalPrice ? Math.round(finalPrice * 0.2).toLocaleString('cs-CZ') : '—'} Kč</span>
+                <span class="sub">Akontace (<span data-dp-percent-sub>60 %</span>)</span>
+                <span class="sub-amount" data-dp-amount>{finalPrice ? Math.round(finalPrice * 0.6).toLocaleString('cs-CZ') : '—'} Kč</span>
               </div>
               <div class="fsr">
                 <span class="sub">Financovaná částka</span>
@@ -753,9 +774,11 @@ const description = (v.description ?? '').split(/\n\s*\n/).filter(Boolean);
     const durationChips = document.querySelectorAll('[data-duration-chips] .chip');
     const rateChips = document.querySelectorAll('[data-rate-chips] .chip');
 
-    let duration = 48;
-    let dpPercent = 20;
-    let annualRatePct = 6.9; // default
+    // Defaults sjednocené s hero "Financování od X Kč" — nejvýhodnější varianta:
+    // 60% akontace, 72 měsíců, 4.9% p.a. (čísla se shodují s computeMinMonthly výpočtem)
+    let duration = 72;
+    let dpPercent = 60;
+    let annualRatePct = 4.9;
 
     const fmt = (n) => Math.round(n).toLocaleString('cs-CZ');
 
