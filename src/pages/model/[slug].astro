@@ -70,13 +70,18 @@ const modelYears = await directusGet<ModelYear>('model_years', {
 });
 const latestYear = modelYears[0];
 
-const trims: TrimLevel[] = latestYear
+// VŠECHNY trimy modelového roku — pro srovnávací podstránku
+const allTrims: TrimLevel[] = latestYear
   ? await directusGet<TrimLevel>('trim_levels', {
       filter: { model_year: { _eq: latestYear.id }, status: { _eq: 'published' } },
       sort: ['sort'],
       fields: ['*'],
     })
   : [];
+// Featured trimy — pro teaser karty na model stránce (default true pokud field neexistuje)
+const trims: TrimLevel[] = allTrims.filter((t: any) =>
+  t.featured_on_model_page === undefined || t.featured_on_model_page === null || t.featured_on_model_page === true
+);
 
 // Option packages (paketové výbavy) — bez status a sort, collection je nemá
 const optionPackages = latestYear
@@ -372,6 +377,27 @@ const introImg = galleryImages[0] ?? rawModel.hero_image;
 
 // Description rozdělené na odstavce
 const introCopy = (rawModel.description ?? '').split(/\n\s*\n/).filter(Boolean);
+
+// ===== AKCE / PROMO =====
+// Aktivní pouze pokud promo_active=true a (volitelně) promo_valid_to není v minulosti.
+const todayDate = new Date().toISOString().slice(0, 10);
+const promoActive: boolean = !!(rawModel as any).promo_active
+  && ((rawModel as any).promo_label || (rawModel as any).promo_discount_amount)
+  && (!(rawModel as any).promo_valid_to || String((rawModel as any).promo_valid_to) >= todayDate);
+const promoLabel: string = ((rawModel as any).promo_label ?? '').toString().trim();
+const promoDiscountAmount: number = Number((rawModel as any).promo_discount_amount ?? 0) || 0;
+const promoValidTo: string | null = (rawModel as any).promo_valid_to ?? null;
+const promoDescription: string = (rawModel as any).promo_description ?? '';
+// Render markdown pro popis akce (lehký inline marked import — pokud chybí, fallback na plain text)
+let promoDescriptionHtml: string = '';
+if (promoActive && promoDescription) {
+  try {
+    const { marked } = await import('marked');
+    promoDescriptionHtml = marked.parse(promoDescription) as string;
+  } catch {
+    promoDescriptionHtml = `<p>${promoDescription.replace(/\n/g, '</p><p>')}</p>`;
+  }
+}
 ---
 
 <BaseLayout
@@ -417,6 +443,7 @@ const introCopy = (rawModel.description ?? '').split(/\n\s*\n/).filter(Boolean);
   <div class="subnav">
     <div class="container subnav-inner">
       <a class="subnav-link is-active" href="#predstaveni">Představení</a>
+      {promoActive && (<><span class="subnav-sep">·</span><a class="subnav-link subnav-link--accent" href="#akce">Akce</a></>)}
       {variantModels.length > 1 && (<><span class="subnav-sep">·</span><a class="subnav-link" href="#varianty">Varianty</a></>)}
       {hasConfigurator && (<><span class="subnav-sep">·</span><a class="subnav-link" href="#barvy">Barvy</a></>)}
       <span class="subnav-sep">·</span>
@@ -431,6 +458,43 @@ const introCopy = (rawModel.description ?? '').split(/\n\s*\n/).filter(Boolean);
       {docsList.length > 0 && (<><span class="subnav-sep">·</span><a class="subnav-link" href="#ke-stazeni">Ke stažení</a></>)}
     </div>
   </div>
+
+  <!-- ===== AKCE BANNER ===== -->
+  {promoActive && (
+    <section class="promo-banner" id="akce">
+      <div class="container">
+        <div class="promo-inner">
+          <div class="promo-side">
+            <div class="promo-eyebrow">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.59 13.41 13.42 20.58a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
+              Akce
+              {promoValidTo && <span class="promo-valid"> · do {new Date(promoValidTo).toLocaleDateString('cs-CZ')}</span>}
+            </div>
+            <h2 class="promo-label">
+              {promoLabel || (promoDiscountAmount > 0 ? `Sleva ${promoDiscountAmount.toLocaleString('cs-CZ')} Kč` : 'Aktuální akce')}
+            </h2>
+            {promoDescriptionHtml && (
+              <div class="promo-desc" set:html={promoDescriptionHtml} />
+            )}
+            <div class="promo-cta-row">
+              <a class="btn btn-accent" href="#skladem">Vybrat z akčních vozů →</a>
+              <a class="btn btn-outline-light" href="/kontakt">Mám zájem o akci</a>
+            </div>
+          </div>
+          {promoDiscountAmount > 0 && (
+            <div class="promo-badge-big">
+              <div class="promo-badge-label">Sleva</div>
+              <div class="promo-badge-amount">
+                −{promoDiscountAmount.toLocaleString('cs-CZ')}
+                <span class="promo-badge-currency">Kč</span>
+              </div>
+              <div class="promo-badge-hint">na všechny skladové vozy</div>
+            </div>
+          )}
+        </div>
+      </div>
+    </section>
+  )}
 
   <!-- ===== VARIANT SWITCHER ===== -->
   {variantModels.length > 1 && (
@@ -667,43 +731,65 @@ const introCopy = (rawModel.description ?? '').split(/\n\s*\n/).filter(Boolean);
             const price = t.promo_price ?? t.list_price ?? 0;
             const trimGroups = getGroupedFeatures((t as any).features);
             const trimFeatureCount = countFeatures((t as any).features);
+            // Top 5 features napříč kategoriemi (1. položka z každé prvních kategorií)
+            const topFeatures: string[] = [];
+            for (const g of trimGroups) {
+              for (const item of g.items) {
+                topFeatures.push(item);
+                if (topFeatures.length >= 5) break;
+              }
+              if (topFeatures.length >= 5) break;
+            }
             return (
               <div class={cls}>
                 {isRecommended && <div class="trim-badge">Doporučujeme</div>}
                 <div class="trim-name">{t.name}</div>
                 <div class="trim-price">{price.toLocaleString('cs-CZ')} Kč</div>
-                <div class="trim-features">
-                  {trimGroups.length > 0 ? (
-                    trimGroups.map((g) => (
-                      <div class="trim-feature-group">
-                        <div class="trim-feature-cat">{g.label}</div>
-                        <ul class="trim-list">
-                          {g.items.slice(0, 6).map((f) => (
-                            <li>
-                              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-                              <span>{f}</span>
-                            </li>
-                          ))}
-                          {g.items.length > 6 && (
-                            <li class="trim-list-more">+ {g.items.length - 6} dalších</li>
-                          )}
-                        </ul>
-                      </div>
-                    ))
+                <div class="trim-teaser">
+                  {topFeatures.length > 0 ? (
+                    <>
+                      <div class="trim-teaser-label">Z výbavy například:</div>
+                      <ul class="trim-list">
+                        {topFeatures.map((f) => (
+                          <li>
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                            <span>{f}</span>
+                          </li>
+                        ))}
+                      </ul>
+                      <div class="trim-teaser-count">+ celkem {trimFeatureCount} prvků výbavy</div>
+                    </>
                   ) : (
                     <div class="trim-feature-empty">Specifikace doplníme.</div>
                   )}
-                  {trimFeatureCount > 0 && (
-                    <div class="trim-feature-total">Celkem {trimFeatureCount} výbavových prvků</div>
-                  )}
                 </div>
-                <a class="btn" href="/kontakt">
-                  Mám zájem
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
-                </a>
+                <div class="trim-actions">
+                  <a class="btn btn-outline trim-compare-link" href={`/model/${rawModel.slug}/vybavy`}>
+                    Kompletní výbava
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                  </a>
+                  <a class="btn" href="/kontakt">
+                    Mám zájem
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                  </a>
+                </div>
               </div>
             );
           })}
+        </div>
+
+        {/* ===== CTA na srovnání + plný ceník ===== */}
+        <div class="trims-cta-row">
+          <a class="trims-cta" href={`/model/${rawModel.slug}/vybavy`}>
+            <div>
+              <div class="trims-cta-eyebrow">Srovnání výbav</div>
+              <div class="trims-cta-title">Kompletní matrice — vidíte přesně co kde je</div>
+              <div class="trims-cta-sub">Sloupce trimů × řádky všech prvků výbavy, jako v PDF ceníku.</div>
+            </div>
+            <span class="trims-cta-arrow">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            </span>
+          </a>
         </div>
 
         {/* ===== Paketové výbavy ===== */}

@@ -69,6 +69,7 @@ const stockSample = await directusGet<any>('stock_vehicles', {
     'color_code', 'color_category',
     'photos.directus_files_id',
     'model.name', 'model.slug', 'model.fuel_type',
+    'model.promo_active', 'model.promo_label', 'model.promo_discount_amount', 'model.promo_valid_to',
     'trim_level.name',
     'model_year.year',
   ],
@@ -354,10 +355,18 @@ const activeBrand = Astro.params.brand;
             const isNew = v.condition === 'new';
             const isHl = v.highlighted;
             const customLabel = (v.highlight_label ?? '').toString().trim();
-            const pillLabel = isHl
-              ? (customLabel || 'Novinka')
-              : isNew ? 'Nové' : 'Skladem';
-            const pillClass = isHl || isNew ? ' is-new' : '';
+            const today = new Date().toISOString().slice(0, 10);
+            const modelPromoActive = !!v.model?.promo_active
+              && (v.model.promo_label || v.model.promo_discount_amount)
+              && (!v.model.promo_valid_to || String(v.model.promo_valid_to) >= today);
+            const modelPromoLabel = (v.model?.promo_label ?? '').toString().trim();
+            const modelPromoDiscount = Number(v.model?.promo_discount_amount ?? 0) || 0;
+            const pillLabel = modelPromoActive && modelPromoLabel
+              ? modelPromoLabel
+              : isHl
+                ? (customLabel || 'Novinka')
+                : isNew ? 'Nové' : 'Skladem';
+            const pillClass = (modelPromoActive || isHl || isNew) ? ' is-new' : '';
             const photoId = v.photos?.[0]?.directus_files_id;
             const trim = v.trim_level_snapshot?.name ?? '';
             const modelName = v.model?.name ?? 'Vůz';

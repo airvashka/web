@@ -1562,6 +1562,132 @@ button.thumb-more {
   height: 3px; background: var(--accent);
   border-radius: 2px 2px 0 0;
 }
+.subnav-link--accent {
+  color: var(--accent) !important;
+  font-weight: 600;
+}
+.subnav-link--accent::before {
+  content: "🔥";
+  margin-right: 4px;
+  font-size: 12px;
+}
+
+/* ===== Promo banner (akce na modelu) ===== */
+.promo-banner {
+  background: linear-gradient(135deg, var(--accent) 0%, #D94C16 100%);
+  color: #fff;
+  padding: 40px 0;
+}
+.promo-inner {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 48px;
+}
+.promo-eyebrow {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 12px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  opacity: 0.85;
+  margin-bottom: 12px;
+}
+.promo-eyebrow svg { color: #fff; }
+.promo-valid {
+  font-weight: 400;
+  text-transform: none;
+  letter-spacing: 0.02em;
+  opacity: 0.85;
+}
+.promo-label {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: clamp(28px, 3vw, 40px);
+  letter-spacing: -0.02em;
+  margin: 0 0 12px;
+  color: #fff;
+}
+.promo-desc {
+  font-size: 15px;
+  line-height: 1.6;
+  margin-bottom: 22px;
+  max-width: 60ch;
+  color: rgba(255,255,255,0.92);
+}
+.promo-desc p { margin: 0 0 10px; }
+.promo-desc p:last-child { margin-bottom: 0; }
+.promo-desc a { color: #fff; text-decoration: underline; }
+.promo-cta-row { display: flex; gap: 12px; flex-wrap: wrap; }
+
+.btn-outline-light {
+  background: transparent;
+  color: #fff;
+  border: 1px solid rgba(255,255,255,0.4);
+  padding: 12px 22px;
+  border-radius: 10px;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 14px;
+  display: inline-flex; align-items: center; gap: 8px;
+  transition: all .15s;
+}
+.btn-outline-light:hover { border-color: #fff; background: rgba(255,255,255,0.1); }
+.btn-accent {
+  background: #fff;
+  color: var(--accent);
+  border: none;
+  padding: 12px 22px;
+  border-radius: 10px;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 14px;
+  display: inline-flex; align-items: center; gap: 8px;
+  transition: all .15s;
+}
+.btn-accent:hover { background: rgba(255,255,255,0.92); transform: translateY(-1px); }
+
+.promo-badge-big {
+  flex-shrink: 0;
+  background: rgba(0,0,0,0.18);
+  padding: 24px 32px;
+  border-radius: var(--radius);
+  text-align: center;
+  border: 1px solid rgba(255,255,255,0.2);
+}
+.promo-badge-label {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 12px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  opacity: 0.85;
+  margin-bottom: 4px;
+}
+.promo-badge-amount {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(36px, 4vw, 52px);
+  letter-spacing: -0.03em;
+  line-height: 1;
+  color: #fff;
+}
+.promo-badge-currency {
+  font-size: 0.55em;
+  margin-left: 4px;
+  opacity: 0.85;
+}
+.promo-badge-hint {
+  font-size: 11px;
+  opacity: 0.75;
+  margin-top: 8px;
+  letter-spacing: 0.04em;
+}
+@media (max-width: 720px) {
+  .promo-inner { grid-template-columns: 1fr; gap: 24px; }
+  .promo-badge-big { justify-self: start; }
+}
 .subnav-sep { color: var(--line-2); font-size: 10px; }
 
 .intro {
@@ -1955,6 +2081,105 @@ button.thumb-more {
   margin-bottom: 30px;
   font-variant-numeric: tabular-nums;
 }
+/* ===== Trim teaser (zkrácená výbava + tlačítko na srovnání) ===== */
+.trim-teaser {
+  margin: 0 0 24px;
+  display: flex; flex-direction: column;
+  gap: 14px;
+}
+.trim-teaser-label {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--line);
+}
+.trim.dark .trim-teaser-label {
+  color: rgba(255,255,255,0.55);
+  border-bottom-color: rgba(255,255,255,0.12);
+}
+.trim-teaser-count {
+  font-family: var(--font-display);
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-top: 4px;
+}
+.trim.dark .trim-teaser-count { color: rgba(255,255,255,0.55); }
+
+.trim-actions {
+  display: flex; flex-direction: column;
+  gap: 10px;
+  margin-top: auto;
+}
+.trim-compare-link {
+  font-size: 13px;
+  padding: 10px 16px;
+  justify-content: center;
+}
+.trim.dark .trim-compare-link {
+  background: transparent;
+  color: #fff;
+  border-color: rgba(255,255,255,0.25);
+}
+.trim.dark .trim-compare-link:hover {
+  border-color: #fff;
+}
+
+/* CTA banner pod sekcí trimů — odkaz na /model/[slug]/vybavy */
+.trims-cta-row {
+  margin-top: 40px;
+  margin-bottom: 64px;
+}
+.trims-cta {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 24px;
+  padding: 22px 28px;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  text-decoration: none;
+  color: var(--ink);
+  transition: border-color .15s, transform .15s, box-shadow .15s;
+}
+.trims-cta:hover {
+  border-color: var(--ink);
+  transform: translateY(-2px);
+  box-shadow: 0 14px 28px -16px rgba(0,0,0,0.16);
+}
+.trims-cta-eyebrow {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 4px;
+}
+.trims-cta-title {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 18px;
+  letter-spacing: -0.01em;
+  margin-bottom: 4px;
+}
+.trims-cta-sub {
+  font-size: 13px;
+  color: var(--text-muted);
+}
+.trims-cta-arrow {
+  flex-shrink: 0;
+  width: 44px; height: 44px;
+  display: grid; place-items: center;
+  background: var(--accent);
+  color: #fff;
+  border-radius: 999px;
+  transition: transform .15s;
+}
+.trims-cta:hover .trims-cta-arrow { transform: translateX(4px); }
+
 .trim-features {
   margin: 0 0 28px;
   display: flex; flex-direction: column;
@@ -2775,6 +3000,27 @@ button.thumb-more {
   color: var(--accent);
   margin-top: 8px;
   font-variant-numeric: tabular-nums;
+  display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap;
+}
+.scard .price-before {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-muted);
+  text-decoration: line-through;
+  text-decoration-thickness: 1.4px;
+}
+
+/* Tag promo source (např. "JARNÍ AKCE") vedle savings v sklad detailu */
+.promo-source-tag {
+  background: var(--accent);
+  color: #fff;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 11px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
 }
 
 /* Servis + E-shop split */

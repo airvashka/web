@@ -109,7 +109,7 @@ const brands = v.brand ? await directusGet<Brand>('brands', { filter: { id: { _e
 const models = v.model ? await directusGet<any>('models', {
   filter: { id: { _eq: Number(v.model) } },
   limit: 1,
-  fields: ['*', 'technical_data'],
+  fields: ['*', 'technical_data', 'promo_active', 'promo_label', 'promo_discount_amount', 'promo_valid_to', 'promo_description'],
 }) : [];
 const trims = v.trim_level ? await directusGet<TrimLevel>('trim_levels', { filter: { id: { _eq: Number(v.trim_level) } }, limit: 1 }) : [];
 const modelYears = v.model_year ? await directusGet<any>('model_years', {
@@ -131,9 +131,42 @@ const heroPhoto = photoIds[0] ?? null;
 const thumbIds = photoIds.slice(1, 5);
 const extraPhotos = Math.max(0, photoIds.length - 5);
 
-// Cena
-const hasPromo = !!(v.promo_price && v.list_price && v.promo_price < v.list_price);
-const finalPrice = v.promo_price ?? v.list_price;
+// Akce na modelu (manuální, z admin)
+const todayDate = new Date().toISOString().slice(0, 10);
+const modelPromoActive: boolean = !!(model as any)?.promo_active
+  && ((model as any)?.promo_label || (model as any)?.promo_discount_amount)
+  && (!(model as any)?.promo_valid_to || String((model as any)?.promo_valid_to) >= todayDate);
+const modelPromoLabel: string = ((model as any)?.promo_label ?? '').toString().trim();
+const modelPromoDiscount: number = Number((model as any)?.promo_discount_amount ?? 0) || 0;
+const modelPromoValidTo: string | null = (model as any)?.promo_valid_to ?? null;
+
+// Cena — priorita:
+//   1) stock.promo_price (specifická akce na konkrétním voze)
+//   2) stock.list_price − model.promo_discount_amount (modelová akce)
+//   3) stock.list_price (běžná cena)
+const baseListPrice = v.list_price;
+const stockPromoApplied = v.promo_price ?? null;
+const modelDiscountApplied = modelPromoActive && modelPromoDiscount > 0 && baseListPrice
+  ? baseListPrice - modelPromoDiscount
+  : null;
+
+let finalPrice: number | null = baseListPrice ?? null;
+let priceBeforePromo: number | null = null;
+let savings: number = 0;
+let promoSource: 'stock' | 'model' | null = null;
+
+if (stockPromoApplied && baseListPrice && stockPromoApplied < baseListPrice) {
+  finalPrice = stockPromoApplied;
+  priceBeforePromo = baseListPrice;
+  savings = baseListPrice - stockPromoApplied;
+  promoSource = 'stock';
+} else if (modelDiscountApplied && baseListPrice) {
+  finalPrice = modelDiscountApplied;
+  priceBeforePromo = baseListPrice;
+  savings = modelPromoDiscount;
+  promoSource = 'model';
+}
+const hasPromo = priceBeforePromo !== null && savings > 0;
 
 // Financování "od X Kč" — auto výpočet nejnižší možné splátky:
 // 60% akontace, 72 měsíců, 4.9% p.a.
@@ -283,7 +316,14 @@ const description = (v.description ?? '').split(/\n\s*\n/).filter(Boolean);
           <button class="gallery-main" type="button" data-gallery-trigger data-index="0" aria-label="Otevřít galerii">
             <div class="badges">
               <span class={`badge ${statusBadge.cls}`}>{statusBadge.label}</span>
-              {v.highlighted && <span class="badge accent">{highlightLabel}</span>}
+              {/* Model promo má prioritu (např. "JARNÍ AKCE -50K") */}
+              {modelPromoActive && modelPromoLabel && (
+                <span class="badge accent">{modelPromoLabel}</span>
+              )}
+              {/* Stock highlight jen pokud není model promo nebo má jiný text */}
+              {v.highlighted && (!modelPromoActive || !modelPromoLabel) && (
+                <span class="badge accent">{highlightLabel}</span>
+              )}
               {year && <span class="badge outline">Model {year}</span>}
             </div>
             {photoIds.length > 0 && <div class="gallery-counter">01 / {String(photoIds.length).padStart(2, '0')}</div>}
@@ -367,10 +407,13 @@ const description = (v.description ?? '').split(/\n\s*\n/).filter(Boolean);
             )}
             <span class="vat">vč. DPH</span>
           </div>
-          {hasPromo && v.list_price && (
+          {hasPromo && priceBeforePromo && (
             <div class="info-price-before">
-              <span class="strike">{v.list_price.toLocaleString('cs-CZ')} Kč</span>
-              <span class="save">Ušetříte {(v.list_price - (v.promo_price ?? 0)).toLocaleString('cs-CZ')} Kč</span>
+              <span class="strike">{priceBeforePromo.toLocaleString('cs-CZ')} Kč</span>
+              <span class="save">Ušetříte {savings.toLocaleString('cs-CZ')} Kč</span>
+              {promoSource === 'model' && modelPromoLabel && (
+                <span class="promo-source-tag">{modelPromoLabel}</span>
+              )}
             </div>
           )}
           {monthlyPayment && (

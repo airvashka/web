@@ -29,6 +29,7 @@ const stockVehicles = await directusGet<any>('stock_vehicles', {
     'color_code', 'color_category',
     'photos.directus_files_id',
     'model.id', 'model.name', 'model.slug',
+    'model.promo_active', 'model.promo_label', 'model.promo_discount_amount', 'model.promo_valid_to',
     'brand.id', 'brand.name', 'brand.slug',
     'trim_level.name',
     'model_year.year',
@@ -206,10 +207,18 @@ const articles = [
             const isNew = v.condition === 'new';
             const isHighlighted = v.highlighted;
             const customLabel = (v.highlight_label ?? '').toString().trim();
-            const pillLabel = isHighlighted
-              ? (customLabel || 'Novinka')
-              : isNew ? 'Nové' : 'Skladem';
-            const pillClass = isHighlighted || isNew ? ' is-new' : '';
+            const today = new Date().toISOString().slice(0, 10);
+            const modelPromoActive = !!v.model?.promo_active
+              && (v.model.promo_label || v.model.promo_discount_amount)
+              && (!v.model.promo_valid_to || String(v.model.promo_valid_to) >= today);
+            const modelPromoLabel = (v.model?.promo_label ?? '').toString().trim();
+            const modelPromoDiscount = Number(v.model?.promo_discount_amount ?? 0) || 0;
+            const pillLabel = modelPromoActive && modelPromoLabel
+              ? modelPromoLabel
+              : isHighlighted
+                ? (customLabel || 'Novinka')
+                : isNew ? 'Nové' : 'Skladem';
+            const pillClass = (modelPromoActive || isHighlighted || isNew) ? ' is-new' : '';
             const photoId = v.photos?.[0]?.directus_files_id;
             const trim = v.trim_level_snapshot?.name ?? '';
             const modelName = v.model?.name ?? 'Vůz';
@@ -217,7 +226,16 @@ const articles = [
             const carYear = v.model_year?.year ?? '';
             const conditionLabel = v.condition === 'new' ? 'Nové' : v.condition === 'demo' ? 'Předváděcí' : 'Ojeté';
             const fuelLabel = v.trim_level_snapshot?.fuel_label ?? '';
-            const price = v.promo_price ?? v.list_price;
+            // Cena s ohledem na model promo
+            const baseList = v.list_price;
+            let price = v.promo_price ?? baseList;
+            let priceBefore: number | null = null;
+            if (v.promo_price && baseList && v.promo_price < baseList) {
+              priceBefore = baseList;
+            } else if (modelPromoActive && modelPromoDiscount > 0 && baseList) {
+              price = baseList - modelPromoDiscount;
+              priceBefore = baseList;
+            }
             return (
               <a class="scard" href={`/sklad/${buildStockSlug(v, v.brand, v.model, v.trim_level ?? { name: trim })}`}>
                 <div class="pic">

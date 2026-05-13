@@ -37,6 +37,7 @@ const vehicles = await directusGet<VehicleListItem>('stock_vehicles', {
     'photos.directus_files_id',
     'brand.name', 'brand.slug',
     'model.name', 'model.slug', 'model.fuel_type',
+    'model.promo_active', 'model.promo_label', 'model.promo_discount_amount', 'model.promo_valid_to',
     'model_year.year',
     'trim_level.name',
   ],
@@ -141,16 +142,35 @@ const fmtKm = (n?: number | null) => (n === 0 || !n ? '0 km' : `${n.toLocaleStri
                 const isNew = v.condition === 'new';
                 const isHighlighted = v.highlighted;
                 const customLabel = ((v as any).highlight_label ?? '').toString().trim();
-                const pillLabel = isHighlighted
-                  ? (customLabel || 'Novinka')
-                  : isNew ? 'Nové' : 'Skladem';
-                const pillClass = isHighlighted || isNew ? ' is-new' : '';
+                // Akce na úrovni modelu
+                const today = new Date().toISOString().slice(0, 10);
+                const modelPromoActive = !!(v.model as any)?.promo_active
+                  && ((v.model as any)?.promo_label || (v.model as any)?.promo_discount_amount)
+                  && (!(v.model as any)?.promo_valid_to || String((v.model as any).promo_valid_to) >= today);
+                const modelPromoLabel = ((v.model as any)?.promo_label ?? '').toString().trim();
+                const modelPromoDiscount = Number((v.model as any)?.promo_discount_amount ?? 0) || 0;
+
+                const pillLabel = modelPromoActive && modelPromoLabel
+                  ? modelPromoLabel
+                  : isHighlighted
+                    ? (customLabel || 'Novinka')
+                    : isNew ? 'Nové' : 'Skladem';
+                const pillClass = (modelPromoActive || isHighlighted || isNew) ? ' is-new' : '';
                 const photoId = firstPhoto(v);
                 const trimName = v.trim_level?.name ?? (v.trim_level_snapshot as any)?.name ?? '';
                 const carYear = v.model_year?.year ?? '';
                 const conditionLabel = conditionLabels[v.condition ?? ''] ?? '';
                 const fuelLabel = fuelLabels[v.model?.fuel_type ?? ''] ?? '';
-                const price = v.promo_price ?? v.list_price;
+                // Cena: stock.promo > model promo > list
+                const baseList = v.list_price;
+                let displayPrice = v.promo_price ?? baseList;
+                let priceBefore: number | null = null;
+                if (v.promo_price && baseList && v.promo_price < baseList) {
+                  priceBefore = baseList;
+                } else if (modelPromoActive && modelPromoDiscount > 0 && baseList) {
+                  displayPrice = baseList - modelPromoDiscount;
+                  priceBefore = baseList;
+                }
                 return (
                   <a
                     class="scard"
@@ -173,7 +193,12 @@ const fmtKm = (n?: number | null) => (n === 0 || !n ? '0 km' : `${n.toLocaleStri
                         <span class="dot">{fmtKm(v.km)}</span>
                         {conditionLabel && <span class="dot">{conditionLabel}</span>}
                       </div>
-                      <div class="price">{fmtPrice(price)}</div>
+                      <div class="price">
+                        {fmtPrice(displayPrice)}
+                        {priceBefore && (
+                          <span class="price-before">{fmtPrice(priceBefore)}</span>
+                        )}
+                      </div>
                     </div>
                   </a>
                 );
