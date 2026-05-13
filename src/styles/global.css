@@ -1472,8 +1472,16 @@ input, textarea, select { font: inherit; }
 
 .tech-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
   gap: 20px;
+}
+@media (min-width: 1100px) {
+  /* Při 4 a méně položkách udržuj 4-col layout; při více se auto-fit zalomí na další řádek */
+  .tech-grid { grid-template-columns: repeat(4, 1fr); }
+  .tech-grid:has(.tech-card:nth-child(5)):not(:has(.tech-card:nth-child(9))) {
+    /* 5–8 položek → 4 kol, 2 řádky */
+    grid-template-columns: repeat(4, 1fr);
+  }
 }
 .tech-card {
   background: #fff;

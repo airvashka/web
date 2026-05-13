@@ -176,9 +176,11 @@ const STAT_SETS: Record<string, StatDef[]> = {
 };
 const statsForFuel = STAT_SETS[fuelKey] ?? STAT_SETS.petrol;
 
-// ===== PRIMARY: admin-editovatelné latestYear.hero_stats; FALLBACK: auto-extract =====
+// ===== Priorita: models.hero_stats > model_years.hero_stats (legacy) > auto-extract =====
 type AdminStat = { label?: string; value?: string };
-const adminHeroStats: AdminStat[] = Array.isArray((latestYear as any)?.hero_stats) ? (latestYear as any).hero_stats : [];
+const modelHeroStats: AdminStat[] = Array.isArray((rawModel as any)?.hero_stats) ? (rawModel as any).hero_stats : [];
+const yearHeroStats: AdminStat[] = Array.isArray((latestYear as any)?.hero_stats) ? (latestYear as any).hero_stats : [];
+const adminHeroStats: AdminStat[] = modelHeroStats.length > 0 ? modelHeroStats : yearHeroStats;
 let heroStats: Array<{ lab: string; val: string }> = [];
 
 if (adminHeroStats.length > 0) {
@@ -518,12 +520,12 @@ const introCopy = (rawModel.description ?? '').split(/\n\s*\n/).filter(Boolean);
     </section>
   )}
 
-  <!-- ===== TECH GRID — z model.highlights nebo fallback z trim features ===== -->
+  <!-- ===== TECH GRID — z model.highlights, nebo fallback z trim features ===== -->
   {(() => {
     const modelHighlights = Array.isArray((rawModel as any).highlights) ? (rawModel as any).highlights : [];
     const hasHighlights = modelHighlights.length > 0;
-    const fallbackFromTrim = (trims[0]?.features ?? []).slice(0, 4).map((f) => ({ title: f, subtitle: 'Součást základní výbavy', photo: null }));
-    const tech = hasHighlights ? modelHighlights.slice(0, 4) : fallbackFromTrim;
+    const fallbackFromTrim = (trims[0]?.features ?? []).slice(0, 4).map((f) => ({ title: f, subtitle: 'Součást základní výbavy', photo: null, photo_file: null }));
+    const tech = hasHighlights ? modelHighlights : fallbackFromTrim; // bez limitu, admin si volí kolik
     if (tech.length === 0) return null;
     return (
       <section class="section" id="technologie">
@@ -534,7 +536,7 @@ const introCopy = (rawModel.description ?? '').split(/\n\s*\n/).filter(Boolean);
             {tech.map((h: any) => (
               <div class="tech-card">
                 <div class="pic">
-                  {/* TODO foto: až bude h.photo M2O na directus_files, vykreslit přes DirectusImage */}
+                  {h.photo_file && <DirectusImage src={h.photo_file} alt={h.title ?? ''} aspectRatio="4/3" widths={[400, 800]} />}
                 </div>
                 <div class="tech-card-body">
                   <div class="t">{h.title ?? h.t ?? ''}</div>
