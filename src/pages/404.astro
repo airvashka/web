@@ -2,16 +2,177 @@
 import BaseLayout from '@layouts/BaseLayout.astro';
 ---
 
-<BaseLayout title="Stránka nenalezena" description="Hledaná stránka neexistuje. Zkuste se vrátit na úvodní stránku.">
-  <section class="container" style="padding-block: clamp(80px, 12vw, 160px); text-align: center;">
-    <p class="eyebrow eyebrow-accent">404</p>
-    <h1 style="margin-block: 12px 16px;">Stránka neexistuje</h1>
-    <p class="lead" style="margin-inline: auto; max-width: 50ch;">
-      Adresa kterou hledáte se možná přesunula nebo byla smazána.
-    </p>
-    <div style="margin-top: 28px; display: inline-flex; gap: 12px; flex-wrap: wrap; justify-content: center;">
-      <a href="/" class="btn btn--primary">Na úvod</a>
-      <a href="/sklad" class="btn btn--ghost">Skladové vozy</a>
+<BaseLayout
+  title="Stránka nenalezena (404)"
+  description="Stránka, kterou hledáte, neexistuje nebo se přesunula. Vraťte se na úvod nebo se podívejte na skladové vozy."
+>
+  <section class="err404">
+    <div class="container err404-inner">
+      <div class="err404-code">404</div>
+      <h1 class="err404-title">Tady cesta končí</h1>
+      <p class="err404-lead">
+        Stránka, kterou hledáte, neexistuje nebo se přesunula. Nezoufejte —
+        nejspíš najdete to, co potřebujete, na jedné z těchto stránek.
+      </p>
+
+      <div class="err404-suggestions">
+        <a class="err404-card" href="/">
+          <div class="err404-card-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+          </div>
+          <div class="err404-card-body">
+            <div class="err404-card-title">Úvodní stránka</div>
+            <div class="err404-card-sub">Vše začíná zde — značky, sklad, kontakt.</div>
+          </div>
+        </a>
+
+        <a class="err404-card" href="/sklad">
+          <div class="err404-card-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 17h14M5 17v3M19 17v3M5 17l-1.5-5.5h17L19 17M3.5 11.5L5 7h14l1.5 4.5"/><circle cx="7.5" cy="14.5" r="1"/><circle cx="16.5" cy="14.5" r="1"/></svg>
+          </div>
+          <div class="err404-card-body">
+            <div class="err404-card-title">Skladové vozy</div>
+            <div class="err404-card-sub">60+ vozů KGM, OMODA & JAECOO, FARIZON skladem.</div>
+          </div>
+        </a>
+
+        <a class="err404-card" href="/kgm">
+          <div class="err404-card-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v8M8 12h8"/></svg>
+          </div>
+          <div class="err404-card-body">
+            <div class="err404-card-title">Modely KGM</div>
+            <div class="err404-card-sub">Korando, Torres, Tivoli, Rexton, Musso Grand.</div>
+          </div>
+        </a>
+
+        <a class="err404-card" href="/omoda-jaecoo">
+          <div class="err404-card-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          </div>
+          <div class="err404-card-body">
+            <div class="err404-card-title">Modely OMODA & JAECOO</div>
+            <div class="err404-card-sub">Omoda 5, Omoda 9, Jaecoo 5, Jaecoo 7.</div>
+          </div>
+        </a>
+
+        <a class="err404-card" href="/servis">
+          <div class="err404-card-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+          </div>
+          <div class="err404-card-body">
+            <div class="err404-card-title">Servis</div>
+            <div class="err404-card-sub">Autorizovaný servis pro 5 značek v Praze-Ďáblicích.</div>
+          </div>
+        </a>
+
+        <a class="err404-card" href="/kontakt">
+          <div class="err404-card-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.86 19.86 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.86 19.86 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+          </div>
+          <div class="err404-card-body">
+            <div class="err404-card-title">Kontakt</div>
+            <div class="err404-card-sub">+420 771 235 458 · Ďáblická 553/2, Praha 8.</div>
+          </div>
+        </a>
+      </div>
+
+      <div class="err404-back">
+        <a href="javascript:history.back()">← Zpět</a>
+      </div>
     </div>
   </section>
 </BaseLayout>
+
+<style>
+  .err404 {
+    padding: clamp(60px, 10vw, 120px) 0;
+    background: linear-gradient(180deg, var(--bg-soft, #F3F2EE) 0%, transparent 100%);
+  }
+  .err404-inner {
+    max-width: 900px;
+    text-align: center;
+  }
+  .err404-code {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: clamp(80px, 18vw, 160px);
+    line-height: 0.9;
+    color: var(--accent, #F25C1B);
+    letter-spacing: -0.04em;
+    margin-bottom: 18px;
+    user-select: none;
+  }
+  .err404-title {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: clamp(28px, 4vw, 44px);
+    letter-spacing: -0.02em;
+    margin: 0 0 18px;
+    color: var(--ink, #1A1A1F);
+  }
+  .err404-lead {
+    margin: 0 auto 44px;
+    max-width: 56ch;
+    color: var(--text-muted, #6B6B72);
+    font-size: clamp(15px, 1.8vw, 17px);
+    line-height: 1.6;
+  }
+  .err404-suggestions {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 14px;
+    margin-bottom: 48px;
+    text-align: left;
+  }
+  .err404-card {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 18px 22px;
+    background: #fff;
+    border: 1px solid var(--line, #D9D7D2);
+    border-radius: 14px;
+    text-decoration: none;
+    color: var(--ink);
+    transition: border-color .15s, transform .15s, box-shadow .15s;
+  }
+  .err404-card:hover {
+    border-color: var(--ink);
+    transform: translateY(-2px);
+    box-shadow: 0 14px 28px -16px rgba(0,0,0,0.16);
+  }
+  .err404-card-icon {
+    flex-shrink: 0;
+    width: 44px; height: 44px;
+    border-radius: 12px;
+    background: var(--bg-cream, #FAF8F3);
+    display: grid; place-items: center;
+    color: var(--accent, #F25C1B);
+  }
+  .err404-card-body { flex: 1; min-width: 0; }
+  .err404-card-title {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 15.5px;
+    letter-spacing: -0.005em;
+    margin-bottom: 4px;
+  }
+  .err404-card-sub {
+    font-size: 13px;
+    color: var(--text-muted);
+    line-height: 1.45;
+  }
+  .err404-back {
+    font-family: var(--font-display);
+    font-size: 14px;
+  }
+  .err404-back a {
+    color: var(--text-muted);
+    text-decoration: none;
+    border-bottom: 1px dashed var(--line-2, #B5B3AE);
+    padding-bottom: 2px;
+    transition: color .15s, border-color .15s;
+  }
+  .err404-back a:hover { color: var(--ink); border-bottom-color: var(--ink); }
+</style>

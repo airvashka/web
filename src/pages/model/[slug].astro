@@ -3,9 +3,11 @@ import BaseLayout from '@layouts/BaseLayout.astro';
 import DirectusImage from '@components/DirectusImage.astro';
 import VideoStrip from '@components/VideoStrip.astro';
 import Breadcrumbs from '@components/Breadcrumbs.astro';
-import { directusGet } from '@lib/directus';
+import JsonLd from '@components/JsonLd.astro';
+import { directusGet, directusAsset } from '@lib/directus';
 import { buildStockSlug } from '@lib/stockSlug';
 import { getGroupedFeatures, countFeatures } from '@lib/features';
+import { modelSchema } from '@lib/schemas';
 import type { Brand, Model, ModelYear, TrimLevel } from '@lib/types';
 
 /* ============================================================
@@ -404,6 +406,14 @@ if (promoActive && promoDescription) {
   title={`${brand.name} ${rawModel.name}`}
   description={rawModel.tagline ?? `${brand.name} ${rawModel.name} u SFR Motor — autorizovaný dealer v Praze-Ďáblicích.`}
 >
+  <JsonLd data={modelSchema({
+    url: `https://sfr-motor.cz${Astro.url.pathname}`,
+    brand: brand.name,
+    name: rawModel.name,
+    description: rawModel.tagline ?? (rawModel.description ?? '').slice(0, 300),
+    image: rawModel.hero_image ? directusAsset(rawModel.hero_image, { width: 1200, format: 'jpg', quality: 85 }) : null,
+    priceFromCzk: (trims[0]?.promo_price ?? trims[0]?.list_price ?? null) as number | null,
+  })} />
   <Breadcrumbs items={[
     { label: brand.name, href: `/${brand.slug}` },
     { label: rawModel.name },
@@ -412,7 +422,7 @@ if (promoActive && promoDescription) {
   <!-- ===== MODEL HERO (dark, full-bleed) ===== -->
   <section class="mhero" data-screen-label="01 Hero">
     <div class="mhero-bg">
-      {rawModel.hero_image && <DirectusImage src={rawModel.hero_image} alt={`${brand.name} ${rawModel.name}`} aspectRatio="auto" />}
+      {rawModel.hero_image && <DirectusImage src={rawModel.hero_image} alt={`${brand.name} ${rawModel.name}`} aspectRatio="auto" loading="eager" fetchpriority="high" widths={[1200, 1920, 2400]} />}
     </div>
     <div class="container mhero-inner">
       <div class="mhero-eyebrow">

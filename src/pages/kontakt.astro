@@ -1,7 +1,9 @@
 ---
 import BaseLayout from '@layouts/BaseLayout.astro';
 import Breadcrumbs from '@components/Breadcrumbs.astro';
+import JsonLd from '@components/JsonLd.astro';
 import { directusGet } from '@lib/directus';
+import { autoDealerSchema } from '@lib/schemas';
 import type { Branch, Employee } from '@lib/types';
 
 // KONTAKT — 1:1 podle _design-draft/kontakt.jsx
@@ -44,6 +46,7 @@ const mapEmbedUrl = 'https://maps.google.com/maps?q=%C4%8Eablicka+553%2F2%2C+182
 ---
 
 <BaseLayout title="Kontakt" description="Kontaktujte SFR Motor — autorizovaný dealer v Praze-Ďáblicích. Prodej, servis, doplňkové služby.">
+  <JsonLd data={autoDealerSchema()} />
   <Breadcrumbs items={[{ label: 'Kontakt' }]} />
   <section class="phero" data-screen-label="01 Hero">
     <div class="container">

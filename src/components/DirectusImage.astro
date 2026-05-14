@@ -4,13 +4,16 @@
  *
  * Použití:
  *   <DirectusImage src={model.hero_image} alt="Korando" />
+ *   <DirectusImage src={...} alt="..." loading="eager" fetchpriority="high" />
  *
- * Vygeneruje <img> s:
- *  • srcset (400w, 800w, 1600w) pro responsive obrázky
- *  • WebP formátem (lehčí o ~40 % proti JPG)
- *  • lazy loading
- *  • async decoding
- *  • Directus transforms — provádí se on-demand na backendu
+ * Vygeneruje <picture> s:
+ *  • AVIF formátem (nejlepší komprese, ~50 % oproti JPG)
+ *  • WebP fallback (širší podpora, ~40 % oproti JPG)
+ *  • JPG fallback pro very old browsers
+ *  • srcset (responsive widths)
+ *  • lazy loading + async decoding
+ *  • fetchpriority hint pro hero fotky
+ *  • Directus transforms on-demand
  */
 import { directusAsset } from '@lib/directus';
 
@@ -22,6 +25,7 @@ interface Props {
   aspectRatio?: string;               // "16/10", "4/3", "1/1"
   fit?: 'cover' | 'contain';
   loading?: 'lazy' | 'eager';
+  fetchpriority?: 'high' | 'low' | 'auto';
   class?: string;
   fallbackGradient?: string;          // pokud src je null, ukáže gradient
 }
@@ -34,6 +38,7 @@ const {
   aspectRatio,
   fit = 'cover',
   loading = 'lazy',
+  fetchpriority,
   class: className = '',
   fallbackGradient,
 } = Astro.props;
@@ -43,26 +48,39 @@ if (aspectRatio) styleParts.push(`aspect-ratio: ${aspectRatio}`);
 if (fit) styleParts.push(`object-fit: ${fit}`);
 const style = styleParts.join('; ');
 
-// Pokud chybí Directus src, vykreslíme prázdný div s gradientem (nebo nic)
 const hasSrc = !!src;
+const mid = widths[Math.floor(widths.length / 2)];
 
-const mainSrc = hasSrc ? directusAsset(src!, { width: widths[Math.floor(widths.length / 2)], format: 'webp', quality: 80 }) : '';
-const srcset = hasSrc
-  ? widths.map(w => `${directusAsset(src!, { width: w, format: 'webp', quality: 80 })} ${w}w`).join(', ')
-  : '';
+// Helper: vygeneruje srcset pro daný formát
+function buildSrcset(format: 'avif' | 'webp' | 'jpg'): string {
+  if (!hasSrc) return '';
+  return widths
+    .map((w) => `${directusAsset(src!, { width: w, format, quality: format === 'avif' ? 70 : 80 })} ${w}w`)
+    .join(', ');
+}
+
+const avifSrcset = buildSrcset('avif');
+const webpSrcset = buildSrcset('webp');
+const jpgSrcset = buildSrcset('jpg');
+const fallbackSrc = hasSrc ? directusAsset(src!, { width: mid, format: 'jpg', quality: 80 }) : '';
 ---
 
 {hasSrc ? (
-  <img
-    src={mainSrc}
-    srcset={srcset}
-    sizes={sizes}
-    alt={alt}
-    loading={loading}
-    decoding="async"
-    class={className}
-    style={style}
-  />
+  <picture>
+    {avifSrcset && <source type="image/avif" srcset={avifSrcset} sizes={sizes} />}
+    {webpSrcset && <source type="image/webp" srcset={webpSrcset} sizes={sizes} />}
+    <img
+      src={fallbackSrc}
+      srcset={jpgSrcset}
+      sizes={sizes}
+      alt={alt}
+      loading={loading}
+      decoding="async"
+      fetchpriority={fetchpriority}
+      class={className}
+      style={style}
+    />
+  </picture>
 ) : (
   <div
     class={`directus-image-placeholder ${className}`}
@@ -73,6 +91,6 @@ const srcset = hasSrc
 )}
 
 <style>
-  img { display: block; width: 100%; height: auto; }
+  picture, img { display: block; width: 100%; height: auto; }
   .directus-image-placeholder { width: 100%; }
 </style>

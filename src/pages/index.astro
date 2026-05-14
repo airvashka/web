@@ -3,8 +3,10 @@ import BaseLayout from '@layouts/BaseLayout.astro';
 import DirectusImage from '@components/DirectusImage.astro';
 import VideoStrip from '@components/VideoStrip.astro';
 import InstagramStrip from '@components/InstagramStrip.astro';
+import JsonLd from '@components/JsonLd.astro';
 import { directusGet } from '@lib/directus';
 import { buildStockSlug } from '@lib/stockSlug';
+import { autoDealerSchema, websiteSchema } from '@lib/schemas';
 import type { Brand, StockVehicle, Model } from '@lib/types';
 
 /* ============================================================
@@ -94,13 +96,14 @@ const articles = [
   title="SFR Motor"
   description="SFR Motor — autorizovaný dealer KGM, OMODA & JAECOO a Farizon. Skladové vozy, servis pro všechny značky, prodej a doplňkové služby. Praha-Ďáblice."
 >
+  <JsonLd data={[autoDealerSchema(), websiteSchema()]} />
   <!-- ===== HERO =====
        Foto + texty z Directus Site Settings (admin → Site Settings).
        Fallback: /hero-home.jpg pokud nic v adminu. -->
   <section class="hhero" data-screen-label="01 Hero">
     <div class="hhero-bg">
       {heroImageId ? (
-        <DirectusImage src={heroImageId} alt="" aspectRatio="auto" widths={[1200, 2000, 2400]} loading="eager" />
+        <DirectusImage src={heroImageId} alt="" aspectRatio="auto" widths={[1200, 2000, 2400]} loading="eager" fetchpriority="high" />
       ) : (
         <img src="/hero-home.jpg" alt="" onerror="this.style.display='none'" />
       )}

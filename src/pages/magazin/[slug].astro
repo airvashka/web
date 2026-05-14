@@ -2,7 +2,9 @@
 import BaseLayout from '@layouts/BaseLayout.astro';
 import DirectusImage from '@components/DirectusImage.astro';
 import Breadcrumbs from '@components/Breadcrumbs.astro';
-import { directusGet } from '@lib/directus';
+import JsonLd from '@components/JsonLd.astro';
+import { directusGet, directusAsset } from '@lib/directus';
+import { articleSchema } from '@lib/schemas';
 import { marked } from 'marked';
 
 /* ============================================================
@@ -92,6 +94,15 @@ const catLabel = article.category ? (CATEGORY_LABELS[article.category] ?? articl
   description={article.excerpt ?? `${article.title} — magazín SFR Motor.`}
   ogImage={article.cover_image ? `${import.meta.env.PUBLIC_DIRECTUS_URL ?? ''}/assets/${article.cover_image}?width=1200&height=630&fit=cover` : undefined}
 >
+  <JsonLd data={articleSchema({
+    url: `https://sfr-motor.cz${Astro.url.pathname}`,
+    title: article.title,
+    description: article.excerpt,
+    image: article.cover_image ? directusAsset(article.cover_image, { width: 1200, format: 'jpg', quality: 85 }) : null,
+    datePublished: ((article as any).date_published ?? (article as any).date_created ?? new Date().toISOString()).toString(),
+    dateModified: ((article as any).date_updated ?? (article as any).date_published ?? new Date().toISOString()).toString(),
+    authorName: (article as any).author ?? 'SFR Motor',
+  })} />
   <Breadcrumbs items={[
     { label: 'Magazín', href: '/magazin' },
     { label: article.title },
@@ -123,7 +134,7 @@ const catLabel = article.category ? (CATEGORY_LABELS[article.category] ?? articl
     <div class="art-cover-wrap">
       <div class="container">
         <div class="art-cover">
-          <DirectusImage src={article.cover_image} alt={article.title} aspectRatio="16/9" widths={[1200, 1920]} loading="eager" />
+          <DirectusImage src={article.cover_image} alt={article.title} aspectRatio="16/9" widths={[1200, 1920]} loading="eager" fetchpriority="high" />
         </div>
       </div>
     </div>

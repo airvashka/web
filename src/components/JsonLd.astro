@@ -1,0 +1,17 @@
+---
+/**
+ * JsonLd — render structured data jako <script type="application/ld+json">.
+ *
+ * Použití:
+ *   <JsonLd data={{ "@context": "https://schema.org", "@type": "Organization", ... }} />
+ *
+ * Více objektů najednou:
+ *   <JsonLd data={[orgSchema, breadcrumbSchema]} />
+ */
+interface Props {
+  data: Record<string, any> | Array<Record<string, any>>;
+}
+const { data } = Astro.props;
+const json = JSON.stringify(data, null, 0);
+---
+<script type="application/ld+json" set:html={json}></script>

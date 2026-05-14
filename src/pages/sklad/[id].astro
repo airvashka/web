@@ -2,8 +2,10 @@
 import BaseLayout from '@layouts/BaseLayout.astro';
 import DirectusImage from '@components/DirectusImage.astro';
 import Breadcrumbs from '@components/Breadcrumbs.astro';
-import { directusGet } from '@lib/directus';
+import JsonLd from '@components/JsonLd.astro';
+import { directusGet, directusAsset } from '@lib/directus';
 import { getGroupedFeatures, CATEGORY_LABELS } from '@lib/features';
+import { vehicleSchema } from '@lib/schemas';
 import { buildStockSlug, parseStockId } from '@lib/stockSlug';
 import { tdToMap } from '@lib/technicalData';
 import type { Brand, Model, StockVehicle, TrimLevel, ModelYear } from '@lib/types';
@@ -301,6 +303,25 @@ const description = (v.description ?? '').split(/\n\s*\n/).filter(Boolean);
 ---
 
 <BaseLayout title={title || 'Skladový vůz'} description={`${title} — skladový vůz u SFR Motor Praha-Ďáblice.`}>
+  <JsonLd data={vehicleSchema({
+    url: `https://sfr-motor.cz${Astro.url.pathname}`,
+    brand: brand?.name ?? 'KGM',
+    model: model?.name ?? 'Vůz',
+    trim: trim?.name,
+    year: year ?? null,
+    vin: v.vin ?? null,
+    km: v.km ?? null,
+    condition: (v.condition ?? 'new') as 'new' | 'demo' | 'used',
+    fuelType: fuelLabel !== '—' ? fuelLabel : undefined,
+    transmission: transmissionLabel,
+    drivetrain: drivetrainLabel,
+    color: colorName,
+    priceCzk: finalPrice,
+    listPriceCzk: priceBeforePromo,
+    availability: (v.availability ?? 'in_stock') as 'in_stock' | 'on_the_way' | 'reserved' | 'sold',
+    photoUrls: photoIds.slice(0, 5).map((id) => directusAsset(id, { width: 1200, format: 'jpg', quality: 85 })),
+    description: (v.description ?? '').slice(0, 500) || undefined,
+  })} />
   <Breadcrumbs items={[
     { label: 'Skladové vozy', href: '/sklad' },
     ...(brand ? [{ label: brand.name, href: `/${brand.slug}` }] : []),
@@ -334,7 +355,7 @@ const description = (v.description ?? '').split(/\n\s*\n/).filter(Boolean);
               </a>
             )}
             {heroPhoto ? (
-              <DirectusImage src={heroPhoto} alt={title} aspectRatio="auto" widths={[800, 1600]} />
+              <DirectusImage src={heroPhoto} alt={title} aspectRatio="auto" widths={[800, 1600]} loading="eager" fetchpriority="high" />
             ) : (
               <div style="padding: 40px; text-align: center; color: var(--text-dim);">Foto bude doplněno</div>
             )}
