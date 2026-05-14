@@ -14,7 +14,9 @@
     "@astrojs/check": "^0.9.4",
     "@astrojs/sitemap": "^3.2.1",
     "astro": "^5.1.1",
+    "cheerio": "^1.2.0",
     "marked": "^14.1.4",
+    "playwright": "^1.60.0",
     "typescript": "^5.7.2"
   }
 }
