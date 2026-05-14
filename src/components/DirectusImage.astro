@@ -6,14 +6,16 @@
  *   <DirectusImage src={model.hero_image} alt="Korando" />
  *   <DirectusImage src={...} alt="..." loading="eager" fetchpriority="high" />
  *
- * Vygeneruje <picture> s:
- *  • AVIF formátem (nejlepší komprese, ~50 % oproti JPG)
- *  • WebP fallback (širší podpora, ~40 % oproti JPG)
- *  • JPG fallback pro very old browsers
- *  • srcset (responsive widths)
+ * Vygeneruje <img> s:
+ *  • WebP formátem (lehčí o ~40 % proti JPG)
+ *  • responsive srcset (3 widths)
  *  • lazy loading + async decoding
  *  • fetchpriority hint pro hero fotky
  *  • Directus transforms on-demand
+ *
+ * Pozn.: AVIF jsme zkusili ale Directus na Railway hobby instance je
+ * příliš pomalý na on-demand generování (5–10× pomalejší než WebP).
+ * WebP fallback na JPG je v praxi dost — WebP má podporu >97 % browserů.
  */
 import { directusAsset } from '@lib/directus';
 
@@ -51,36 +53,24 @@ const style = styleParts.join('; ');
 const hasSrc = !!src;
 const mid = widths[Math.floor(widths.length / 2)];
 
-// Helper: vygeneruje srcset pro daný formát
-function buildSrcset(format: 'avif' | 'webp' | 'jpg'): string {
-  if (!hasSrc) return '';
-  return widths
-    .map((w) => `${directusAsset(src!, { width: w, format, quality: format === 'avif' ? 70 : 80 })} ${w}w`)
-    .join(', ');
-}
-
-const avifSrcset = buildSrcset('avif');
-const webpSrcset = buildSrcset('webp');
-const jpgSrcset = buildSrcset('jpg');
-const fallbackSrc = hasSrc ? directusAsset(src!, { width: mid, format: 'jpg', quality: 80 }) : '';
+const mainSrc = hasSrc ? directusAsset(src!, { width: mid, format: 'webp', quality: 80 }) : '';
+const srcset = hasSrc
+  ? widths.map((w) => `${directusAsset(src!, { width: w, format: 'webp', quality: 80 })} ${w}w`).join(', ')
+  : '';
 ---
 
 {hasSrc ? (
-  <picture>
-    {avifSrcset && <source type="image/avif" srcset={avifSrcset} sizes={sizes} />}
-    {webpSrcset && <source type="image/webp" srcset={webpSrcset} sizes={sizes} />}
-    <img
-      src={fallbackSrc}
-      srcset={jpgSrcset}
-      sizes={sizes}
-      alt={alt}
-      loading={loading}
-      decoding="async"
-      fetchpriority={fetchpriority}
-      class={className}
-      style={style}
-    />
-  </picture>
+  <img
+    src={mainSrc}
+    srcset={srcset}
+    sizes={sizes}
+    alt={alt}
+    loading={loading}
+    decoding="async"
+    fetchpriority={fetchpriority}
+    class={className}
+    style={style}
+  />
 ) : (
   <div
     class={`directus-image-placeholder ${className}`}
@@ -91,6 +81,6 @@ const fallbackSrc = hasSrc ? directusAsset(src!, { width: mid, format: 'jpg', qu
 )}
 
 <style>
-  picture, img { display: block; width: 100%; height: auto; }
+  img { display: block; width: 100%; height: auto; }
   .directus-image-placeholder { width: 100%; }
 </style>
