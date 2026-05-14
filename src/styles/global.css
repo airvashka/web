@@ -31,6 +31,12 @@
 
 * { box-sizing: border-box; }
 html, body { margin: 0; padding: 0; }
+html { -webkit-text-size-adjust: 100%; overflow-x: hidden; }
+body { overflow-x: hidden; min-width: 0; }
+/* Globální image reset — zabrání tomu, aby fotky vystupovaly za viewport */
+img, svg, video, iframe { max-width: 100%; height: auto; display: block; }
+/* Tap target friendly buttons na mobilu */
+button { touch-action: manipulation; }
 body {
   font-family: var(--font-body);
   color: var(--text);
@@ -178,6 +184,112 @@ input, textarea, select { font: inherit; }
 }
 .nav-menu-toggle span::before { top: -6px; }
 .nav-menu-toggle span::after { top: 6px; }
+.nav-menu-toggle.is-open span { background: transparent; }
+.nav-menu-toggle.is-open span::before { top: 0; transform: rotate(45deg); }
+.nav-menu-toggle.is-open span::after { top: 0; transform: rotate(-45deg); }
+
+/* ===== Mobile drawer (vysunovací menu z hamburgeru) ===== */
+.mobile-drawer {
+  position: fixed;
+  inset: 0 0 0 auto;
+  width: min(380px, 88vw);
+  background: #fff;
+  z-index: 200;
+  transform: translateX(100%);
+  transition: transform .28s ease;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding-top: env(safe-area-inset-top);
+  padding-bottom: env(safe-area-inset-bottom);
+  box-shadow: -16px 0 40px -10px rgba(0,0,0,0.18);
+}
+.mobile-drawer.is-open { transform: translateX(0); }
+.mobile-drawer-head {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--line);
+}
+.mobile-drawer-logo img { height: 32px; width: auto; }
+.mobile-drawer-close {
+  width: 44px; height: 44px;
+  display: grid; place-items: center;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: #fff;
+  color: var(--ink);
+}
+.mobile-drawer-close:hover { background: var(--bg-soft); }
+.mobile-drawer-nav {
+  display: flex; flex-direction: column;
+  padding: 8px 0;
+}
+.mobile-drawer-link {
+  padding: 16px 24px;
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: 17px;
+  color: var(--ink);
+  text-decoration: none;
+  border-bottom: 1px solid var(--line);
+  display: flex; align-items: center; justify-content: space-between;
+  transition: background .15s, color .15s;
+  min-height: 56px;
+}
+.mobile-drawer-link::after {
+  content: "→";
+  opacity: 0.3;
+  font-size: 18px;
+  transition: opacity .15s, transform .15s;
+}
+.mobile-drawer-link:hover,
+.mobile-drawer-link:focus-visible { background: var(--bg-soft); }
+.mobile-drawer-link:hover::after { opacity: 0.8; transform: translateX(4px); }
+.mobile-drawer-link.is-active {
+  color: var(--accent);
+  background: rgba(242, 92, 27, 0.06);
+}
+.mobile-drawer-link.is-active::after { color: var(--accent); opacity: 1; }
+.mobile-drawer-cta {
+  padding: 20px 24px;
+  display: flex; flex-direction: column;
+  gap: 10px;
+}
+.mobile-drawer-cta .btn {
+  width: 100%;
+  justify-content: center;
+}
+.mobile-drawer-info {
+  margin-top: auto;
+  padding: 20px 24px;
+  border-top: 1px solid var(--line);
+  display: flex; flex-direction: column;
+  gap: 8px;
+}
+.mobile-drawer-info-item {
+  display: flex; align-items: center; gap: 10px;
+  font-size: 13px;
+  color: var(--text-muted);
+}
+.mobile-drawer-info-item svg { flex-shrink: 0; }
+
+/* Backdrop pod drawer */
+.mobile-drawer-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.4);
+  border: none;
+  padding: 0;
+  z-index: 190;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .28s ease;
+}
+.mobile-drawer-backdrop.is-visible {
+  opacity: 1;
+  pointer-events: auto;
+}
 
 /* ===== Breadcrumb ===== */
 .crumbs {
@@ -1529,7 +1641,7 @@ button.thumb-more {
 .subnav {
   position: sticky;
   top: 76px;
-  z-index: 40;
+  z-index: 45;
   background: #fff;
   border-bottom: 1px solid var(--line);
 }
@@ -1541,6 +1653,8 @@ button.thumb-more {
   height: 64px;
   overflow-x: auto;
   scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+  scroll-snap-type: x proximity;
 }
 .subnav-inner::-webkit-scrollbar { display: none; }
 .subnav-link {
@@ -3675,18 +3789,21 @@ button.thumb-more {
   background: #fff;
   border-top: 1px solid var(--line);
   box-shadow: 0 -2px 12px rgba(0,0,0,0.05);
+  padding-bottom: env(safe-area-inset-bottom);
 }
 .mbb__item {
   display: flex; flex-direction: column;
   align-items: center; justify-content: center;
   gap: 4px;
-  padding: 10px 8px;
+  padding: 12px 8px;
   font-family: var(--font-display);
   font-size: 11.5px;
   font-weight: 600;
   letter-spacing: 0.04em;
   color: var(--text);
   border-right: 1px solid var(--line);
+  min-height: 56px;
+  text-decoration: none;
 }
 .mbb__item:last-child { border-right: 0; }
 .mbb__item--accent { background: var(--accent); color: #fff; }
@@ -3718,36 +3835,41 @@ button.thumb-more {
   .nav-links { display: none; }
   .nav-cta { display: none; }
   .nav-menu-toggle { display: inline-flex; }
-  .hero { grid-template-columns: 1fr; gap: 32px; padding: 20px 0 40px; }
-  .info-title { font-size: 36px; }
-  .info-price .amount { font-size: 44px; }
-  .section { padding: 56px 0; }
-  .section-title { font-size: 32px; }
+  .hero { grid-template-columns: 1fr; gap: 24px; padding: 16px 0 32px; }
+  .info-title { font-size: 32px; }
+  .info-price .amount { font-size: 40px; }
+  .section { padding: 44px 0; }
+  .section.tight { padding: 28px 0; }
+  .section-title { font-size: 28px; }
   .section-head-row { flex-direction: column; align-items: flex-start; }
-  .about-grid { grid-template-columns: 1fr; gap: 40px; }
-  .equip-grid { grid-template-columns: 1fr 1fr; gap: 32px; }
+  .about-grid { grid-template-columns: 1fr; gap: 28px; }
+  .equip-grid { grid-template-columns: 1fr 1fr; gap: 24px; }
   .specs-grid { grid-template-columns: 1fr; gap: 0; }
-  .finance-grid { grid-template-columns: 1fr; }
-  .calc, .calc-summary { padding: 24px; }
+  .finance-grid { grid-template-columns: 1fr; gap: 16px; }
+  .calc, .calc-summary { padding: 20px; }
   .cars { grid-template-columns: 1fr; }
-  .contact-grid { grid-template-columns: 1fr; gap: 32px; }
-  .form-card { padding: 24px; }
+  .contact-grid { grid-template-columns: 1fr; gap: 24px; }
+  .form-card { padding: 20px; }
   .form-row { grid-template-columns: 1fr; }
-  .trust-inner { grid-template-columns: 1fr 1fr; gap: 20px; }
-  .footer-grid { grid-template-columns: 1fr 1fr; gap: 32px; }
+  .trust-inner { grid-template-columns: 1fr 1fr; gap: 16px; }
+  .footer-grid { grid-template-columns: 1fr 1fr; gap: 24px; }
   .footer-bottom { flex-direction: column; gap: 8px; }
-  .sticky-cta { left: 12px; right: 12px; transform: none; padding: 8px 8px 8px 18px; gap: 14px; }
-  .sticky-cta .name { font-size: 12px; }
+  /* Sticky CTA pryč na všech mobilech (kolize s MobileBottomBar) */
+  .sticky-cta { display: none; }
   .thumbs { grid-template-columns: repeat(4, 1fr); }
   .thumbs .thumb:nth-child(5) { display: none; }
   .spec-grid { grid-template-columns: 1fr 1fr; }
   .cta-row { grid-template-columns: 1fr; }
-  .mhero-inner { padding: 56px 0 220px; }
-  .mhero-stats-inner { grid-template-columns: 1fr 1fr; gap: 18px; }
+  .mhero-inner { padding: 40px 0 200px; }
+  .mhero-stats-inner { grid-template-columns: 1fr 1fr; gap: 14px; }
   .mhero-price, .mhero-stats .btn { grid-column: span 2; justify-self: stretch; }
   .subnav { top: 64px; }
-  .subnav-inner { justify-content: flex-start; padding: 0 var(--pad); }
-  .intro { grid-template-columns: 1fr; gap: 40px; }
+  .subnav-inner { justify-content: flex-start; padding: 0 var(--pad); gap: 0; }
+  .subnav-link { padding: 18px 14px; font-size: 13px; }
+  .subnav-sep { display: none; }
+  .intro { grid-template-columns: 1fr; gap: 28px; }
+  /* MobileBottomBar překryv — uvolnit prostor pro poslední sekci */
+  body { padding-bottom: calc(60px + env(safe-area-inset-bottom)); }
   .ext-grid,
   .ext-grid[data-count="3"],
   .ext-grid[data-count="4"],
@@ -3796,6 +3918,15 @@ button.thumb-more {
   .spec-grid { grid-template-columns: 1fr; }
   .sticky-cta { display: none; }
   .tech-grid { grid-template-columns: 1fr; }
+  /* Thumbs — víc dýchatelné na malých zařízeních */
+  .thumbs { grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  .thumbs .thumb:nth-child(4),
+  .thumbs .thumb:nth-child(5) { display: none; }
+  /* Info-meta-chips wrap lépe */
+  .info-meta-chips { gap: 6px; }
+  .info-meta-chips li { padding: 5px 10px; font-size: 12px; }
+  /* Container padding na úzké screen — méně marginu, víc obsahu */
+  :root { --pad: 16px; }
   .ext-grid,
   .ext-grid[data-count="3"],
   .ext-grid[data-count="4"],
