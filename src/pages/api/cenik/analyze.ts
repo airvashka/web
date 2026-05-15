@@ -12,6 +12,7 @@
  */
 import type { APIRoute } from 'astro';
 import Anthropic from '@anthropic-ai/sdk';
+import { jsonrepair } from 'jsonrepair';
 
 export const prerender = false;
 
@@ -255,17 +256,30 @@ Použij tool extract_pricelist a předej strukturovaná data. Vyplň co najdeš,
     }
 
     // Defenzivní: pokud Claude vrátí field jako JSON string místo objektu, parsuj
-    const ensureParsed = (v: any) => {
+    // Pokud standard JSON.parse selže (např. unescaped quotes), použij jsonrepair
+    debugInfo.parse_errors = [];
+    const ensureParsed = (v: any, fieldName?: string) => {
       if (typeof v === 'string') {
-        try { return JSON.parse(v); } catch { return v; }
+        try { return JSON.parse(v); } catch (e1) {
+          debugInfo.parse_errors.push(`${fieldName} JSON.parse: ${(e1 as Error).message.substring(0, 200)}`);
+          try {
+            const fixed = jsonrepair(v);
+            const parsed = JSON.parse(fixed);
+            debugInfo.parse_errors.push(`${fieldName} → jsonrepair succeeded`);
+            return parsed;
+          } catch (e2) {
+            debugInfo.parse_errors.push(`${fieldName} jsonrepair fail: ${(e2 as Error).message.substring(0, 200)}`);
+            return v;
+          }
+        }
       }
       return v;
     };
     if (extracted && typeof extracted === 'object') {
-      if ('trim_levels' in extracted) extracted.trim_levels = ensureParsed(extracted.trim_levels);
-      if ('option_packages' in extracted) extracted.option_packages = ensureParsed(extracted.option_packages);
-      if ('technical_data' in extracted) extracted.technical_data = ensureParsed(extracted.technical_data);
-      if ('detected' in extracted) extracted.detected = ensureParsed(extracted.detected);
+      if ('trim_levels' in extracted) extracted.trim_levels = ensureParsed(extracted.trim_levels, 'trim_levels');
+      if ('option_packages' in extracted) extracted.option_packages = ensureParsed(extracted.option_packages, 'option_packages');
+      if ('technical_data' in extracted) extracted.technical_data = ensureParsed(extracted.technical_data, 'technical_data');
+      if ('detected' in extracted) extracted.detected = ensureParsed(extracted.detected, 'detected');
     }
 
     // Po-parsing log
