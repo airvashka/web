@@ -140,16 +140,77 @@ ${context.brand ? `Brand: ${context.brand}` : ''}
 ${context.model ? `Model: ${context.model}` : ''}
 ${context.year ? `Modelový rok: ${context.year}` : ''}
 
-Vrať JSON v této struktuře (vyplň co najdeš, neexistující sekce nech prázdné):
-
-${RESPONSE_SCHEMA}`;
+Použij tool extract_pricelist a předej strukturovaná data. Vyplň co najdeš, neexistující sekce nech prázdné.`;
 
     const anthropic = new Anthropic({ apiKey: import.meta.env.ANTHROPIC_API_KEY });
 
+    // Tool use — vrátí strukturovaný objekt, ne text JSON (žádné parsing chyby)
+    const featureCategories = ['pohon', 'podvozek', 'bezpecnost', 'asistent', 'komfort', 'multimedia', 'exterier', 'ostatni'];
+    const featuresSchema: any = { type: 'object', properties: {} };
+    for (const cat of featureCategories) {
+      featuresSchema.properties[cat] = { type: 'array', items: { type: 'string' }, description: `Items v kategorii ${cat}. Pokud trim B má stejné jako trim A, použij ["viz A"]` };
+    }
+
+    const tools: any[] = [{
+      name: 'extract_pricelist',
+      description: 'Uloží extrahovaná data ze ceníku do strukturovaného formátu.',
+      input_schema: {
+        type: 'object',
+        properties: {
+          detected: {
+            type: 'object',
+            properties: {
+              has_trim_levels: { type: 'boolean' },
+              has_option_packages: { type: 'boolean' },
+              has_technical_data: { type: 'boolean' },
+              model_name_guess: { type: 'string', description: 'Detekovaný název modelu (např. "Korando" nebo "OMODA 9 SHS")' },
+              year_guess: { type: 'number', description: 'Detekovaný rok' },
+            },
+          },
+          trim_levels: {
+            type: 'array',
+            items: {
+              type: 'object',
+              properties: {
+                name: { type: 'string', description: 'Název trimu (např. "Style+", "PREMIUM")' },
+                list_price: { type: 'number', description: 'Cena v Kč (integer, např. 549900)' },
+                features: featuresSchema,
+              },
+              required: ['name'],
+            },
+          },
+          option_packages: {
+            type: 'array',
+            items: {
+              type: 'object',
+              properties: {
+                name: { type: 'string' },
+                features: { type: 'array', items: { type: 'string' } },
+                pricing_per_trim: {
+                  type: 'object',
+                  description: 'Klíče = trim names (lowercase), hodnoty = cena v Kč nebo "standard" nebo "unavailable"',
+                  additionalProperties: true,
+                },
+              },
+              required: ['name'],
+            },
+          },
+          technical_data: {
+            type: 'object',
+            description: 'Key-value technické údaje (motor, rozměry, atd.)',
+            additionalProperties: { type: 'string' },
+          },
+        },
+        required: ['trim_levels', 'option_packages', 'technical_data'],
+      },
+    }];
+
     const message = await anthropic.messages.create({
       model: 'claude-sonnet-4-6',
-      max_tokens: 64000,  // detailní ceníky jako Farizon/JAECOO mají >>32K tokens (i s dedupe)
+      max_tokens: 64000,
       system: SYSTEM_PROMPT,
+      tools,
+      tool_choice: { type: 'tool', name: 'extract_pricelist' },
       messages: [
         {
           role: 'user',
@@ -160,38 +221,19 @@ ${RESPONSE_SCHEMA}`;
         },
       ],
     }, {
-      headers: { 'anthropic-beta': 'output-128k-2025-02-19' },  // extended output (až 128K tokens)
+      headers: { 'anthropic-beta': 'output-128k-2025-02-19' },
     });
 
-    // Extract text response
-    const textBlock = message.content.find((b) => b.type === 'text');
-    if (!textBlock || textBlock.type !== 'text') {
-      return new Response(JSON.stringify({ error: 'AI nevrátila text response', raw: message }), { status: 502, headers: { 'Content-Type': 'application/json' } });
-    }
-
-    let extracted;
-    try {
-      // Robustní extrakce: najdi první { a poslední } v odpovědi
-      // Pokrývá ```json wrapper, leading whitespace, případně poznámky před/po.
-      const text = textBlock.text;
-      const startIdx = text.indexOf('{');
-      const endIdx = text.lastIndexOf('}');
-      if (startIdx < 0 || endIdx <= startIdx) {
-        throw new Error('No JSON object found in response');
-      }
-      const cleaned = text.substring(startIdx, endIdx + 1);
-      extracted = JSON.parse(cleaned);
-    } catch (e) {
+    // Extract tool_use block — guaranteed valid object
+    const toolUse = message.content.find((b) => b.type === 'tool_use');
+    if (!toolUse || toolUse.type !== 'tool_use') {
       return new Response(JSON.stringify({
-        error: 'AI nevrátila validní JSON',
-        raw_text: textBlock.text.substring(0, 8000),
-        parse_error: (e as Error).message,
+        error: 'AI nevrátila tool_use response',
+        raw: message,
         stop_reason: message.stop_reason,
-        hint: message.stop_reason === 'max_tokens'
-          ? 'Odpověď byla useknuta (max_tokens). Zkus menší PDF nebo split po sekci.'
-          : 'JSON parse selhal. Zkontroluj raw_text, jestli AI vrátila něco rozumného.',
       }), { status: 502, headers: { 'Content-Type': 'application/json' } });
     }
+    const extracted = toolUse.input as any;
 
     return new Response(JSON.stringify({
       ...extracted,
