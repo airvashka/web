@@ -34,6 +34,13 @@ FEATURES KATEGORIE: Při zařazování standardní výbavy do trim_levels.featur
 - exterier (Světla, kola, exteriérové prvky)
 - ostatni (Co se nevejde jinam)
 
+⚡ DEDUPLIKACE — DŮLEŽITÉ: Pokud má trim B v kategorii (např. "podvozek") **EXAKTNĚ stejné features jako trim A**, vrať pro tu kategorii jen jeden prvek: ["viz A"]. Příklad:
+  trim_levels: [
+    { "name": "SELECT", "features": { "podvozek": ["Brzdy ABS", "ESP", "..."] } },
+    { "name": "EXCLUSIVE", "features": { "podvozek": ["viz SELECT"] } }
+  ]
+Save logika to automaticky expanduje. Šetří to tisíce tokenů u modelů s mnoha trimy. Použij to vždy, když trim B kompletně dědí features kategorie z trim A.
+
 CENY:
 - list_price: integer v Kč, bez mezer (např. 549900, ne "549 900")
 - pricing_per_trim u option_packages: object kde klíč = trim name (lowercase: "style", "premium"), hodnota = number Kč | "standard" (pokud je v standardní výbavě toho trim) | "unavailable" (pokud paket není dostupný v tom trimu)
@@ -141,7 +148,7 @@ ${RESPONSE_SCHEMA}`;
 
     const message = await anthropic.messages.create({
       model: 'claude-sonnet-4-6',
-      max_tokens: 32000,  // detailní ceníky jako Farizon mají >>8K tokens výstupu
+      max_tokens: 64000,  // detailní ceníky jako Farizon/JAECOO mají >>32K tokens (i s dedupe)
       system: SYSTEM_PROMPT,
       messages: [
         {
