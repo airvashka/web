@@ -184,30 +184,9 @@ const navItems: Array<{ label: string; href: string; key: NonNullable<Props['act
 </script>
 
 <style is:global>
-  /* Smart hide-on-scroll header — funguje na všech obrazovkách.
-     is:global protože .subnav je v jiném souboru (model/[slug].astro).
-     Desktop: keep position sticky + transform.
-     Mobile (<=960): switch na position fixed + body padding (iOS Safari fix). */
-  .nav {
-    transition: transform 0.28s cubic-bezier(0.2, 0.7, 0.2, 1),
-                box-shadow 0.2s ease;
-    will-change: transform;
-  }
-  html.scrolled-up .nav,
-  html.scrolled-down .nav {
-    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
-  }
-  html.scrolled-down .nav {
-    transform: translateY(-100%);
-  }
-
-  /* Subnav zůstává sticky na své pozici. Když header zmizí, je nad ní 64px gap
-     (transparentní oblast nad subnavem). To je lepší než thrashing animace. */
-  /* Pokud chceš subnav vyplnit gap, můžeš přidat:
-     html.scrolled-down .subnav { box-shadow: 0 -64px 0 #fff; }
-     ale zatím nech jak je. */
-
-  /* Mobile only: position fixed (iOS Safari nespouští transform na sticky elements) */
+  /* Smart hide-on-scroll — pouze MOBILE (<=960px).
+     Desktop má dost prostoru, klasický sticky stačí.
+     Mobile: position fixed + transform (iOS Safari friendly). */
   @media (max-width: 960px) {
     .nav {
       position: fixed;
@@ -215,6 +194,16 @@ const navItems: Array<{ label: string; href: string; key: NonNullable<Props['act
       left: 0;
       right: 0;
       width: 100%;
+      transition: transform 0.28s cubic-bezier(0.2, 0.7, 0.2, 1),
+                  box-shadow 0.2s ease;
+      will-change: transform;
+    }
+    html.scrolled-up .nav,
+    html.scrolled-down .nav {
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+    }
+    html.scrolled-down .nav {
+      transform: translateY(-100%);
     }
     body {
       padding-top: 64px;
@@ -222,6 +211,6 @@ const navItems: Array<{ label: string; href: string; key: NonNullable<Props['act
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .nav, .subnav { transition: none !important; }
+    .nav { transition: none !important; }
   }
 </style>
