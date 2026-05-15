@@ -108,28 +108,24 @@ export const POST: APIRoute = async ({ request }) => {
       return new Response(JSON.stringify({ error: 'Neautorizováno — chybí nebo neplatný Directus token' }), { status: 401, headers: { 'Content-Type': 'application/json' } });
     }
 
-    const formData = await request.formData();
-    const pdf = formData.get('pdf');
-    const contextRaw = formData.get('context');
+    // JSON body s PDF jako base64 (FormData/multipart upload může být blokované Vercel security)
+    const body = await request.json().catch(() => null);
+    if (!body || typeof body !== 'object') {
+      return new Response(JSON.stringify({ error: 'Invalid JSON body' }), { status: 400, headers: { 'Content-Type': 'application/json' } });
+    }
+    const pdf_base64: string | undefined = (body as any).pdf_base64;
+    const context: { brand?: string; model?: string; year?: number } = (body as any).context ?? {};
 
-    if (!(pdf instanceof File)) {
-      return new Response(JSON.stringify({ error: 'Chybí pdf v form-data' }), { status: 400, headers: { 'Content-Type': 'application/json' } });
+    if (!pdf_base64 || typeof pdf_base64 !== 'string') {
+      return new Response(JSON.stringify({ error: 'Chybí pdf_base64 v JSON body' }), { status: 400, headers: { 'Content-Type': 'application/json' } });
     }
-    if (!pdf.name.toLowerCase().endsWith('.pdf') && pdf.type !== 'application/pdf') {
-      return new Response(JSON.stringify({ error: 'Soubor není PDF' }), { status: 400, headers: { 'Content-Type': 'application/json' } });
-    }
-    if (pdf.size > 30 * 1024 * 1024) {
+    // Base64 → binary size approx (base64 je ~33% větší)
+    const decodedSize = Math.floor(pdf_base64.length * 0.75);
+    if (decodedSize > 30 * 1024 * 1024) {
       return new Response(JSON.stringify({ error: 'PDF příliš velké (>30MB)' }), { status: 400, headers: { 'Content-Type': 'application/json' } });
     }
 
-    let context: { brand?: string; model?: string; year?: number } = {};
-    if (typeof contextRaw === 'string') {
-      try { context = JSON.parse(contextRaw); } catch {}
-    }
-
-    // PDF → base64 (Claude API expects base64 string)
-    const ab = await pdf.arrayBuffer();
-    const base64 = Buffer.from(ab).toString('base64');
+    const base64 = pdf_base64;
 
     const userPrompt = `Extrahuj data z přiloženého ceníku.
 

@@ -311,17 +311,27 @@ $('analyze-btn').addEventListener('click', async () => {
   if (!yearId) { alert('Vyber nejdřív model_year (kontext pro AI)'); return; }
   $('analyze-error').classList.add('hidden');
   $('analyze-btn').disabled = true;
-  $('analyze-status').textContent = '⏳ AI parsing běží (~30-90s pro detailní ceníky)...';
+  $('analyze-status').textContent = '⏳ Připravuji PDF...';
 
-  const fd = new FormData();
-  fd.append('pdf', SELECTED_PDF);
-  fd.append('context', JSON.stringify({ brand, model, year, year_id: yearId }));
+  // Convert PDF to base64 — Vercel security někdy blokuje multipart, JSON projde
+  const arrayBuffer = await SELECTED_PDF.arrayBuffer();
+  const bytes = new Uint8Array(arrayBuffer);
+  let binary = '';
+  for (let i = 0; i < bytes.length; i++) binary += String.fromCharCode(bytes[i]);
+  const pdf_base64 = btoa(binary);
+  $('analyze-status').textContent = '⏳ AI parsing běží (~30-90s pro detailní ceníky)...';
 
   try {
     const r = await fetch('/api/cenik/analyze', {
       method: 'POST',
-      body: fd,
-      headers: { Authorization: `Bearer ${TOKEN}` },
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${TOKEN}`,
+      },
+      body: JSON.stringify({
+        pdf_base64,
+        context: { brand, model, year, year_id: yearId },
+      }),
     });
     const data = await r.json();
     if (!r.ok) {
