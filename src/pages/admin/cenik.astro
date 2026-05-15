@@ -176,6 +176,7 @@ const DIRECTUS_URL = import.meta.env.PUBLIC_DIRECTUS_URL || 'https://directus-pr
 console.log('[cenik] Script loaded. DIRECTUS_URL =', DIRECTUS_URL);
 
 let TOKEN = null;
+let REFRESH_TOKEN = null;
 let SELECTED_PDF = null;
 let CURRENT_DATA = null; // poslední AI výstup
 
@@ -222,7 +223,9 @@ $('login-btn').addEventListener('click', async () => {
   try {
     const r = await api('/auth/login', { method: 'POST', body: JSON.stringify({ email, password }) });
     TOKEN = r.data.access_token;
+    REFRESH_TOKEN = r.data.refresh_token;
     sessionStorage.setItem('directus_token', TOKEN);
+    sessionStorage.setItem('directus_refresh', REFRESH_TOKEN);
     $('login-panel').classList.add('hidden');
     $('context-panel').classList.remove('hidden');
     $('upload-panel').classList.remove('hidden');
@@ -233,24 +236,66 @@ $('login-btn').addEventListener('click', async () => {
   }
 });
 
-// Auto-login pokud token v session — ověř že stále platí
+// Auto-login pokud token v session — ověř že stále platí, případně refresh
 const savedToken = sessionStorage.getItem('directus_token');
+const savedRefresh = sessionStorage.getItem('directus_refresh');
 if (savedToken) {
   fetch(`${DIRECTUS_URL}/users/me`, { headers: { Authorization: `Bearer ${savedToken}` } })
-    .then((r) => {
+    .then(async (r) => {
       if (r.ok) {
         TOKEN = savedToken;
+        REFRESH_TOKEN = savedRefresh;
         $('login-panel').classList.add('hidden');
         $('context-panel').classList.remove('hidden');
         $('upload-panel').classList.remove('hidden');
         loadBrands();
+      } else if (savedRefresh) {
+        // Token expired, try refresh
+        REFRESH_TOKEN = savedRefresh;
+        const refreshed = await refreshAccessToken();
+        if (refreshed) {
+          $('login-panel').classList.add('hidden');
+          $('context-panel').classList.remove('hidden');
+          $('upload-panel').classList.remove('hidden');
+          loadBrands();
+        } else {
+          sessionStorage.removeItem('directus_token');
+          sessionStorage.removeItem('directus_refresh');
+        }
       } else {
-        // Expired — vyčistit
         sessionStorage.removeItem('directus_token');
-        console.log('[cenik] Saved token expired, cleared');
       }
     })
-    .catch(() => sessionStorage.removeItem('directus_token'));
+    .catch(() => {
+      sessionStorage.removeItem('directus_token');
+      sessionStorage.removeItem('directus_refresh');
+    });
+}
+
+/** Refresh access token using refresh_token. Returns true on success. */
+async function refreshAccessToken() {
+  if (!REFRESH_TOKEN) return false;
+  try {
+    const r = await fetch(`${DIRECTUS_URL}/auth/refresh`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ refresh_token: REFRESH_TOKEN, mode: 'json' }),
+    });
+    if (!r.ok) {
+      console.warn('[cenik] Refresh failed', r.status);
+      return false;
+    }
+    const data = await r.json();
+    TOKEN = data.data.access_token;
+    REFRESH_TOKEN = data.data.refresh_token;
+    sessionStorage.setItem('directus_token', TOKEN);
+    sessionStorage.setItem('directus_refresh', REFRESH_TOKEN);
+    console.log('[cenik] Token refreshed');
+    return true;
+  } catch (e) {
+    console.warn('[cenik] Refresh error', e);
+    return false;
+  }
 }
 
 // ─── BRAND → MODEL → YEAR ────────────────────────────────
@@ -591,12 +636,27 @@ $('save-btn').addEventListener('click', async () => {
   $('save-btn').textContent = '⏳ Ukládám...';
 
   try {
-    const r = await fetch('/api/cenik/save', {
+    // Pro-aktivně refresh token před save (může běžet dlouho po loginu)
+    await refreshAccessToken();
+
+    let r = await fetch('/api/cenik/save', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ model_year_id: yearId, directus_token: TOKEN, data }),
     });
-    const result = await r.json();
+    let result = await r.json();
+    // Pokud Directus odhalil token expired uvnitř save, zkus refresh + retry
+    if (!r.ok && (JSON.stringify(result).includes('TOKEN_EXPIRED') || r.status === 401)) {
+      const refreshed = await refreshAccessToken();
+      if (refreshed) {
+        r = await fetch('/api/cenik/save', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ model_year_id: yearId, directus_token: TOKEN, data }),
+        });
+        result = await r.json();
+      }
+    }
     showSaveResult(r.ok, result);
   } catch (e) {
     showSaveResult(false, { error: e.message });
