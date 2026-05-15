@@ -1,0 +1,82 @@
+---
+/**
+ * VariantBadge — small SVG badge pro Torres ICE / HEV / EVX.
+ *
+ * ICE = oranžová/hnědá s kapkou+plamenem (spalovací motor)
+ * HEV = teal s listem+kapkou (plný hybrid)
+ * EVX = zelená s baterií+bleskem (elektromobil)
+ *
+ * Použití:
+ *   <VariantBadge kind="ICE" size={48} />
+ *   <VariantBadge kind="HEV" />
+ *   <VariantBadge kind="EVX" size={32} />
+ */
+interface Props {
+  kind: 'ICE' | 'HEV' | 'EVX' | string | null | undefined;
+  size?: number;
+  ariaLabel?: string;
+}
+
+const { kind, size = 48, ariaLabel } = Astro.props;
+const k = String(kind ?? '').toUpperCase();
+
+const labels: Record<string, string> = {
+  ICE: 'Spalovací motor',
+  HEV: 'Hybrid',
+  EVX: 'Elektromobil',
+};
+const label = ariaLabel ?? labels[k] ?? '';
+---
+
+{k === 'ICE' && (
+  <svg viewBox="0 0 48 48" width={size} height={size} aria-label={label} role="img" class="variant-badge variant-badge--ice">
+    <defs>
+      <linearGradient id={`vbice-${size}`} x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0" stop-color="#F5D9B5"/>
+        <stop offset="1" stop-color="#E8B27A"/>
+      </linearGradient>
+    </defs>
+    <rect width="48" height="48" rx="12" fill={`url(#vbice-${size})`}/>
+    <path d="M24 11c4 5 7 9 7 13a7 7 0 0 1-14 0c0-4 3-8 7-13z" fill="#fff" opacity="0.55"/>
+    <path d="M24 11c4 5 7 9 7 13a7 7 0 0 1-14 0c0-4 3-8 7-13z" fill="none" stroke="#8B4A12" stroke-width="1.8" stroke-linejoin="round"/>
+    <path d="M24 19c2 2 3.2 3.4 3.2 5.4a3.2 3.2 0 0 1-6.4 0c0-2 1.2-3.4 3.2-5.4z" fill="#C1611B"/>
+    <rect x="19" y="33.5" width="10" height="2.5" rx="1.25" fill="#8B4A12"/>
+  </svg>
+)}
+
+{k === 'HEV' && (
+  <svg viewBox="0 0 48 48" width={size} height={size} aria-label={label} role="img" class="variant-badge variant-badge--hev">
+    <defs>
+      <linearGradient id={`vbhev-${size}`} x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0" stop-color="#C9E4DD"/>
+        <stop offset="1" stop-color="#7FB8C2"/>
+      </linearGradient>
+      <clipPath id={`vbhevclip-${size}`}>
+        <rect x="24" y="0" width="24" height="48"/>
+      </clipPath>
+    </defs>
+    <rect width="48" height="48" rx="12" fill={`url(#vbhev-${size})`}/>
+    <path d="M24 11c-5 0-9 4-9 9 0 4 2 7 5 8.5l4-4 4-4V11z" fill="#2F8F6A"/>
+    <path d="M24 31.5c-3-1.5-5-4.5-5-8" fill="none" stroke="#fff" stroke-width="1.6" stroke-linecap="round"/>
+    <g clip-path={`url(#vbhevclip-${size})`}>
+      <path d="M24 11c4 5 7 9 7 13a7 7 0 0 1-14 0c0-4 3-8 7-13z" fill="#2A6F8E"/>
+      <path d="M27 21c1.5 1.6 2.2 2.8 2.2 4.2" fill="none" stroke="#fff" stroke-width="1.4" stroke-linecap="round"/>
+    </g>
+    <line x1="24" y1="10" x2="24" y2="38" stroke="#fff" stroke-width="1.6" stroke-linecap="round"/>
+  </svg>
+)}
+
+{k === 'EVX' && (
+  <svg viewBox="0 0 48 48" width={size} height={size} aria-label={label} role="img" class="variant-badge variant-badge--evx">
+    <defs>
+      <linearGradient id={`vbevx-${size}`} x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0" stop-color="#C8EFD3"/>
+        <stop offset="1" stop-color="#7DCB99"/>
+      </linearGradient>
+    </defs>
+    <rect width="48" height="48" rx="12" fill={`url(#vbevx-${size})`}/>
+    <rect x="12" y="16" width="22" height="16" rx="3.5" fill="none" stroke="#1A6B3B" stroke-width="1.8"/>
+    <rect x="34" y="21" width="3" height="6" rx="1" fill="#1A6B3B"/>
+    <path d="M24.5 18.5l-5 6.5h3.5l-1.5 4.5 5-6.5h-3.5l1.5-4.5z" fill="#FFB100" stroke="#1A6B3B" stroke-width="1.2" stroke-linejoin="round"/>
+  </svg>
+)}

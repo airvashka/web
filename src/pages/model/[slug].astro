@@ -4,6 +4,8 @@ import DirectusImage from '@components/DirectusImage.astro';
 import VideoStrip from '@components/VideoStrip.astro';
 import Breadcrumbs from '@components/Breadcrumbs.astro';
 import JsonLd from '@components/JsonLd.astro';
+import HighlightsPanel from '@components/HighlightsPanel.astro';
+import VariantBadge from '@components/VariantBadge.astro';
 import { directusGet, directusAsset } from '@lib/directus';
 import { buildStockSlug } from '@lib/stockSlug';
 import { getGroupedFeatures, countFeatures } from '@lib/features';
@@ -41,6 +43,8 @@ const rawModels = await directusGet<ModelRaw>('models', {
   limit: 1,
   fields: [
     '*',
+    'highlights_panel',
+    'variant_badge_kind',
     'gallery.directus_files_id',
     'color_exterior.*',
     'color_interior.*',
@@ -557,8 +561,26 @@ if (promoActive && promoDescription) {
           ) : (
             <p>{rawModel.description ?? `${brand.name} ${rawModel.name} — model dostupný u SFR Motor.`}</p>
           )}
+          {(rawModel as any).variant_badge_kind && (() => {
+            const k = String((rawModel as any).variant_badge_kind).toUpperCase();
+            const variantLabels: Record<string, string> = { ICE: 'Spalovací motor', HEV: 'Plný hybrid', EVX: 'Elektromobil' };
+            return (
+              <div class="intro-variant-tag">
+                <VariantBadge kind={k} size={36} />
+                <span class="intro-variant-label">{variantLabels[k] ?? ''}</span>
+              </div>
+            );
+          })()}
         </div>
       </div>
+
+      {/* Lákadlový panel — render pod Představením (per model) */}
+      {Array.isArray((rawModel as any).highlights_panel) && (rawModel as any).highlights_panel.length > 0 && (
+        <HighlightsPanel
+          items={(rawModel as any).highlights_panel}
+          theme={String((rawModel as any).variant_badge_kind ?? '').toLowerCase()}
+        />
+      )}
     </div>
   </section>
 

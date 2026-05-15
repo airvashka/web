@@ -2660,6 +2660,50 @@ button.thumb-more {
 .fuel-tag.diesel { background: #5C5A52; color: #fff; }
 .fuel-tag.pickup { background: #8A6E50; color: #fff; }
 .fuel-tag.dodavka { background: #4A6F8E; color: #fff; }
+
+/* VariantBadge — top-right na model card hero */
+.variant-badge-pos {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 2;
+  display: block;
+  line-height: 0;
+  filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.18));
+}
+.variant-badge-pos svg { display: block; }
+
+/* Intro variant tag (na model detailu pod popisem) */
+.intro-variant-tag {
+  margin-top: 16px;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 14px 6px 6px;
+  background: var(--bg-soft, #fafaf7);
+  border: 1px solid var(--line, #e5e5e5);
+  border-radius: 999px;
+}
+.intro-variant-tag svg { display: block; }
+.intro-variant-label {
+  font-family: var(--font-display, inherit);
+  font-size: 13px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-muted, #6b7280);
+  font-weight: 600;
+}
+
+/* Info title badge — sklad detail next to model name */
+.info-title {
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+.info-title-badge { display: inline-block; line-height: 0; }
+.info-title-badge svg { display: block; }
+
 .model-body {
   padding: 28px 28px 24px;
   display: flex; flex-direction: column;
