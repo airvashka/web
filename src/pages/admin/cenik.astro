@@ -69,20 +69,46 @@ const DIRECTUS_URL = import.meta.env.PUBLIC_DIRECTUS_URL || 'https://directus-pr
       border-bottom: 1px solid #f0f0f0; border-right: 1px solid #e0e0e0;
       vertical-align: top; cursor: pointer;
     }
-    .matrix-table .feature-cell:hover { background: #f5f8ff; outline: 2px solid #1f6feb; outline-offset: -2px; }
-    .matrix-table .feature-cell .feat-code { color: #999; font-size: 11px; margin-top: 2px; }
-    .matrix-table .section-row td {
-      background: #1a1a2e !important; color: white !important; padding: 10px 14px;
-      font-weight: 800; font-size: 13px;
-      text-transform: uppercase; letter-spacing: 1px;
-      border-bottom: 2px solid #1a1a2e;
+    .matrix-table .feature-cell:hover { background: #eef6ff !important; outline: 2px solid #1f6feb; outline-offset: -2px; }
+    .matrix-table .feature-cell .feat-code { color: #888; font-size: 11px; margin-top: 2px; }
+
+    /* Section header rows — výrazná zelená hlavička sekce */
+    .matrix-table tr.section-row td,
+    .matrix-table tr.section-row > td.feature-cell {
+      background: linear-gradient(180deg, #2f9b5c 0%, #1e7b47 100%) !important;
+      color: #fff !important;
+      padding: 11px 14px !important;
+      font-weight: 800 !important;
+      font-size: 13px !important;
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+      border-bottom: 2px solid #145a32 !important;
+      border-top: 2px solid #145a32 !important;
+      position: static !important;  /* zruší sticky pro section header */
+      cursor: default !important;
+      outline: none !important;
     }
-    .matrix-table .section-row td::before { content: '▶ '; opacity: 0.6; margin-right: 4px; }
+    .matrix-table tr.section-row td::before {
+      content: '▶ ';
+      opacity: 0.75;
+      margin-right: 6px;
+    }
+    .matrix-table tr.section-row td:hover { outline: none !important; }
+
+    /* Zebra striping — aplikujeme jen na první (sticky) sloupec s názvy položek.
+       Color-coded cellí (S/cena/paket) si zachovají vlastní barvu. */
+    .matrix-table tr.feature-row.zebra-odd  > .feature-cell { background: #ffffff !important; }
+    .matrix-table tr.feature-row.zebra-even > .feature-cell { background: #eff6ff !important; }  /* světle modrá */
+    /* Default cell bg pro NEbarevné cells (kdyby kind nebyl) — kopie zebry */
+    .matrix-table tr.feature-row.zebra-odd  > td.cell:not([class*="cell-"]) { background: #ffffff; }
+    .matrix-table tr.feature-row.zebra-even > td.cell:not([class*="cell-"]) { background: #eff6ff; }
+
+    /* Cell base (kromě color-coded variant) */
     .matrix-table .cell {
-      text-align: center; padding: 6px 8px; border-bottom: 1px solid #f0f0f0;
+      text-align: center; padding: 6px 8px; border-bottom: 1px solid #e7eef5;
       font-weight: 500; cursor: pointer; min-width: 110px;
     }
-    .matrix-table .cell:hover { outline: 2px solid #1f6feb; outline-offset: -2px; }
+    .matrix-table .cell:hover { outline: 2px solid #1f6feb; outline-offset: -2px; z-index: 2; position: relative; }
     .cell-standard { background: #d6f5d6; color: #1e7b5f; }
     .cell-optional { background: #ffe8cc; color: #b27516; }
     .cell-package { background: #e8d6f5; color: #6f42c1; }
@@ -98,6 +124,26 @@ const DIRECTUS_URL = import.meta.env.PUBLIC_DIRECTUS_URL || 'https://directus-pr
     .save-bar button { padding: 11px 22px; font-size: 14px; }
 
     pre.raw-json { background: #1e1e2e; color: #cdd6f4; padding: 14px; border-radius: 6px; overflow: auto; font-size: 11px; max-height: 600px; }
+
+    /* Pakety editor */
+    .pkg-card { border: 1px solid #e0e0e0; padding: 14px 16px; }
+    .pkg-card[open] { border-color: #2f9b5c; }
+    .pkg-lab {
+      display: block; font-weight: 600; font-size: 12px;
+      letter-spacing: 0.04em; text-transform: uppercase;
+      color: #555; margin-bottom: 4px;
+    }
+    .pkg-card input[type="text"], .pkg-card textarea {
+      width: 100%; box-sizing: border-box;
+      padding: 7px 10px; font-size: 13px;
+      border: 1px solid #d0d0d5; border-radius: 4px;
+      font-family: inherit;
+    }
+    .pkg-card input[type="text"]:focus, .pkg-card textarea:focus {
+      border-color: #1f6feb; outline: 2px solid #1f6feb33;
+    }
+    .pkg-card textarea { resize: vertical; min-height: 70px; line-height: 1.5; }
+    .btn-link { background: none; border: none; color: #1f6feb; text-decoration: underline; cursor: pointer; padding: 0; font-size: inherit; }
   </style>
 </head>
 <body>
@@ -496,7 +542,8 @@ function renderMatrix(data) {
     tbody += `<tr class="section-row"><td colspan="${trims.length + 1}">${escapeHtml(section.name)}</td></tr>`;
     for (let rIdx = 0; rIdx < (section.rows ?? []).length; rIdx++) {
       const row = section.rows[rIdx];
-      tbody += `<tr data-section="${sIdx}" data-row="${rIdx}">`;
+      const zebra = rIdx % 2 === 0 ? 'zebra-odd' : 'zebra-even';
+      tbody += `<tr class="feature-row ${zebra}" data-section="${sIdx}" data-row="${rIdx}">`;
       tbody += `<td class="feature-cell">${escapeHtml(row.feature ?? '')}${row.code ? `<div class="feat-code">${escapeHtml(row.code)}</div>` : ''}</td>`;
       for (let i = 0; i < trims.length; i++) {
         const cell = row.cells?.[i] ?? '';
@@ -605,22 +652,145 @@ function renderMatrix(data) {
 
 function renderPackages(packages, trims) {
   const container = $('packages-container');
-  if (!packages.length) { container.innerHTML = '<p class="muted">Žádné pakety v ceníku.</p>'; return; }
+  if (!packages.length) {
+    container.innerHTML = '<p class="muted">Žádné pakety v ceníku. <button id="add-package-empty" class="btn-link">+ Přidat paket ručně</button></p>';
+    const addBtn = document.getElementById('add-package-empty');
+    if (addBtn) addBtn.addEventListener('click', () => { addPackage(); });
+    return;
+  }
+
   let html = '';
   for (let pi = 0; pi < packages.length; pi++) {
     const p = packages[pi];
-    html += `<details class="panel" style="margin-bottom:8px;" ${pi === 0 ? 'open' : ''}>
-      <summary style="cursor:pointer;font-weight:600;">${escapeHtml(p.name)} ${p.code ? `<code style="color:#999;">(${escapeHtml(p.code)})</code>` : ''}</summary>
-      <p class="muted" style="margin-top:8px;">Ceny per trim:</p>
-      <table style="width:100%;border-collapse:collapse;font-size:13px;margin-top:4px;">
-        <thead><tr>${trims.map((t) => `<th style="padding:6px;background:#f5f5f7;text-align:center;">${escapeHtml(t.name)}</th>`).join('')}</tr></thead>
-        <tbody><tr>${(p.cells ?? []).map((c) => `<td class="cell cell-${classifyCell(c)}">${escapeHtml(formatCell(c))}</td>`).join('')}</tr></tbody>
+    const contentsText = (p.contents ?? []).join('\n');
+    html += `
+    <details class="panel pkg-card" style="margin-bottom:10px;" ${pi === 0 ? 'open' : ''}>
+      <summary style="cursor:pointer;font-weight:700;display:flex;align-items:center;gap:10px;">
+        <span class="pkg-summary-name">${escapeHtml(p.name || '(bez názvu)')}</span>
+        ${p.code ? `<code style="color:#888;font-weight:400;">(${escapeHtml(p.code)})</code>` : ''}
+        <button class="pkg-remove" data-pkg-idx="${pi}" title="Smazat paket" style="margin-left:auto;background:#fee;color:#b43a2c;border:1px solid #f5b4b4;padding:3px 9px;font-size:12px;border-radius:4px;cursor:pointer;">Smazat</button>
+      </summary>
+
+      <div class="pkg-row" style="display:grid;grid-template-columns:1fr 200px;gap:10px;margin-top:10px;">
+        <div>
+          <label class="pkg-lab">Název paketu</label>
+          <input class="pkg-name-input" data-pkg-idx="${pi}" type="text" value="${escapeAttr(p.name ?? '')}" placeholder="např. CLUB+, BLACK, SAFETY" />
+        </div>
+        <div>
+          <label class="pkg-lab">Kód (volitelný)</label>
+          <input class="pkg-code-input" data-pkg-idx="${pi}" type="text" value="${escapeAttr(p.code ?? '')}" placeholder="např. CGK" />
+        </div>
+      </div>
+
+      <p class="pkg-lab" style="margin-top:14px;">Ceny per trim <span class="muted">(klikni do buňky pro úpravu — <strong>S</strong> = standardní, číslo = cena, <strong>–</strong> = nedostupné)</span></p>
+      <table class="pkg-pricing" data-pkg-idx="${pi}" style="width:100%;border-collapse:collapse;font-size:13px;margin-top:4px;">
+        <thead><tr>${trims.map((t) => `<th style="padding:7px;background:#f5f5f7;text-align:center;">${escapeHtml(t.name)}</th>`).join('')}</tr></thead>
+        <tbody><tr>${(p.cells ?? trims.map(() => '')).map((c, ci) => `<td class="cell cell-${classifyCell(c)}" data-pkg-cell-idx="${ci}" title="Klik pro úpravu">${escapeHtml(formatCell(c))}</td>`).join('')}</tr></tbody>
       </table>
-      <p class="muted" style="margin-top:12px;"><strong>Obsah:</strong></p>
-      <ul style="margin-top:4px;">${(p.contents ?? []).map((c) => `<li>${escapeHtml(c)}</li>`).join('')}</ul>
+
+      <label class="pkg-lab" style="margin-top:14px;">Obsah paketu <span class="muted">(jedna položka na řádek)</span></label>
+      <textarea class="pkg-contents-input" data-pkg-idx="${pi}" rows="${Math.max(3, (p.contents ?? []).length + 1)}" placeholder="Vyhřívaný volant\nVyhřívání předních sedadel\nVnitřní zpětné zrcátko s automatickým stmíváním">${escapeHtml(contentsText)}</textarea>
     </details>`;
   }
+
+  html += `<div style="margin-top:14px;"><button id="add-package-btn" style="background:#2f9b5c;color:white;padding:8px 18px;font-size:13px;border:none;border-radius:5px;cursor:pointer;">+ Přidat paket</button></div>`;
   container.innerHTML = html;
+
+  // Wire up event handlers — name/code/contents inputs
+  container.querySelectorAll('.pkg-name-input').forEach((inp) => {
+    inp.addEventListener('input', (e) => {
+      const i = parseInt(e.target.dataset.pkgIdx, 10);
+      CURRENT_DATA.packages[i].name = e.target.value;
+      const summary = e.target.closest('.pkg-card')?.querySelector('.pkg-summary-name');
+      if (summary) summary.textContent = e.target.value || '(bez názvu)';
+    });
+  });
+  container.querySelectorAll('.pkg-code-input').forEach((inp) => {
+    inp.addEventListener('input', (e) => {
+      const i = parseInt(e.target.dataset.pkgIdx, 10);
+      CURRENT_DATA.packages[i].code = e.target.value;
+    });
+  });
+  container.querySelectorAll('.pkg-contents-input').forEach((ta) => {
+    ta.addEventListener('input', (e) => {
+      const i = parseInt(e.target.dataset.pkgIdx, 10);
+      CURRENT_DATA.packages[i].contents = e.target.value
+        .split('\n')
+        .map((l) => l.trim())
+        .filter((l) => l.length > 0);
+    });
+  });
+
+  // Pricing cells inline edit
+  container.querySelectorAll('.pkg-pricing td.cell').forEach((td) => {
+    td.addEventListener('click', () => {
+      if (td.querySelector('input')) return;
+      const tbl = td.closest('.pkg-pricing');
+      const pi = parseInt(tbl.dataset.pkgIdx, 10);
+      const ci = parseInt(td.dataset.pkgCellIdx, 10);
+      if (!Array.isArray(CURRENT_DATA.packages[pi].cells)) CURRENT_DATA.packages[pi].cells = [];
+      const cur = CURRENT_DATA.packages[pi].cells[ci] ?? '';
+      const input = document.createElement('input');
+      input.type = 'text';
+      input.value = cur;
+      input.style.cssText = 'width:100%;box-sizing:border-box;border:2px solid #1f6feb;padding:4px 6px;font-size:13px;text-align:center;border-radius:3px;';
+      td.textContent = '';
+      td.appendChild(input);
+      input.focus(); input.select();
+      const commit = (save) => {
+        if (save) {
+          CURRENT_DATA.packages[pi].cells[ci] = input.value;
+        }
+        const v = CURRENT_DATA.packages[pi].cells[ci] ?? '';
+        td.textContent = formatCell(v);
+        td.className = `cell cell-${classifyCell(v)}`;
+      };
+      input.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') { e.preventDefault(); commit(true); }
+        else if (e.key === 'Escape') { e.preventDefault(); commit(false); }
+      });
+      input.addEventListener('blur', () => commit(true));
+    });
+  });
+
+  // Remove package
+  container.querySelectorAll('.pkg-remove').forEach((btn) => {
+    btn.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      const i = parseInt(e.target.dataset.pkgIdx, 10);
+      if (!confirm(`Smazat paket "${CURRENT_DATA.packages[i].name}"?`)) return;
+      CURRENT_DATA.packages.splice(i, 1);
+      renderPackages(CURRENT_DATA.packages, CURRENT_DATA.trims);
+      $('count-packages').textContent = CURRENT_DATA.packages.length;
+    });
+  });
+
+  // Add package
+  const addBtn = document.getElementById('add-package-btn');
+  if (addBtn) addBtn.addEventListener('click', () => { addPackage(); });
+}
+
+function addPackage() {
+  const newPkg = {
+    name: 'Nový paket',
+    code: '',
+    contents: [],
+    cells: CURRENT_DATA.trims.map(() => '-'),
+  };
+  CURRENT_DATA.packages.push(newPkg);
+  renderPackages(CURRENT_DATA.packages, CURRENT_DATA.trims);
+  $('count-packages').textContent = CURRENT_DATA.packages.length;
+  // Otevři poslední přidaný
+  const cards = document.querySelectorAll('#packages-container details');
+  if (cards.length) {
+    cards.forEach((c, i) => c.open = (i === cards.length - 1));
+    cards[cards.length - 1].scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+}
+
+function escapeAttr(s) {
+  return String(s ?? '').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
 }
 
 function renderColors(ext, int, trims) {
