@@ -67,14 +67,17 @@ const DIRECTUS_URL = import.meta.env.PUBLIC_DIRECTUS_URL || 'https://directus-pr
       position: sticky; left: 0; z-index: 5;
       background: white; padding: 8px 10px; min-width: 280px; max-width: 380px;
       border-bottom: 1px solid #f0f0f0; border-right: 1px solid #e0e0e0;
-      vertical-align: top;
+      vertical-align: top; cursor: pointer;
     }
+    .matrix-table .feature-cell:hover { background: #f5f8ff; outline: 2px solid #1f6feb; outline-offset: -2px; }
     .matrix-table .feature-cell .feat-code { color: #999; font-size: 11px; margin-top: 2px; }
     .matrix-table .section-row td {
-      position: sticky; left: 0;
-      background: #1a1a2e; color: white; padding: 8px 12px; font-weight: 700; font-size: 12px;
-      text-transform: uppercase; letter-spacing: 0.5px;
+      background: #1a1a2e !important; color: white !important; padding: 10px 14px;
+      font-weight: 800; font-size: 13px;
+      text-transform: uppercase; letter-spacing: 1px;
+      border-bottom: 2px solid #1a1a2e;
     }
+    .matrix-table .section-row td::before { content: '▶ '; opacity: 0.6; margin-right: 4px; }
     .matrix-table .cell {
       text-align: center; padding: 6px 8px; border-bottom: 1px solid #f0f0f0;
       font-weight: 500; cursor: pointer; min-width: 110px;
@@ -507,10 +510,10 @@ function renderMatrix(data) {
 
   table.innerHTML = thead + tbody;
 
-  // Inline edit — input swap on cell click (better UX than prompt)
+  // Inline edit cell (S/-/cena/paket)
   table.querySelectorAll('.cell').forEach((td) => {
     td.addEventListener('click', () => {
-      if (td.querySelector('input')) return; // už edituje
+      if (td.querySelector('input')) return;
       const tr = td.closest('tr');
       const sIdx = parseInt(tr.dataset.section, 10);
       const rIdx = parseInt(tr.dataset.row, 10);
@@ -521,7 +524,6 @@ function renderMatrix(data) {
       input.type = 'text';
       input.value = currentValue;
       input.style.cssText = 'width:100%;box-sizing:border-box;border:2px solid #1f6feb;padding:4px 6px;font-size:13px;text-align:center;border-radius:3px;';
-      input.setAttribute('list', 'cell-values');
       td.textContent = '';
       td.appendChild(input);
       input.focus();
@@ -541,6 +543,62 @@ function renderMatrix(data) {
         if (e.key === 'Enter') { e.preventDefault(); commit(true); }
         if (e.key === 'Escape') { e.preventDefault(); commit(false); }
       });
+    });
+  });
+
+  // Inline edit feature name (1. sloupec)
+  table.querySelectorAll('.feature-cell').forEach((td) => {
+    td.addEventListener('click', (e) => {
+      if (td.querySelector('input,textarea')) return;
+      const tr = td.closest('tr');
+      const sIdx = parseInt(tr.dataset.section, 10);
+      const rIdx = parseInt(tr.dataset.row, 10);
+      if (isNaN(sIdx) || isNaN(rIdx)) return; // section row, needitovat tady
+      const row = data.sections[sIdx].rows[rIdx];
+      const currentFeature = row.feature ?? '';
+      const currentCode = row.code ?? '';
+
+      const wrap = document.createElement('div');
+      wrap.style.cssText = 'display:flex;flex-direction:column;gap:4px;';
+      const inputName = document.createElement('textarea');
+      inputName.value = currentFeature;
+      inputName.rows = 2;
+      inputName.style.cssText = 'width:100%;box-sizing:border-box;border:2px solid #1f6feb;padding:4px 6px;font-size:13px;border-radius:3px;resize:vertical;font-family:inherit;';
+      const inputCode = document.createElement('input');
+      inputCode.type = 'text';
+      inputCode.value = currentCode;
+      inputCode.placeholder = 'kód (volitelně)';
+      inputCode.style.cssText = 'width:100%;box-sizing:border-box;border:1px solid #ccc;padding:3px 6px;font-size:11px;color:#666;border-radius:3px;';
+      wrap.appendChild(inputName);
+      wrap.appendChild(inputCode);
+      td.textContent = '';
+      td.appendChild(wrap);
+      inputName.focus();
+      inputName.select();
+
+      const commit = (save) => {
+        if (save) {
+          row.feature = inputName.value.trim();
+          row.code = inputCode.value.trim();
+        }
+        // re-render this cell
+        td.innerHTML = `${escapeHtml(row.feature ?? '')}${row.code ? `<div class="feat-code">${escapeHtml(row.code)}</div>` : ''}`;
+        if (save) $('raw-json').textContent = JSON.stringify(data, null, 2);
+      };
+      inputName.addEventListener('blur', (ev) => {
+        // commit jen pokud focus odešel mimo wrap úplně
+        setTimeout(() => { if (!td.contains(document.activeElement)) commit(true); }, 100);
+      });
+      inputCode.addEventListener('blur', () => {
+        setTimeout(() => { if (!td.contains(document.activeElement)) commit(true); }, 100);
+      });
+      [inputName, inputCode].forEach((el) => {
+        el.addEventListener('keydown', (ev) => {
+          if (ev.key === 'Enter' && !ev.shiftKey) { ev.preventDefault(); commit(true); }
+          if (ev.key === 'Escape') { ev.preventDefault(); commit(false); }
+        });
+      });
+      e.stopPropagation();
     });
   });
 }
