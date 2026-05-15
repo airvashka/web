@@ -233,7 +233,26 @@ Použij tool extract_pricelist a předej strukturovaná data. Vyplň co najdeš,
         stop_reason: message.stop_reason,
       }), { status: 502, headers: { 'Content-Type': 'application/json' } });
     }
-    const extracted = toolUse.input as any;
+    let extracted = toolUse.input as any;
+
+    // DEBUG info — vidíme reálnou strukturu
+    const debugInfo: any = {
+      extracted_type: typeof extracted,
+      extracted_is_string: typeof extracted === 'string',
+      extracted_string_sample: typeof extracted === 'string' ? extracted.substring(0, 300) : null,
+      trim_levels_type: typeof extracted?.trim_levels,
+      trim_levels_is_array: Array.isArray(extracted?.trim_levels),
+      trim_levels_sample: typeof extracted?.trim_levels === 'string'
+        ? extracted.trim_levels.substring(0, 500)
+        : Array.isArray(extracted?.trim_levels)
+          ? `Array(${extracted.trim_levels.length}) first item type: ${typeof extracted.trim_levels[0]}`
+          : null,
+    };
+
+    // Defenzivní: pokud Claude vrátí celý input jako string, parsuj
+    if (typeof extracted === 'string') {
+      try { extracted = JSON.parse(extracted); } catch {}
+    }
 
     // Defenzivní: pokud Claude vrátí field jako JSON string místo objektu, parsuj
     const ensureParsed = (v: any) => {
@@ -242,12 +261,17 @@ Použij tool extract_pricelist a předej strukturovaná data. Vyplň co najdeš,
       }
       return v;
     };
-    if (extracted) {
+    if (extracted && typeof extracted === 'object') {
       if ('trim_levels' in extracted) extracted.trim_levels = ensureParsed(extracted.trim_levels);
       if ('option_packages' in extracted) extracted.option_packages = ensureParsed(extracted.option_packages);
       if ('technical_data' in extracted) extracted.technical_data = ensureParsed(extracted.technical_data);
       if ('detected' in extracted) extracted.detected = ensureParsed(extracted.detected);
     }
+
+    // Po-parsing log
+    debugInfo.after_parse_trim_levels_type = typeof extracted?.trim_levels;
+    debugInfo.after_parse_trim_levels_is_array = Array.isArray(extracted?.trim_levels);
+    debugInfo.after_parse_trim_levels_count = Array.isArray(extracted?.trim_levels) ? extracted.trim_levels.length : 'N/A';
 
     return new Response(JSON.stringify({
       ...extracted,
@@ -256,6 +280,7 @@ Použij tool extract_pricelist a předej strukturovaná data. Vyplň co najdeš,
         model: message.model,
         stop_reason: message.stop_reason,
       },
+      __debug: debugInfo,
     }), { status: 200, headers: { 'Content-Type': 'application/json' } });
 
   } catch (e) {
