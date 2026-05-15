@@ -141,4 +141,61 @@ const navItems: Array<{ label: string; href: string; key: NonNullable<Props['act
       if (e.key === 'Escape' && drawer.classList.contains('is-open')) closeDrawer();
     });
   })();
+
+  // ===== Smart hide-on-scroll header (mobile only via CSS @media) =====
+  // Track scroll direction → toggle html.scrolled-down / scrolled-up
+  // CSS pak na mobilu (≤960) animuje translateY na .nav a .subnav.
+  (function () {
+    let lastY = window.scrollY;
+    let ticking = false;
+    const THRESHOLD = 80;   // px from top — pod tím header vždy viditelný
+    const DELTA = 5;        // min px scroll change před změnou state
+    const root = document.documentElement;
+
+    function update() {
+      const y = window.scrollY;
+      const diff = y - lastY;
+      if (Math.abs(diff) > DELTA) {
+        if (y < THRESHOLD) {
+          root.classList.remove('scrolled-down');
+          root.classList.add('scrolled-up');
+        } else if (diff > 0) {
+          root.classList.add('scrolled-down');
+          root.classList.remove('scrolled-up');
+        } else {
+          root.classList.remove('scrolled-down');
+          root.classList.add('scrolled-up');
+        }
+        lastY = y;
+      }
+      ticking = false;
+    }
+
+    window.addEventListener('scroll', function () {
+      if (!ticking) {
+        window.requestAnimationFrame(update);
+        ticking = true;
+      }
+    }, { passive: true });
+  })();
 </script>
+
+<style>
+  /* Smart hide-on-scroll header — pouze mobile (<=960px) */
+  @media (max-width: 960px) {
+    .nav,
+    .subnav {
+      transition: transform 0.28s cubic-bezier(0.2, 0.7, 0.2, 1);
+      will-change: transform;
+    }
+    html.scrolled-down .nav {
+      transform: translateY(-100%);
+    }
+    html.scrolled-down .subnav {
+      transform: translateY(-64px);
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .nav, .subnav { transition: none !important; }
+  }
+</style>
