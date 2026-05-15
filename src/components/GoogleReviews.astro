@@ -1,0 +1,121 @@
+---
+/**
+ * GoogleReviews — zobrazení Google recenzí z build-time fetched JSON.
+ *
+ * Props:
+ *   business: 'prodej' | 'servis' — která pobočka
+ *   layout: 'compact' (jen header s ratingem) | 'cards' (header + 3-5 karet) | 'full' (header + všechny)
+ *   limit: kolik karet zobrazit (default 5 pro cards, all pro full)
+ *   showHeading: zobrazit "Co o nás říkají zákazníci" heading (default true)
+ *
+ * Build-time: čte z src/data/google-reviews.json (generováno scriptem fetch-google-reviews.mjs).
+ */
+import reviewsData from '../data/google-reviews.json';
+
+interface Props {
+  business?: 'prodej' | 'servis';
+  layout?: 'compact' | 'cards' | 'full';
+  limit?: number;
+  showHeading?: boolean;
+  headingText?: string;
+}
+
+const {
+  business = 'prodej',
+  layout = 'cards',
+  limit = 5,
+  showHeading = true,
+  headingText = 'Co o nás říkají zákazníci',
+} = Astro.props;
+
+const place = (reviewsData as any)[business];
+
+if (!place) {
+  // No data — render nothing
+}
+
+const reviews = (place?.reviews ?? [])
+  .slice()
+  .sort((a: any, b: any) => b.rating - a.rating || (b.time ?? 0) - (a.time ?? 0))
+  .slice(0, layout === 'full' ? 100 : limit);
+
+const stars = (rating: number) => {
+  const full = Math.floor(rating);
+  const half = rating - full >= 0.5;
+  return '★'.repeat(full) + (half ? '½' : '') + '☆'.repeat(5 - full - (half ? 1 : 0));
+};
+---
+
+{place && (
+  <section class={`google-reviews layout-${layout}`}>
+    {showHeading && layout !== 'compact' && (
+      <h2 class="gr-heading">{headingText}</h2>
+    )}
+
+    <div class="gr-summary">
+      <div class="gr-rating">
+        <span class="gr-stars">{stars(place.rating)}</span>
+        <strong class="gr-score">{place.rating}</strong>
+      </div>
+      <div class="gr-count">
+        Hodnoceno {place.total_ratings}× na <a href={place.google_url} target="_blank" rel="noopener noreferrer">Google</a>
+      </div>
+    </div>
+
+    {layout !== 'compact' && reviews.length > 0 && (
+      <div class="gr-cards">
+        {reviews.map((r: any) => (
+          <article class="gr-card">
+            <div class="gr-card-header">
+              {r.author_photo && (
+                <img src={r.author_photo} alt={r.author_name} loading="lazy" referrerpolicy="no-referrer" />
+              )}
+              <div>
+                <div class="gr-author">{r.author_name}</div>
+                <div class="gr-meta">
+                  <span class="gr-stars-sm">{stars(r.rating)}</span>
+                  <span class="gr-time">{r.relative_time}</span>
+                </div>
+              </div>
+            </div>
+            <p class="gr-text">{r.text}</p>
+          </article>
+        ))}
+      </div>
+    )}
+
+    {layout !== 'compact' && (
+      <a class="gr-cta" href={place.google_url} target="_blank" rel="noopener noreferrer">
+        Zobrazit všechna hodnocení na Google →
+      </a>
+    )}
+  </section>
+)}
+
+<style>
+  .google-reviews { --gr-gold: #F5A623; --gr-text: #1a1a1a; --gr-muted: #666; --gr-border: #e0e0e0; padding: 24px 0; }
+  .gr-heading { font-size: 28px; margin: 0 0 16px; color: var(--gr-text); }
+  .gr-summary { display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap; margin-bottom: 20px; }
+  .gr-rating { display: flex; align-items: baseline; gap: 8px; }
+  .gr-stars { color: var(--gr-gold); font-size: 22px; letter-spacing: 1px; line-height: 1; }
+  .gr-score { font-size: 28px; font-weight: 700; }
+  .gr-count { font-size: 14px; color: var(--gr-muted); }
+  .gr-count a { color: var(--gr-muted); text-decoration: underline; }
+  .gr-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 14px; margin-top: 14px; }
+  .layout-full .gr-cards { grid-template-columns: 1fr; }
+  .gr-card { background: white; border: 1px solid var(--gr-border); border-radius: 8px; padding: 16px; }
+  .gr-card-header { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+  .gr-card-header img { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; }
+  .gr-author { font-weight: 600; font-size: 14px; }
+  .gr-meta { font-size: 12px; color: var(--gr-muted); display: flex; align-items: center; gap: 8px; }
+  .gr-stars-sm { color: var(--gr-gold); letter-spacing: 1px; }
+  .gr-text { font-size: 14px; line-height: 1.5; color: var(--gr-text); margin: 0; display: -webkit-box; -webkit-line-clamp: 6; -webkit-box-orient: vertical; overflow: hidden; }
+  .layout-full .gr-text { -webkit-line-clamp: unset; overflow: visible; }
+  .gr-cta { display: inline-block; margin-top: 16px; padding: 10px 16px; background: white; border: 1px solid var(--gr-border); border-radius: 6px; font-size: 14px; color: var(--gr-text); text-decoration: none; transition: background 0.2s; }
+  .gr-cta:hover { background: #f5f5f5; }
+  .layout-compact .gr-summary { margin-bottom: 0; }
+  @media (prefers-color-scheme: dark) {
+    .gr-card { background: #1a1a1a; border-color: #333; }
+    .google-reviews { --gr-text: #f0f0f0; --gr-muted: #999; --gr-border: #333; }
+  }
+</style>

@@ -37,9 +37,11 @@ const COMPANY = {
 /**
  * AutoDealer / LocalBusiness — Organization na úrovni site.
  * Vkládá se na homepage + kontakt.
+ *
+ * Volitelně přijímá Google reviews data — pak se přidá aggregateRating.
  */
-export function autoDealerSchema() {
-  return {
+export function autoDealerSchema(googleReviews?: { rating: number; total_ratings: number } | null) {
+  const schema: any = {
     '@context': 'https://schema.org',
     '@type': 'AutoDealer',
     '@id': `${SITE_URL}/#dealer`,
@@ -86,6 +88,60 @@ export function autoDealerSchema() {
       { '@type': 'PropertyValue', name: 'DIČ', value: COMPANY.dic },
     ],
   };
+
+  if (googleReviews && googleReviews.rating && googleReviews.total_ratings) {
+    schema.aggregateRating = {
+      '@type': 'AggregateRating',
+      ratingValue: googleReviews.rating,
+      reviewCount: googleReviews.total_ratings,
+      bestRating: 5,
+      worstRating: 1,
+    };
+  }
+
+  return schema;
+}
+
+/**
+ * AutoRepair — separátní LocalBusiness pro servisní pobočku.
+ * Použít na /servis stránce.
+ */
+export function autoRepairSchema(googleReviews?: { rating: number; total_ratings: number } | null) {
+  const schema: any = {
+    '@context': 'https://schema.org',
+    '@type': 'AutoRepair',
+    '@id': `${SITE_URL}/servis#service`,
+    name: 'SFR Motor servis',
+    legalName: COMPANY.legalName,
+    url: `${SITE_URL}/servis`,
+    logo: COMPANY.logo,
+    image: COMPANY.logo,
+    email: COMPANY.email,
+    telephone: '+420602224794',
+    description:
+      'Autorizovaný servis vozů KGM, OMODA & JAECOO, FARIZON a SsangYong v Praze-Ďáblicích. Pneuservis, karosárna, lakovna.',
+    address: { '@type': 'PostalAddress', ...COMPANY.address },
+    geo: { '@type': 'GeoCoordinates', latitude: COMPANY.geo.latitude, longitude: COMPANY.geo.longitude },
+    sameAs: COMPANY.social,
+    openingHoursSpecification: [{
+      '@type': 'OpeningHoursSpecification',
+      dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
+      opens: '08:00',
+      closes: '17:00',
+    }],
+    currenciesAccepted: 'CZK',
+    areaServed: { '@type': 'Country', name: 'Czech Republic' },
+  };
+  if (googleReviews && googleReviews.rating && googleReviews.total_ratings) {
+    schema.aggregateRating = {
+      '@type': 'AggregateRating',
+      ratingValue: googleReviews.rating,
+      reviewCount: googleReviews.total_ratings,
+      bestRating: 5,
+      worstRating: 1,
+    };
+  }
+  return schema;
 }
 
 /**

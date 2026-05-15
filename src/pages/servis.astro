@@ -1,6 +1,10 @@
 ---
 import BaseLayout from '@layouts/BaseLayout.astro';
 import Breadcrumbs from '@components/Breadcrumbs.astro';
+import JsonLd from '@components/JsonLd.astro';
+import GoogleReviews from '@components/GoogleReviews.astro';
+import { autoRepairSchema } from '@lib/schemas';
+import googleReviews from '../data/google-reviews.json';
 
 /* ============================================================
    SERVIS — 1:1 podle _design-draft/servis.jsx
@@ -20,6 +24,7 @@ const SERVICES = [
 ---
 
 <BaseLayout title="Servis" description="Autorizovaný servis pro KGM, OMODA & JAECOO, Farizon, Dacia, Renault. Praha-Ďáblice.">
+  <JsonLd data={autoRepairSchema(googleReviews.servis)} />
   <Breadcrumbs items={[{ label: 'Servis' }]} />
 
   <!-- ===== HERO ===== -->
@@ -95,6 +100,14 @@ const SERVICES = [
         <button class="btn btn-primary" type="submit">Odeslat poptávku</button>
         <div class="lead-status" data-lead-status></div>
       </form>
+    </div>
+  </section>
+
+  <!-- ===== GOOGLE RECENZE SERVIS ===== -->
+  <section class="reviews-section" data-screen-label="03 Recenze">
+    <div class="container">
+      <div class="section-eyebrow">⭐ Hodnocení servisu</div>
+      <GoogleReviews business="servis" layout="cards" limit={5} headingText="Co o servisu říkají zákazníci" />
     </div>
   </section>
 

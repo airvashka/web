@@ -4,9 +4,11 @@ import DirectusImage from '@components/DirectusImage.astro';
 import VideoStrip from '@components/VideoStrip.astro';
 import InstagramStrip from '@components/InstagramStrip.astro';
 import JsonLd from '@components/JsonLd.astro';
+import GoogleReviews from '@components/GoogleReviews.astro';
 import { directusGet } from '@lib/directus';
 import { buildStockSlug } from '@lib/stockSlug';
 import { autoDealerSchema, websiteSchema } from '@lib/schemas';
+import googleReviews from '../data/google-reviews.json';
 import type { Brand, StockVehicle, Model } from '@lib/types';
 
 /* ============================================================
@@ -96,7 +98,7 @@ const articles = [
   title="SFR Motor"
   description="SFR Motor — autorizovaný dealer KGM, OMODA & JAECOO a Farizon. Skladové vozy, servis pro všechny značky, prodej a doplňkové služby. Praha-Ďáblice."
 >
-  <JsonLd data={[autoDealerSchema(), websiteSchema()]} />
+  <JsonLd data={[autoDealerSchema(googleReviews.prodej), websiteSchema()]} />
   <!-- ===== HERO =====
        Foto + texty z Directus Site Settings (admin → Site Settings).
        Fallback: /hero-home.jpg pokud nic v adminu. -->
@@ -293,6 +295,14 @@ const articles = [
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7"/><polyline points="7 7 17 7 17 17"/></svg>
         </a>
       </div>
+    </div>
+  </section>
+
+  <!-- ===== GOOGLE RECENZE — social proof před community sekcí ===== -->
+  <section class="reviews-section" data-screen-label="05 Recenze">
+    <div class="container">
+      <div class="section-eyebrow">⭐ Google hodnocení</div>
+      <GoogleReviews business="prodej" layout="cards" limit={4} headingText="Co o nás říkají naši zákazníci" />
     </div>
   </section>
 

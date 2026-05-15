@@ -2,8 +2,10 @@
 import BaseLayout from '@layouts/BaseLayout.astro';
 import Breadcrumbs from '@components/Breadcrumbs.astro';
 import JsonLd from '@components/JsonLd.astro';
+import GoogleReviews from '@components/GoogleReviews.astro';
 import { directusGet } from '@lib/directus';
-import { autoDealerSchema } from '@lib/schemas';
+import { autoDealerSchema, autoRepairSchema } from '@lib/schemas';
+import googleReviews from '../data/google-reviews.json';
 import type { Branch, Employee } from '@lib/types';
 
 // KONTAKT — 1:1 podle _design-draft/kontakt.jsx
@@ -46,7 +48,7 @@ const mapEmbedUrl = 'https://maps.google.com/maps?q=%C4%8Eablicka+553%2F2%2C+182
 ---
 
 <BaseLayout title="Kontakt" description="Kontaktujte SFR Motor — autorizovaný dealer v Praze-Ďáblicích. Prodej, servis, doplňkové služby.">
-  <JsonLd data={autoDealerSchema()} />
+  <JsonLd data={[autoDealerSchema(googleReviews.prodej), autoRepairSchema(googleReviews.servis)]} />
   <Breadcrumbs items={[{ label: 'Kontakt' }]} />
   <section class="phero" data-screen-label="01 Hero">
     <div class="container">
@@ -189,7 +191,15 @@ const mapEmbedUrl = 'https://maps.google.com/maps?q=%C4%8Eablicka+553%2F2%2C+182
     </div>
   </section>
 
-  <section class="formpanel" data-screen-label="04 Form">
+  <!-- ===== GOOGLE RECENZE — full list před formem ===== -->
+  <section class="reviews-section" data-screen-label="04 Recenze">
+    <div class="container">
+      <div class="section-eyebrow">⭐ Google hodnocení</div>
+      <GoogleReviews business="prodej" layout="full" headingText="Hodnocení od zákazníků" />
+    </div>
+  </section>
+
+  <section class="formpanel" data-screen-label="05 Form">
     <div class="container formpanel-grid">
       <div>
         <div class="section-eyebrow">Napište nám</div>

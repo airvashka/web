@@ -6,9 +6,10 @@
   "scripts": {
     "dev": "astro dev",
     "start": "astro dev",
-    "build": "astro build",
+    "build": "node scripts/fetch-google-reviews.mjs && astro build",
     "preview": "astro preview",
-    "astro": "astro"
+    "astro": "astro",
+    "fetch-reviews": "node scripts/fetch-google-reviews.mjs"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.32.1",
