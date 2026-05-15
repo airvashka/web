@@ -479,8 +479,8 @@ function renderMatrix(data) {
   const table = $('matrix-table');
   const trims = data.trims;
 
-  // Header
-  let thead = '<thead><tr><th class="feature-cell" style="position:sticky;left:0;z-index:11;">Položka</th><th style="position:sticky;top:0;z-index:11;background:#f5f5f7;">Kód</th>';
+  // Header — bez separátního Kód sloupce (kód je uvnitř feature cell)
+  let thead = '<thead><tr><th class="feature-cell" style="position:sticky;left:0;z-index:11;">Položka</th>';
   for (const t of trims) {
     const priceFmt = t.list_price ? `${t.list_price.toLocaleString('cs-CZ')} Kč` : '';
     thead += `<th class="trim-col"><div class="trim-header"><strong>${escapeHtml(t.name)}</strong>${priceFmt ? `<span class="price">${priceFmt}</span>` : ''}</div></th>`;
@@ -490,16 +490,15 @@ function renderMatrix(data) {
   let tbody = '<tbody>';
   for (let sIdx = 0; sIdx < data.sections.length; sIdx++) {
     const section = data.sections[sIdx];
-    tbody += `<tr class="section-row"><td colspan="${trims.length + 2}">${escapeHtml(section.name)}</td></tr>`;
+    tbody += `<tr class="section-row"><td colspan="${trims.length + 1}">${escapeHtml(section.name)}</td></tr>`;
     for (let rIdx = 0; rIdx < (section.rows ?? []).length; rIdx++) {
       const row = section.rows[rIdx];
       tbody += `<tr data-section="${sIdx}" data-row="${rIdx}">`;
       tbody += `<td class="feature-cell">${escapeHtml(row.feature ?? '')}${row.code ? `<div class="feat-code">${escapeHtml(row.code)}</div>` : ''}</td>`;
-      tbody += `<td>${row.code ? escapeHtml(row.code) : ''}</td>`;
       for (let i = 0; i < trims.length; i++) {
         const cell = row.cells?.[i] ?? '';
         const kind = classifyCell(cell);
-        tbody += `<td class="cell cell-${kind}" data-cell-idx="${i}" title="Klik = upravit">${escapeHtml(formatCell(cell))}</td>`;
+        tbody += `<td class="cell cell-${kind}" data-cell-idx="${i}" title="Klik = upravit (Enter=uložit, Esc=zrušit)">${escapeHtml(formatCell(cell))}</td>`;
       }
       tbody += '</tr>';
     }
@@ -508,22 +507,40 @@ function renderMatrix(data) {
 
   table.innerHTML = thead + tbody;
 
-  // Inline edit on cell click
+  // Inline edit — input swap on cell click (better UX than prompt)
   table.querySelectorAll('.cell').forEach((td) => {
     td.addEventListener('click', () => {
+      if (td.querySelector('input')) return; // už edituje
       const tr = td.closest('tr');
       const sIdx = parseInt(tr.dataset.section, 10);
       const rIdx = parseInt(tr.dataset.row, 10);
       const cIdx = parseInt(td.dataset.cellIdx, 10);
-      const currentCell = data.sections[sIdx].rows[rIdx].cells[cIdx];
-      const newValue = prompt(`Hodnota pro "${data.sections[sIdx].rows[rIdx].feature}" / ${data.trims[cIdx].name}\n\nMožnosti:\n  S — standard\n  - — není\n  číslo (např. 14900) — dokoupit\n  CLUB+ / SAFETY / BLACK — v paketu`, currentCell ?? '');
-      if (newValue !== null) {
-        data.sections[sIdx].rows[rIdx].cells[cIdx] = newValue.trim();
-        const newKind = classifyCell(newValue);
-        td.className = `cell cell-${newKind}`;
-        td.textContent = formatCell(newValue);
-        $('raw-json').textContent = JSON.stringify(data, null, 2);
-      }
+      const currentValue = data.sections[sIdx].rows[rIdx].cells[cIdx] ?? '';
+
+      const input = document.createElement('input');
+      input.type = 'text';
+      input.value = currentValue;
+      input.style.cssText = 'width:100%;box-sizing:border-box;border:2px solid #1f6feb;padding:4px 6px;font-size:13px;text-align:center;border-radius:3px;';
+      input.setAttribute('list', 'cell-values');
+      td.textContent = '';
+      td.appendChild(input);
+      input.focus();
+      input.select();
+
+      const commit = (save) => {
+        const v = save ? input.value.trim() : currentValue;
+        data.sections[sIdx].rows[rIdx].cells[cIdx] = v;
+        const kind = classifyCell(v);
+        td.className = `cell cell-${kind}`;
+        td.textContent = formatCell(v);
+        td.setAttribute('title', 'Klik = upravit (Enter=uložit, Esc=zrušit)');
+        if (save) $('raw-json').textContent = JSON.stringify(data, null, 2);
+      };
+      input.addEventListener('blur', () => commit(true));
+      input.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') { e.preventDefault(); commit(true); }
+        if (e.key === 'Escape') { e.preventDefault(); commit(false); }
+      });
     });
   });
 }
