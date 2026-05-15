@@ -1,0 +1,615 @@
+---
+/**
+ * Ceník uploader — admin stránka.
+ *
+ * Stage 2: editovatelná review UI + save do Directus.
+ */
+export const prerender = false;
+
+const DIRECTUS_URL = import.meta.env.PUBLIC_DIRECTUS_URL || 'https://directus-production-3e67.up.railway.app';
+---
+
+<html lang="cs">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>Ceník uploader — SFR Motor admin</title>
+  <style>
+    body { font-family: system-ui, -apple-system, sans-serif; max-width: 1200px; margin: 0 auto; padding: 24px; color: #1a1a1a; background: #fafafa; }
+    h1 { font-size: 24px; margin-bottom: 8px; }
+    h2 { font-size: 18px; margin: 0 0 12px; }
+    h3 { font-size: 15px; margin: 12px 0 6px; color: #444; }
+    .muted { color: #666; font-size: 14px; }
+    .panel { background: white; border: 1px solid #e0e0e0; border-radius: 8px; padding: 20px; margin-bottom: 16px; }
+    label { display: block; font-weight: 500; font-size: 13px; margin-top: 8px; margin-bottom: 4px; }
+    input[type="email"], input[type="password"], input[type="text"], input[type="number"], select, textarea {
+      width: 100%; padding: 8px 12px; border: 1px solid #ccc; border-radius: 6px; font-size: 14px; box-sizing: border-box; font-family: inherit;
+    }
+    textarea { resize: vertical; min-height: 60px; }
+    select:disabled { background: #f5f5f5; color: #999; }
+    button { background: #1f6feb; color: white; border: 0; padding: 9px 18px; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 500; }
+    button:hover { background: #1858bb; }
+    button:disabled { background: #ccc; cursor: not-allowed; }
+    button.secondary { background: #6b6b72; }
+    button.secondary:hover { background: #555; }
+    button.danger { background: #b43a2c; padding: 4px 10px; font-size: 12px; }
+    button.danger:hover { background: #8e2c20; }
+    button.small { padding: 5px 10px; font-size: 12px; }
+    .drop-zone { border: 2px dashed #aaa; border-radius: 8px; padding: 28px; text-align: center; cursor: pointer; transition: background 0.2s; }
+    .drop-zone:hover, .drop-zone.dragover { background: #eef4ff; border-color: #1f6feb; }
+    .drop-zone.has-file { background: #f0fff0; border-color: #2da64a; border-style: solid; }
+    .error { color: #b43a2c; padding: 10px; background: #fef0ef; border-left: 4px solid #b43a2c; margin-top: 10px; white-space: pre-wrap; }
+    .success { color: #1e7b5f; padding: 10px; background: #f0fdf6; border-left: 4px solid #1e7b5f; margin-top: 10px; }
+    .hidden { display: none !important; }
+    .row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+    .meta { display: flex; gap: 8px; font-size: 12px; color: #555; margin-top: 8px; flex-wrap: wrap; }
+    .meta span { background: #eef; padding: 2px 8px; border-radius: 4px; }
+
+    /* Tabs */
+    .tabs { display: flex; gap: 4px; border-bottom: 2px solid #e0e0e0; margin-bottom: 16px; }
+    .tab-btn { background: transparent; color: #666; border: 0; padding: 10px 16px; border-radius: 6px 6px 0 0; font-weight: 500; }
+    .tab-btn.active { background: #1f6feb; color: white; }
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+
+    /* Trim editor */
+    .trim-editor, .package-editor { background: #f9f9fb; border: 1px solid #e0e0e0; border-radius: 6px; margin-bottom: 8px; padding: 0; }
+    .trim-editor summary, .package-editor summary {
+      cursor: pointer; padding: 10px 12px; display: grid; grid-template-columns: 1fr 180px auto; gap: 10px; align-items: center; list-style: none;
+    }
+    .trim-editor summary::-webkit-details-marker, .package-editor summary::-webkit-details-marker { display: none; }
+    .trim-editor[open] summary, .package-editor[open] summary { border-bottom: 1px solid #e0e0e0; background: #f0f4ff; }
+    .trim-editor .summary-name, .package-editor .summary-name { font-weight: 600; margin: 0; padding: 4px 8px; }
+    .trim-editor .summary-price { text-align: right; }
+    .trim-body, .package-body { padding: 12px; }
+    .feature-cat { margin-bottom: 12px; }
+    .feature-cat label { font-weight: 600; text-transform: uppercase; font-size: 11px; color: #666; }
+
+    /* Pricing table */
+    .pricing-table, .techdata-table { width: 100%; border-collapse: collapse; margin-top: 6px; }
+    .pricing-table th, .techdata-table th { text-align: left; padding: 6px 8px; background: #eef; font-size: 12px; font-weight: 600; }
+    .pricing-table td, .techdata-table td { padding: 4px 8px; border-bottom: 1px solid #f0f0f0; }
+    .pricing-table input, .techdata-table input { padding: 4px 8px; font-size: 13px; }
+
+    /* Save bar */
+    .save-bar { position: sticky; bottom: 0; background: white; border-top: 2px solid #e0e0e0; margin-top: 24px; padding: 16px 20px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 -2px 12px rgba(0,0,0,0.06); border-radius: 0 0 8px 8px; }
+    .save-bar button { padding: 12px 24px; font-size: 15px; }
+    .save-summary { font-size: 13px; color: #444; }
+  </style>
+</head>
+<body>
+  <h1>Ceník uploader</h1>
+  <p class="muted">PDF → AI extrakce → review → uložit do Directus.</p>
+
+  <!-- LOGIN -->
+  <div class="panel" id="login-panel">
+    <h2>1. Přihlášení do Directus</h2>
+    <label for="email">Email</label>
+    <input type="email" id="email" placeholder="tvůj@email.cz" autocomplete="username" />
+    <label for="password">Heslo</label>
+    <input type="password" id="password" placeholder="zadej heslo" autocomplete="current-password" />
+    <button id="login-btn" style="margin-top: 12px;">Přihlásit</button>
+    <div id="login-error" class="error hidden"></div>
+  </div>
+
+  <!-- CONTEXT -->
+  <div class="panel hidden" id="context-panel">
+    <h2>2. Vybrat cíl (model + rok)</h2>
+    <div class="row">
+      <div>
+        <label for="brand-select">Značka</label>
+        <select id="brand-select"><option value="">— vyber —</option></select>
+      </div>
+      <div>
+        <label for="model-select">Model</label>
+        <select id="model-select" disabled><option value="">— nejdřív značka —</option></select>
+      </div>
+      <div>
+        <label for="year-select">Modelový rok</label>
+        <select id="year-select" disabled><option value="">— nejdřív model —</option></select>
+      </div>
+    </div>
+  </div>
+
+  <!-- UPLOAD -->
+  <div class="panel hidden" id="upload-panel">
+    <h2>3. Nahrát PDF ceník</h2>
+    <div class="drop-zone" id="drop-zone">
+      <p><strong>Drag & drop PDF zde</strong></p>
+      <p class="muted">nebo klikni a vyber soubor (max 30 MB)</p>
+      <input type="file" id="file-input" accept="application/pdf" style="display: none;" />
+    </div>
+    <button id="analyze-btn" disabled style="margin-top: 12px;">Analyzovat PDF</button>
+    <div id="analyze-status" class="muted" style="margin-top: 8px;"></div>
+    <div id="analyze-error" class="error hidden"></div>
+  </div>
+
+  <!-- REVIEW -->
+  <div class="panel hidden" id="result-panel">
+    <h2>4. Review extrahovaného obsahu</h2>
+    <div id="result-summary" class="muted"></div>
+    <div class="meta" id="result-meta"></div>
+
+    <div class="tabs" id="tabs" style="margin-top: 20px;">
+      <button class="tab-btn active" data-tab="trims">Trim levels (<span id="count-trims">0</span>)</button>
+      <button class="tab-btn" data-tab="packages">Pakety (<span id="count-packages">0</span>)</button>
+      <button class="tab-btn" data-tab="techdata">Tech data (<span id="count-techdata">0</span>)</button>
+      <button class="tab-btn" data-tab="raw">Raw JSON</button>
+    </div>
+
+    <div class="tab-content active" data-tab="trims">
+      <div id="trims-container"></div>
+      <button class="secondary small" id="add-trim-btn">+ Přidat trim level</button>
+    </div>
+
+    <div class="tab-content" data-tab="packages">
+      <div id="packages-container"></div>
+      <button class="secondary small" id="add-package-btn">+ Přidat paket</button>
+    </div>
+
+    <div class="tab-content" data-tab="techdata">
+      <table class="techdata-table">
+        <thead><tr><th>Klíč</th><th>Hodnota</th><th></th></tr></thead>
+        <tbody id="techdata-tbody"></tbody>
+      </table>
+      <button class="secondary small" id="add-techdata-btn" style="margin-top: 8px;">+ Přidat řádek</button>
+    </div>
+
+    <div class="tab-content" data-tab="raw">
+      <p class="muted">Read-only JSON pro debug. Editace v Trims/Pakety/Tech data tabech se sem nepromítají v real-time — viditelné až po reloadu po save.</p>
+      <pre id="raw-json" style="background:#1e1e2e;color:#cdd6f4;padding:14px;border-radius:6px;overflow-x:auto;font-size:11px;max-height:500px;"></pre>
+    </div>
+
+    <div class="save-bar">
+      <div class="save-summary" id="save-summary"></div>
+      <div>
+        <button class="secondary" id="discard-btn">Zahodit</button>
+        <button id="save-btn">Uložit do Directus</button>
+      </div>
+    </div>
+
+    <div id="save-result" class="hidden" style="margin-top: 16px;"></div>
+  </div>
+
+<script is:inline define:vars={{ DIRECTUS_URL }}>
+console.log('[cenik] Script loaded. DIRECTUS_URL =', DIRECTUS_URL);
+
+let TOKEN = null;
+let SELECTED_PDF = null;
+let CURRENT_DATA = null; // poslední AI výstup
+
+const $ = (id) => document.getElementById(id);
+const $$ = (sel, parent = document) => [...parent.querySelectorAll(sel)];
+
+const CATEGORIES = ['pohon', 'podvozek', 'bezpecnost', 'asistent', 'komfort', 'multimedia', 'exterier', 'ostatni'];
+const CATEGORY_LABELS = {
+  pohon: 'Pohon, převodovka',
+  podvozek: 'Podvozek, brzdy',
+  bezpecnost: 'Bezpečnost, airbagy',
+  asistent: 'Asistenční systémy',
+  komfort: 'Interiér, komfort',
+  multimedia: 'Multimedia, infotainment',
+  exterier: 'Exteriér, světla, kola',
+  ostatni: 'Ostatní',
+};
+
+// ─── Directus API ────────────────────────────────────────
+async function api(path, opts = {}) {
+  const r = await fetch(`${DIRECTUS_URL}${path}`, {
+    ...opts,
+    headers: {
+      'Content-Type': 'application/json',
+      ...(TOKEN ? { Authorization: `Bearer ${TOKEN}` } : {}),
+      ...opts.headers,
+    },
+  });
+  const text = await r.text();
+  let j; try { j = JSON.parse(text); } catch { j = text; }
+  if (!r.ok) throw new Error(`${r.status}: ${JSON.stringify(j?.errors ?? j)}`);
+  return j;
+}
+
+// ─── LOGIN ────────────────────────────────────────────────
+$('login-btn').addEventListener('click', async () => {
+  const email = $('email').value.trim();
+  const password = $('password').value;
+  if (!email || !password) return;
+  $('login-error').classList.add('hidden');
+  // CRITICAL: vyčistit TOKEN před login — jinak by se expired Bearer posílal i s /auth/login
+  TOKEN = null;
+  sessionStorage.removeItem('directus_token');
+  try {
+    const r = await api('/auth/login', { method: 'POST', body: JSON.stringify({ email, password }) });
+    TOKEN = r.data.access_token;
+    sessionStorage.setItem('directus_token', TOKEN);
+    $('login-panel').classList.add('hidden');
+    $('context-panel').classList.remove('hidden');
+    $('upload-panel').classList.remove('hidden');
+    await loadBrands();
+  } catch (e) {
+    $('login-error').textContent = `Login selhal: ${e.message}`;
+    $('login-error').classList.remove('hidden');
+  }
+});
+
+// Auto-login pokud token v session — ověř že stále platí
+const savedToken = sessionStorage.getItem('directus_token');
+if (savedToken) {
+  fetch(`${DIRECTUS_URL}/users/me`, { headers: { Authorization: `Bearer ${savedToken}` } })
+    .then((r) => {
+      if (r.ok) {
+        TOKEN = savedToken;
+        $('login-panel').classList.add('hidden');
+        $('context-panel').classList.remove('hidden');
+        $('upload-panel').classList.remove('hidden');
+        loadBrands();
+      } else {
+        // Expired — vyčistit
+        sessionStorage.removeItem('directus_token');
+        console.log('[cenik] Saved token expired, cleared');
+      }
+    })
+    .catch(() => sessionStorage.removeItem('directus_token'));
+}
+
+// ─── BRAND → MODEL → YEAR ────────────────────────────────
+async function loadBrands() {
+  const r = await api('/items/brands?sort=name&fields=id,name&limit=50');
+  const sel = $('brand-select');
+  sel.innerHTML = '<option value="">— vyber —</option>';
+  for (const b of r.data) sel.innerHTML += `<option value="${b.id}">${escapeHtml(b.name)}</option>`;
+}
+
+$('brand-select').addEventListener('change', async (e) => {
+  const brandId = e.target.value;
+  $('model-select').disabled = !brandId;
+  $('year-select').disabled = true;
+  $('model-select').innerHTML = '<option value="">— vyber —</option>';
+  $('year-select').innerHTML = '<option value="">— nejdřív model —</option>';
+  if (!brandId) return;
+  const r = await api(`/items/models?filter[brand][_eq]=${brandId}&sort=name&fields=id,name&limit=100`);
+  for (const m of r.data) $('model-select').innerHTML += `<option value="${m.id}">${escapeHtml(m.name)}</option>`;
+});
+
+$('model-select').addEventListener('change', async (e) => {
+  const modelId = e.target.value;
+  $('year-select').disabled = !modelId;
+  $('year-select').innerHTML = '<option value="">— vyber —</option>';
+  if (!modelId) return;
+  const r = await api(`/items/model_years?filter[model][_eq]=${modelId}&sort=-year&fields=id,year,version&limit=20`);
+  for (const y of r.data) {
+    const label = `${y.year}${y.version ? ' ' + y.version : ''}`;
+    $('year-select').innerHTML += `<option value="${y.id}">${escapeHtml(label)}</option>`;
+  }
+});
+
+// ─── UPLOAD ──────────────────────────────────────────────
+const dz = $('drop-zone');
+const fi = $('file-input');
+dz.addEventListener('click', () => fi.click());
+dz.addEventListener('dragover', (e) => { e.preventDefault(); dz.classList.add('dragover'); });
+dz.addEventListener('dragleave', () => dz.classList.remove('dragover'));
+dz.addEventListener('drop', (e) => { e.preventDefault(); dz.classList.remove('dragover'); if (e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0]); });
+fi.addEventListener('change', (e) => { if (e.target.files[0]) handleFile(e.target.files[0]); });
+
+function handleFile(f) {
+  if (!f.name.toLowerCase().endsWith('.pdf')) { alert('Musí být PDF'); return; }
+  SELECTED_PDF = f;
+  dz.classList.add('has-file');
+  dz.innerHTML = `<p><strong>✓ ${escapeHtml(f.name)}</strong></p><p class="muted">${(f.size / 1024 / 1024).toFixed(2)} MB · klikni pro výměnu</p>`;
+  $('analyze-btn').disabled = false;
+}
+
+// ─── ANALYZE ─────────────────────────────────────────────
+$('analyze-btn').addEventListener('click', async () => {
+  if (!SELECTED_PDF) return;
+  const brand = $('brand-select').selectedOptions[0]?.textContent;
+  const model = $('model-select').selectedOptions[0]?.textContent;
+  const year = $('year-select').selectedOptions[0]?.textContent;
+  const yearId = $('year-select').value;
+  if (!yearId) { alert('Vyber nejdřív model_year (kontext pro AI)'); return; }
+  $('analyze-error').classList.add('hidden');
+  $('analyze-btn').disabled = true;
+  $('analyze-status').textContent = '⏳ AI parsing běží (~30-90s pro detailní ceníky)...';
+
+  const fd = new FormData();
+  fd.append('pdf', SELECTED_PDF);
+  fd.append('context', JSON.stringify({ brand, model, year, year_id: yearId }));
+
+  try {
+    const r = await fetch('/api/cenik/analyze', { method: 'POST', body: fd });
+    const data = await r.json();
+    if (!r.ok) {
+      $('analyze-error').textContent = `Chyba: ${data.error || 'unknown'}\n\n${data.raw_text ?? ''}`;
+      $('analyze-error').classList.remove('hidden');
+      return;
+    }
+    CURRENT_DATA = data;
+    showReview(data);
+  } catch (e) {
+    $('analyze-error').textContent = `Síťová chyba: ${e.message}`;
+    $('analyze-error').classList.remove('hidden');
+  } finally {
+    $('analyze-btn').disabled = false;
+    $('analyze-status').textContent = '';
+  }
+});
+
+// ─── REVIEW UI ───────────────────────────────────────────
+function showReview(data) {
+  $('result-panel').classList.remove('hidden');
+  $('save-result').classList.add('hidden');
+
+  const trims = data.trim_levels ?? [];
+  const packages = data.option_packages ?? [];
+  const techData = data.technical_data ?? {};
+  const tdKeys = Object.keys(techData).length;
+
+  $('count-trims').textContent = trims.length;
+  $('count-packages').textContent = packages.length;
+  $('count-techdata').textContent = tdKeys;
+
+  $('result-summary').innerHTML = `
+    <strong>Detekováno:</strong>
+    ${trims.length} trim levels,
+    ${packages.length} option packages,
+    ${tdKeys} technical data klíčů.
+    ${data.detected?.model_name_guess ? `Model: <em>${escapeHtml(data.detected.model_name_guess)}</em>.` : ''}
+    ${data.detected?.year_guess ? `Rok: <em>${data.detected.year_guess}</em>.` : ''}
+  `;
+  if (data.meta?.usage) {
+    $('result-meta').innerHTML = `
+      <span>Input: ${data.meta.usage.input_tokens} tok</span>
+      <span>Output: ${data.meta.usage.output_tokens} tok</span>
+      <span>~$${((data.meta.usage.input_tokens * 0.003 + data.meta.usage.output_tokens * 0.015) / 1000).toFixed(3)}</span>
+    `;
+  }
+  $('save-summary').textContent = `Uloží se do "${$('year-select').selectedOptions[0]?.textContent}" — ${trims.length} trims, ${packages.length} pakety, ${tdKeys} tech data klíčů.`;
+
+  renderTrims(trims);
+  renderPackages(packages, trims);
+  renderTechData(techData);
+  $('raw-json').textContent = JSON.stringify(data, null, 2);
+
+  $('result-panel').scrollIntoView({ behavior: 'smooth' });
+}
+
+function renderTrims(trims) {
+  const container = $('trims-container');
+  container.innerHTML = '';
+  trims.forEach((t, idx) => container.appendChild(buildTrimEditor(t, idx)));
+}
+
+function buildTrimEditor(trim, idx) {
+  const el = document.createElement('details');
+  el.className = 'trim-editor';
+  el.dataset.idx = idx;
+  el.open = idx === 0;
+
+  const features = trim.features ?? {};
+  const featuresHtml = CATEGORIES.map((cat) => `
+    <div class="feature-cat">
+      <label>${CATEGORY_LABELS[cat]}</label>
+      <textarea class="trim-feat" data-cat="${cat}" rows="3">${escapeHtml((features[cat] ?? []).join('\n'))}</textarea>
+    </div>
+  `).join('');
+
+  el.innerHTML = `
+    <summary>
+      <input type="text" class="trim-name" value="${escapeHtml(trim.name ?? '')}" placeholder="Trim name (např. Style+)" />
+      <div style="display:flex; align-items:center; gap:6px;">
+        <input type="number" class="trim-price" value="${trim.list_price ?? ''}" placeholder="Cena" />
+        <span class="muted">Kč</span>
+      </div>
+      <button class="danger" type="button" data-remove-trim>×</button>
+    </summary>
+    <div class="trim-body">
+      <p class="muted" style="margin-top:0;">Features — jeden prvek na řádek. Pokud řádek obsahuje "viz X" (např. "viz SV L1H1 49 kWh"), při save se expanduje z toho trim.</p>
+      ${featuresHtml}
+    </div>
+  `;
+
+  el.querySelector('[data-remove-trim]').addEventListener('click', (e) => {
+    e.preventDefault();
+    if (confirm(`Smazat trim "${trim.name}" z review (jen z formuláře, ne z DB)?`)) el.remove();
+  });
+  return el;
+}
+
+function renderPackages(packages, trims) {
+  const container = $('packages-container');
+  container.innerHTML = '';
+  packages.forEach((p, idx) => container.appendChild(buildPackageEditor(p, idx, trims)));
+}
+
+function buildPackageEditor(pkg, idx, trims) {
+  const el = document.createElement('details');
+  el.className = 'package-editor';
+  el.dataset.idx = idx;
+  el.open = idx === 0;
+
+  const pricing = pkg.pricing_per_trim ?? {};
+  // Collect all keys: from pkg.pricing + from trim names lowercase
+  const keys = new Set(Object.keys(pricing).map((k) => k.toLowerCase()));
+  trims.forEach((t) => keys.add(String(t.name ?? '').toLowerCase()));
+  const pricingRows = [...keys].sort().map((k) => `
+    <tr>
+      <td><code>${escapeHtml(k)}</code></td>
+      <td><input class="pkg-price" data-trim-key="${escapeHtml(k)}" value="${escapeHtml(String(pricing[k] ?? ''))}" placeholder="Kč | standard | unavailable" /></td>
+    </tr>
+  `).join('');
+
+  el.innerHTML = `
+    <summary>
+      <input type="text" class="pkg-name" value="${escapeHtml(pkg.name ?? '')}" placeholder="Paket name" />
+      <div></div>
+      <button class="danger" type="button" data-remove-pkg>×</button>
+    </summary>
+    <div class="package-body">
+      <label>Features (jeden na řádek)</label>
+      <textarea class="pkg-features" rows="4">${escapeHtml((pkg.features ?? []).join('\n'))}</textarea>
+      <label style="margin-top: 12px;">Pricing per trim</label>
+      <table class="pricing-table">
+        <thead><tr><th>Trim (key)</th><th>Hodnota</th></tr></thead>
+        <tbody>${pricingRows}</tbody>
+      </table>
+    </div>
+  `;
+  el.querySelector('[data-remove-pkg]').addEventListener('click', (e) => {
+    e.preventDefault();
+    if (confirm(`Smazat paket "${pkg.name}" z review?`)) el.remove();
+  });
+  return el;
+}
+
+function renderTechData(td) {
+  const tbody = $('techdata-tbody');
+  tbody.innerHTML = '';
+  Object.entries(td).forEach(([k, v]) => tbody.appendChild(buildTechDataRow(k, v)));
+}
+
+function buildTechDataRow(k = '', v = '') {
+  const tr = document.createElement('tr');
+  tr.innerHTML = `
+    <td><input type="text" class="td-key" value="${escapeHtml(k)}" placeholder="klíč" /></td>
+    <td><input type="text" class="td-val" value="${escapeHtml(String(v))}" placeholder="hodnota" /></td>
+    <td><button class="danger" type="button" data-remove-td>×</button></td>
+  `;
+  tr.querySelector('[data-remove-td]').addEventListener('click', () => tr.remove());
+  return tr;
+}
+
+// ─── Add new rows ────────────────────────────────────────
+$('add-trim-btn').addEventListener('click', () => {
+  $('trims-container').appendChild(buildTrimEditor({ name: '', list_price: null, features: {} }, $$('#trims-container .trim-editor').length));
+});
+$('add-package-btn').addEventListener('click', () => {
+  const trims = collectTrims();
+  $('packages-container').appendChild(buildPackageEditor({ name: '', features: [], pricing_per_trim: {} }, $$('#packages-container .package-editor').length, trims));
+});
+$('add-techdata-btn').addEventListener('click', () => {
+  $('techdata-tbody').appendChild(buildTechDataRow());
+});
+
+// ─── Tabs ────────────────────────────────────────────────
+$$('#tabs .tab-btn').forEach((btn) => {
+  btn.addEventListener('click', () => {
+    const tab = btn.dataset.tab;
+    $$('#tabs .tab-btn').forEach((b) => b.classList.toggle('active', b === btn));
+    $$('.tab-content').forEach((c) => c.classList.toggle('active', c.dataset.tab === tab));
+  });
+});
+
+// ─── Collect form → JSON ─────────────────────────────────
+function collectTrims() {
+  return $$('#trims-container .trim-editor').map((el) => {
+    const name = el.querySelector('.trim-name').value.trim();
+    const priceStr = el.querySelector('.trim-price').value.trim();
+    const list_price = priceStr ? parseInt(priceStr, 10) : null;
+    const features = {};
+    $$('.trim-feat', el).forEach((ta) => {
+      const cat = ta.dataset.cat;
+      const lines = ta.value.split('\n').map((l) => l.trim()).filter(Boolean);
+      if (lines.length) features[cat] = lines;
+    });
+    return { name, list_price, features };
+  }).filter((t) => t.name);
+}
+
+function collectPackages() {
+  return $$('#packages-container .package-editor').map((el) => {
+    const name = el.querySelector('.pkg-name').value.trim();
+    const features = el.querySelector('.pkg-features').value.split('\n').map((l) => l.trim()).filter(Boolean);
+    const pricing_per_trim = {};
+    $$('.pkg-price', el).forEach((inp) => {
+      const k = inp.dataset.trimKey;
+      const v = inp.value.trim();
+      if (!v) return;
+      const n = parseInt(v, 10);
+      pricing_per_trim[k] = (v === 'standard' || v === 'unavailable') ? v : (Number.isFinite(n) ? n : v);
+    });
+    return { name, features, pricing_per_trim };
+  }).filter((p) => p.name);
+}
+
+function collectTechData() {
+  const td = {};
+  $$('#techdata-tbody tr').forEach((tr) => {
+    const k = tr.querySelector('.td-key').value.trim();
+    const v = tr.querySelector('.td-val').value.trim();
+    if (k && v) td[k] = v;
+  });
+  return td;
+}
+
+// ─── SAVE ────────────────────────────────────────────────
+$('save-btn').addEventListener('click', async () => {
+  const yearId = $('year-select').value;
+  if (!yearId) { alert('Není vybraný model_year'); return; }
+  const data = {
+    trim_levels: collectTrims(),
+    option_packages: collectPackages(),
+    technical_data: collectTechData(),
+  };
+  const summary = `${data.trim_levels.length} trims, ${data.option_packages.length} pakety, ${Object.keys(data.technical_data).length} tech data klíčů`;
+  if (!confirm(`Uložit do "${$('year-select').selectedOptions[0]?.textContent}":\n${summary}\n\nPokračovat?`)) return;
+
+  $('save-btn').disabled = true;
+  $('save-btn').textContent = '⏳ Ukládám...';
+
+  try {
+    const r = await fetch('/api/cenik/save', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ model_year_id: yearId, directus_token: TOKEN, data }),
+    });
+    const result = await r.json();
+    showSaveResult(r.ok, result);
+  } catch (e) {
+    showSaveResult(false, { error: e.message });
+  } finally {
+    $('save-btn').disabled = false;
+    $('save-btn').textContent = 'Uložit do Directus';
+  }
+});
+
+function showSaveResult(ok, result) {
+  const div = $('save-result');
+  div.classList.remove('hidden');
+  if (ok && result.ok) {
+    const s = result.summary;
+    div.className = 'success';
+    div.innerHTML = `
+      <strong>✓ Uloženo do Directus</strong><br>
+      Trim levels: ${s.trims_created} vytvořeno, ${s.trims_updated} aktualizováno<br>
+      Pakety: ${s.packages_created} vytvořeno, ${s.packages_updated} aktualizováno<br>
+      Tech data: ${s.tech_data_updated ? 'updatováno' : 'beze změny'}<br>
+      ${s.errors.length ? `<br><strong style="color: #b43a2c;">Chyby (${s.errors.length}):</strong><br>${s.errors.map((e) => escapeHtml(e)).join('<br>')}` : ''}
+      <details style="margin-top: 8px;"><summary class="muted">Detail (${s.details.length} operací)</summary><pre style="font-size:11px;">${s.details.map((d) => escapeHtml(d)).join('\n')}</pre></details>
+    `;
+  } else {
+    div.className = 'error';
+    div.innerHTML = `<strong>✗ Save selhal</strong><br>${escapeHtml(result.error ?? 'Neznámá chyba')}`;
+  }
+  div.scrollIntoView({ behavior: 'smooth' });
+}
+
+$('discard-btn').addEventListener('click', () => {
+  if (confirm('Zahodit review a začít znova?')) {
+    CURRENT_DATA = null;
+    $('result-panel').classList.add('hidden');
+    SELECTED_PDF = null;
+    dz.classList.remove('has-file');
+    dz.innerHTML = `<p><strong>Drag & drop PDF zde</strong></p><p class="muted">nebo klikni a vyber soubor (max 30 MB)</p>`;
+    $('analyze-btn').disabled = true;
+  }
+});
+
+// ─── Helpers ─────────────────────────────────────────────
+function escapeHtml(s) {
+  return String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+}
+</script>
+</body>
+</html>

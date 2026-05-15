@@ -1,11 +1,13 @@
 // @ts-check
 import { defineConfig } from 'astro/config';
 import sitemap from '@astrojs/sitemap';
+import vercel from '@astrojs/vercel';
 
 // https://astro.build/config
 export default defineConfig({
   site: 'https://sfr-motor.cz',
-  output: 'static',
+  output: 'static',  // default static, individual routes opt-in to SSR via `export const prerender = false`
+  adapter: vercel(),
   trailingSlash: 'ignore',
   build: {
     inlineStylesheets: 'auto',
