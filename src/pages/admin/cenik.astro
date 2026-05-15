@@ -392,6 +392,9 @@ function showReview(data) {
 function renderTrims(trims) {
   const container = $('trims-container');
   container.innerHTML = '';
+  // Defenzivní: pokud přišlo jako JSON string, parsuj
+  if (typeof trims === 'string') { try { trims = JSON.parse(trims); } catch { trims = []; } }
+  if (!Array.isArray(trims)) trims = [];
   trims.forEach((t, idx) => container.appendChild(buildTrimEditor(t, idx)));
 }
 
@@ -434,6 +437,10 @@ function buildTrimEditor(trim, idx) {
 function renderPackages(packages, trims) {
   const container = $('packages-container');
   container.innerHTML = '';
+  if (typeof packages === 'string') { try { packages = JSON.parse(packages); } catch { packages = []; } }
+  if (!Array.isArray(packages)) packages = [];
+  if (typeof trims === 'string') { try { trims = JSON.parse(trims); } catch { trims = []; } }
+  if (!Array.isArray(trims)) trims = [];
   packages.forEach((p, idx) => container.appendChild(buildPackageEditor(p, idx, trims)));
 }
 

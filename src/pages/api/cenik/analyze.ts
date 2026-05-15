@@ -235,6 +235,20 @@ Použij tool extract_pricelist a předej strukturovaná data. Vyplň co najdeš,
     }
     const extracted = toolUse.input as any;
 
+    // Defenzivní: pokud Claude vrátí field jako JSON string místo objektu, parsuj
+    const ensureParsed = (v: any) => {
+      if (typeof v === 'string') {
+        try { return JSON.parse(v); } catch { return v; }
+      }
+      return v;
+    };
+    if (extracted) {
+      if ('trim_levels' in extracted) extracted.trim_levels = ensureParsed(extracted.trim_levels);
+      if ('option_packages' in extracted) extracted.option_packages = ensureParsed(extracted.option_packages);
+      if ('technical_data' in extracted) extracted.technical_data = ensureParsed(extracted.technical_data);
+      if ('detected' in extracted) extracted.detected = ensureParsed(extracted.detected);
+    }
+
     return new Response(JSON.stringify({
       ...extracted,
       meta: {
