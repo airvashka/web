@@ -119,6 +119,7 @@ export const POST: APIRoute = async ({ request }) => {
     // PDF zdroj: file_id v Directus (bypasses Vercel 4.5MB body limit) NEBO inline FormData/base64
     let base64: string;
     let context: { brand?: string; model?: string; year?: number } = {};
+    let uploadedFileId: string | undefined; // pro auto-cleanup po Claude response
     const contentType = request.headers.get('content-type') || '';
 
     if (contentType.includes('application/json')) {
@@ -133,6 +134,7 @@ export const POST: APIRoute = async ({ request }) => {
 
       if (file_id) {
         // Fetch z Directus (žádný Vercel body limit problém)
+        uploadedFileId = file_id; // si pamatuju pro cleanup po analyze
         const assetUrl = `${DIRECTUS_URL}/assets/${file_id}`;
         const assetResp = await fetch(assetUrl, { headers: { Authorization: `Bearer ${token}` } });
         if (!assetResp.ok) {
@@ -314,6 +316,19 @@ Použij tool extract_pricelist a předej strukturovaná data. Vyplň co najdeš,
     debugInfo.after_parse_trim_levels_type = typeof extracted?.trim_levels;
     debugInfo.after_parse_trim_levels_is_array = Array.isArray(extracted?.trim_levels);
     debugInfo.after_parse_trim_levels_count = Array.isArray(extracted?.trim_levels) ? extracted.trim_levels.length : 'N/A';
+
+    // Auto-cleanup uploaded PDF — analyze proběhlo, soubor v Directus už nepotřebujeme
+    if (uploadedFileId) {
+      try {
+        const delResp = await fetch(`${DIRECTUS_URL}/files/${uploadedFileId}`, {
+          method: 'DELETE',
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        debugInfo.cleanup = delResp.ok ? 'deleted' : `failed ${delResp.status}`;
+      } catch (e) {
+        debugInfo.cleanup = `error: ${(e as Error).message}`;
+      }
+    }
 
     return new Response(JSON.stringify({
       ...extracted,
