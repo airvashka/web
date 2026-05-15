@@ -754,59 +754,75 @@ if (promoActive && promoDescription) {
         <h2 class="section-title">
           {trims.length === 1 ? 'Jeden výbavový stupeň' : trims.length === 2 ? 'Dva výbavové stupně' : trims.length === 3 ? 'Tři výbavové stupně' : `${trims.length} výbavových stupňů`}, jasná cena.
         </h2>
-        <div class={`trims trims-${trims.length}`}>
-          {trims.map((t, i) => {
-            const isRecommended = i === trims.length - 1 && trims.length > 1;
-            const cls = isRecommended ? 'trim dark' : 'trim light';
-            const price = t.promo_price ?? t.list_price ?? 0;
-            const trimGroups = getGroupedFeatures((t as any).features);
-            const trimFeatureCount = countFeatures((t as any).features);
-            // Top 5 features napříč kategoriemi (1. položka z každé prvních kategorií)
-            const topFeatures: string[] = [];
-            for (const g of trimGroups) {
-              for (const item of g.items) {
-                topFeatures.push(item);
-                if (topFeatures.length >= 5) break;
-              }
-              if (topFeatures.length >= 5) break;
-            }
-            return (
-              <div class={cls}>
-                {isRecommended && <div class="trim-badge">Doporučujeme</div>}
-                <div class="trim-name">{t.name}</div>
-                <div class="trim-price">{price.toLocaleString('cs-CZ')} Kč</div>
-                <div class="trim-teaser">
-                  {topFeatures.length > 0 ? (
-                    <>
-                      <div class="trim-teaser-label">Z výbavy například:</div>
-                      <ul class="trim-list">
-                        {topFeatures.map((f) => (
-                          <li>
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-                            <span>{f}</span>
-                          </li>
-                        ))}
-                      </ul>
-                      <div class="trim-teaser-count">+ celkem {trimFeatureCount} prvků výbavy</div>
-                    </>
-                  ) : (
-                    <div class="trim-feature-empty">Specifikace doplníme.</div>
-                  )}
-                </div>
-                <div class="trim-actions">
-                  <a class="btn btn-outline trim-compare-link" href={`/model/${rawModel.slug}/vybavy`}>
-                    Kompletní výbava
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
-                  </a>
-                  <a class="btn" href="/kontakt">
-                    Mám zájem
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
-                  </a>
-                </div>
-              </div>
-            );
-          })}
-        </div>
+        {(() => {
+          // Pre-compute flat features set per trim (lowercased + trimmed for diff)
+          const flatPerTrim = trims.map((t) => {
+            const groups = getGroupedFeatures((t as any).features);
+            const flat: string[] = [];
+            for (const g of groups) for (const item of g.items) flat.push(item);
+            return flat;
+          });
+          const normSet = (arr: string[]) => new Set(arr.map((s) => s.trim().toLowerCase()));
+          return (
+            <div class={`trims trims-${trims.length}`}>
+              {trims.map((t, i) => {
+                const isRecommended = i === trims.length - 1 && trims.length > 1;
+                const cls = isRecommended ? 'trim dark' : 'trim light';
+                const price = t.promo_price ?? t.list_price ?? 0;
+                const trimFeatureCount = countFeatures((t as any).features);
+                const flat = flatPerTrim[i];
+
+                let teaserLabel = 'Z výbavy například:';
+                let teaserItems: string[] = [];
+                let extraCount = 0;
+
+                if (i === 0) {
+                  // První trim → top 5 features
+                  teaserItems = flat.slice(0, 5);
+                } else {
+                  // Vyšší trim → diff oproti předchozímu
+                  const prevSet = normSet(flatPerTrim[i - 1]);
+                  const diff = flat.filter((f) => !prevSet.has(f.trim().toLowerCase()));
+                  teaserLabel = `Navíc oproti ${trims[i - 1].name}:`;
+                  teaserItems = diff.slice(0, 5);
+                  extraCount = Math.max(0, diff.length - teaserItems.length);
+                }
+
+                return (
+                  <div class={cls}>
+                    {isRecommended && <div class="trim-badge">Doporučujeme</div>}
+                    <div class="trim-name">{t.name}</div>
+                    <div class="trim-price">{price.toLocaleString('cs-CZ')} Kč</div>
+                    <div class="trim-teaser">
+                      {teaserItems.length > 0 ? (
+                        <>
+                          <div class="trim-teaser-label">{teaserLabel}</div>
+                          <ul class="trim-list">
+                            {teaserItems.map((f) => (
+                              <li>
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                                <span>{f}</span>
+                              </li>
+                            ))}
+                          </ul>
+                          {i === 0 ? (
+                            <div class="trim-teaser-count">+ celkem {trimFeatureCount} prvků výbavy</div>
+                          ) : extraCount > 0 ? (
+                            <div class="trim-teaser-count">+ dalších {extraCount} novinek (celkem {trimFeatureCount} prvků)</div>
+                          ) : (
+                            <div class="trim-teaser-count">celkem {trimFeatureCount} prvků výbavy</div>
+                          )}
+                        </>
+                      ) : (
+                        <div class="trim-feature-empty">Specifikace doplníme.</div>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          );
+        })()}
 
         {/* ===== CTA na srovnání + plný ceník ===== */}
         <div class="trims-cta-row">
