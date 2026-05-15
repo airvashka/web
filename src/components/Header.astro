@@ -180,10 +180,40 @@ const navItems: Array<{ label: string; href: string; key: NonNullable<Props['act
   })();
 </script>
 
-<style>
-  /* Smart hide-on-scroll header — pouze mobile (<=960px).
-     Použijeme position: fixed (ne sticky), protože iOS Safari
-     nespouští transform na sticky elements během scroll. */
+<style is:global>
+  /* Smart hide-on-scroll header — funguje na všech obrazovkách.
+     is:global protože .subnav je v jiném souboru (model/[slug].astro).
+     Desktop: keep position sticky + transform.
+     Mobile (<=960): switch na position fixed + body padding (iOS Safari fix). */
+  .nav {
+    transition: transform 0.28s cubic-bezier(0.2, 0.7, 0.2, 1),
+                box-shadow 0.2s ease;
+    will-change: transform;
+  }
+  html.scrolled-up .nav,
+  html.scrolled-down .nav {
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  }
+  html.scrolled-down .nav {
+    transform: translateY(-100%);
+  }
+
+  /* Subnav schova s headerem — sticky element nemůže animovat top smoothly,
+     použijem transform: translateY místo změny top hodnoty */
+  .subnav {
+    transition: transform 0.28s cubic-bezier(0.2, 0.7, 0.2, 1);
+    will-change: transform;
+  }
+  html.scrolled-down .subnav {
+    transform: translateY(-76px);
+  }
+  @media (max-width: 960px) {
+    html.scrolled-down .subnav {
+      transform: translateY(-64px);
+    }
+  }
+
+  /* Mobile only: position fixed (iOS Safari nespouští transform na sticky elements) */
   @media (max-width: 960px) {
     .nav {
       position: fixed;
@@ -191,32 +221,12 @@ const navItems: Array<{ label: string; href: string; key: NonNullable<Props['act
       left: 0;
       right: 0;
       width: 100%;
-      transition: transform 0.28s cubic-bezier(0.2, 0.7, 0.2, 1),
-                  box-shadow 0.2s ease;
-      will-change: transform;
     }
-    /* Lehký shadow když user scrolluje (signal že nav je nad obsahem) */
-    html.scrolled-up .nav,
-    html.scrolled-down .nav {
-      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
-    }
-    html.scrolled-down .nav {
-      transform: translateY(-100%);
-    }
-
-    /* Subnav — sticky pod nav, animuje top při hide */
-    .subnav {
-      transition: top 0.28s cubic-bezier(0.2, 0.7, 0.2, 1);
-    }
-    html.scrolled-down .subnav {
-      top: 0;
-    }
-
-    /* Body padding aby obsah pod fixed nav neprekrýval */
     body {
       padding-top: 64px;
     }
   }
+
   @media (prefers-reduced-motion: reduce) {
     .nav, .subnav { transition: none !important; }
   }
