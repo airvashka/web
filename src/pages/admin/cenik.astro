@@ -355,9 +355,20 @@ function showReview(data) {
   $('result-panel').classList.remove('hidden');
   $('save-result').classList.add('hidden');
 
-  const trims = data.trim_levels ?? [];
-  const packages = data.option_packages ?? [];
-  const techData = data.technical_data ?? {};
+  // Defensive: Claude tool_use někdy vrátí stringified JSON místo objektů
+  const parseIf = (v, fallback) => {
+    if (typeof v === 'string') { try { return JSON.parse(v); } catch { return fallback; } }
+    return v ?? fallback;
+  };
+  data.trim_levels = parseIf(data.trim_levels, []);
+  data.option_packages = parseIf(data.option_packages, []);
+  data.technical_data = parseIf(data.technical_data, {});
+  if (!Array.isArray(data.trim_levels)) data.trim_levels = [];
+  if (!Array.isArray(data.option_packages)) data.option_packages = [];
+
+  const trims = data.trim_levels;
+  const packages = data.option_packages;
+  const techData = data.technical_data;
   const tdKeys = Object.keys(techData).length;
 
   $('count-trims').textContent = trims.length;
