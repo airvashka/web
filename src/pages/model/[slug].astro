@@ -291,6 +291,18 @@ const variantFuelSub: Record<string, string> = {
   ev: 'Elektromobil',
 };
 
+/* Mapování fuel_type → VariantBadge kind a theme color */
+function fuelTypeToVariantKind(ft?: string): 'ICE' | 'HEV' | 'EVX' {
+  if (ft === 'ev') return 'EVX';
+  if (ft === 'hybrid' || ft === 'phev') return 'HEV';
+  return 'ICE'; // petrol / diesel / prázdný
+}
+function fuelTypeToVariantTheme(ft?: string): 'ice' | 'hev' | 'evx' {
+  if (ft === 'ev') return 'evx';
+  if (ft === 'hybrid' || ft === 'phev') return 'hev';
+  return 'ice';
+}
+
 // Ostatní modely stejné značky (kromě aktuálního a kromě variant rodiny)
 const otherModelsRaw = await directusGet<any>('models', {
   filter: {
@@ -528,12 +540,8 @@ if (promoActive && promoDescription) {
             const isActive = vm.slug === slug;
             const fuelType = (vm as any).fuel_type ?? '';
             return (
-              <a class={`variant-pill${isActive ? ' is-active' : ''}`} href={`/model/${vm.slug}`}>
-                <span class="icbox">
-                  {fuelType === 'ev' && <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>}
-                  {(fuelType === 'hybrid' || fuelType === 'phev') && <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19.2 2.96c1.4 9.3-3.3 16.1-9.2 17.04Z"/><path d="M2 21c0-3 1.85-5.36 5.08-6"/></svg>}
-                  {(fuelType === 'petrol' || fuelType === 'diesel' || !fuelType) && <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="22" x2="15" y2="22"/><line x1="4" y1="9" x2="14" y2="9"/><path d="M14 22V4a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v18"/><path d="M14 13h2a2 2 0 0 1 2 2v2a2 2 0 0 0 2 2 2 2 0 0 0 2-2V9.83a2 2 0 0 0-.59-1.42L18 5"/></svg>}
-                </span>
+              <a class={`variant-pill variant-pill--${fuelTypeToVariantTheme(fuelType)}${isActive ? ' is-active' : ''}`} href={`/model/${vm.slug}`}>
+                <span class="icbox"><VariantBadge kind={fuelTypeToVariantKind(fuelType)} size={44} /></span>
                 <div>
                   <div class="vn">{vm.name}</div>
                   <div class="vs">{variantFuelSub[fuelType] ?? fuelLabels[fuelType] ?? '—'}</div>
@@ -561,24 +569,14 @@ if (promoActive && promoDescription) {
           ) : (
             <p>{rawModel.description ?? `${brand.name} ${rawModel.name} — model dostupný u SFR Motor.`}</p>
           )}
-          {(rawModel as any).variant_badge_kind && (() => {
-            const k = String((rawModel as any).variant_badge_kind).toUpperCase();
-            const variantLabels = { ICE: 'Spalovací motor', HEV: 'Plný hybrid', EVX: 'Elektromobil' };
-            return (
-              <div class="intro-variant-tag">
-                <VariantBadge kind={k} size={36} />
-                <span class="intro-variant-label">{variantLabels[k] ?? ''}</span>
-              </div>
-            );
-          })()}
         </div>
       </div>
 
-      {/* Lákadlový panel — render pod Představením (per model) */}
+      {/* Lákadlový panel — render pod Představením (každý model, theme dle fuel_type) */}
       {Array.isArray((rawModel as any).highlights_panel) && (rawModel as any).highlights_panel.length > 0 && (
         <HighlightsPanel
           items={(rawModel as any).highlights_panel}
-          theme={String((rawModel as any).variant_badge_kind ?? '').toLowerCase()}
+          theme={fuelTypeToVariantTheme(rawModel.fuel_type)}
         />
       )}
     </div>

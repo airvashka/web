@@ -134,6 +134,110 @@ const DATA = {
       { icon_kind: 'range',      big: 'Velký dojezd',    lab: 'Na jednu nádrž',   note: 'Bez kompromisů na delších trasách.' },
     ],
   },
+
+  // ─── KGM Tivoli (kompakt SUV, benzín) ──────
+  TIVOLI: {
+    kind: 'ICE',
+    items: [
+      { icon_kind: 'fuel',         big: '1.5 Turbo',  lab: 'Benzín',          note: 'Svižný benzínový motor pro každý den.' },
+      { icon_kind: 'transmission', big: 'Manuál / AT', lab: 'Na výběr',       note: 'Manuální i automatická převodovka v ceníku.' },
+      { icon_kind: 'awd',          big: 'FWD',        lab: 'Pohon předních', note: 'Lehká konstrukce, nižší spotřeba a náklady.' },
+    ],
+  },
+
+  // ─── KGM Korando (rodinné SUV) ─────────────
+  KORANDO: {
+    kind: 'ICE',
+    items: [
+      { icon_kind: 'awd',          big: '4×4 i 2WD',  lab: 'Na výběr',         note: 'Pohon všech kol pro klid v jakémkoli počasí.' },
+      { icon_kind: 'transmission', big: '6st AT',     lab: 'Automat Aisin',    note: 'Plynulé a vyzkoušené řazení.' },
+      { icon_kind: 'tow',          big: '1 500 kg',   lab: 'Brzděný přívěs',   note: 'Vhodný pro karavan i menší přívěs.' },
+    ],
+  },
+
+  // ─── KGM Rexton (velké rodinné SUV / off-road) ─────
+  REXTON: {
+    kind: 'ICE',
+    items: [
+      { icon_kind: 'awd',          big: '4×4',        lab: 'Pohon všech kol',   note: 'Skutečný off-road s nízkým převodem.' },
+      { icon_kind: 'tow',          big: '3 500 kg',   lab: 'Brzděný přívěs',    note: 'Nejvyšší trakční schopnost v třídě.' },
+      { icon_kind: 'transmission', big: '8st AT',     lab: 'Automat Mercedes',  note: 'Robustní převodovka pro náročné použití.' },
+    ],
+  },
+
+  // ─── KGM Musso (pickup) ───────────────────
+  MUSSO: {
+    kind: 'ICE',
+    items: [
+      { icon_kind: 'tow',          big: '3 500 kg',   lab: 'Brzděný přívěs',   note: 'Top tahačské schopnosti v segmentu.' },
+      { icon_kind: 'awd',          big: '4×4',        lab: 'Pohon všech kol',  note: 'Plnohodnotný off-road s redukcí.' },
+      { icon_kind: 'fuel',         big: '2.2 Diesel', lab: 'Vznětový motor',   note: 'Dlouhé trasy s rezervou točivého momentu.' },
+    ],
+  },
+
+  // ─── OMODA 9 / E9 ─────────────────────────
+  OMODA9_PHEV: {
+    kind: 'HEV',
+    items: [
+      { icon_kind: 'selfcharge', big: 'Plug-in hybrid', lab: 'Nabíjení i tankování', note: 'Krátké trasy elektricky, dlouhé bez kompromisů.' },
+      { icon_kind: 'range',      big: 'Velký dojezd',   lab: 'Hybrid + nádrž',       note: 'Bezstarostná dálnice i město.' },
+      { icon_kind: 'fuel',       big: 'Nízká spotřeba', lab: 'Úspora paliva',        note: 'Energetická efektivita prémiové třídy.' },
+    ],
+  },
+
+  // ─── JAECOO 8 ─────────────────────────────
+  JAECOO8_ICE: {
+    kind: 'ICE',
+    items: [
+      { icon_kind: 'awd',          big: '4×4 / 2WD',   lab: 'Na výběr',         note: 'Pohon všech kol nebo úsporné FWD.' },
+      { icon_kind: 'transmission', big: 'DCT 7st',     lab: 'Automat',          note: 'Rychlé řazení s prémiovou odezvou.' },
+      { icon_kind: 'fuel',         big: '2.0 Turbo',   lab: 'Benzín',           note: 'Silný motor pro velký SUV.' },
+    ],
+  },
+  JAECOO8_PHEV: {
+    kind: 'HEV',
+    items: [
+      { icon_kind: 'selfcharge', big: 'Plug-in hybrid', lab: 'Elektro + benzín', note: 'Tichá jízda po městě, klid na dálnici.' },
+      { icon_kind: 'range',      big: 'Velký dojezd',   lab: 'Hybrid + nádrž',   note: 'Stovky kilometrů bez plánování.' },
+      { icon_kind: 'fuel',       big: 'Nízká spotřeba', lab: 'Úspora paliva',    note: 'Hybridní pohon šetří denní rutinu.' },
+    ],
+  },
+
+  // ─── Farizon SuperVAN (elektrický užitkový) ──
+  FARIZON_VAN: {
+    kind: 'EVX',
+    items: [
+      { icon_kind: 'range',    big: 'Elektrický',     lab: 'Nulové emise',     note: 'Pro firmy s ohledem na životní prostředí.' },
+      { icon_kind: 'charge',   big: 'DC nabíjení',    lab: 'Rychle do akce',   note: 'Krátká přestávka — a zase v provozu.' },
+      { icon_kind: 'tow',      big: 'Velký nákladový prostor', lab: 'Užitkový',  note: 'Optimalizovaný pro logistiku v městě.' },
+    ],
+  },
+
+  // ─── FALLBACK ICE — pro neznámé spalovací modely ──
+  FALLBACK_ICE: {
+    kind: 'ICE',
+    items: [
+      { icon_kind: 'fuel',         big: 'Spalovací motor', lab: 'Benzín / Diesel', note: 'Klasický pohon s tisíci kilometry zkušeností.' },
+      { icon_kind: 'transmission', big: 'Automat',         lab: 'Plynulé řazení',  note: 'Komfortní jízda v každé situaci.' },
+      { icon_kind: 'awd',          big: 'Stabilita',       lab: 'Bezpečné chování', note: 'Důvěryhodné chování na silnici.' },
+    ],
+  },
+  FALLBACK_HEV: {
+    kind: 'HEV',
+    items: [
+      { icon_kind: 'selfcharge', big: 'Hybrid',         lab: 'Self-charging',   note: 'Baterii doplní motor a rekuperace.' },
+      { icon_kind: 'fuel',       big: 'Nízká spotřeba', lab: 'Úspora paliva',   note: 'Hybridní pohon šetří v městě i mimo něj.' },
+      { icon_kind: 'range',      big: 'Velký dojezd',   lab: 'Na jednu nádrž',  note: 'Dlouhé trasy bez kompromisů.' },
+    ],
+  },
+  FALLBACK_EV: {
+    kind: 'EVX',
+    items: [
+      { icon_kind: 'range',    big: 'Elektrický',    lab: 'Nulové emise',     note: 'Bez emisí, bez kompromisů na zážitku z jízdy.' },
+      { icon_kind: 'charge',   big: 'DC nabíjení',   lab: 'Rychle nabito',    note: 'Krátká pauza a jedete dál.' },
+      { icon_kind: 'heatpump', big: 'Tepelná pumpa', lab: 'Efektivní topení', note: 'V zimě úsporné teplo bez ztráty dojezdu.' },
+    ],
+  },
 };
 
 /* ──────────── PRAVIDLA detekce dle slugu ────────────
@@ -157,11 +261,34 @@ const RULES = [
   // JAECOO 7 — pozn. SHS = Super Hybrid System (Chery), tedy HEV
   { match: (s) => /jaecoo[-_ ]*7[-_ ]*(hev|hybrid|shs)/.test(s),                                                                   data: 'JAECOO7_HEV' },
   { match: (s) => /^jaecoo[-_ ]*7$/.test(s) || (/jaecoo[-_ ]*7/.test(s) && !/(hev|hybrid|shs)/.test(s)),                           data: 'JAECOO7_ICE' },
+
+  // JAECOO 8 — PHEV i ICE
+  { match: (s) => /jaecoo[-_ ]*8[-_ ]*(phev|plug|hybrid|shs|hev)/.test(s),                                                          data: 'JAECOO8_PHEV' },
+  { match: (s) => /jaecoo[-_ ]*8/.test(s),                                                                                          data: 'JAECOO8_ICE' },
+
+  // OMODA 9 (PHEV)
+  { match: (s) => /omoda[-_ ]*9|omoda[-_ ]*e9/.test(s),                                                                             data: 'OMODA9_PHEV' },
+
+  // KGM modely (zbytek)
+  { match: (s) => /tivoli/.test(s),                                                                                                 data: 'TIVOLI'   },
+  { match: (s) => /korando/.test(s),                                                                                                data: 'KORANDO'  },
+  { match: (s) => /rexton/.test(s),                                                                                                 data: 'REXTON'   },
+  { match: (s) => /musso/.test(s),                                                                                                  data: 'MUSSO'    },
+
+  // Farizon (elektrické dodávky)
+  { match: (s) => /farizon|supervan/.test(s),                                                                                       data: 'FARIZON_VAN' },
 ];
 
+/* Pravidla pro fallback dle fuel_type — když explicitní preset neexistuje. */
+function fallbackByFuelType(fuelType) {
+  const ft = (fuelType || '').toLowerCase();
+  if (ft === 'ev') return 'FALLBACK_EV';
+  if (ft === 'hybrid' || ft === 'phev') return 'FALLBACK_HEV';
+  return 'FALLBACK_ICE'; // petrol / diesel / prázdný
+}
+
 async function findCandidateModels() {
-  // Stáhneme všechny published modely, klient-side filter podle slugu
-  const resp = await api('GET', `/items/models?filter[status][_eq]=published&limit=200&fields=id,slug,name,highlights_panel,variant_badge_kind`);
+  const resp = await api('GET', `/items/models?filter[status][_eq]=published&limit=200&fields=id,slug,name,fuel_type,highlights_panel,variant_badge_kind`);
   return resp.data || [];
 }
 
@@ -194,24 +321,36 @@ async function main() {
 
   const models = await findCandidateModels();
   const matched = [];
+  const fallbackUsed = [];
   for (const m of models) {
     const key = detect(m.slug);
-    if (key) matched.push({ ...m, _key: key });
+    if (key) {
+      matched.push({ ...m, _key: key, _fallback: false });
+    } else {
+      // Žádný explicitní preset — použij fallback dle fuel_type, ať každý model má panel
+      const fb = fallbackByFuelType(m.fuel_type);
+      matched.push({ ...m, _key: fb, _fallback: true });
+      fallbackUsed.push(m.slug);
+    }
   }
 
   if (matched.length === 0) {
-    warn('Žádné modely k aktualizaci nenalezeny. Pravidla pokrývají Torres, Actyon, Omoda 5, Jaecoo 7.');
-    info(`Modely v Directus: ${models.map((m) => m.slug).slice(0, 40).join(', ')}`);
+    warn('Žádné modely v Directus.');
     rl.close();
     return;
   }
 
-  console.log(`Nalezeno ${matched.length} modelů k aktualizaci:\n`);
+  console.log(`Celkem ${matched.length} modelů (z toho ${fallbackUsed.length} přes fallback dle fuel_type):\n`);
   for (const m of matched) {
     const d = DATA[m._key];
-    console.log(`  • ${m.slug.padEnd(28)} → ${m._key.padEnd(14)} (${d.kind})`);
+    const flag = m._fallback ? ' (fallback)' : '';
+    console.log(`  • ${m.slug.padEnd(28)} → ${m._key.padEnd(14)} (${d.kind})${flag}`);
   }
   console.log('');
+  if (fallbackUsed.length > 0) {
+    info(`Modely s obecnými fallback textem (uprav v Directus admin → Models → Highlights panel):`);
+    info(`  ${fallbackUsed.join(', ')}\n`);
+  }
 
   for (const m of matched) {
     const d = DATA[m._key];

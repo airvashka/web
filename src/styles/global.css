@@ -2437,26 +2437,33 @@ button.thumb-more {
 .variant-pill {
   border: 1px solid var(--line);
   border-radius: var(--radius);
-  padding: 18px 22px;
+  padding: 16px 20px;
   background: #fff;
-  display: flex; align-items: center; gap: 16px;
+  display: flex; align-items: center; gap: 14px;
   cursor: pointer;
   transition: all .15s;
   text-align: left;
+  --theme: var(--accent);
 }
-.variant-pill:hover { border-color: var(--ink); }
+/* Theme barvy per variant (ICE/HEV/EVX) — souznění s VariantBadge */
+.variant-pill.variant-pill--ice { --theme: #B4762E; }
+.variant-pill.variant-pill--hev { --theme: #2A7A8F; }
+.variant-pill.variant-pill--evx { --theme: #2F9B5C; }
+
+.variant-pill:hover { border-color: var(--theme); transform: translateY(-1px); }
 .variant-pill.is-active {
-  border-color: var(--accent);
-  box-shadow: 0 0 0 1px var(--accent);
+  border-color: var(--theme);
+  box-shadow: 0 0 0 1px var(--theme);
 }
 .variant-pill .icbox {
+  /* VariantBadge má vlastní gradient bg → icbox je jen wrapper bez vlastního pozadí */
   width: 44px; height: 44px;
-  border-radius: 12px;
-  background: var(--bg-soft);
   display: grid; place-items: center;
-  color: var(--ink);
+  line-height: 0;
+  flex-shrink: 0;
 }
-.variant-pill.is-active .icbox { background: var(--accent-soft); color: var(--accent); }
+.variant-pill .icbox svg { display: block; }
+.variant-pill.is-active .vn { color: var(--theme); }
 .variant-pill .vn { font-family: var(--font-display); font-weight: 600; font-size: 15px; letter-spacing: -0.01em; }
 .variant-pill .vs { font-size: 12px; color: var(--text-muted); }
 
@@ -2661,48 +2668,8 @@ button.thumb-more {
 .fuel-tag.pickup { background: #8A6E50; color: #fff; }
 .fuel-tag.dodavka { background: #4A6F8E; color: #fff; }
 
-/* VariantBadge — top-right na model card hero */
-.variant-badge-pos {
-  position: absolute;
-  top: 12px;
-  right: 12px;
-  z-index: 2;
-  display: block;
-  line-height: 0;
-  filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.18));
-}
-.variant-badge-pos svg { display: block; }
-
-/* Intro variant tag (na model detailu pod popisem) */
-.intro-variant-tag {
-  margin-top: 16px;
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  padding: 6px 14px 6px 6px;
-  background: var(--bg-soft, #fafaf7);
-  border: 1px solid var(--line, #e5e5e5);
-  border-radius: 999px;
-}
-.intro-variant-tag svg { display: block; }
-.intro-variant-label {
-  font-family: var(--font-display, inherit);
-  font-size: 13px;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--text-muted, #6b7280);
-  font-weight: 600;
-}
-
-/* Info title badge — sklad detail next to model name */
-.info-title {
-  display: inline-flex;
-  align-items: center;
-  gap: 14px;
-  flex-wrap: wrap;
-}
-.info-title-badge { display: inline-block; line-height: 0; }
-.info-title-badge svg { display: block; }
+/* (variant-badge-pos / intro-variant-tag / info-title-badge — odstraněno,
+   VariantBadge se používá jen v variants switcher panelu uvnitř detailu modelu) */
 
 .model-body {
   padding: 28px 28px 24px;

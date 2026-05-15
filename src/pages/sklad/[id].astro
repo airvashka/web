@@ -1,7 +1,6 @@
 ---
 import BaseLayout from '@layouts/BaseLayout.astro';
 import DirectusImage from '@components/DirectusImage.astro';
-import VariantBadge from '@components/VariantBadge.astro';
 import Breadcrumbs from '@components/Breadcrumbs.astro';
 import JsonLd from '@components/JsonLd.astro';
 import { directusGet, directusAsset } from '@lib/directus';
@@ -384,12 +383,7 @@ const description = (v.description ?? '').split(/\n\s*\n/).filter(Boolean);
             {trim && <><span class="dot">·</span><span class="info-trim-chip">{trim.name}</span></>}
             {year && <><span class="dot">·</span><span>Model {year}</span></>}
           </div>
-          <h1 class="info-title">
-            <span>{model?.name ?? title}</span>
-            {model?.variant_badge_kind && (
-              <span class="info-title-badge"><VariantBadge kind={model.variant_badge_kind} size={36} /></span>
-            )}
-          </h1>
+          <h1 class="info-title">{model?.name ?? title}</h1>
           {model?.tagline && <p class="info-tagline">{model.tagline}</p>}
 
           <ul class="info-meta-chips">
