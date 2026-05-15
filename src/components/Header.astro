@@ -142,32 +142,35 @@ const navItems: Array<{ label: string; href: string; key: NonNullable<Props['act
     });
   })();
 
-  // ===== Smart hide-on-scroll header (mobile only via CSS @media) =====
+  // ===== Smart hide-on-scroll header =====
   // Track scroll direction → toggle html.scrolled-down / scrolled-up
-  // CSS pak na mobilu (≤960) animuje translateY na .nav a .subnav.
+  // CSS animuje translateY na .nav (subnav zůstává nezměněn).
   (function () {
     let lastY = window.scrollY;
     let ticking = false;
-    const THRESHOLD = 80;   // px from top — pod tím header vždy viditelný
-    const DELTA = 5;        // min px scroll change před změnou state
+    const THRESHOLD = 200;  // px from top — pod tím žádné hide/show; klid
+    const DELTA = 10;       // min px scroll change před změnou state (anti-thrash)
     const root = document.documentElement;
 
     function update() {
       const y = window.scrollY;
       const diff = y - lastY;
-      if (Math.abs(diff) > DELTA) {
-        if (y < THRESHOLD) {
-          root.classList.remove('scrolled-down');
-          root.classList.add('scrolled-up');
-        } else if (diff > 0) {
-          root.classList.add('scrolled-down');
-          root.classList.remove('scrolled-up');
-        } else {
-          root.classList.remove('scrolled-down');
-          root.classList.add('scrolled-up');
-        }
-        lastY = y;
+      if (Math.abs(diff) < DELTA) {
+        ticking = false;
+        return;
       }
+      if (y < THRESHOLD) {
+        // Near top — neutral state, no animations
+        root.classList.remove('scrolled-down');
+        root.classList.remove('scrolled-up');
+      } else if (diff > 0) {
+        root.classList.add('scrolled-down');
+        root.classList.remove('scrolled-up');
+      } else {
+        root.classList.remove('scrolled-down');
+        root.classList.add('scrolled-up');
+      }
+      lastY = y;
       ticking = false;
     }
 
@@ -198,20 +201,11 @@ const navItems: Array<{ label: string; href: string; key: NonNullable<Props['act
     transform: translateY(-100%);
   }
 
-  /* Subnav schova s headerem — sticky element nemůže animovat top smoothly,
-     použijem transform: translateY místo změny top hodnoty */
-  .subnav {
-    transition: transform 0.28s cubic-bezier(0.2, 0.7, 0.2, 1);
-    will-change: transform;
-  }
-  html.scrolled-down .subnav {
-    transform: translateY(-76px);
-  }
-  @media (max-width: 960px) {
-    html.scrolled-down .subnav {
-      transform: translateY(-64px);
-    }
-  }
+  /* Subnav zůstává sticky na své pozici. Když header zmizí, je nad ní 64px gap
+     (transparentní oblast nad subnavem). To je lepší než thrashing animace. */
+  /* Pokud chceš subnav vyplnit gap, můžeš přidat:
+     html.scrolled-down .subnav { box-shadow: 0 -64px 0 #fff; }
+     ale zatím nech jak je. */
 
   /* Mobile only: position fixed (iOS Safari nespouští transform na sticky elements) */
   @media (max-width: 960px) {
