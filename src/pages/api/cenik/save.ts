@@ -1,24 +1,25 @@
 /**
- * Cenik save endpoint.
+ * Cenik save endpoint — accepts matrix-format data, transforms to Directus.
  *
  * POST application/json:
  *   {
  *     model_year_id: string|number,
  *     directus_token: string,
  *     data: {
- *       trim_levels?: [...],
- *       option_packages?: [...],
- *       technical_data?: {...}
+ *       trims: [{ name, list_price }],
+ *       sections: [{ name, rows: [{ feature, code, cells: [...] }] }],
+ *       packages: [{ name, code, contents, cells }],
+ *       colors_exterior: [...],
+ *       colors_interior: [...],
+ *       technical_data: { ... }
  *     }
  *   }
  *
- * Operace:
- *   1) PATCH model_years.technical_data
- *   2) Pro každý trim: upsert podle (model_year, name) case-insensitive
- *   3) Pro každý package: upsert podle (model_year, name)
- *
- * Expanduje "viz X" reference (z Farizon ceníku) — pokud features = ["viz X"],
- * zkopíruje features z trim s name=X.
+ * Transform:
+ *   - Cell "S" → patří do trim_levels.features (s sekcí jako category)
+ *   - Cell číslo → trim_levels.optional_items
+ *   - Cell paket name → option_packages.features (řádky odkazujou na paket)
+ *   - Package row → option_packages s pricing_per_trim z cells
  *
  * Response: { ok: true, summary: {...} }
  */
@@ -28,37 +29,15 @@ export const prerender = false;
 
 const DIRECTUS_URL = import.meta.env.PUBLIC_DIRECTUS_URL || 'https://directus-production-3e67.up.railway.app';
 
-/** Convert features z {pohon: [items]} na [{category, items}] (Directus repeater) */
-function convertFeatures(features: any): Array<{ category: string; items: string[] }> {
-  if (Array.isArray(features)) return features;
-  if (features && typeof features === 'object') {
-    return Object.entries(features)
-      .map(([category, items]) => ({
-        category,
-        items: Array.isArray(items) ? items.filter(Boolean) : [],
-      }))
-      .filter((f) => f.items.length > 0);
-  }
-  return [];
-}
+// ─── Helpers ─────────────────────────────────────────────
 
-/** Convert tech data z {Motor: "1.5"} na [{label, value}] (Directus repeater) */
-function convertTechData(td: any): Array<{ label: string; value: string }> {
-  if (Array.isArray(td)) return td;
-  if (td && typeof td === 'object') {
-    return Object.entries(td).map(([label, value]) => ({ label, value: String(value) }));
-  }
-  return [];
-}
-
-/** Slugify pro povinné slug field v trim_levels / option_packages */
 function slugify(s: string): string {
   return String(s ?? '')
     .toLowerCase()
     .trim()
     .replace(/\+/g, '-plus')
     .replace(/&/g, '-and')
-    .normalize('NFD').replace(/[̀-ͯ]/g, '')  // strip diacritics (Štýl → Styl)
+    .normalize('NFD').replace(/[̀-ͯ]/g, '')
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/^-+|-+$/g, '')
     || 'untitled';
@@ -76,26 +55,134 @@ async function dapi(token: string, method: string, path: string, body?: any) {
   return j;
 }
 
-/** Pokud features = ["viz X"], expanduj z trim s name=X. */
-function expandReferences(trims: any[]): any[] {
-  const byName = new Map<string, any>();
-  for (const t of trims) byName.set(String(t.name ?? '').trim().toLowerCase(), t);
+/** Cell value classifier */
+type CellKind = 'standard' | 'optional' | 'package' | 'unavailable' | 'conditional' | 'choice' | 'other';
 
-  for (const t of trims) {
-    if (!t.features || typeof t.features !== 'object') continue;
-    for (const cat of Object.keys(t.features)) {
-      const items = t.features[cat];
-      if (Array.isArray(items) && items.length === 1 && typeof items[0] === 'string' && /^viz\s+/i.test(items[0])) {
-        const refName = items[0].replace(/^viz\s+/i, '').trim().toLowerCase();
-        const ref = byName.get(refName);
-        if (ref?.features?.[cat]) {
-          t.features[cat] = [...ref.features[cat]];
+function classifyCell(cell: string): { kind: CellKind; price?: number; packageCode?: string } {
+  const v = String(cell ?? '').trim();
+  if (!v || v === '-' || v === '—') return { kind: 'unavailable' };
+  if (v === 'S' || /^S$/i.test(v)) return { kind: 'standard' };
+  // S (Hybrid), S (4x4) — conditional standard
+  if (/^S\s*\(/i.test(v)) return { kind: 'conditional' };
+  // Number (with optional space-separated thousands)
+  const num = v.replace(/\s/g, '');
+  if (/^\d+$/.test(num)) return { kind: 'optional', price: parseInt(num, 10) };
+  // "volitelné" — choice (e.g., colors)
+  if (/^volitelné/i.test(v)) return { kind: 'choice' };
+  // Anything else (CLUB+, BLACK, SAFETY, ...) treat as package reference
+  return { kind: 'package', packageCode: v };
+}
+
+/** Convert tech data {key: value} → Directus repeater [{label, value}] */
+function convertTechData(td: any): Array<{ label: string; value: string }> {
+  if (Array.isArray(td)) return td;
+  if (td && typeof td === 'object') {
+    return Object.entries(td)
+      .filter(([k, v]) => k && v !== undefined && v !== null && String(v).trim() !== '')
+      .map(([label, value]) => ({ label, value: String(value) }));
+  }
+  return [];
+}
+
+// ─── Matrix → Directus transform ─────────────────────────
+
+interface MatrixData {
+  trims?: Array<{ name: string; list_price?: number }>;
+  sections?: Array<{ name: string; rows: Array<{ feature: string; code?: string; cells: string[] }> }>;
+  packages?: Array<{ name: string; code?: string; contents?: string[]; cells: string[] }>;
+  colors_exterior?: any[];
+  colors_interior?: any[];
+  technical_data?: Record<string, string>;
+}
+
+interface DirectusTrim {
+  name: string;
+  list_price?: number;
+  features: Array<{ category: string; items: string[] }>;
+  optional_items: Array<{ name: string; code?: string; price: number }>;
+}
+
+interface DirectusPackage {
+  name: string;
+  code?: string;
+  features: string[];
+  pricing_per_trim: Record<string, number | string>;
+}
+
+function transformMatrix(data: MatrixData): { trims: DirectusTrim[]; packages: DirectusPackage[] } {
+  const trims = (data.trims ?? []).map((t) => ({
+    name: t.name,
+    list_price: t.list_price,
+    features: [] as Array<{ category: string; items: string[] }>,
+    optional_items: [] as Array<{ name: string; code?: string; price: number }>,
+  }));
+
+  // Per trim, accumulate features by section
+  const featuresByTrimSection: Record<number, Record<string, string[]>> = {};
+  trims.forEach((_, i) => { featuresByTrimSection[i] = {}; });
+
+  // Walk sections → rows → cells
+  for (const section of data.sections ?? []) {
+    for (const row of section.rows ?? []) {
+      const cells = row.cells ?? [];
+      for (let i = 0; i < trims.length; i++) {
+        const cell = cells[i] ?? '';
+        const { kind, price } = classifyCell(cell);
+
+        if (kind === 'standard' || kind === 'conditional') {
+          // Add to trim.features under this section as category
+          if (!featuresByTrimSection[i][section.name]) featuresByTrimSection[i][section.name] = [];
+          let displayFeature = row.feature;
+          if (kind === 'conditional') {
+            displayFeature = `${row.feature} (${cell})`;  // např. "ACC (S Hybrid)"
+          }
+          featuresByTrimSection[i][section.name].push(displayFeature);
+        } else if (kind === 'optional' && price !== undefined) {
+          trims[i].optional_items.push({
+            name: row.feature,
+            code: row.code || undefined,
+            price,
+          });
         }
+        // package, unavailable, choice, other — ignored for trim_levels (jsou v packages section samostatně)
       }
     }
   }
-  return trims;
+
+  // Convert featuresByTrimSection → trim.features array
+  for (let i = 0; i < trims.length; i++) {
+    trims[i].features = Object.entries(featuresByTrimSection[i])
+      .map(([category, items]) => ({ category, items: items.filter(Boolean) }))
+      .filter((f) => f.items.length > 0);
+  }
+
+  // Packages
+  const packages: DirectusPackage[] = (data.packages ?? []).map((p) => {
+    const pricing_per_trim: Record<string, number | string> = {};
+    for (let i = 0; i < trims.length; i++) {
+      const cell = p.cells?.[i] ?? '';
+      const { kind, price } = classifyCell(cell);
+      const trimKey = slugify(trims[i].name); // např. "club", "style", "premium"
+      if (kind === 'optional' && price !== undefined) {
+        pricing_per_trim[trimKey] = price;
+      } else if (kind === 'standard' || kind === 'conditional') {
+        pricing_per_trim[trimKey] = 'standard';
+      } else {
+        pricing_per_trim[trimKey] = 'unavailable';
+      }
+    }
+    return {
+      name: p.name,
+      code: p.code || undefined,
+      features: Array.isArray(p.contents) ? p.contents : [],
+      pricing_per_trim,
+    };
+  });
+
+  return { trims, packages };
 }
+
+// ─── Save endpoint ───────────────────────────────────────
 
 export const POST: APIRoute = async ({ request }) => {
   try {
@@ -116,7 +203,11 @@ export const POST: APIRoute = async ({ request }) => {
       errors: [] as string[],
     };
 
-    // 1) Technical data → PATCH model_years (konverze na [{label, value}] repeater)
+    // Transform matrix → Directus shapes
+    const { trims, packages } = transformMatrix(data as MatrixData);
+    summary.details.push(`Transform: ${trims.length} trims, ${packages.length} packages`);
+
+    // 1) Technical data → PATCH model_years
     if (data.technical_data && typeof data.technical_data === 'object' && Object.keys(data.technical_data).length > 0) {
       try {
         const tdArray = convertTechData(data.technical_data);
@@ -128,33 +219,31 @@ export const POST: APIRoute = async ({ request }) => {
       }
     }
 
-    // 2) Trim levels — expand references → upsert
-    if (Array.isArray(data.trim_levels) && data.trim_levels.length > 0) {
-      const expanded = expandReferences(JSON.parse(JSON.stringify(data.trim_levels)));
-
-      // Načti existující trims pro case-insensitive match
+    // 2) Trim levels — case-insensitive upsert
+    if (trims.length > 0) {
       const existingResp = await dapi(directus_token, 'GET', `/items/trim_levels?filter[model_year][_eq]=${model_year_id}&limit=200&fields=id,name`);
       const existingByName = new Map<string, any>();
       for (const t of (existingResp as any).data) {
         existingByName.set(String(t.name ?? '').trim().toLowerCase(), t);
       }
 
-      for (const t of expanded) {
+      for (const t of trims) {
         try {
           const payload: any = {
             name: t.name,
             slug: slugify(t.name),
             model_year: model_year_id,
             status: 'published',
+            features: t.features,
+            optional_items: t.optional_items,
           };
           if (t.list_price !== undefined && t.list_price !== null) payload.list_price = t.list_price;
-          if (t.features) payload.features = convertFeatures(t.features);
 
           const existing = existingByName.get(String(t.name ?? '').trim().toLowerCase());
           if (existing) {
             await dapi(directus_token, 'PATCH', `/items/trim_levels/${existing.id}`, payload);
             summary.trims_updated++;
-            summary.details.push(`Trim "${t.name}" → updated (id=${existing.id})`);
+            summary.details.push(`Trim "${t.name}" → updated (id=${existing.id}, ${t.features.length} sekcí, ${t.optional_items.length} optional)`);
           } else {
             const created = await dapi(directus_token, 'POST', '/items/trim_levels', payload);
             summary.trims_created++;
@@ -167,22 +256,22 @@ export const POST: APIRoute = async ({ request }) => {
     }
 
     // 3) Option packages — upsert
-    if (Array.isArray(data.option_packages) && data.option_packages.length > 0) {
+    if (packages.length > 0) {
       const existingResp = await dapi(directus_token, 'GET', `/items/option_packages?filter[model_year][_eq]=${model_year_id}&limit=200&fields=id,name`);
       const existingByName = new Map<string, any>();
       for (const p of (existingResp as any).data) {
         existingByName.set(String(p.name ?? '').trim().toLowerCase(), p);
       }
 
-      for (const p of data.option_packages) {
+      for (const p of packages) {
         try {
           const payload: any = {
             name: p.name,
             slug: slugify(p.name),
             model_year: model_year_id,
+            features: p.features,
+            pricing_per_trim: p.pricing_per_trim,
           };
-          if (p.features) payload.features = p.features;
-          if (p.pricing_per_trim) payload.pricing_per_trim = p.pricing_per_trim;
 
           const existing = existingByName.get(String(p.name ?? '').trim().toLowerCase());
           if (existing) {

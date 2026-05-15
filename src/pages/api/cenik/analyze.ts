@@ -16,37 +16,46 @@ import { jsonrepair } from 'jsonrepair';
 
 export const prerender = false;
 
-const SYSTEM_PROMPT = `Jsi expert na extrakci strukturovaných dat z českých ceníků automobilů (značky KGM, OMODA & JAECOO, Farizon).
+const SYSTEM_PROMPT = `Jsi expert na extrakci dat z českých ceníků automobilů (značky KGM, OMODA & JAECOO, Farizon).
 
-ÚKOL: Z PDF ceníku extrahuj:
-1. Trim levels (výbavové stupně, např. Style, Style+, Elegant, Premium, CLUB, CLEVER)
-2. Option packages (paketové výbavy, např. TECH paket, BLACK paket, STYLE+ paket)
-3. Technical data (motor, výkon, převodovka, rozměry, atd.)
+ÚKOL: Z PDF extrahuj data v MATRIX struktuře přesně tak, jak je v PDF tabulkách.
 
-DETEKCE: Pokud PDF obsahuje jen některé z nich, ostatní vrať jako prázdná pole/objekt. Označ v "detected" co jsi našel.
+═══════════════════════════════════════════════════════════════
+KLÍČOVÁ PRAVIDLA
+═══════════════════════════════════════════════════════════════
 
-FEATURES KATEGORIE: Při zařazování standardní výbavy do trim_levels.features, použij tyto kategorie (vždy přesně tato jména klíčů):
-- pohon (Pohon, převodovka)
-- podvozek (Zavěšení kol, řízení, brzdy)
-- bezpecnost (Bezpečnost, airbagy)
-- asistent (Asistenční systémy)
-- komfort (Interiér, klimatizace, sedadla)
-- multimedia (Audio, navigace, displej)
-- exterier (Světla, kola, exteriérové prvky)
-- ostatni (Co se nevejde jinam)
+1) **TRIMS = SLOUPCE.** Vůz má jeden nebo více výbavových stupňů (CLUB, STYLE, PREMIUM, nebo třeba jen PREMIUM). Pole "trims" má jeden záznam per sloupec. List_price je ceníková cena v Kč jako integer (např. 649900, ne "649 900 Kč").
 
-⚡ DEDUPLIKACE — DŮLEŽITÉ: Pokud má trim B v kategorii (např. "podvozek") **EXAKTNĚ stejné features jako trim A**, vrať pro tu kategorii jen jeden prvek: ["viz A"]. Příklad:
-  trim_levels: [
-    { "name": "SELECT", "features": { "podvozek": ["Brzdy ABS", "ESP", "..."] } },
-    { "name": "EXCLUSIVE", "features": { "podvozek": ["viz SELECT"] } }
-  ]
-Save logika to automaticky expanduje. Šetří to tisíce tokenů u modelů s mnoha trimy. Použij to vždy, když trim B kompletně dědí features kategorie z trim A.
+2) **SEKCE = NÁZVY Z PDF, NE VLASTNÍ KATEGORIE.** Sekce v ceníku (např. "MOTORIZACE/VÝBAVA", "ZAVĚŠENÍ KOL, ŘÍZENÍ, BRZDY", "BEZPEČNOST", "INTERIÉR/KOMFORT", "MULTIMEDIA", "EXTERIÉR") přepiš LITERAL z PDF. Pokud má PDF jen seznam bez sekcí (OMODA single-trim formát), použij sekce z bold/heading textu (ASISTENT, BEZPEČNOST, INFOTAINMENT, atd.).
 
-CENY:
-- list_price: integer v Kč, bez mezer (např. 549900, ne "549 900")
-- pricing_per_trim u option_packages: object kde klíč = trim name (lowercase: "style", "premium"), hodnota = number Kč | "standard" (pokud je v standardní výbavě toho trim) | "unavailable" (pokud paket není dostupný v tom trimu)
+3) **CELL VOCABULARY — PRESERVUJ DOSLOVNĚ:**
+   - "S" = standardní v daném trimu (zdarma)
+   - "-" nebo "" = nedostupné v daném trimu
+   - Číslo jako STRING (např. "14900", "49900") = lze dokoupit za cenu v Kč. **BEZ MEZER, BEZ Kč, jen číslice.**
+   - Název paketu (např. "CLUB+", "BLACK", "SAFETY", "TECH") = součást daného paketu
+   - "S (Hybrid)" / "S (4x4)" / podobné = podmínečně standard
+   - "volitelné" = lze vybrat (typicky textil/kůže — musíš vybrat jednu)
+   - Pokud cell obsahuje něco specifického (např. "cena viz barva interiéru"), preserve doslovně.
 
-VRAŤ POUZE VALIDNÍ JSON, žádný markdown wrapper, žádný komentář.`;
+4) **CELLS POLE má PŘESNĚ stejnou délku jako trims pole.** Pokud trims=[CLUB, STYLE, PREMIUM], každý row.cells má 3 hodnoty (i kdyby byly prázdné nebo "-").
+
+5) **NEKATEGORIZUJ POLOŽKY DO PŘEDDEFINOVANÝCH BUCKETŮ.** Necpi věci do "pohon/podvozek/...". Drž originální sekce z PDF.
+
+6) **PAKETY jsou separate entita v "packages" poli:**
+   - Každý paket má name (např. "CLUB+ paket"), code (např. "CLUB+"), contents (list co obsahuje), a cells (cena/dostupnost per trim z paketového řádku v ceníku)
+   - Pokud položka v sections.rows má v cells hodnotu "CLUB+" nebo "BLACK", znamená to: tato položka je obsažena v tom paketu pro daný trim
+   - V "contents" paketu uveď VŠECHNY features co paket přidává
+
+7) **BARVY = samostatné sekce** ("colors_exterior", "colors_interior"):
+   - Každá barva má name, code (např. "WAA", "ADE"), type (např. "základní", "metalická", "dvoutónová"), cells (cena per trim)
+
+8) **TECH DATA** = key-value object {název parametru: hodnota jako string}
+
+9) **PRESERVUJ LITERAL FORMULACE.** Neparafrázuj, neměň slova. Pokud PDF říká "Pohon všech kol (AWD) s možností uzamčení pohonu + rezervní kolo 145/90 D16 (pouze v kombinaci s automatickou převodovkou)", vrať to celé doslovně. Včetně závorek, čárek, podmínek.
+
+10) **KÓD VÝBAVY** — pokud má řádek v PDF kód (např. "PT6/E11", "PCA/TS7", "ISN", "TAZ"), dej ho do "code" pole. Jinak null.
+
+Vrať data přes tool extract_pricelist. ŽÁDNÝ text mimo tool call.`;
 
 const RESPONSE_SCHEMA = `{
   "detected": {
@@ -175,64 +184,105 @@ Použij tool extract_pricelist a předej strukturovaná data. Vyplň co najdeš,
 
     const anthropic = new Anthropic({ apiKey: import.meta.env.ANTHROPIC_API_KEY });
 
-    // Tool use — vrátí strukturovaný objekt, ne text JSON (žádné parsing chyby)
-    const featureCategories = ['pohon', 'podvozek', 'bezpecnost', 'asistent', 'komfort', 'multimedia', 'exterier', 'ostatni'];
-    const featuresSchema: any = { type: 'object', properties: {} };
-    for (const cat of featureCategories) {
-      featuresSchema.properties[cat] = { type: 'array', items: { type: 'string' }, description: `Items v kategorii ${cat}. Pokud trim B má stejné jako trim A, použij ["viz A"]` };
-    }
-
+    // Tool use — MATRIX schema preserves PDF structure (sekce + cells per trim)
     const tools: any[] = [{
       name: 'extract_pricelist',
-      description: 'Uloží extrahovaná data ze ceníku do strukturovaného formátu.',
+      description: 'Uloží extrahovaná data z ceníku v MATRIX struktuře (sekce × řádky × buňky per trim).',
       input_schema: {
         type: 'object',
         properties: {
           detected: {
             type: 'object',
             properties: {
-              has_trim_levels: { type: 'boolean' },
-              has_option_packages: { type: 'boolean' },
-              has_technical_data: { type: 'boolean' },
-              model_name_guess: { type: 'string', description: 'Detekovaný název modelu (např. "Korando" nebo "OMODA 9 SHS")' },
-              year_guess: { type: 'number', description: 'Detekovaný rok' },
+              model_name: { type: 'string', description: 'Detekovaný název modelu (např. "Torres", "OMODA 9 SHS")' },
+              year: { type: 'number', description: 'Detekovaný modelový rok' },
+              format: { type: 'string', enum: ['matrix', 'list'], description: '"matrix" pokud má více trimů ve sloupcích, "list" pokud jen jeden trim' },
             },
           },
-          trim_levels: {
+          trims: {
             type: 'array',
+            description: 'Trim levels jako sloupce v ceníku. Pokud má model jediný trim, 1 entry.',
             items: {
               type: 'object',
               properties: {
-                name: { type: 'string', description: 'Název trimu (např. "Style+", "PREMIUM")' },
-                list_price: { type: 'number', description: 'Cena v Kč (integer, např. 549900)' },
-                features: featuresSchema,
+                name: { type: 'string', description: 'Název trimu (např. "CLUB", "STYLE", "PREMIUM"). Preserveruj original case z PDF.' },
+                list_price: { type: 'number', description: 'Ceníková cena v Kč jako integer (např. 649900). Pokud ICE/HEV verze, vyber ICE — Hybrid bude v dedikovaném row v sections.' },
               },
               required: ['name'],
             },
           },
-          option_packages: {
+          sections: {
+            type: 'array',
+            description: 'Sekce z PDF s LITERAL názvy (MOTORIZACE/VÝBAVA, ZAVĚŠENÍ KOL, BEZPEČNOST, atd.). NEKATEGORIZUJ do vlastních škatulek.',
+            items: {
+              type: 'object',
+              properties: {
+                name: { type: 'string', description: 'Název sekce z PDF doslova (např. "MOTORIZACE/VÝBAVA")' },
+                rows: {
+                  type: 'array',
+                  items: {
+                    type: 'object',
+                    properties: {
+                      feature: { type: 'string', description: 'Název položky LITERAL z PDF (i s podmínkami v závorkách)' },
+                      code: { type: 'string', description: 'Kód výbavy z PDF (např. "PT6/E11", "PCA/TS7"). Pokud chybí, prázdný string.' },
+                      cells: {
+                        type: 'array',
+                        description: 'Hodnoty buněk per trim. Délka = trims.length. LITERAL: "S" / "-" / "14900" (číslo bez mezer) / "CLUB+" (název paketu) / "S (Hybrid)" / "volitelné". Žádné Kč ani jiné jednotky.',
+                        items: { type: 'string' },
+                      },
+                    },
+                    required: ['feature', 'cells'],
+                  },
+                },
+              },
+              required: ['name', 'rows'],
+            },
+          },
+          packages: {
+            type: 'array',
+            description: 'Pakety jako separátní entity. Mají jak vlastní řádek v ceníku (cells = cena/dostupnost per trim), tak obsah (contents).',
+            items: {
+              type: 'object',
+              properties: {
+                name: { type: 'string', description: 'Název paketu (např. "CLUB+ paket")' },
+                code: { type: 'string', description: 'Kód paketu (např. "CLUB+", "CVG, CGK", "BLACK")' },
+                contents: { type: 'array', description: 'Co paket obsahuje (list features)', items: { type: 'string' } },
+                cells: { type: 'array', description: 'Cena/dostupnost per trim. Stejná délka jako trims. Hodnoty: "14900", "S", "-".', items: { type: 'string' } },
+              },
+              required: ['name', 'cells'],
+            },
+          },
+          colors_exterior: {
             type: 'array',
             items: {
               type: 'object',
               properties: {
                 name: { type: 'string' },
-                features: { type: 'array', items: { type: 'string' } },
-                pricing_per_trim: {
-                  type: 'object',
-                  description: 'Klíče = trim names (lowercase), hodnoty = cena v Kč nebo "standard" nebo "unavailable"',
-                  additionalProperties: true,
-                },
+                code: { type: 'string', description: 'Kód barvy (např. "WAA", "ADE", "2DE (E22B)")' },
+                type: { type: 'string', description: 'Typ — "základní" / "metalická" / "dvoutónová" / atd.' },
+                cells: { type: 'array', items: { type: 'string' } },
               },
-              required: ['name'],
+            },
+          },
+          colors_interior: {
+            type: 'array',
+            items: {
+              type: 'object',
+              properties: {
+                name: { type: 'string' },
+                code: { type: 'string' },
+                material: { type: 'string', description: '"textil" / "syntetická kůže" / "pravá kůže" / atd.' },
+                cells: { type: 'array', items: { type: 'string' } },
+              },
             },
           },
           technical_data: {
             type: 'object',
-            description: 'Key-value technické údaje (motor, rozměry, atd.)',
+            description: 'Key-value technické údaje. Klíče preservuj literal z PDF.',
             additionalProperties: { type: 'string' },
           },
         },
-        required: ['trim_levels', 'option_packages', 'technical_data'],
+        required: ['trims', 'sections'],
       },
     }];
 
@@ -269,15 +319,13 @@ Použij tool extract_pricelist a předej strukturovaná data. Vyplň co najdeš,
     // DEBUG info — vidíme reálnou strukturu
     const debugInfo: any = {
       extracted_type: typeof extracted,
-      extracted_is_string: typeof extracted === 'string',
-      extracted_string_sample: typeof extracted === 'string' ? extracted.substring(0, 300) : null,
-      trim_levels_type: typeof extracted?.trim_levels,
-      trim_levels_is_array: Array.isArray(extracted?.trim_levels),
-      trim_levels_sample: typeof extracted?.trim_levels === 'string'
-        ? extracted.trim_levels.substring(0, 500)
-        : Array.isArray(extracted?.trim_levels)
-          ? `Array(${extracted.trim_levels.length}) first item type: ${typeof extracted.trim_levels[0]}`
-          : null,
+      trims_type: typeof extracted?.trims,
+      trims_is_array: Array.isArray(extracted?.trims),
+      trims_count: Array.isArray(extracted?.trims) ? extracted.trims.length : 'N/A',
+      sections_type: typeof extracted?.sections,
+      sections_is_array: Array.isArray(extracted?.sections),
+      sections_count: Array.isArray(extracted?.sections) ? extracted.sections.length : 'N/A',
+      packages_count: Array.isArray(extracted?.packages) ? extracted.packages.length : 'N/A',
     };
 
     // Defenzivní: pokud Claude vrátí celý input jako string, parsuj
@@ -306,16 +354,14 @@ Použij tool extract_pricelist a předej strukturovaná data. Vyplň co najdeš,
       return v;
     };
     if (extracted && typeof extracted === 'object') {
-      if ('trim_levels' in extracted) extracted.trim_levels = ensureParsed(extracted.trim_levels, 'trim_levels');
-      if ('option_packages' in extracted) extracted.option_packages = ensureParsed(extracted.option_packages, 'option_packages');
-      if ('technical_data' in extracted) extracted.technical_data = ensureParsed(extracted.technical_data, 'technical_data');
-      if ('detected' in extracted) extracted.detected = ensureParsed(extracted.detected, 'detected');
+      for (const key of ['trims', 'sections', 'packages', 'colors_exterior', 'colors_interior', 'technical_data', 'detected']) {
+        if (key in extracted) extracted[key] = ensureParsed(extracted[key], key);
+      }
     }
 
     // Po-parsing log
-    debugInfo.after_parse_trim_levels_type = typeof extracted?.trim_levels;
-    debugInfo.after_parse_trim_levels_is_array = Array.isArray(extracted?.trim_levels);
-    debugInfo.after_parse_trim_levels_count = Array.isArray(extracted?.trim_levels) ? extracted.trim_levels.length : 'N/A';
+    debugInfo.after_parse_sections_count = Array.isArray(extracted?.sections) ? extracted.sections.length : 'N/A';
+    debugInfo.after_parse_trims_count = Array.isArray(extracted?.trims) ? extracted.trims.length : 'N/A';
 
     // Auto-cleanup uploaded PDF — analyze proběhlo, soubor v Directus už nepotřebujeme
     if (uploadedFileId) {
