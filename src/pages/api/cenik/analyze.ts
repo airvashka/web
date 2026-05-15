@@ -18,15 +18,31 @@ export const prerender = false;
 
 const SYSTEM_PROMPT = `Jsi expert na extrakci dat z českých ceníků automobilů (značky KGM, OMODA & JAECOO, Farizon).
 
-ÚKOL: Z PDF extrahuj data v MATRIX struktuře (sekce × řádky × buňky per trim) přesně tak, jak je v PDF.
+ÚKOL: Z PDF extrahuj data v **PER-TRIM** struktuře — z pohledu zákazníka.
+Pro každý trim (CLUB, STYLE, PREMIUM, SELECT, EXCLUSIVE, …) odpověz na 3 otázky:
+  1. **Co dostanu, když si koupím tento trim?** → \`features\` (grouped by section)
+  2. **Co si k tomu můžu dokoupit?** → \`optional_items\` (name + code + cena)
+  3. **Jaké pakety jsou pro tento trim dostupné?** → \`packages_available\` (kód paketu)
 
 ═══════════════════════════════════════════════════════════════
 TYPY CENÍKŮ — UMÍŠ OBA
 ═══════════════════════════════════════════════════════════════
 
-**TYP A — MATRIX (KGM Torres, Korando, ...):** Ceník je tabulka. Sloupce = trimy (CLUB, STYLE, PREMIUM). Řádky = features. Buňky obsahují "S", "-", číslo, nebo kód paketu. Zachovej 1:1.
+**TYP A — MATRIX (KGM Torres, Korando, Actyon, …):** Tabulka. Sloupce = trimy (CLUB, STYLE, PREMIUM nebo i 4 sloupce). Řádky = features. Buňky obsahují "S", "-", číslo (cena dokoupení), nebo kód paketu (CLUB+, BLACK, SAFETY).
 
-**TYP B — LIST (JAECOO 5, OMODA single-trim, ...):** Ceník je strukturovaný jako per-trim seznam výbavy. Nemá tabulkové sloupce. Typický pattern:
+PŘEVOD MATRIX → PER-TRIM (povinné):
+- Pro každý trim (sloupec) projdi všechny řádky:
+  - Pokud cell = "S" → feature je včleněn → patří do \`trims[i].features\` pod sekcí ze sloupce 1 řádku
+  - Pokud cell = číslo (např. "49900") → feature je dokoupitelný → \`trims[i].optional_items.push({ name, code, price: 49900 })\`
+  - Pokud cell = kód paketu (např. "CLUB+") → \`trims[i].packages_available.push("CLUB+")\` (unique) a feature je součástí paketu (uveď v \`packages[].contents\`)
+  - Pokud cell = "-" → ignoruj pro tento trim
+  - Pokud cell = "S (Hybrid)" → \`features\` s notou v názvu "Adaptivní tempomat (pouze pro Hybrid verze)"
+- Příklad: Torres má řádek "Panoramatická střecha" s cells = ["-", "29900", "S"]:
+  - STYLE.optional_items += { name: "Panoramatická střecha", price: 29900 }
+  - PREMIUM.features += pod sekci "EXTERIÉR" (nebo kde to je v PDF) → "Panoramatická střecha"
+  - CLUB → nic (cell = "-")
+
+**TYP B — LIST (JAECOO 5, OMODA single-trim, …):** Ceník je strukturovaný jako per-trim seznam výbavy. Nemá tabulkové sloupce. Typický pattern:
 \`\`\`
 SELECT                                  629 000 Kč
 Základní výbava
@@ -47,52 +63,126 @@ Navíc k předchozí výbavě
   ...
 \`\`\`
 
-**PŘEVOD TYP B → MATRIX (POVINNÉ — nesmíš vrátit prázdné sections!):**
-- trims = [SELECT, EXCLUSIVE] (každý jako jeden sloupec, list_price = ceníková ne akční)
+PŘEVOD TYP B → PER-TRIM:
+- trims = [{ name: "SELECT", … }, { name: "EXCLUSIVE", … }]
 - detected.format = "list"
-- Sekce = bold/uppercase headings ze seznamu (ASISTENT, BEZPEČNOST, EXTERIÉR, INFOTAINMENT, INTERIÉR, KOMFORT)
-- **Každá feature** ze SELECT seznamu má cells = ["S", "S"] (je v obou trimech — EXCLUSIVE má všechno ze SELECT + nové)
-- **Každá feature** ze "EXCLUSIVE Navíc k předchozí výbavě" má cells = ["-", "S"] (jen v EXCLUSIVE)
-- Pokud má EXCLUSIVE celý vlastní seznam (ne "Navíc"), porovnej oba — features v obou = ["S","S"], jen v EXCLUSIVE = ["-","S"], jen v SELECT = ["S","-"]
-- Sekce neorganizuj — drž pořadí z PDF (každý trim přispěje features do svojí sekce, dedupuj features napříč trimy)
+- Pro SELECT: features = vše ze "Základní výbava" seznamu, grouped by uppercase heading (ASISTENT, BEZPEČNOST, …)
+- Pro EXCLUSIVE: features = **VŠECHNO ze SELECT + features z "Navíc k předchozí výbavě"** (kumulativní! "Navíc" znamená přidat k tomu co už SELECT má)
+- Pokud má EXCLUSIVE svůj kompletní seznam (ne "Navíc"), použij ten — porovnání s SELECT není potřeba.
+- optional_items, packages_available často prázdné pro list-style.
 
-**NIKDY NEVRACEJ trims bez sections!** Pokud z PDF vytáhneš trimy a barvy, MUSÍŠ vytáhnout i features (sections+rows). Ceník bez výbavy je rozbitý.
+═══════════════════════════════════════════════════════════════
+KONKRÉTNÍ PŘÍKLAD — JAECOO 5 (LIST STYLE)
+═══════════════════════════════════════════════════════════════
+
+PDF obsahuje:
+\`\`\`
+SELECT  629 000 Kč  (ceníková 669 000 Kč)
+Základní výbava
+  ASISTENT:
+    - Adaptivní tempomat (ACC+LKA)
+    - Asistent jízdy v koloně (TJA)
+  BEZPEČNOST:
+    - Autoalarm
+    - Boční airbagy předních sedadel
+
+EXCLUSIVE  709 000 Kč  (ceníková 749 000 Kč)
+Navíc k předchozí výbavě
+  ASISTENT:
+    - Kamerový systém 540°
+  EXTERIÉR:
+    - Panoramatická střecha
+\`\`\`
+
+SPRÁVNÝ output:
+\`\`\`json
+{
+  "detected": { "model_name": "JAECOO 5", "year": 2026, "format": "list" },
+  "trims": [
+    {
+      "name": "SELECT",
+      "list_price": 669000,
+      "features": [
+        { "section": "ASISTENT",   "items": ["Adaptivní tempomat (ACC+LKA)", "Asistent jízdy v koloně (TJA)"] },
+        { "section": "BEZPEČNOST", "items": ["Autoalarm", "Boční airbagy předních sedadel"] }
+      ],
+      "optional_items": [],
+      "packages_available": []
+    },
+    {
+      "name": "EXCLUSIVE",
+      "list_price": 749000,
+      "features": [
+        { "section": "ASISTENT",   "items": ["Adaptivní tempomat (ACC+LKA)", "Asistent jízdy v koloně (TJA)", "Kamerový systém 540°"] },
+        { "section": "BEZPEČNOST", "items": ["Autoalarm", "Boční airbagy předních sedadel"] },
+        { "section": "EXTERIÉR",   "items": ["Panoramatická střecha"] }
+      ],
+      "optional_items": [],
+      "packages_available": []
+    }
+  ],
+  "packages": [],
+  "colors_exterior": [ … ],
+  "colors_interior": [ … ],
+  "technical_data": { … }
+}
+\`\`\`
+
+VŠIMNI SI:
+- EXCLUSIVE.features OBSAHUJE VŠE ze SELECT + "Navíc". To je to co zákazník dostane když si koupí EXCLUSIVE.
+- list_price = **CENÍKOVÁ** (669/749 tisíc), ne **AKČNÍ** (629/709). Akční ignoruj.
+- **MUSÍŠ projít VŠECHNY features v PDF**, ne jen prvních pár. JAECOO 5 má typicky 40+ položek per trim.
+
+═══════════════════════════════════════════════════════════════
+PŘÍKLAD — KGM Torres (MATRIX STYLE, 3 trimy)
+═══════════════════════════════════════════════════════════════
+
+PDF řádek "Panoramatická střecha (kód: ISN)" má cells: ["-", "29900", "S"] pro trimy [CLUB, STYLE, PREMIUM].
+PDF řádek "Vyhřívaný volant" má cells: ["-", "CLUB+", "S"].
+
+Výsledek pro tento KUS dat:
+- CLUB:    feature ignored (cell "-"); CLUB.packages_available += "CLUB+" jen pokud paket existuje a má CLUB+ price
+- STYLE:   optional_items += { name: "Panoramatická střecha", code: "ISN", price: 29900 }; packages_available += "CLUB+" (vyhřívaný volant je v CLUB+)
+- PREMIUM: features.EXTERIÉR += "Panoramatická střecha"; features.KOMFORT += "Vyhřívaný volant"
+
+Plus packages[] dostane:
+\`\`\`
+{ "name": "CLUB+ paket", "code": "CLUB+", "contents": ["Vyhřívaný volant", ...], "pricing_per_trim": { "club": 14900, "style": 14900, "premium": "standard" } }
+\`\`\`
 
 ═══════════════════════════════════════════════════════════════
 KLÍČOVÁ PRAVIDLA
 ═══════════════════════════════════════════════════════════════
 
-1) **TRIMS = SLOUPCE.** Vůz má jeden nebo více výbavových stupňů (CLUB, STYLE, PREMIUM, SELECT, EXCLUSIVE, nebo třeba jen PREMIUM). Pole "trims" má jeden záznam per sloupec. List_price je ceníková cena v Kč jako integer (např. 649900, 669000, ne "649 900 Kč").
+1) **TRIMS — 1 záznam per výbavový stupeň.** Můžeš mít 1, 2, 3 nebo 4 trimy. List_price = CENÍKOVÁ cena v Kč jako integer (např. 669000), ne akční.
 
-2) **SEKCE = NÁZVY Z PDF, NE VLASTNÍ KATEGORIE.** Sekce z PDF (např. "MOTORIZACE/VÝBAVA", "ZAVĚŠENÍ KOL, ŘÍZENÍ, BRZDY", "BEZPEČNOST", "ASISTENT", "INFOTAINMENT", "INTERIÉR", "KOMFORT", "EXTERIÉR") přepiš LITERAL.
+2) **SEKCE V FEATURES = LITERAL Z PDF.** Sekce z PDF (např. "MOTORIZACE", "ZAVĚŠENÍ KOL", "BEZPEČNOST", "ASISTENT", "INFOTAINMENT", "INTERIÉR", "KOMFORT", "EXTERIÉR") drž doslova. Nekategorizuj do vlastních škatulek typu "podvozek/komfort".
 
-3) **CELL VOCABULARY — PRESERVUJ DOSLOVNĚ:**
-   - "S" = standardní v daném trimu (zdarma)
-   - "-" nebo "" = nedostupné v daném trimu
-   - Číslo jako STRING (např. "14900", "49900") = lze dokoupit za cenu v Kč. **BEZ MEZER, BEZ Kč, jen číslice.**
-   - Název paketu (např. "CLUB+", "BLACK", "SAFETY", "TECH") = součást daného paketu
-   - "S (Hybrid)" / "S (4x4)" = podmínečně standard
-   - "volitelné" = lze vybrat (typicky textil/kůže)
+3) **OPTIONAL_ITEMS = dokoupitelné věci k trimu** (cell = číslo v matrix-style, nebo explicit "navíc za X Kč" v list-style):
+   - name = LITERAL z PDF
+   - code = kód výbavy (např. "ISN", "PT6/E11") nebo prázdný string
+   - price = integer Kč (např. 29900)
 
-4) **CELLS POLE má PŘESNĚ stejnou délku jako trims pole.** trims=[SELECT, EXCLUSIVE] → každý row.cells má 2 hodnoty.
+4) **PACKAGES_AVAILABLE = list kódů paketů** dostupných pro tento trim (např. ["CLUB+", "BLACK"]). Pokud trim nemá pakety, prázdné [].
 
-5) **NEKATEGORIZUJ DO PŘEDDEFINOVANÝCH BUCKETŮ.** Drž originální sekce z PDF.
+5) **PACKAGES (samostatné pole)**:
+   - name (např. "CLUB+ paket"), code (např. "CLUB+"), contents (list features co paket přidává), pricing_per_trim (object: trim_slug → price | "standard" | "unavailable")
+   - Pokud ceník nemá pakety, packages = []
 
-6) **PAKETY jsou separate entita v "packages" poli:**
-   - Každý paket má name (např. "CLUB+ paket"), code (např. "CLUB+"), contents (list co obsahuje), cells (cena/dostupnost per trim)
-   - Pokud položka v sections.rows má v cells hodnotu "CLUB+", znamená to: tato položka je obsažena v paketu CLUB+ pro daný trim
-   - V "contents" paketu uveď VŠECHNY features co paket přidává
-   - Pokud ceník nemá pakety (jako JAECOO 5), packages = []
+6) **BARVY** (colors_exterior, colors_interior):
+   - name, code (např. "WAA"), type ("základní"/"metalická"/"dvoutónová")
+   - pricing_per_trim: object trim_slug → cena v Kč (např. { "select": 14000, "exclusive": 14000 })
 
-7) **BARVY = samostatné sekce** ("colors_exterior", "colors_interior"):
-   - Každá barva má name, code (např. "WAA", "ADE"), type ("základní"/"metalická"/"dvoutónová"), cells (cena per trim)
-   - LIST-style ceník: pokud barva má jednu cenu pro všechny trimy, vyplň všechny cells stejně (např. ["14000", "14000"])
+7) **TECH DATA** = key-value object. Pokud trimy mají různé hodnoty, použij " / " jako separátor ("SELECT: 7DCT / EXCLUSIVE: 7DCT").
 
-8) **TECH DATA** = key-value object. Pokud má hodnota dva sloupce per trim ale jsou stejné, vrať jednou jako string. Pokud se liší per trim, použij formát "SELECT: X / EXCLUSIVE: Y".
+8) **PRESERVUJ LITERAL FORMULACE.** Neparafrázuj. Včetně závorek, čárek, podmínek.
 
-9) **PRESERVUJ LITERAL FORMULACE.** Neparafrázuj. Včetně závorek, čárek, podmínek.
+9) **JSON ESCAPING — KRITICKÉ:**
+   - Pokud má feature uvozovky (např. \`18" kola\`), **ZAPIŠ** \`18'' kola\` (dva apostrofy) nebo \`18 palců kola\`. NEPOUŽÍVEJ ASCII \`"\` uvnitř hodnot.
+   - Smart quotes (\`„"\`, \`''\`) nepoužívej — ASCII single quote \`'\` nebo vynech.
+   - Drž features SHORT a CHECK že JSON je validní. NIKDY nezapisuj features pole jako stringifikovaný JSON — vrať to jako nativní array.
 
-10) **KÓD VÝBAVY** — pokud má řádek v PDF kód (např. "PT6/E11", "PCA/TS7", "ISN"), dej ho do "code" pole. Jinak prázdný string.
+10) **NIKDY NEVRACEJ trims s prázdnými features.** Pokud z PDF vytáhneš trimy, MUSÍŠ vyplnit features pro každý. Trim bez features = rozbitý.
 
 Vrať data přes tool extract_pricelist. ŽÁDNÝ text mimo tool call.`;
 
@@ -223,72 +313,79 @@ Použij tool extract_pricelist a předej strukturovaná data. Vyplň co najdeš,
 
     const anthropic = new Anthropic({ apiKey: import.meta.env.ANTHROPIC_API_KEY });
 
-    // Tool use — MATRIX schema preserves PDF structure (sekce + cells per trim)
+    // Tool use — PER-TRIM schema (customer view: co dostanu když koupím trim X)
     const tools: any[] = [{
       name: 'extract_pricelist',
-      description: 'Uloží extrahovaná data z ceníku v MATRIX struktuře (sekce × řádky × buňky per trim).',
+      description: 'Uloží extrahovaná data z ceníku v PER-TRIM struktuře (pro každý trim: features grouped by section + optional_items + dostupné pakety).',
       input_schema: {
         type: 'object',
         properties: {
           detected: {
             type: 'object',
             properties: {
-              model_name: { type: 'string', description: 'Detekovaný název modelu (např. "Torres", "OMODA 9 SHS")' },
+              model_name: { type: 'string', description: 'Detekovaný název modelu (např. "Torres", "JAECOO 5")' },
               year: { type: 'number', description: 'Detekovaný modelový rok' },
-              format: { type: 'string', enum: ['matrix', 'list'], description: '"matrix" pokud má více trimů ve sloupcích, "list" pokud jen jeden trim' },
+              format: { type: 'string', enum: ['matrix', 'list'], description: '"matrix" pokud tabulkový ceník se sloupci, "list" pokud per-trim seznam.' },
             },
           },
           trims: {
             type: 'array',
-            description: 'Trim levels jako sloupce v ceníku. Pokud má model jediný trim, 1 entry.',
+            description: 'Pro každý trim: co dostanu, co můžu dokoupit, jaké pakety jsou dostupné. Min 1 trim. Pokud má model 3 výbavy (CLUB/STYLE/PREMIUM), 3 entries.',
             items: {
               type: 'object',
               properties: {
-                name: { type: 'string', description: 'Název trimu (např. "CLUB", "STYLE", "PREMIUM"). Preserveruj original case z PDF.' },
-                list_price: { type: 'number', description: 'Ceníková cena v Kč jako integer (např. 649900). Pokud ICE/HEV verze, vyber ICE — Hybrid bude v dedikovaném row v sections.' },
-              },
-              required: ['name'],
-            },
-          },
-          sections: {
-            type: 'array',
-            description: 'Sekce z PDF s LITERAL názvy (MOTORIZACE/VÝBAVA, ZAVĚŠENÍ KOL, BEZPEČNOST, atd.). NEKATEGORIZUJ do vlastních škatulek.',
-            items: {
-              type: 'object',
-              properties: {
-                name: { type: 'string', description: 'Název sekce z PDF doslova (např. "MOTORIZACE/VÝBAVA")' },
-                rows: {
+                name: { type: 'string', description: 'Název trimu LITERAL z PDF (např. "CLUB", "STYLE", "PREMIUM", "SELECT", "EXCLUSIVE").' },
+                list_price: { type: 'number', description: 'CENÍKOVÁ cena v Kč jako integer (např. 669000), NE akční.' },
+                features: {
                   type: 'array',
+                  description: 'CO ZÁKAZNÍK DOSTANE když si koupí tento trim, grouped by section z PDF. Pro každou sekci pole items. U list-style EXCLUSIVE = SELECT features + nové (kumulativně).',
                   items: {
                     type: 'object',
                     properties: {
-                      feature: { type: 'string', description: 'Název položky LITERAL z PDF (i s podmínkami v závorkách)' },
-                      code: { type: 'string', description: 'Kód výbavy z PDF (např. "PT6/E11", "PCA/TS7"). Pokud chybí, prázdný string.' },
-                      cells: {
-                        type: 'array',
-                        description: 'Hodnoty buněk per trim. Délka = trims.length. LITERAL: "S" / "-" / "14900" (číslo bez mezer) / "CLUB+" (název paketu) / "S (Hybrid)" / "volitelné". Žádné Kč ani jiné jednotky.',
-                        items: { type: 'string' },
-                      },
+                      section: { type: 'string', description: 'Název sekce LITERAL z PDF (např. "ASISTENT", "BEZPEČNOST", "EXTERIÉR", "MOTORIZACE")' },
+                      items: { type: 'array', description: 'Features v této sekci pro tento trim. LITERAL z PDF.', items: { type: 'string' } },
                     },
-                    required: ['feature', 'cells'],
+                    required: ['section', 'items'],
                   },
                 },
+                optional_items: {
+                  type: 'array',
+                  description: 'Co si zákazník MŮŽE DOKOUPIT k tomuto trimu. V matrix-style ceníku = řádky kde má daný trim cenu místo "S".',
+                  items: {
+                    type: 'object',
+                    properties: {
+                      name: { type: 'string', description: 'Název položky LITERAL z PDF (např. "Panoramatická střecha")' },
+                      code: { type: 'string', description: 'Kód výbavy (např. "ISN", "PT6/E11") nebo prázdný string' },
+                      price: { type: 'number', description: 'Cena dokoupení v Kč jako integer (např. 29900)' },
+                    },
+                    required: ['name', 'price'],
+                  },
+                },
+                packages_available: {
+                  type: 'array',
+                  description: 'Kódy paketů dostupných pro tento trim (např. ["CLUB+", "BLACK"]). Cena paketu je v packages[].pricing_per_trim. Pokud trim nemá pakety, [].',
+                  items: { type: 'string' },
+                },
               },
-              required: ['name', 'rows'],
+              required: ['name', 'features'],
             },
           },
           packages: {
             type: 'array',
-            description: 'Pakety jako separátní entity. Mají jak vlastní řádek v ceníku (cells = cena/dostupnost per trim), tak obsah (contents).',
+            description: 'Volitelné paketové sady (samostatně). Pokud ceník nemá pakety, [].',
             items: {
               type: 'object',
               properties: {
                 name: { type: 'string', description: 'Název paketu (např. "CLUB+ paket")' },
-                code: { type: 'string', description: 'Kód paketu (např. "CLUB+", "CVG, CGK", "BLACK")' },
-                contents: { type: 'array', description: 'Co paket obsahuje (list features)', items: { type: 'string' } },
-                cells: { type: 'array', description: 'Cena/dostupnost per trim. Stejná délka jako trims. Hodnoty: "14900", "S", "-".', items: { type: 'string' } },
+                code: { type: 'string', description: 'Kód paketu (např. "CLUB+", "BLACK", "SAFETY")' },
+                contents: { type: 'array', description: 'Co paket obsahuje (list features LITERAL z PDF)', items: { type: 'string' } },
+                pricing_per_trim: {
+                  type: 'object',
+                  description: 'Cena paketu per trim. Klíče = lowercase trim names (slugified). Hodnoty = integer (cena Kč) | "standard" | "unavailable".',
+                  additionalProperties: true,
+                },
               },
-              required: ['name', 'cells'],
+              required: ['name', 'contents'],
             },
           },
           colors_exterior: {
@@ -298,8 +395,8 @@ Použij tool extract_pricelist a předej strukturovaná data. Vyplň co najdeš,
               properties: {
                 name: { type: 'string' },
                 code: { type: 'string', description: 'Kód barvy (např. "WAA", "ADE", "2DE (E22B)")' },
-                type: { type: 'string', description: 'Typ — "základní" / "metalická" / "dvoutónová" / atd.' },
-                cells: { type: 'array', items: { type: 'string' } },
+                type: { type: 'string', description: '"základní" / "metalická" / "dvoutónová" / atd.' },
+                pricing_per_trim: { type: 'object', description: 'Cena barvy per trim. Klíče = trim slug. Hodnoty = integer Kč.', additionalProperties: { type: 'number' } },
               },
             },
           },
@@ -311,17 +408,17 @@ Použij tool extract_pricelist a předej strukturovaná data. Vyplň co najdeš,
                 name: { type: 'string' },
                 code: { type: 'string' },
                 material: { type: 'string', description: '"textil" / "syntetická kůže" / "pravá kůže" / atd.' },
-                cells: { type: 'array', items: { type: 'string' } },
+                pricing_per_trim: { type: 'object', description: 'Cena per trim.', additionalProperties: { type: 'number' } },
               },
             },
           },
           technical_data: {
             type: 'object',
-            description: 'Key-value technické údaje. Klíče preservuj literal z PDF.',
+            description: 'Key-value technické údaje. Klíče literal z PDF. Hodnota string.',
             additionalProperties: { type: 'string' },
           },
         },
-        required: ['trims', 'sections'],
+        required: ['trims'],
       },
     }];
 
@@ -373,34 +470,97 @@ Použij tool extract_pricelist a předej strukturovaná data. Vyplň co najdeš,
     }
 
     // Defenzivní: pokud Claude vrátí field jako JSON string místo objektu, parsuj
-    // Pokud standard JSON.parse selže (např. unescaped quotes), použij jsonrepair
+    // Multi-pass repair: 1) JSON.parse → 2) jsonrepair → 3) custom regex escape pro běžné LLM chyby (palce 18", apostrofy)
     debugInfo.parse_errors = [];
+    debugInfo.raw_strings = {};
+
+    const escapeUnescapedQuotes = (s: string): string => {
+      // Nejčastější vzorec: "18" kola" (palce uvnitř stringu).
+      // Hledáme `<digit>"` následované znakem typu mezera/písmeno/čárka — taková `"` nemůže být legitimní string-closer.
+      let fixed = s.replace(/(\d)"(?=\s|,|\)|]|[A-Za-zÁ-ž])/g, '$1\\"');
+      // "Follow me home" v ASCII uvnitř JSON stringu (znaků kolem `"Follow`)
+      // Heuristika: `"word "` (otevírající ASCII " uvnitř hodnoty) — neprovádím, riskantní.
+      // Smart quotes na ASCII apostrof
+      fixed = fixed.replace(/[„"]/g, '\\"').replace(/[']/g, "'");
+      return fixed;
+    };
+
     const ensureParsed = (v: any, fieldName?: string) => {
       if (typeof v === 'string') {
+        // Pass 1: clean JSON.parse
         try { return JSON.parse(v); } catch (e1) {
           debugInfo.parse_errors.push(`${fieldName} JSON.parse: ${(e1 as Error).message.substring(0, 200)}`);
-          try {
-            const fixed = jsonrepair(v);
-            const parsed = JSON.parse(fixed);
-            debugInfo.parse_errors.push(`${fieldName} → jsonrepair succeeded`);
-            return parsed;
-          } catch (e2) {
-            debugInfo.parse_errors.push(`${fieldName} jsonrepair fail: ${(e2 as Error).message.substring(0, 200)}`);
-            return v;
-          }
         }
+        // Pass 2: jsonrepair
+        try {
+          const fixed = jsonrepair(v);
+          const parsed = JSON.parse(fixed);
+          debugInfo.parse_errors.push(`${fieldName} → jsonrepair succeeded`);
+          return parsed;
+        } catch (e2) {
+          debugInfo.parse_errors.push(`${fieldName} jsonrepair fail: ${(e2 as Error).message.substring(0, 200)}`);
+        }
+        // Pass 3: custom regex escape pro běžné LLM chyby
+        try {
+          const escaped = escapeUnescapedQuotes(v);
+          const fixed = jsonrepair(escaped);
+          const parsed = JSON.parse(fixed);
+          debugInfo.parse_errors.push(`${fieldName} → custom escape + jsonrepair succeeded`);
+          return parsed;
+        } catch (e3) {
+          debugInfo.parse_errors.push(`${fieldName} custom-escape fail: ${(e3 as Error).message.substring(0, 200)}`);
+        }
+        // Pass 4: vrať raw string + uložím ho do debugu pro diagnostiku
+        debugInfo.raw_strings[fieldName ?? '?'] = v.substring(0, 500) + (v.length > 500 ? `\n... [+${v.length - 500} chars]` : '');
+        return v;
       }
       return v;
     };
     if (extracted && typeof extracted === 'object') {
-      for (const key of ['trims', 'sections', 'packages', 'colors_exterior', 'colors_interior', 'technical_data', 'detected']) {
+      for (const key of ['trims', 'packages', 'colors_exterior', 'colors_interior', 'technical_data', 'detected']) {
         if (key in extracted) extracted[key] = ensureParsed(extracted[key], key);
+      }
+      // Nested: trims[i].features, optional_items, packages_available
+      if (Array.isArray(extracted.trims)) {
+        extracted.trims = extracted.trims.map((t: any, i: number) => {
+          if (t && typeof t === 'object') {
+            for (const innerKey of ['features', 'optional_items', 'packages_available']) {
+              if (innerKey in t) t[innerKey] = ensureParsed(t[innerKey], `trims[${i}].${innerKey}`);
+            }
+          }
+          return t;
+        });
+      }
+    }
+
+    // Final safety net — pokud pole stále zůstanou jako strings, set na []
+    for (const arrayField of ['trims', 'packages', 'colors_exterior', 'colors_interior']) {
+      if (extracted && typeof extracted[arrayField] === 'string') {
+        debugInfo.parse_errors.push(`${arrayField} stále string po všech repair pokusech, coerce na []`);
+        extracted[arrayField] = [];
+      }
+    }
+    if (extracted && typeof extracted.technical_data === 'string') {
+      extracted.technical_data = {};
+    }
+    // Nested safety net pro trims[i].features apod.
+    if (Array.isArray(extracted?.trims)) {
+      for (const t of extracted.trims) {
+        if (typeof t.features === 'string') t.features = [];
+        if (typeof t.optional_items === 'string') t.optional_items = [];
+        if (typeof t.packages_available === 'string') t.packages_available = [];
       }
     }
 
     // Po-parsing log
-    debugInfo.after_parse_sections_count = Array.isArray(extracted?.sections) ? extracted.sections.length : 'N/A';
     debugInfo.after_parse_trims_count = Array.isArray(extracted?.trims) ? extracted.trims.length : 'N/A';
+    if (Array.isArray(extracted?.trims)) {
+      debugInfo.trims_features_summary = extracted.trims.map((t: any) => ({
+        name: t.name,
+        features_sections: Array.isArray(t.features) ? t.features.length : 'NOT_ARRAY',
+        optional_count: Array.isArray(t.optional_items) ? t.optional_items.length : 'NOT_ARRAY',
+      }));
+    }
 
     // Auto-cleanup uploaded PDF — analyze proběhlo, soubor v Directus už nepotřebujeme
     if (uploadedFileId) {

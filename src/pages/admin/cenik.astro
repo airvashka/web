@@ -54,61 +54,105 @@ const DIRECTUS_URL = import.meta.env.PUBLIC_DIRECTUS_URL || 'https://directus-pr
     .tab-content { display: none; }
     .tab-content.active { display: block; }
 
-    /* Matrix table */
-    .matrix-wrap { overflow-x: auto; max-height: 70vh; overflow-y: auto; border: 1px solid #e0e0e0; border-radius: 6px; background: white; }
-    .matrix-table { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 13px; }
-    .matrix-table thead th {
-      position: sticky; top: 0; z-index: 10;
-      background: #f5f5f7; padding: 10px 8px; text-align: left; font-weight: 600;
-      border-bottom: 2px solid #d0d0d5; white-space: nowrap;
-    }
-    .matrix-table thead th.trim-col { text-align: center; min-width: 110px; }
-    .matrix-table .feature-cell {
-      position: sticky; left: 0; z-index: 5;
-      background: white; padding: 8px 10px; min-width: 280px; max-width: 380px;
-      border-bottom: 1px solid #f0f0f0; border-right: 1px solid #e0e0e0;
-      vertical-align: top; cursor: pointer;
-    }
-    .matrix-table .feature-cell:hover { background: #eef6ff !important; outline: 2px solid #1f6feb; outline-offset: -2px; }
-    .matrix-table .feature-cell .feat-code { color: #888; font-size: 11px; margin-top: 2px; }
+    .save-bar { position: sticky; bottom: 0; background: white; border-top: 2px solid #e0e0e0; margin-top: 16px; padding: 14px 18px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 -2px 12px rgba(0,0,0,0.06); border-radius: 0 0 8px 8px; }
+    .save-bar button { padding: 11px 22px; font-size: 14px; }
 
-    /* Section header rows — výrazná zelená hlavička sekce */
-    .matrix-table tr.section-row td,
-    .matrix-table tr.section-row > td.feature-cell {
-      background: linear-gradient(180deg, #2f9b5c 0%, #1e7b47 100%) !important;
-      color: #fff !important;
-      padding: 11px 14px !important;
-      font-weight: 800 !important;
-      font-size: 13px !important;
-      text-transform: uppercase;
-      letter-spacing: 1.2px;
-      border-bottom: 2px solid #145a32 !important;
-      border-top: 2px solid #145a32 !important;
-      position: static !important;  /* zruší sticky pro section header */
-      cursor: default !important;
-      outline: none !important;
-    }
-    .matrix-table tr.section-row td::before {
-      content: '▶ ';
-      opacity: 0.75;
-      margin-right: 6px;
-    }
-    .matrix-table tr.section-row td:hover { outline: none !important; }
+    pre.raw-json { background: #1e1e2e; color: #cdd6f4; padding: 14px; border-radius: 6px; overflow: auto; font-size: 11px; max-height: 600px; }
 
-    /* Zebra striping — aplikujeme jen na první (sticky) sloupec s názvy položek.
-       Color-coded cellí (S/cena/paket) si zachovají vlastní barvu. */
-    .matrix-table tr.feature-row.zebra-odd  > .feature-cell { background: #ffffff !important; }
-    .matrix-table tr.feature-row.zebra-even > .feature-cell { background: #eff6ff !important; }  /* světle modrá */
-    /* Default cell bg pro NEbarevné cells (kdyby kind nebyl) — kopie zebry */
-    .matrix-table tr.feature-row.zebra-odd  > td.cell:not([class*="cell-"]) { background: #ffffff; }
-    .matrix-table tr.feature-row.zebra-even > td.cell:not([class*="cell-"]) { background: #eff6ff; }
-
-    /* Cell base (kromě color-coded variant) */
-    .matrix-table .cell {
-      text-align: center; padding: 6px 8px; border-bottom: 1px solid #e7eef5;
-      font-weight: 500; cursor: pointer; min-width: 110px;
+    /* Per-trim editor */
+    .trim-tabs {
+      display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 16px;
+      border-bottom: 2px solid #e5e5e5; padding-bottom: 0;
     }
-    .matrix-table .cell:hover { outline: 2px solid #1f6feb; outline-offset: -2px; z-index: 2; position: relative; }
+    .trim-tab-btn {
+      background: #f5f5f7; border: 1px solid #d0d0d5; border-bottom: 2px solid transparent;
+      padding: 10px 18px; cursor: pointer; border-radius: 6px 6px 0 0;
+      display: flex; flex-direction: column; align-items: flex-start; gap: 2px;
+      font-size: 14px; line-height: 1.2;
+    }
+    .trim-tab-btn:hover { background: #e8e8ed; }
+    .trim-tab-btn.active {
+      background: #1f6feb; color: white; border-color: #1f6feb;
+      border-bottom-color: #1f6feb;
+      transform: translateY(2px);
+    }
+    .trim-tab-btn strong { font-size: 14px; font-weight: 700; }
+    .trim-tab-btn .trim-tab-price { font-size: 11px; font-weight: 500; opacity: 0.8; }
+    .trim-pane { display: none; padding: 14px 0; }
+    .trim-pane.active { display: block; }
+
+    .trim-header-row {
+      display: grid; grid-template-columns: 1fr 220px; gap: 14px;
+      padding: 14px; background: #f9f9fc; border-radius: 6px;
+      margin-bottom: 18px;
+    }
+    .trim-header-row input { width: 100%; box-sizing: border-box; padding: 8px 10px; font-size: 14px; border: 1px solid #d0d0d5; border-radius: 4px; }
+
+    .trim-section-heading {
+      font-size: 14px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.06em; color: #1a1a2e;
+      margin: 22px 0 10px; padding: 8px 12px;
+      background: linear-gradient(180deg, #2f9b5c 0%, #1e7b47 100%);
+      color: white; border-radius: 5px;
+    }
+    .trim-section-heading .muted { color: rgba(255,255,255,0.8); font-weight: 400; }
+
+    .feat-section {
+      border: 1px solid #e0e0e0; border-radius: 6px; padding: 8px 12px;
+      margin-bottom: 8px; background: white;
+    }
+    .feat-section[open] { border-color: #1f6feb33; }
+    .feat-section summary {
+      display: flex; align-items: center; gap: 10px; cursor: pointer;
+      list-style: none;
+    }
+    .feat-section summary::-webkit-details-marker { display: none; }
+    .feat-section summary::before {
+      content: '▶'; color: #999; transition: transform .15s;
+    }
+    .feat-section[open] summary::before { transform: rotate(90deg); }
+    .feat-section .section-title-input {
+      flex: 1; border: none; background: transparent;
+      font-weight: 700; font-size: 14px; padding: 4px 6px;
+      text-transform: uppercase; letter-spacing: 0.04em; color: #1a1a2e;
+    }
+    .feat-section .section-title-input:focus { background: #eef6ff; outline: 1px solid #1f6feb; border-radius: 3px; }
+    .feat-section .btn-remove-section,
+    .opt-table .btn-remove-optional {
+      background: transparent; border: none; color: #b43a2c;
+      font-size: 18px; cursor: pointer; padding: 2px 8px;
+      border-radius: 4px; line-height: 1;
+    }
+    .feat-section .btn-remove-section:hover,
+    .opt-table .btn-remove-optional:hover { background: #fee; }
+    .feat-section textarea {
+      width: 100%; box-sizing: border-box; margin-top: 8px;
+      padding: 8px 10px; font-size: 13px; line-height: 1.5;
+      border: 1px solid #d0d0d5; border-radius: 4px;
+      font-family: inherit; resize: vertical;
+    }
+    .feat-section textarea:focus { border-color: #1f6feb; outline: 2px solid #1f6feb33; }
+
+    .btn-add-section, .btn-add-optional {
+      background: #2f9b5c; color: white; border: none;
+      padding: 7px 16px; border-radius: 4px; cursor: pointer;
+      font-size: 13px; margin: 4px 0 12px;
+    }
+    .btn-add-section:hover, .btn-add-optional:hover { background: #267a47; }
+
+    .opt-table { width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 6px; }
+    .opt-table th { background: #f5f5f7; padding: 8px 10px; text-align: left; font-weight: 600; }
+    .opt-table td { padding: 4px 6px; border-bottom: 1px solid #f0f0f0; }
+    .opt-table input { width: 100%; box-sizing: border-box; padding: 6px 8px; font-size: 13px; border: 1px solid transparent; background: transparent; border-radius: 3px; }
+    .opt-table input:focus { background: white; border-color: #1f6feb; outline: none; }
+
+    /* Cell coloring (used in packages pricing + colors tabs) */
+    .cell {
+      text-align: center; padding: 6px 8px;
+      font-weight: 500; cursor: pointer; min-width: 100px;
+      border-bottom: 1px solid #e7eef5;
+    }
+    .cell:hover { outline: 2px solid #1f6feb; outline-offset: -2px; }
     .cell-standard { background: #d6f5d6; color: #1e7b5f; }
     .cell-optional { background: #ffe8cc; color: #b27516; }
     .cell-package { background: #e8d6f5; color: #6f42c1; }
@@ -116,14 +160,6 @@ const DIRECTUS_URL = import.meta.env.PUBLIC_DIRECTUS_URL || 'https://directus-pr
     .cell-conditional { background: #d6e8f5; color: #1e5f7b; }
     .cell-choice { background: #fff4d6; color: #8b6914; }
     .cell-other { background: #ffd6d6; color: #b43a2c; }
-
-    .trim-header { display: flex; flex-direction: column; gap: 4px; }
-    .trim-header .price { font-size: 12px; font-weight: 400; color: #444; }
-
-    .save-bar { position: sticky; bottom: 0; background: white; border-top: 2px solid #e0e0e0; margin-top: 16px; padding: 14px 18px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 -2px 12px rgba(0,0,0,0.06); border-radius: 0 0 8px 8px; }
-    .save-bar button { padding: 11px 22px; font-size: 14px; }
-
-    pre.raw-json { background: #1e1e2e; color: #cdd6f4; padding: 14px; border-radius: 6px; overflow: auto; font-size: 11px; max-height: 600px; }
 
     /* Pakety editor */
     .pkg-card { border: 1px solid #e0e0e0; padding: 14px 16px; }
@@ -148,7 +184,7 @@ const DIRECTUS_URL = import.meta.env.PUBLIC_DIRECTUS_URL || 'https://directus-pr
 </head>
 <body>
   <h1>Ceník uploader</h1>
-  <p class="muted">PDF → AI matrix extract → review → uložit do Directus. Cell vocabulary: <span class="cell cell-standard" style="padding:2px 6px;">S</span> Standard · <span class="cell cell-optional" style="padding:2px 6px;">19900</span> Dokoupit · <span class="cell cell-package" style="padding:2px 6px;">CLUB+</span> Paket · <span class="cell cell-unavailable" style="padding:2px 6px;">–</span> Není</p>
+  <p class="muted">PDF → AI extract → review po výbavách → uložit do Directus. Pro každou výbavu: <em>co dostane zákazník</em> + <em>co si může dokoupit</em>.</p>
 
   <!-- LOGIN -->
   <div class="panel" id="login-panel">
@@ -195,21 +231,21 @@ const DIRECTUS_URL = import.meta.env.PUBLIC_DIRECTUS_URL || 'https://directus-pr
 
   <!-- REVIEW -->
   <div class="panel hidden" id="result-panel">
-    <h2>4. Review extrahovaného obsahu (matrix view)</h2>
+    <h2>4. Review extrahovaného obsahu</h2>
     <div id="result-summary" class="muted"></div>
     <div class="meta" id="result-meta"></div>
 
     <div class="tabs" id="tabs" style="margin-top: 20px;">
-      <button class="tab-btn active" data-tab="matrix">📊 Matrix (<span id="count-rows">0</span> řádků)</button>
+      <button class="tab-btn active" data-tab="trims">🚗 Výbavy (<span id="count-trims">0</span>)</button>
       <button class="tab-btn" data-tab="packages">📦 Pakety (<span id="count-packages">0</span>)</button>
       <button class="tab-btn" data-tab="colors">🎨 Barvy (<span id="count-colors">0</span>)</button>
       <button class="tab-btn" data-tab="techdata">🔧 Tech data (<span id="count-techdata">0</span>)</button>
       <button class="tab-btn" data-tab="raw">Raw JSON</button>
     </div>
 
-    <div class="tab-content active" data-tab="matrix">
-      <p class="muted">Klik na buňku = upravit hodnotu. Hodnoty: <code>S</code>, <code>-</code>, číslo, název paketu.</p>
-      <div class="matrix-wrap"><table class="matrix-table" id="matrix-table"></table></div>
+    <div class="tab-content active" data-tab="trims">
+      <p class="muted">Pro každou výbavu: <strong>co dostane zákazník</strong> (features) + <strong>co si může dokoupit</strong> (optional). Klik = editovat.</p>
+      <div id="trims-container"></div>
     </div>
 
     <div class="tab-content" data-tab="packages">
@@ -252,27 +288,6 @@ let CURRENT_DATA = null;
 
 const $ = (id) => document.getElementById(id);
 const $$ = (sel, parent = document) => [...parent.querySelectorAll(sel)];
-
-// ─── Cell classification (mirror of save.ts) ─────────────
-function classifyCell(cell) {
-  const v = String(cell ?? '').trim();
-  if (!v || v === '-' || v === '—') return 'unavailable';
-  if (v === 'S' || /^S$/i.test(v)) return 'standard';
-  if (/^S\s*\(/i.test(v)) return 'conditional';
-  const num = v.replace(/\s/g, '');
-  if (/^\d+$/.test(num)) return 'optional';
-  if (/^volitelné/i.test(v)) return 'choice';
-  return 'package';
-}
-
-function formatCell(cell) {
-  const v = String(cell ?? '').trim();
-  if (!v) return '–';
-  if (v === '-' || v === '—') return '–';
-  // Format number nicely
-  if (/^\d+$/.test(v)) return parseInt(v, 10).toLocaleString('cs-CZ');
-  return v;
-}
 
 // ─── Directus API ────────────────────────────────────────
 async function api(path, opts = {}) {
@@ -488,19 +503,27 @@ function showReview(data) {
   if (!Array.isArray(data.sections)) data.sections = [];
   if (!Array.isArray(data.packages)) data.packages = [];
 
-  const totalRows = data.sections.reduce((acc, s) => acc + (s.rows?.length ?? 0), 0);
-  const tdKeys = Object.keys(data.technical_data ?? {}).length;
-  const colorsTotal = (data.colors_exterior?.length ?? 0) + (data.colors_interior?.length ?? 0);
+  // Defensive defaults — per-trim schema z analyze
+  data.trims          = Array.isArray(data.trims) ? data.trims : [];
+  data.packages       = Array.isArray(data.packages) ? data.packages : [];
+  data.colors_exterior = Array.isArray(data.colors_exterior) ? data.colors_exterior : [];
+  data.colors_interior = Array.isArray(data.colors_interior) ? data.colors_interior : [];
 
-  $('count-rows').textContent = totalRows;
+  const totalFeatures = data.trims.reduce((acc, t) =>
+    acc + (Array.isArray(t.features) ? t.features.reduce((a, s) => a + (s.items?.length ?? 0), 0) : 0), 0);
+  const totalOptional = data.trims.reduce((acc, t) => acc + (t.optional_items?.length ?? 0), 0);
+  const tdKeys = Object.keys(data.technical_data ?? {}).length;
+  const colorsTotal = data.colors_exterior.length + data.colors_interior.length;
+
+  $('count-trims').textContent = data.trims.length;
   $('count-packages').textContent = data.packages.length;
   $('count-colors').textContent = colorsTotal;
   $('count-techdata').textContent = tdKeys;
 
   $('result-summary').innerHTML = `
     <strong>Detekováno:</strong>
-    ${data.trims.length} trims (${data.trims.map((t) => escapeHtml(t.name)).join(' · ')}),
-    ${data.sections.length} sekcí (${totalRows} řádků),
+    ${data.trims.length} výbav (${data.trims.map((t) => escapeHtml(t.name)).join(' · ')}),
+    ${totalFeatures} features celkem, ${totalOptional} dokoupitelných,
     ${data.packages.length} paketů,
     ${colorsTotal} barev,
     ${tdKeys} tech klíčů.
@@ -515,7 +538,7 @@ function showReview(data) {
   }
   $('save-summary').textContent = `Uloží se do "${$('year-select').selectedOptions[0]?.textContent}"`;
 
-  renderMatrix(data);
+  renderTrims(data.trims);
   renderPackages(data.packages, data.trims);
   renderColors(data.colors_exterior, data.colors_interior, data.trims);
   renderTechData(data.technical_data);
@@ -524,130 +547,206 @@ function showReview(data) {
   $('result-panel').scrollIntoView({ behavior: 'smooth' });
 }
 
-function renderMatrix(data) {
-  const table = $('matrix-table');
-  const trims = data.trims;
+function renderTrims(trims) {
+  const container = $('trims-container');
+  if (!trims || !trims.length) {
+    container.innerHTML = '<p class="muted">Žádné výbavy detekovány.</p>';
+    return;
+  }
 
-  // Header — bez separátního Kód sloupce (kód je uvnitř feature cell)
-  let thead = '<thead><tr><th class="feature-cell" style="position:sticky;left:0;z-index:11;">Položka</th>';
-  for (const t of trims) {
+  let html = `<div class="trim-tabs">`;
+  for (let ti = 0; ti < trims.length; ti++) {
+    const t = trims[ti];
     const priceFmt = t.list_price ? `${t.list_price.toLocaleString('cs-CZ')} Kč` : '';
-    thead += `<th class="trim-col"><div class="trim-header"><strong>${escapeHtml(t.name)}</strong>${priceFmt ? `<span class="price">${priceFmt}</span>` : ''}</div></th>`;
+    html += `<button class="trim-tab-btn ${ti === 0 ? 'active' : ''}" data-trim-idx="${ti}">
+      <strong>${escapeHtml(t.name || '(bez názvu)')}</strong>
+      ${priceFmt ? `<span class="trim-tab-price">${priceFmt}</span>` : ''}
+    </button>`;
   }
-  thead += '</tr></thead>';
+  html += `</div>`;
 
-  let tbody = '<tbody>';
-  for (let sIdx = 0; sIdx < data.sections.length; sIdx++) {
-    const section = data.sections[sIdx];
-    tbody += `<tr class="section-row"><td colspan="${trims.length + 1}">${escapeHtml(section.name)}</td></tr>`;
-    for (let rIdx = 0; rIdx < (section.rows ?? []).length; rIdx++) {
-      const row = section.rows[rIdx];
-      const zebra = rIdx % 2 === 0 ? 'zebra-odd' : 'zebra-even';
-      tbody += `<tr class="feature-row ${zebra}" data-section="${sIdx}" data-row="${rIdx}">`;
-      tbody += `<td class="feature-cell">${escapeHtml(row.feature ?? '')}${row.code ? `<div class="feat-code">${escapeHtml(row.code)}</div>` : ''}</td>`;
-      for (let i = 0; i < trims.length; i++) {
-        const cell = row.cells?.[i] ?? '';
-        const kind = classifyCell(cell);
-        tbody += `<td class="cell cell-${kind}" data-cell-idx="${i}" title="Klik = upravit (Enter=uložit, Esc=zrušit)">${escapeHtml(formatCell(cell))}</td>`;
-      }
-      tbody += '</tr>';
+  for (let ti = 0; ti < trims.length; ti++) {
+    const t = trims[ti];
+    html += `<div class="trim-pane ${ti === 0 ? 'active' : ''}" data-trim-idx="${ti}">${renderTrimPane(t, ti)}</div>`;
+  }
+  container.innerHTML = html;
+
+  // Tab switching
+  container.querySelectorAll('.trim-tab-btn').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const idx = btn.dataset.trimIdx;
+      container.querySelectorAll('.trim-tab-btn').forEach((b) => b.classList.toggle('active', b.dataset.trimIdx === idx));
+      container.querySelectorAll('.trim-pane').forEach((p) => p.classList.toggle('active', p.dataset.trimIdx === idx));
+    });
+  });
+
+  // Wire trim-level editors (name, price)
+  container.querySelectorAll('.trim-name-input').forEach((inp) => {
+    inp.addEventListener('input', (e) => {
+      const i = parseInt(e.target.dataset.trimIdx, 10);
+      CURRENT_DATA.trims[i].name = e.target.value;
+      const btn = container.querySelector(`.trim-tab-btn[data-trim-idx="${i}"] strong`);
+      if (btn) btn.textContent = e.target.value || '(bez názvu)';
+    });
+  });
+  container.querySelectorAll('.trim-price-input').forEach((inp) => {
+    inp.addEventListener('input', (e) => {
+      const i = parseInt(e.target.dataset.trimIdx, 10);
+      const v = parseInt(e.target.value.replace(/\s/g, ''), 10);
+      CURRENT_DATA.trims[i].list_price = Number.isFinite(v) ? v : undefined;
+      const priceEl = container.querySelector(`.trim-tab-btn[data-trim-idx="${i}"] .trim-tab-price`);
+      if (priceEl) priceEl.textContent = Number.isFinite(v) ? `${v.toLocaleString('cs-CZ')} Kč` : '';
+    });
+  });
+
+  // Section title edit
+  container.querySelectorAll('.section-title-input').forEach((inp) => {
+    inp.addEventListener('input', (e) => {
+      const ti = parseInt(e.target.dataset.trimIdx, 10);
+      const si = parseInt(e.target.dataset.sectionIdx, 10);
+      CURRENT_DATA.trims[ti].features[si].section = e.target.value;
+    });
+  });
+
+  // Feature items textarea — one per line
+  container.querySelectorAll('.section-items-textarea').forEach((ta) => {
+    ta.addEventListener('input', (e) => {
+      const ti = parseInt(e.target.dataset.trimIdx, 10);
+      const si = parseInt(e.target.dataset.sectionIdx, 10);
+      CURRENT_DATA.trims[ti].features[si].items = e.target.value
+        .split('\n').map((l) => l.trim()).filter((l) => l.length > 0);
+    });
+  });
+
+  // Add section
+  container.querySelectorAll('.btn-add-section').forEach((btn) => {
+    btn.addEventListener('click', (e) => {
+      e.preventDefault();
+      const ti = parseInt(e.target.dataset.trimIdx, 10);
+      if (!Array.isArray(CURRENT_DATA.trims[ti].features)) CURRENT_DATA.trims[ti].features = [];
+      CURRENT_DATA.trims[ti].features.push({ section: 'NOVÁ SEKCE', items: [] });
+      renderTrims(CURRENT_DATA.trims);
+      // Re-aktivuj ten tab
+      const tabBtn = container.querySelector(`.trim-tab-btn[data-trim-idx="${ti}"]`);
+      if (tabBtn) tabBtn.click();
+    });
+  });
+
+  // Remove section
+  container.querySelectorAll('.btn-remove-section').forEach((btn) => {
+    btn.addEventListener('click', (e) => {
+      e.preventDefault();
+      const ti = parseInt(e.target.dataset.trimIdx, 10);
+      const si = parseInt(e.target.dataset.sectionIdx, 10);
+      const sec = CURRENT_DATA.trims[ti].features[si];
+      if (sec.items.length > 0 && !confirm(`Smazat sekci "${sec.section}" (${sec.items.length} položek)?`)) return;
+      CURRENT_DATA.trims[ti].features.splice(si, 1);
+      renderTrims(CURRENT_DATA.trims);
+      const tabBtn = container.querySelector(`.trim-tab-btn[data-trim-idx="${ti}"]`);
+      if (tabBtn) tabBtn.click();
+    });
+  });
+
+  // Optional items inline edit (name, code, price)
+  container.querySelectorAll('.opt-name').forEach((inp) => {
+    inp.addEventListener('input', (e) => {
+      const ti = parseInt(e.target.dataset.trimIdx, 10);
+      const oi = parseInt(e.target.dataset.optIdx, 10);
+      CURRENT_DATA.trims[ti].optional_items[oi].name = e.target.value;
+    });
+  });
+  container.querySelectorAll('.opt-code').forEach((inp) => {
+    inp.addEventListener('input', (e) => {
+      const ti = parseInt(e.target.dataset.trimIdx, 10);
+      const oi = parseInt(e.target.dataset.optIdx, 10);
+      CURRENT_DATA.trims[ti].optional_items[oi].code = e.target.value;
+    });
+  });
+  container.querySelectorAll('.opt-price').forEach((inp) => {
+    inp.addEventListener('input', (e) => {
+      const ti = parseInt(e.target.dataset.trimIdx, 10);
+      const oi = parseInt(e.target.dataset.optIdx, 10);
+      const v = parseInt(e.target.value.replace(/\s/g, ''), 10);
+      CURRENT_DATA.trims[ti].optional_items[oi].price = Number.isFinite(v) ? v : 0;
+    });
+  });
+  container.querySelectorAll('.btn-add-optional').forEach((btn) => {
+    btn.addEventListener('click', (e) => {
+      e.preventDefault();
+      const ti = parseInt(e.target.dataset.trimIdx, 10);
+      if (!Array.isArray(CURRENT_DATA.trims[ti].optional_items)) CURRENT_DATA.trims[ti].optional_items = [];
+      CURRENT_DATA.trims[ti].optional_items.push({ name: 'Nová položka', code: '', price: 0 });
+      renderTrims(CURRENT_DATA.trims);
+      const tabBtn = container.querySelector(`.trim-tab-btn[data-trim-idx="${ti}"]`);
+      if (tabBtn) tabBtn.click();
+    });
+  });
+  container.querySelectorAll('.btn-remove-optional').forEach((btn) => {
+    btn.addEventListener('click', (e) => {
+      e.preventDefault();
+      const ti = parseInt(e.target.dataset.trimIdx, 10);
+      const oi = parseInt(e.target.dataset.optIdx, 10);
+      CURRENT_DATA.trims[ti].optional_items.splice(oi, 1);
+      renderTrims(CURRENT_DATA.trims);
+      const tabBtn = container.querySelector(`.trim-tab-btn[data-trim-idx="${ti}"]`);
+      if (tabBtn) tabBtn.click();
+    });
+  });
+}
+
+function renderTrimPane(t, ti) {
+  const features = Array.isArray(t.features) ? t.features : [];
+  const optional = Array.isArray(t.optional_items) ? t.optional_items : [];
+
+  let html = `
+    <div class="trim-header-row">
+      <div>
+        <label class="pkg-lab">Název výbavy</label>
+        <input class="trim-name-input" data-trim-idx="${ti}" type="text" value="${escapeAttr(t.name ?? '')}" />
+      </div>
+      <div>
+        <label class="pkg-lab">Ceníková cena (Kč)</label>
+        <input class="trim-price-input" data-trim-idx="${ti}" type="text" value="${t.list_price ?? ''}" placeholder="např. 669000" />
+      </div>
+    </div>
+
+    <h3 class="trim-section-heading">Co dostane zákazník <span class="muted">(${features.reduce((a, s) => a + (s.items?.length ?? 0), 0)} položek)</span></h3>
+  `;
+
+  for (let si = 0; si < features.length; si++) {
+    const sec = features[si];
+    const itemsText = (sec.items ?? []).join('\n');
+    html += `
+      <details class="feat-section" open>
+        <summary>
+          <input class="section-title-input" data-trim-idx="${ti}" data-section-idx="${si}" type="text" value="${escapeAttr(sec.section ?? '')}" placeholder="Název sekce" />
+          <button class="btn-remove-section" data-trim-idx="${ti}" data-section-idx="${si}" title="Smazat sekci">×</button>
+        </summary>
+        <textarea class="section-items-textarea" data-trim-idx="${ti}" data-section-idx="${si}" rows="${Math.max(3, (sec.items ?? []).length + 1)}" placeholder="Jedna položka na řádek">${escapeHtml(itemsText)}</textarea>
+      </details>
+    `;
+  }
+  html += `<button class="btn-add-section" data-trim-idx="${ti}">+ Přidat sekci</button>`;
+
+  html += `<h3 class="trim-section-heading">Co si zákazník může dokoupit <span class="muted">(${optional.length} položek)</span></h3>`;
+  if (optional.length === 0) {
+    html += `<p class="muted">Žádné dokoupitelné položky.</p>`;
+  } else {
+    html += `<table class="opt-table"><thead><tr><th>Název</th><th style="width:120px;">Kód</th><th style="width:140px;">Cena (Kč)</th><th style="width:40px;"></th></tr></thead><tbody>`;
+    for (let oi = 0; oi < optional.length; oi++) {
+      const o = optional[oi];
+      html += `<tr>
+        <td><input class="opt-name" data-trim-idx="${ti}" data-opt-idx="${oi}" type="text" value="${escapeAttr(o.name ?? '')}" /></td>
+        <td><input class="opt-code" data-trim-idx="${ti}" data-opt-idx="${oi}" type="text" value="${escapeAttr(o.code ?? '')}" placeholder="—" /></td>
+        <td><input class="opt-price" data-trim-idx="${ti}" data-opt-idx="${oi}" type="text" value="${o.price ?? ''}" /></td>
+        <td><button class="btn-remove-optional" data-trim-idx="${ti}" data-opt-idx="${oi}" title="Smazat">×</button></td>
+      </tr>`;
     }
+    html += `</tbody></table>`;
   }
-  tbody += '</tbody>';
+  html += `<button class="btn-add-optional" data-trim-idx="${ti}">+ Přidat dokoupitelnou položku</button>`;
 
-  table.innerHTML = thead + tbody;
-
-  // Inline edit cell (S/-/cena/paket)
-  table.querySelectorAll('.cell').forEach((td) => {
-    td.addEventListener('click', () => {
-      if (td.querySelector('input')) return;
-      const tr = td.closest('tr');
-      const sIdx = parseInt(tr.dataset.section, 10);
-      const rIdx = parseInt(tr.dataset.row, 10);
-      const cIdx = parseInt(td.dataset.cellIdx, 10);
-      const currentValue = data.sections[sIdx].rows[rIdx].cells[cIdx] ?? '';
-
-      const input = document.createElement('input');
-      input.type = 'text';
-      input.value = currentValue;
-      input.style.cssText = 'width:100%;box-sizing:border-box;border:2px solid #1f6feb;padding:4px 6px;font-size:13px;text-align:center;border-radius:3px;';
-      td.textContent = '';
-      td.appendChild(input);
-      input.focus();
-      input.select();
-
-      const commit = (save) => {
-        const v = save ? input.value.trim() : currentValue;
-        data.sections[sIdx].rows[rIdx].cells[cIdx] = v;
-        const kind = classifyCell(v);
-        td.className = `cell cell-${kind}`;
-        td.textContent = formatCell(v);
-        td.setAttribute('title', 'Klik = upravit (Enter=uložit, Esc=zrušit)');
-        if (save) $('raw-json').textContent = JSON.stringify(data, null, 2);
-      };
-      input.addEventListener('blur', () => commit(true));
-      input.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter') { e.preventDefault(); commit(true); }
-        if (e.key === 'Escape') { e.preventDefault(); commit(false); }
-      });
-    });
-  });
-
-  // Inline edit feature name (1. sloupec)
-  table.querySelectorAll('.feature-cell').forEach((td) => {
-    td.addEventListener('click', (e) => {
-      if (td.querySelector('input,textarea')) return;
-      const tr = td.closest('tr');
-      const sIdx = parseInt(tr.dataset.section, 10);
-      const rIdx = parseInt(tr.dataset.row, 10);
-      if (isNaN(sIdx) || isNaN(rIdx)) return; // section row, needitovat tady
-      const row = data.sections[sIdx].rows[rIdx];
-      const currentFeature = row.feature ?? '';
-      const currentCode = row.code ?? '';
-
-      const wrap = document.createElement('div');
-      wrap.style.cssText = 'display:flex;flex-direction:column;gap:4px;';
-      const inputName = document.createElement('textarea');
-      inputName.value = currentFeature;
-      inputName.rows = 2;
-      inputName.style.cssText = 'width:100%;box-sizing:border-box;border:2px solid #1f6feb;padding:4px 6px;font-size:13px;border-radius:3px;resize:vertical;font-family:inherit;';
-      const inputCode = document.createElement('input');
-      inputCode.type = 'text';
-      inputCode.value = currentCode;
-      inputCode.placeholder = 'kód (volitelně)';
-      inputCode.style.cssText = 'width:100%;box-sizing:border-box;border:1px solid #ccc;padding:3px 6px;font-size:11px;color:#666;border-radius:3px;';
-      wrap.appendChild(inputName);
-      wrap.appendChild(inputCode);
-      td.textContent = '';
-      td.appendChild(wrap);
-      inputName.focus();
-      inputName.select();
-
-      const commit = (save) => {
-        if (save) {
-          row.feature = inputName.value.trim();
-          row.code = inputCode.value.trim();
-        }
-        // re-render this cell
-        td.innerHTML = `${escapeHtml(row.feature ?? '')}${row.code ? `<div class="feat-code">${escapeHtml(row.code)}</div>` : ''}`;
-        if (save) $('raw-json').textContent = JSON.stringify(data, null, 2);
-      };
-      inputName.addEventListener('blur', (ev) => {
-        // commit jen pokud focus odešel mimo wrap úplně
-        setTimeout(() => { if (!td.contains(document.activeElement)) commit(true); }, 100);
-      });
-      inputCode.addEventListener('blur', () => {
-        setTimeout(() => { if (!td.contains(document.activeElement)) commit(true); }, 100);
-      });
-      [inputName, inputCode].forEach((el) => {
-        el.addEventListener('keydown', (ev) => {
-          if (ev.key === 'Enter' && !ev.shiftKey) { ev.preventDefault(); commit(true); }
-          if (ev.key === 'Escape') { ev.preventDefault(); commit(false); }
-        });
-      });
-      e.stopPropagation();
-    });
-  });
+  return html;
 }
 
 function renderPackages(packages, trims) {
@@ -682,10 +781,14 @@ function renderPackages(packages, trims) {
         </div>
       </div>
 
-      <p class="pkg-lab" style="margin-top:14px;">Ceny per trim <span class="muted">(klikni do buňky pro úpravu — <strong>S</strong> = standardní, číslo = cena, <strong>–</strong> = nedostupné)</span></p>
+      <p class="pkg-lab" style="margin-top:14px;">Ceny per trim <span class="muted">(klik do buňky — zadej číslo Kč / <code>standard</code> / <code>unavailable</code>)</span></p>
       <table class="pkg-pricing" data-pkg-idx="${pi}" style="width:100%;border-collapse:collapse;font-size:13px;margin-top:4px;">
         <thead><tr>${trims.map((t) => `<th style="padding:7px;background:#f5f5f7;text-align:center;">${escapeHtml(t.name)}</th>`).join('')}</tr></thead>
-        <tbody><tr>${(p.cells ?? trims.map(() => '')).map((c, ci) => `<td class="cell cell-${classifyCell(c)}" data-pkg-cell-idx="${ci}" title="Klik pro úpravu">${escapeHtml(formatCell(c))}</td>`).join('')}</tr></tbody>
+        <tbody><tr>${trims.map((t) => {
+          const slug = slugifyJs(t.name);
+          const v = p.pricing_per_trim?.[slug];
+          return `<td class="cell ${pricingCellClass(v)}" data-pkg-trim-slug="${slug}" title="Klik pro úpravu">${formatPricingValue(v)}</td>`;
+        }).join('')}</tr></tbody>
       </table>
 
       <label class="pkg-lab" style="margin-top:14px;">Obsah paketu <span class="muted">(jedna položka na řádek)</span></label>
@@ -721,29 +824,40 @@ function renderPackages(packages, trims) {
     });
   });
 
-  // Pricing cells inline edit
+  // Pricing cells inline edit (pricing_per_trim object)
   container.querySelectorAll('.pkg-pricing td.cell').forEach((td) => {
     td.addEventListener('click', () => {
       if (td.querySelector('input')) return;
       const tbl = td.closest('.pkg-pricing');
       const pi = parseInt(tbl.dataset.pkgIdx, 10);
-      const ci = parseInt(td.dataset.pkgCellIdx, 10);
-      if (!Array.isArray(CURRENT_DATA.packages[pi].cells)) CURRENT_DATA.packages[pi].cells = [];
-      const cur = CURRENT_DATA.packages[pi].cells[ci] ?? '';
+      const slug = td.dataset.pkgTrimSlug;
+      if (!CURRENT_DATA.packages[pi].pricing_per_trim) CURRENT_DATA.packages[pi].pricing_per_trim = {};
+      const cur = CURRENT_DATA.packages[pi].pricing_per_trim[slug];
+      const curStr = (typeof cur === 'number') ? String(cur) : (cur ?? '');
       const input = document.createElement('input');
       input.type = 'text';
-      input.value = cur;
+      input.value = curStr;
+      input.placeholder = 'číslo / standard / unavailable';
       input.style.cssText = 'width:100%;box-sizing:border-box;border:2px solid #1f6feb;padding:4px 6px;font-size:13px;text-align:center;border-radius:3px;';
       td.textContent = '';
       td.appendChild(input);
       input.focus(); input.select();
       const commit = (save) => {
         if (save) {
-          CURRENT_DATA.packages[pi].cells[ci] = input.value;
+          const v = input.value.trim();
+          let parsed;
+          if (v === '' || v === '-' || v === '–') parsed = 'unavailable';
+          else if (v.toLowerCase() === 'standard' || v === 'S') parsed = 'standard';
+          else if (v.toLowerCase() === 'unavailable') parsed = 'unavailable';
+          else {
+            const num = parseInt(v.replace(/\s/g, ''), 10);
+            parsed = Number.isFinite(num) ? num : v;
+          }
+          CURRENT_DATA.packages[pi].pricing_per_trim[slug] = parsed;
         }
-        const v = CURRENT_DATA.packages[pi].cells[ci] ?? '';
-        td.textContent = formatCell(v);
-        td.className = `cell cell-${classifyCell(v)}`;
+        const v = CURRENT_DATA.packages[pi].pricing_per_trim[slug];
+        td.textContent = formatPricingValue(v);
+        td.className = `cell ${pricingCellClass(v)}`;
       };
       input.addEventListener('keydown', (e) => {
         if (e.key === 'Enter') { e.preventDefault(); commit(true); }
@@ -772,16 +886,12 @@ function renderPackages(packages, trims) {
 }
 
 function addPackage() {
-  const newPkg = {
-    name: 'Nový paket',
-    code: '',
-    contents: [],
-    cells: CURRENT_DATA.trims.map(() => '-'),
-  };
+  const pricing_per_trim = {};
+  for (const t of CURRENT_DATA.trims) pricing_per_trim[slugifyJs(t.name)] = 'unavailable';
+  const newPkg = { name: 'Nový paket', code: '', contents: [], pricing_per_trim };
   CURRENT_DATA.packages.push(newPkg);
   renderPackages(CURRENT_DATA.packages, CURRENT_DATA.trims);
   $('count-packages').textContent = CURRENT_DATA.packages.length;
-  // Otevři poslední přidaný
   const cards = document.querySelectorAll('#packages-container details');
   if (cards.length) {
     cards.forEach((c, i) => c.open = (i === cards.length - 1));
@@ -793,16 +903,50 @@ function escapeAttr(s) {
   return String(s ?? '').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
 }
 
+// JS-side slugify (matches save.ts slugify výsledkem pro běžné trim názvy)
+function slugifyJs(s) {
+  return String(s ?? '').toLowerCase().trim()
+    .replace(/\+/g, '-plus').replace(/&/g, '-and')
+    .normalize('NFD').replace(/[̀-ͯ]/g, '')
+    .replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '') || 'untitled';
+}
+
+// Pricing hodnota → třída cellu (barva)
+function pricingCellClass(v) {
+  if (v === 'standard') return 'cell-standard';
+  if (v === 'unavailable' || v == null) return 'cell-unavailable';
+  if (typeof v === 'number') return 'cell-optional';
+  return 'cell-other';
+}
+function formatPricingValue(v) {
+  if (v === 'standard') return 'standard';
+  if (v === 'unavailable' || v == null) return '–';
+  if (typeof v === 'number') return v.toLocaleString('cs-CZ');
+  return String(v);
+}
+
 function renderColors(ext, int, trims) {
   const container = $('colors-container');
   let html = '';
+  const colorPriceCell = (c, trim) => {
+    const slug = slugifyJs(trim.name);
+    // Akceptuj jak pricing_per_trim object, tak fallback array cells (legacy)
+    let v = c.pricing_per_trim?.[slug];
+    if (v === undefined && Array.isArray(c.cells)) v = c.cells[trims.indexOf(trim)];
+    if (v === undefined || v === '' || v === '-' || v === '–') return `<td class="cell cell-unavailable">–</td>`;
+    if (typeof v === 'number') return `<td class="cell cell-optional">${v.toLocaleString('cs-CZ')}</td>`;
+    const num = parseInt(String(v).replace(/\s/g, ''), 10);
+    if (Number.isFinite(num)) return `<td class="cell cell-optional">${num.toLocaleString('cs-CZ')}</td>`;
+    return `<td class="cell cell-standard">${escapeHtml(String(v))}</td>`;
+  };
+
   if (ext?.length) {
     html += '<h3>Exteriér</h3><table style="width:100%;border-collapse:collapse;font-size:13px;"><thead><tr><th style="text-align:left;padding:6px;background:#f5f5f7;">Barva</th><th style="padding:6px;background:#f5f5f7;">Kód</th><th style="padding:6px;background:#f5f5f7;">Typ</th>';
     for (const t of trims) html += `<th style="padding:6px;background:#f5f5f7;text-align:center;">${escapeHtml(t.name)}</th>`;
     html += '</tr></thead><tbody>';
     for (const c of ext) {
       html += `<tr><td style="padding:6px;">${escapeHtml(c.name ?? '')}</td><td style="padding:6px;color:#999;">${escapeHtml(c.code ?? '')}</td><td style="padding:6px;">${escapeHtml(c.type ?? '')}</td>`;
-      for (const cell of c.cells ?? []) html += `<td class="cell cell-${classifyCell(cell)}">${escapeHtml(formatCell(cell))}</td>`;
+      for (const t of trims) html += colorPriceCell(c, t);
       html += '</tr>';
     }
     html += '</tbody></table>';
@@ -813,7 +957,7 @@ function renderColors(ext, int, trims) {
     html += '</tr></thead><tbody>';
     for (const c of int) {
       html += `<tr><td style="padding:6px;">${escapeHtml(c.name ?? '')}</td><td style="padding:6px;color:#999;">${escapeHtml(c.code ?? '')}</td><td style="padding:6px;">${escapeHtml(c.material ?? '')}</td>`;
-      for (const cell of c.cells ?? []) html += `<td class="cell cell-${classifyCell(cell)}">${escapeHtml(formatCell(cell))}</td>`;
+      for (const t of trims) html += colorPriceCell(c, t);
       html += '</tr>';
     }
     html += '</tbody></table>';
