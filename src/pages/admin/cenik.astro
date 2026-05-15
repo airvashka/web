@@ -356,14 +356,36 @@ $('analyze-btn').addEventListener('click', async () => {
   if (!yearId) { alert('Vyber nejdřív model_year (kontext pro AI)'); return; }
   $('analyze-error').classList.add('hidden');
   $('analyze-btn').disabled = true;
-  $('analyze-status').textContent = '⏳ Připravuji PDF...';
 
-  // Convert PDF to base64 — Vercel security někdy blokuje multipart, JSON projde
-  const arrayBuffer = await SELECTED_PDF.arrayBuffer();
-  const bytes = new Uint8Array(arrayBuffer);
-  let binary = '';
-  for (let i = 0; i < bytes.length; i++) binary += String.fromCharCode(bytes[i]);
-  const pdf_base64 = btoa(binary);
+  // Refresh token před dlouhým procesem
+  await refreshAccessToken();
+
+  // 1) Upload PDF do Directus (bypasses Vercel 4.5MB body limit)
+  $('analyze-status').textContent = '⏳ Uploaduji PDF do Directus...';
+  const uploadFd = new FormData();
+  uploadFd.append('title', `Cenik ${model || ''} ${year || ''} ${new Date().toISOString().substring(0, 10)}`.trim());
+  uploadFd.append('file', SELECTED_PDF);
+
+  let fileId;
+  try {
+    const upResp = await fetch(`${DIRECTUS_URL}/files`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${TOKEN}` },
+      body: uploadFd,
+    });
+    if (!upResp.ok) throw new Error(`Directus upload ${upResp.status}: ${(await upResp.text()).substring(0, 300)}`);
+    const upData = await upResp.json();
+    fileId = upData.data?.id;
+    if (!fileId) throw new Error('Directus nevrátil file ID');
+  } catch (e) {
+    $('analyze-error').textContent = `Upload do Directus selhal: ${e.message}`;
+    $('analyze-error').classList.remove('hidden');
+    $('analyze-btn').disabled = false;
+    $('analyze-status').textContent = '';
+    return;
+  }
+
+  // 2) AI parsing — jen file_id v requestu (tiny body)
   $('analyze-status').textContent = '⏳ AI parsing běží (~30-90s pro detailní ceníky)...';
 
   try {
@@ -374,7 +396,7 @@ $('analyze-btn').addEventListener('click', async () => {
         Authorization: `Bearer ${TOKEN}`,
       },
       body: JSON.stringify({
-        pdf_base64,
+        file_id: fileId,
         context: { brand, model, year, year_id: yearId },
       }),
     });

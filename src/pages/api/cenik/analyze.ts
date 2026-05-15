@@ -116,24 +116,52 @@ export const POST: APIRoute = async ({ request }) => {
       return new Response(JSON.stringify({ error: 'Neautorizováno — chybí nebo neplatný Directus token' }), { status: 401, headers: { 'Content-Type': 'application/json' } });
     }
 
-    // JSON body s PDF jako base64 (FormData/multipart upload může být blokované Vercel security)
-    const body = await request.json().catch(() => null);
-    if (!body || typeof body !== 'object') {
-      return new Response(JSON.stringify({ error: 'Invalid JSON body' }), { status: 400, headers: { 'Content-Type': 'application/json' } });
-    }
-    const pdf_base64: string | undefined = (body as any).pdf_base64;
-    const context: { brand?: string; model?: string; year?: number } = (body as any).context ?? {};
+    // PDF zdroj: file_id v Directus (bypasses Vercel 4.5MB body limit) NEBO inline FormData/base64
+    let base64: string;
+    let context: { brand?: string; model?: string; year?: number } = {};
+    const contentType = request.headers.get('content-type') || '';
 
-    if (!pdf_base64 || typeof pdf_base64 !== 'string') {
-      return new Response(JSON.stringify({ error: 'Chybí pdf_base64 v JSON body' }), { status: 400, headers: { 'Content-Type': 'application/json' } });
-    }
-    // Base64 → binary size approx (base64 je ~33% větší)
-    const decodedSize = Math.floor(pdf_base64.length * 0.75);
-    if (decodedSize > 30 * 1024 * 1024) {
-      return new Response(JSON.stringify({ error: 'PDF příliš velké (>30MB)' }), { status: 400, headers: { 'Content-Type': 'application/json' } });
-    }
+    if (contentType.includes('application/json')) {
+      const body = await request.json().catch(() => null);
+      if (!body || typeof body !== 'object') {
+        return new Response(JSON.stringify({ error: 'Invalid JSON body' }), { status: 400, headers: { 'Content-Type': 'application/json' } });
+      }
+      context = (body as any).context ?? {};
 
-    const base64 = pdf_base64;
+      const file_id: string | undefined = (body as any).file_id;
+      const pdf_base64: string | undefined = (body as any).pdf_base64;
+
+      if (file_id) {
+        // Fetch z Directus (žádný Vercel body limit problém)
+        const assetUrl = `${DIRECTUS_URL}/assets/${file_id}`;
+        const assetResp = await fetch(assetUrl, { headers: { Authorization: `Bearer ${token}` } });
+        if (!assetResp.ok) {
+          return new Response(JSON.stringify({ error: `Directus file fetch ${assetResp.status}: ${await assetResp.text()}` }), { status: 502, headers: { 'Content-Type': 'application/json' } });
+        }
+        const ab = await assetResp.arrayBuffer();
+        if (ab.byteLength > 50 * 1024 * 1024) {
+          return new Response(JSON.stringify({ error: 'PDF příliš velké (>50MB)' }), { status: 400, headers: { 'Content-Type': 'application/json' } });
+        }
+        base64 = Buffer.from(ab).toString('base64');
+      } else if (pdf_base64) {
+        base64 = pdf_base64;
+      } else {
+        return new Response(JSON.stringify({ error: 'Chybí file_id nebo pdf_base64 v JSON body' }), { status: 400, headers: { 'Content-Type': 'application/json' } });
+      }
+    } else if (contentType.includes('multipart/form-data')) {
+      // Legacy FormData support (pro malé PDFs)
+      const formData = await request.formData();
+      const pdf = formData.get('pdf');
+      const contextRaw = formData.get('context');
+      if (!(pdf instanceof File)) {
+        return new Response(JSON.stringify({ error: 'Chybí pdf v form-data' }), { status: 400, headers: { 'Content-Type': 'application/json' } });
+      }
+      if (typeof contextRaw === 'string') { try { context = JSON.parse(contextRaw); } catch {} }
+      const ab = await pdf.arrayBuffer();
+      base64 = Buffer.from(ab).toString('base64');
+    } else {
+      return new Response(JSON.stringify({ error: 'Unsupported content-type — use application/json with file_id, nebo multipart/form-data' }), { status: 400, headers: { 'Content-Type': 'application/json' } });
+    }
 
     const userPrompt = `Extrahuj data z přiloženého ceníku.
 
