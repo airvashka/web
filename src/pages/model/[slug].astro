@@ -563,7 +563,7 @@ if (promoActive && promoDescription) {
           )}
           {(rawModel as any).variant_badge_kind && (() => {
             const k = String((rawModel as any).variant_badge_kind).toUpperCase();
-            const variantLabels: Record<string, string> = { ICE: 'Spalovací motor', HEV: 'Plný hybrid', EVX: 'Elektromobil' };
+            const variantLabels = { ICE: 'Spalovací motor', HEV: 'Plný hybrid', EVX: 'Elektromobil' };
             return (
               <div class="intro-variant-tag">
                 <VariantBadge kind={k} size={36} />
