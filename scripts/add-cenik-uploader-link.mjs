@@ -37,7 +37,12 @@ const ok = (m) => console.log(`  ✓  ${m}`);
 const info = (m) => console.log(`  ℹ  ${m}`);
 
 const FIELD_NAME = '_cenik_uploader_link';
-const NOTICE_TEXT = '📄 **Hromadný upload ceníku z PDF**\\n\\nPotřebuješ nahrát nové trim levels, pakety nebo technická data? Použij AI Ceník uploader — drag & drop PDF, AI extrahuje strukturu, ty zreviewuješ a uložíš.\\n\\n→ [Otevřít Ceník uploader](https://sfr-motor-test.vercel.app/admin/cenik)';
+// Template literal s reálnými newlines + HTML anchor s target="_blank" (otevře v novém tab/okně)
+const NOTICE_TEXT = `📄 **Hromadný upload ceníku z PDF**
+
+Potřebuješ nahrát nové trim levels, pakety nebo technická data? Použij AI Ceník uploader — drag & drop PDF, AI extrahuje strukturu, ty zreviewuješ a uložíš.
+
+→ <a href="https://sfr-motor-test.vercel.app/admin/cenik" target="_blank" rel="noopener">Otevřít Ceník uploader v novém okně ↗</a>`;
 
 async function fieldExists() {
   try {

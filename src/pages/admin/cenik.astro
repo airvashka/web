@@ -318,7 +318,11 @@ $('analyze-btn').addEventListener('click', async () => {
   fd.append('context', JSON.stringify({ brand, model, year, year_id: yearId }));
 
   try {
-    const r = await fetch('/api/cenik/analyze', { method: 'POST', body: fd });
+    const r = await fetch('/api/cenik/analyze', {
+      method: 'POST',
+      body: fd,
+      headers: { Authorization: `Bearer ${TOKEN}` },
+    });
     const data = await r.json();
     if (!r.ok) {
       $('analyze-error').textContent = `Chyba: ${data.error || 'unknown'}\n\n${data.raw_text ?? ''}`;

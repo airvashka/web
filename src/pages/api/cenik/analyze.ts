@@ -82,10 +82,30 @@ const RESPONSE_SCHEMA = `{
   }
 }`;
 
+const DIRECTUS_URL = import.meta.env.PUBLIC_DIRECTUS_URL || 'https://directus-production-3e67.up.railway.app';
+
+/** Ověř Directus token — vrátí true pokud user platí. Brání Anthropic spam. */
+async function verifyDirectusToken(token: string): Promise<boolean> {
+  if (!token) return false;
+  try {
+    const r = await fetch(`${DIRECTUS_URL}/users/me`, { headers: { Authorization: `Bearer ${token}` } });
+    return r.ok;
+  } catch {
+    return false;
+  }
+}
+
 export const POST: APIRoute = async ({ request }) => {
   try {
     if (!import.meta.env.ANTHROPIC_API_KEY) {
       return new Response(JSON.stringify({ error: 'ANTHROPIC_API_KEY není v env nastaven' }), { status: 500, headers: { 'Content-Type': 'application/json' } });
+    }
+
+    // Ověř Directus token — brání anonymnímu API zneužití (Anthropic náklady)
+    const authHeader = request.headers.get('authorization') || '';
+    const token = authHeader.replace(/^Bearer\s+/i, '');
+    if (!(await verifyDirectusToken(token))) {
+      return new Response(JSON.stringify({ error: 'Neautorizováno — chybí nebo neplatný Directus token' }), { status: 401, headers: { 'Content-Type': 'application/json' } });
     }
 
     const formData = await request.formData();
