@@ -802,9 +802,7 @@ if (promoActive && promoDescription) {
     <section class="section" id="ceny" style="background: var(--bg-soft);">
       <div class="container">
         <div class="section-eyebrow">Ceny a výbavy</div>
-        <h2 class="section-title">
-          {trims.length === 1 ? 'Jeden výbavový stupeň' : trims.length === 2 ? 'Dva výbavové stupně' : trims.length === 3 ? 'Tři výbavové stupně' : `${trims.length} výbavových stupňů`}, jasná cena.
-        </h2>
+        <h2 class="section-title">Dostupné výbavy a pakety</h2>
         {(() => {
           // Pre-compute flat features set per trim (lowercased + trimmed for diff)
           const flatPerTrim = trims.map((t) => {
@@ -875,24 +873,9 @@ if (promoActive && promoDescription) {
           );
         })()}
 
-        {/* ===== CTA na srovnání + plný ceník ===== */}
-        <div class="trims-cta-row">
-          <a class="trims-cta" href={`/model/${rawModel.slug}/vybavy`}>
-            <div>
-              <div class="trims-cta-eyebrow">Srovnání výbav</div>
-              <div class="trims-cta-title">Kompletní matrice — vidíte přesně co kde je</div>
-              <div class="trims-cta-sub">Sloupce trimů × řádky všech prvků výbavy, jako v PDF ceníku.</div>
-            </div>
-            <span class="trims-cta-arrow">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
-            </span>
-          </a>
-        </div>
-
-        {/* ===== Paketové výbavy ===== */}
+        {/* ===== Doplňkové pakety — hned pod trim kartami, bez orange eyebrow ===== */}
         {optionPackages.length > 0 && (
-          <div class="packages-block">
-            <div class="section-eyebrow" style="margin-top: 64px;">Paketové výbavy</div>
+          <div class="packages-block" style="margin-top: 56px;">
             <h3 style="font-family: var(--font-display); font-weight: 600; font-size: clamp(28px, 2.8vw, 36px); letter-spacing: -0.02em; margin: 0 0 32px;">
               Doplňkové pakety
             </h3>
@@ -919,6 +902,20 @@ if (promoActive && promoDescription) {
             </div>
           </div>
         )}
+
+        {/* ===== CTA na srovnání + plný ceník — úplně na konci sekce ===== */}
+        <div class="trims-cta-row" style="margin-top: 56px;">
+          <a class="trims-cta" href={`/model/${rawModel.slug}/vybavy`}>
+            <div>
+              <div class="trims-cta-eyebrow">Srovnání výbav</div>
+              <div class="trims-cta-title">Kompletní matrice — vidíte přesně co kde je</div>
+              <div class="trims-cta-sub">Sloupce trimů × řádky všech prvků výbavy + paketové ceny + barvy.</div>
+            </div>
+            <span class="trims-cta-arrow">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            </span>
+          </a>
+        </div>
       </div>
     </section>
   )}

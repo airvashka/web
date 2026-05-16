@@ -2432,10 +2432,11 @@ button.thumb-more {
 .trim-teaser-count {
   font-family: var(--font-display);
   font-size: 13px;
-  color: var(--text-muted);
+  color: var(--accent, #F25C1B);
+  font-weight: 600;
   margin-top: 4px;
 }
-.trim.dark .trim-teaser-count { color: rgba(255,255,255,0.55); }
+.trim.dark .trim-teaser-count { color: var(--accent, #F25C1B); }
 
 .trim-actions {
   display: flex; flex-direction: column;

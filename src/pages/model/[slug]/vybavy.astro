@@ -113,9 +113,21 @@ interface CompareCategory {
 }
 
 const compareData: CompareCategory[] = [];
-const categories = [...CATEGORY_ORDER];
 
-for (const cat of categories) {
+// Dynamicky sebereme VŠECHNY kategorie napříč trimy (predefined + literal z PDF).
+const allCategories = new Set<string>();
+for (const trimMap of trimFeaturesMap.values()) {
+  for (const key of Object.keys(trimMap)) allCategories.add(key);
+}
+
+// Order: nejprve známé CATEGORY_ORDER, pak zbytek alfabeticky (literal z PDF).
+const knownOrder = CATEGORY_ORDER as readonly string[];
+const ordered = [
+  ...knownOrder.filter((c) => allCategories.has(c)),
+  ...[...allCategories].filter((c) => !knownOrder.includes(c)).sort(),
+];
+
+for (const cat of ordered) {
   // Sjednocení features napříč trimy v této kategorii
   const allFeaturesInCat = new Set<string>();
   for (const trimMap of trimFeaturesMap.values()) {
@@ -210,35 +222,69 @@ function trimPrice(t: TrimLevel): string {
         </div>
       )}
 
-      {/* Pakety */}
-      {optionPackages.length > 0 && (
-        <div class="compare-packages">
-          <h2 class="section-title" style="font-size: clamp(24px, 2.2vw, 32px); margin-top: 64px; margin-bottom: 16px;">
-            Volitelné balíčky
-          </h2>
-          <p style="color: var(--text-muted); margin-bottom: 32px;">
-            K libovolnému stupni výbavy si můžeš doobjednat tyto balíčky.
-          </p>
-          <div class="compare-packages-grid">
-            {optionPackages.map((pkg: any) => (
-              <article class="pkg-card">
-                <h3 class="pkg-name">{pkg.name}</h3>
-                {pkg.description && <p class="pkg-desc">{pkg.description}</p>}
-                {Array.isArray(pkg.features) && pkg.features.length > 0 && (
-                  <ul class="pkg-list">
-                    {pkg.features.map((f: string) => (
-                      <li>
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-                        <span>{f}</span>
-                      </li>
-                    ))}
-                  </ul>
-                )}
-              </article>
-            ))}
+      {/* Pakety s pricing_per_trim */}
+      {optionPackages.length > 0 && (() => {
+        const slugifyTrim = (s: string) => String(s ?? '')
+          .toLowerCase().trim()
+          .replace(/\+/g, '-plus').replace(/&/g, '-and')
+          .normalize('NFD').replace(/[̀-ͯ]/g, '')
+          .replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '') || 'untitled';
+        const trimSlugs = trims.map((t) => ({ name: t.name, slug: slugifyTrim(t.name) }));
+
+        const fmtPkgCell = (v: any) => {
+          if (v === 'standard' || v === 'S') return { text: 'V ceně', cls: 'pkg-cell-standard' };
+          if (v === 'unavailable' || v === '-' || v === '–' || v == null || v === '') return { text: '—', cls: 'pkg-cell-unavailable' };
+          if (typeof v === 'number') return { text: `${v.toLocaleString('cs-CZ')} Kč`, cls: 'pkg-cell-price' };
+          const num = parseInt(String(v).replace(/\s/g, ''), 10);
+          if (Number.isFinite(num)) return { text: `${num.toLocaleString('cs-CZ')} Kč`, cls: 'pkg-cell-price' };
+          return { text: String(v), cls: 'pkg-cell-other' };
+        };
+
+        return (
+          <div class="compare-packages">
+            <h2 class="section-title" style="font-size: clamp(24px, 2.2vw, 32px); margin-top: 64px; margin-bottom: 16px;">
+              Volitelné pakety
+            </h2>
+            <p style="color: var(--text-muted); margin-bottom: 32px;">
+              Ceny per trim. <strong>V ceně</strong> = standardně, <strong>—</strong> = nedostupné, číslo = příplatek.
+            </p>
+            <div class="compare-packages-grid">
+              {optionPackages.map((pkg: any) => (
+                <article class="pkg-card">
+                  <h3 class="pkg-name">{pkg.name}{pkg.code && <span class="pkg-code"> ({pkg.code})</span>}</h3>
+                  {pkg.description && <p class="pkg-desc">{pkg.description}</p>}
+                  {Array.isArray(pkg.features) && pkg.features.length > 0 && (
+                    <ul class="pkg-list">
+                      {pkg.features.map((f: string) => (
+                        <li>
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                          <span>{f}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                  {pkg.pricing_per_trim && typeof pkg.pricing_per_trim === 'object' && (
+                    <div class="pkg-pricing">
+                      <div class="pkg-pricing-label">Cena za paket:</div>
+                      <ul class="pkg-pricing-list">
+                        {trimSlugs.map((t) => {
+                          const cell = fmtPkgCell(pkg.pricing_per_trim?.[t.slug]);
+                          return (
+                            <li>
+                              <span class="pkg-pricing-trim">{t.name}</span>
+                              <span class={`pkg-pricing-value ${cell.cls}`}>{cell.text}</span>
+                            </li>
+                          );
+                        })}
+                      </ul>
+                    </div>
+                  )}
+                </article>
+              ))}
+            </div>
           </div>
-        </div>
-      )}
+        );
+      })()}
 
       {(pricelistColors.exterior.length > 0 || pricelistColors.interior.length > 0) && (() => {
         // Build slug → trim name map for pricing_per_trim keys
@@ -496,6 +542,46 @@ function trimPrice(t: TrimLevel): string {
     grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
     gap: 18px;
   }
+  .pkg-code { font-weight: 400; color: var(--text-muted, #6b7280); font-size: 14px; }
+  .pkg-pricing {
+    margin-top: 18px;
+    padding-top: 16px;
+    border-top: 1px dashed var(--line, #e5e5e5);
+  }
+  .pkg-pricing-label {
+    font-family: var(--font-display, inherit);
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-muted, #6b7280);
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+  .pkg-pricing-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .pkg-pricing-list li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 13.5px;
+    padding: 4px 0;
+  }
+  .pkg-pricing-trim {
+    font-family: var(--font-display, inherit);
+    font-weight: 600;
+    color: var(--ink, #111);
+  }
+  .pkg-pricing-value { font-weight: 600; }
+  .pkg-cell-standard   { color: #1e7b5f; }
+  .pkg-cell-price      { color: var(--accent, #F25C1B); }
+  .pkg-cell-unavailable{ color: var(--text-muted, #9ca3af); font-weight: 400; }
+  .pkg-cell-other      { color: var(--ink, #111); }
 
   @media (max-width: 600px) {
     .compare-feature-head { width: 36%; }
