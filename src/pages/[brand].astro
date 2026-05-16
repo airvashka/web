@@ -236,7 +236,7 @@ const activeBrand = Astro.params.brand;
                     const tagLabel = fuelLabel[fuelKey] ?? '';
                     const body = bodyLabel[m.body_type ?? ''] ?? m.body_type ?? '';
                     return (
-                      <a class="model-card" href={`/model/${m.slug}`}>
+                      <a class={`model-card${m.variant_badge_kind ? ` model-card--${String(m.variant_badge_kind).toLowerCase()}` : ''}`} href={`/model/${m.slug}`}>
                         <div class="pic">
                           {tagLabel && <span class={`fuel-tag ${tagClass}`}>{tagLabel}</span>}
                           {(m.hero_image_card || m.hero_image) && <DirectusImage src={m.hero_image_card || m.hero_image!} alt={`${brand.name} ${m.name}`} aspectRatio="4/3" />}
@@ -271,7 +271,7 @@ const activeBrand = Astro.params.brand;
                 const tagClass = fuelTagClass[fuelKey] ?? 'benzin';
                 const tagLabel = fuelLabel[fuelKey] ?? '';
                 return (
-                  <a class="model-card" href={`/model/${m.slug}`}>
+                  <a class={`model-card${m.variant_badge_kind ? ` model-card--${String(m.variant_badge_kind).toLowerCase()}` : ''}`} href={`/model/${m.slug}`}>
                     <div class="pic">
                       {tagLabel && <span class={`fuel-tag ${tagClass}`}>{tagLabel}</span>}
                       {(m.hero_image_card || m.hero_image) && <DirectusImage src={m.hero_image_card || m.hero_image!} alt={`${brand.name} ${m.name}`} aspectRatio="4/3" />}
@@ -301,7 +301,7 @@ const activeBrand = Astro.params.brand;
             const tagLabel = fuelLabel[fuelKey] ?? '';
             const body = bodyLabel[m.body_type ?? ''] ?? m.body_type ?? '';
             return (
-              <a class="model-card" href={`/model/${m.slug}`}>
+              <a class={`model-card${m.variant_badge_kind ? ` model-card--${String(m.variant_badge_kind).toLowerCase()}` : ''}`} href={`/model/${m.slug}`}>
                 <div class="pic">
                   {tagLabel && <span class={`fuel-tag ${tagClass}`}>{tagLabel}</span>}
                   {(m.hero_image_card || m.hero_image) && <DirectusImage src={m.hero_image_card || m.hero_image!} alt={`${brand.name} ${m.name}`} aspectRatio="4/3" />}

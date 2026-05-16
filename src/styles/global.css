@@ -2862,13 +2862,34 @@ button.thumb-more {
   border-radius: var(--radius-lg);
   overflow: hidden;
   border: 1px solid rgba(0,0,0,0.04);
-  transition: transform .2s, box-shadow .2s;
+  transition: transform .2s, box-shadow .2s, border-color .2s;
   display: flex; flex-direction: column;
   cursor: pointer;
+  position: relative;
+  /* Default theme = bez accent stripe */
+  --variant-color: transparent;
+}
+/* Variant accent — barevný strip nahoře karty + theme color pro hover */
+.model-card--ice { --variant-color: #B4762E; }  /* spalovací — warm ochre */
+.model-card--hev { --variant-color: #2A7A8F; }  /* hybrid — teal */
+.model-card--evx { --variant-color: #2F9B5C; }  /* elektro — green */
+
+.model-card[class*="model-card--"]::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 4px;
+  background: var(--variant-color);
+  z-index: 3;
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
 }
 .model-card:hover {
   transform: translateY(-4px);
   box-shadow: 0 16px 40px -14px rgba(0,0,0,0.18);
+}
+.model-card[class*="model-card--"]:hover {
+  border-color: var(--variant-color);
+  box-shadow: 0 18px 44px -14px color-mix(in srgb, var(--variant-color) 45%, rgba(0, 0, 0, 0.3));
 }
 .model-card .pic {
   aspect-ratio: 4 / 3;
