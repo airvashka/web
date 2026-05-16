@@ -510,10 +510,11 @@ function trimPrice(t: TrimLevel): string {
     font-size: 14px;
     min-width: 600px;
   }
+  /* Pozn.: thead měl `position: sticky; top: 56px;`, ale compare-wrapper má
+     `overflow: hidden`, který sticky context zničí — thead pak zůstal posunutý
+     o 56px dolů a MOTORIZACE/VÝBAVA řádek (první tbody row) ho překryl.
+     Pro statické chování bez offsetu zachováváme jen background. */
   .compare-table thead {
-    position: sticky;
-    top: 56px; /* below subnav */
-    z-index: 5;
     background: var(--bg-cream);
     box-shadow: 0 1px 0 var(--line);
   }
