@@ -438,7 +438,21 @@ if (promoActive && promoDescription) {
   <!-- ===== MODEL HERO (dark, full-bleed) ===== -->
   <section class="mhero" data-screen-label="01 Hero">
     <div class="mhero-bg">
-      {rawModel.hero_image && <DirectusImage src={rawModel.hero_image} alt={`${brand.name} ${rawModel.name}`} aspectRatio="auto" loading="eager" fetchpriority="high" widths={[1200, 1920, 2400]} />}
+      {(rawModel as any).hero_video ? (
+        <video
+          class="mhero-video"
+          autoplay
+          muted
+          loop
+          playsinline
+          preload="metadata"
+          poster={rawModel.hero_image ? directusAsset(rawModel.hero_image, { width: 1600, format: 'jpg', quality: 80 }) : undefined}
+        >
+          <source src={directusAsset((rawModel as any).hero_video)} />
+        </video>
+      ) : (
+        rawModel.hero_image && <DirectusImage src={rawModel.hero_image} alt={`${brand.name} ${rawModel.name}`} aspectRatio="auto" loading="eager" fetchpriority="high" widths={[1200, 1920, 2400]} />
+      )}
     </div>
     <div class="container mhero-inner">
       <div class="mhero-eyebrow">
