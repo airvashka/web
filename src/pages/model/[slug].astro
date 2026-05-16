@@ -465,16 +465,20 @@ if (promoActive && promoDescription) {
     )}
   </section>
 
-  <!-- ===== SUBNAV ===== -->
+  <!-- ===== SUBNAV (pořadí: Discovery → Identity → Features → Visual → Price → Action → Details) ===== -->
   <div class="subnav">
     <div class="container subnav-inner">
       <a class="subnav-link is-active" href="#predstaveni">Představení</a>
       {promoActive && (<><span class="subnav-sep">·</span><a class="subnav-link subnav-link--accent" href="#akce">Akce</a></>)}
       {variantModels.length > 1 && (<><span class="subnav-sep">·</span><a class="subnav-link" href="#varianty">Varianty</a></>)}
-      {hasConfigurator && (<><span class="subnav-sep">·</span><a class="subnav-link" href="#barvy">Barvy</a></>)}
       <span class="subnav-sep">·</span>
       <a class="subnav-link" href="#tech-technologie">Technologie</a>
+      <span class="subnav-sep">·</span>
+      <a class="subnav-link" href="#tech-bezpecnost">Bezpečnost</a>
+      <span class="subnav-sep">·</span>
+      <a class="subnav-link" href="#tech-komfort">Komfort</a>
       {galleryFileIds.length > 0 && (<><span class="subnav-sep">·</span><a class="subnav-link" href="#galerie">Galerie</a></>)}
+      {hasConfigurator && (<><span class="subnav-sep">·</span><a class="subnav-link" href="#barvy">Barvy</a></>)}
       <span class="subnav-sep">·</span>
       <a class="subnav-link" href="#ceny">Ceny a výbavy</a>
       <span class="subnav-sep">·</span>
@@ -602,7 +606,6 @@ if (promoActive && promoDescription) {
       return (
         <section class="section tech-section-dark" id={`tech-${cat.key}`}>
           <div class="container">
-            <div class="section-eyebrow">Co umí {rawModel.name}</div>
             <h2 class="section-title">{cat.label}</h2>
             <div class="tech-grid">
               {items.map((h: any) => {
@@ -632,7 +635,52 @@ if (promoActive && promoDescription) {
     });
   })()}
 
-  <!-- ===== BARVY (read-only gallery, žádný konfigurátor) ===== -->
+  <!-- ===== GALERIE (visual exploration — před Barvy) ===== -->
+  {galleryFileIds.length > 0 && (
+    <section class="section" id="galerie" style="background: var(--bg-soft);">
+      <div class="container">
+        <div class="section-head-row">
+          <div>
+            <div class="section-eyebrow">Galerie</div>
+            <h2 class="section-title" style="margin-bottom: 0;">{rawModel.name} v detailech</h2>
+          </div>
+          <span class="head-link" style="cursor: default; border: none;">{galleryFileIds.length} fotek</span>
+        </div>
+        <div class="gallery-grid" data-gallery>
+          {galleryFileIds.map((id, i) => (
+            <button type="button" class="gallery-item" data-gallery-trigger data-index={i} aria-label={`Foto ${i + 1}`}>
+              <DirectusImage src={id} alt={`${rawModel.name} — foto ${i + 1}`} aspectRatio="4/3" widths={[400, 800, 1600]} />
+            </button>
+          ))}
+        </div>
+      </div>
+    </section>
+  )}
+
+  <!-- Gallery lightbox modal -->
+  {galleryFileIds.length > 0 && (
+    <div class="gallery-modal" data-gallery-modal aria-hidden="true">
+      <button type="button" class="gallery-modal-close" data-gallery-close aria-label="Zavřít">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+      <button type="button" class="gallery-modal-nav prev" data-gallery-prev aria-label="Předchozí">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+      </button>
+      <button type="button" class="gallery-modal-nav next" data-gallery-next aria-label="Další">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+      </button>
+      <div class="gallery-modal-counter" data-gallery-counter></div>
+      <div class="gallery-modal-image" data-gallery-image>
+        {galleryFileIds.map((id, i) => (
+          <div class="gallery-modal-slide" data-slide-index={i} hidden={i !== 0}>
+            <DirectusImage src={id} alt={`${rawModel.name} — foto ${i + 1}`} aspectRatio="auto" widths={[1200, 2000]} loading="eager" />
+          </div>
+        ))}
+      </div>
+    </div>
+  )}
+
+  <!-- ===== BARVY (vizuální výběr konkrétní specifikace) ===== -->
   {hasConfigurator && (
     <section class="config" id="barvy">
       <div class="container">
@@ -737,51 +785,7 @@ if (promoActive && promoDescription) {
   )}
 
   {/* Tech grid sekce přesunuta hned za Představení — viz výše. */}
-
-  <!-- ===== GALERIE ===== -->
-  {galleryFileIds.length > 0 && (
-    <section class="section" id="galerie" style="background: var(--bg-soft);">
-      <div class="container">
-        <div class="section-head-row">
-          <div>
-            <div class="section-eyebrow">Galerie</div>
-            <h2 class="section-title" style="margin-bottom: 0;">{rawModel.name} v detailech</h2>
-          </div>
-          <span class="head-link" style="cursor: default; border: none;">{galleryFileIds.length} fotek</span>
-        </div>
-        <div class="gallery-grid" data-gallery>
-          {galleryFileIds.map((id, i) => (
-            <button type="button" class="gallery-item" data-gallery-trigger data-index={i} aria-label={`Foto ${i + 1}`}>
-              <DirectusImage src={id} alt={`${rawModel.name} — foto ${i + 1}`} aspectRatio="4/3" widths={[400, 800, 1600]} />
-            </button>
-          ))}
-        </div>
-      </div>
-    </section>
-  )}
-
-  <!-- Gallery lightbox modal -->
-  {galleryFileIds.length > 0 && (
-    <div class="gallery-modal" data-gallery-modal aria-hidden="true">
-      <button type="button" class="gallery-modal-close" data-gallery-close aria-label="Zavřít">
-        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-      </button>
-      <button type="button" class="gallery-modal-nav prev" data-gallery-prev aria-label="Předchozí">
-        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
-      </button>
-      <button type="button" class="gallery-modal-nav next" data-gallery-next aria-label="Další">
-        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
-      </button>
-      <div class="gallery-modal-counter" data-gallery-counter></div>
-      <div class="gallery-modal-image" data-gallery-image>
-        {galleryFileIds.map((id, i) => (
-          <div class="gallery-modal-slide" data-slide-index={i} hidden={i !== 0}>
-            <DirectusImage src={id} alt={`${rawModel.name} — foto ${i + 1}`} aspectRatio="auto" widths={[1200, 2000]} loading="eager" />
-          </div>
-        ))}
-      </div>
-    </div>
-  )}
+  {/* Galerie a Modal byly přesunuty nahoru, před Barvy (lepší user flow). */}
 
   <!-- ===== TRIMS / CENY A VÝBAVY ===== -->
   {trims.length > 0 && (
@@ -1027,25 +1031,7 @@ if (promoActive && promoDescription) {
     background="white"
   />
 
-  <!-- ===== CLOSING CTA BANNER ===== -->
-  <section class="cta-banner">
-    <div class="cta-banner-bg">
-      {rawModel.hero_image && <DirectusImage src={rawModel.hero_image} alt="" aspectRatio="auto" />}
-    </div>
-    <div class="container cta-banner-inner">
-      <h2>Připraveni na zkušební jízdu {rawModel.name}?</h2>
-      <p>Rezervujte si testovací jízdu a zažijte vůz na vlastní kůži.</p>
-      <div class="cta-banner-actions">
-        <a class="btn btn-primary" href="/kontakt">
-          Testovací jízda
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
-        </a>
-        <a class="btn btn-outline" href="/kontakt">Poptat vůz</a>
-      </div>
-    </div>
-  </section>
-
-  <!-- ===== KE STAŽENÍ — multi-dokumenty (brožury + ceníky) ===== -->
+  <!-- ===== KE STAŽENÍ — multi-dokumenty (brožury + ceníky). Pro detailisty co se vrátí. ===== -->
   {docsList.length > 0 && (
     <section class="section downloads-section" id="ke-stazeni" style="background: var(--bg-soft); padding: 60px 0;">
       <div class="container">
@@ -1086,6 +1072,24 @@ if (promoActive && promoDescription) {
       </div>
     </section>
   )}
+
+  <!-- ===== CLOSING CTA BANNER (conversion trigger jako úplně poslední, vždy viditelný) ===== -->
+  <section class="cta-banner">
+    <div class="cta-banner-bg">
+      {rawModel.hero_image && <DirectusImage src={rawModel.hero_image} alt="" aspectRatio="auto" />}
+    </div>
+    <div class="container cta-banner-inner">
+      <h2>Připraveni na zkušební jízdu {rawModel.name}?</h2>
+      <p>Rezervujte si testovací jízdu a zažijte vůz na vlastní kůži.</p>
+      <div class="cta-banner-actions">
+        <a class="btn btn-primary" href="/kontakt">
+          Testovací jízda
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </a>
+        <a class="btn btn-outline" href="/kontakt">Poptat vůz</a>
+      </div>
+    </div>
+  </section>
 
   <script>
     // ===== Gallery lightbox =====
