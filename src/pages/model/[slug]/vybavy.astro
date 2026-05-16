@@ -82,29 +82,17 @@ const optionPackages = latestYear
   : [];
 
 /* ============================================================
-   Build comparison matrix:
-   Map<category, Map<featureLabel, Map<trimSlug, boolean>>>
+   Build comparison matrix — zachovává pořadí kategorií z adminu
+   a podporuje optional_items per trim (zobrazí cenu v buňce).
    ============================================================ */
 
-interface TrimGroupMap {
-  [category: string]: Set<string>;
-}
+// Cell value: 'standard' (✓), 'unavailable' (—), nebo { price } (číslo Kč)
+type CellValue = 'standard' | 'unavailable' | { price: number };
 
-const trimFeaturesMap: Map<string, TrimGroupMap> = new Map();
-for (const t of trims) {
-  const groups = getGroupedFeatures((t as any).features);
-  const map: TrimGroupMap = {};
-  for (const g of groups) {
-    if (!map[g.key]) map[g.key] = new Set();
-    g.items.forEach((it) => map[g.key].add(it));
-  }
-  trimFeaturesMap.set(String(t.id), map);
-}
-
-// Sjednocené features per category (union napříč všemi trimy)
 interface CompareRow {
   feature: string;
-  inTrim: Record<string, boolean>; // trim.id → má feature?
+  code?: string;
+  cells: Record<string, CellValue>; // trim.id → cell
 }
 interface CompareCategory {
   key: string;
@@ -112,40 +100,86 @@ interface CompareCategory {
   rows: CompareRow[];
 }
 
-const compareData: CompareCategory[] = [];
+// Per-trim mapa: { categoryKey → Set<featureName> }
+const trimFeaturesMap: Map<string, Record<string, Set<string>>> = new Map();
+// Per-trim mapa: optional_items
+type OptItem = { name: string; code?: string; price: number };
+const trimOptionalsMap: Map<string, OptItem[]> = new Map();
 
-// Dynamicky sebereme VŠECHNY kategorie napříč trimy (predefined + literal z PDF).
-const allCategories = new Set<string>();
-for (const trimMap of trimFeaturesMap.values()) {
-  for (const key of Object.keys(trimMap)) allCategories.add(key);
+// Canonical pořadí kategorií = pořadí z prvního trimu s daty (zachová admin order),
+// doplněné o případně extra kategorie z dalších trimů.
+const canonicalOrder: string[] = [];
+const seenCat = new Set<string>();
+
+for (const t of trims) {
+  const groups = getGroupedFeatures((t as any).features);
+  const map: Record<string, Set<string>> = {};
+  for (const g of groups) {
+    const key = String(g.key ?? '').trim();
+    if (!key) continue; // skip empty keys (rozbíjely render first cat)
+    if (!map[key]) map[key] = new Set();
+    g.items.forEach((it) => map[key].add(String(it)));
+    if (!seenCat.has(key)) { seenCat.add(key); canonicalOrder.push(key); }
+  }
+  trimFeaturesMap.set(String(t.id), map);
+
+  const opts = Array.isArray((t as any).optional_items) ? (t as any).optional_items : [];
+  trimOptionalsMap.set(String(t.id), opts.filter((o: any) => o && o.name && Number.isFinite(Number(o.price))));
 }
 
-// Order: nejprve známé CATEGORY_ORDER, pak zbytek alfabeticky (literal z PDF).
-const knownOrder = CATEGORY_ORDER as readonly string[];
-const ordered = [
-  ...knownOrder.filter((c) => allCategories.has(c)),
-  ...[...allCategories].filter((c) => !knownOrder.includes(c)).sort(),
-];
+const compareData: CompareCategory[] = [];
 
-for (const cat of ordered) {
-  // Sjednocení features napříč trimy v této kategorii
+// 1) Standard features per category
+for (const cat of canonicalOrder) {
   const allFeaturesInCat = new Set<string>();
   for (const trimMap of trimFeaturesMap.values()) {
     if (trimMap[cat]) trimMap[cat].forEach((f) => allFeaturesInCat.add(f));
   }
   if (allFeaturesInCat.size === 0) continue;
 
-  const rows: CompareRow[] = Array.from(allFeaturesInCat).sort().map((feature) => {
-    const inTrim: Record<string, boolean> = {};
+  const rows: CompareRow[] = [...allFeaturesInCat].sort((a, b) => a.localeCompare(b, 'cs')).map((feature) => {
+    const cells: Record<string, CellValue> = {};
     for (const t of trims) {
-      const trimMap = trimFeaturesMap.get(String(t.id));
-      inTrim[String(t.id)] = !!(trimMap?.[cat]?.has(feature));
+      cells[String(t.id)] = trimFeaturesMap.get(String(t.id))?.[cat]?.has(feature) ? 'standard' : 'unavailable';
     }
-    return { feature, inTrim };
+    return { feature, cells };
   });
   compareData.push({
     key: cat,
     label: CATEGORY_LABELS[cat as keyof typeof CATEGORY_LABELS] ?? cat,
+    rows,
+  });
+}
+
+// 2) Optional items — separátní pseudo-kategorie "Dokoupitelné položky" na konci
+type OptAgg = { code?: string; cells: Record<string, number> };
+const optAggregated = new Map<string, OptAgg>();
+for (const t of trims) {
+  const opts = trimOptionalsMap.get(String(t.id)) ?? [];
+  for (const o of opts) {
+    const name = String(o.name).trim();
+    if (!name) continue;
+    if (!optAggregated.has(name)) optAggregated.set(name, { code: o.code, cells: {} });
+    const entry = optAggregated.get(name)!;
+    entry.cells[String(t.id)] = Number(o.price);
+    if (o.code && !entry.code) entry.code = String(o.code);
+  }
+}
+
+if (optAggregated.size > 0) {
+  const rows: CompareRow[] = [...optAggregated.entries()]
+    .sort(([a], [b]) => a.localeCompare(b, 'cs'))
+    .map(([name, info]) => {
+      const cells: Record<string, CellValue> = {};
+      for (const t of trims) {
+        const price = info.cells[String(t.id)];
+        cells[String(t.id)] = price > 0 ? { price } : 'unavailable';
+      }
+      return { feature: name, code: info.code, cells };
+    });
+  compareData.push({
+    key: '__dokoupitelne',
+    label: 'Dokoupitelné položky',
     rows,
   });
 }
@@ -196,25 +230,41 @@ function trimPrice(t: TrimLevel): string {
               </thead>
               <tbody>
                 {compareData.map((cat) => (
-                  <>
+                  <Fragment>
                     <tr class="compare-cat-row">
                       <td colspan={trims.length + 1}>{cat.label}</td>
                     </tr>
                     {cat.rows.map((row) => (
                       <tr>
-                        <td class="compare-feature">{row.feature}</td>
-                        {trims.map((t) => (
-                          <td class={`compare-cell ${row.inTrim[String(t.id)] ? 'has' : 'missing'}`}>
-                            {row.inTrim[String(t.id)] ? (
-                              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-                            ) : (
+                        <td class="compare-feature">
+                          {row.feature}
+                          {row.code && <span class="compare-feature-code"> ({row.code})</span>}
+                        </td>
+                        {trims.map((t) => {
+                          const v = row.cells[String(t.id)];
+                          if (v === 'standard') {
+                            return (
+                              <td class="compare-cell has">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                              </td>
+                            );
+                          }
+                          if (typeof v === 'object' && v && 'price' in v) {
+                            return (
+                              <td class="compare-cell optional">
+                                <span class="compare-price">{v.price.toLocaleString('cs-CZ')} Kč</span>
+                              </td>
+                            );
+                          }
+                          return (
+                            <td class="compare-cell missing">
                               <span class="compare-dash">—</span>
-                            )}
-                          </td>
-                        ))}
+                            </td>
+                          );
+                        })}
                       </tr>
                     ))}
-                  </>
+                  </Fragment>
                 ))}
               </tbody>
             </table>
@@ -523,14 +573,26 @@ function trimPrice(t: TrimLevel): string {
     font-size: 14px;
     line-height: 1.45;
   }
+  .compare-feature-code {
+    color: var(--text-muted, #9ca3af);
+    font-size: 12px;
+    font-weight: 400;
+  }
   .compare-cell {
     text-align: center;
+    white-space: nowrap;
   }
   .compare-cell.has svg {
-    color: var(--ok);
+    color: var(--ok, #2f9b5c);
+  }
+  .compare-cell.optional .compare-price {
+    color: var(--accent, #F25C1B);
+    font-weight: 700;
+    font-size: 13.5px;
+    font-family: var(--font-display, inherit);
   }
   .compare-dash {
-    color: var(--line-2);
+    color: var(--line-2, #d0d0d5);
   }
   .compare-table tbody tr:hover td:not(.compare-cat-row td) {
     background: rgba(242, 92, 27, 0.03);
