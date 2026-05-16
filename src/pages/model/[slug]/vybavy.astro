@@ -216,7 +216,7 @@ function trimPrice(t: TrimLevel): string {
       ) : (
         <div class="compare-wrapper">
           <div class="compare-scroll">
-            <table class="compare-table">
+            <table class="compare-table" style={`--trim-count: ${trims.length}`}>
               <thead>
                 <tr>
                   <th class="compare-feature-head">Prvek výbavy</th>
@@ -518,10 +518,10 @@ function trimPrice(t: TrimLevel): string {
     box-shadow: 0 1px 0 var(--line);
   }
   .compare-table thead th {
-    padding: 18px 16px;
+    padding: 14px 16px;
     text-align: left;
     border-bottom: 2px solid var(--line-2);
-    vertical-align: bottom;
+    vertical-align: middle;
   }
   .compare-feature-head {
     width: 42%;
@@ -535,6 +535,10 @@ function trimPrice(t: TrimLevel): string {
   .compare-trim-head {
     width: calc(58% / var(--trim-count, 4));
     text-align: center !important;
+  }
+  .compare-trim-head .compare-trim-name,
+  .compare-trim-head .compare-trim-price {
+    text-align: center;
   }
   .compare-trim-name {
     font-family: var(--font-display);
@@ -550,6 +554,13 @@ function trimPrice(t: TrimLevel): string {
     font-size: 13px;
     color: var(--text-muted);
     font-variant-numeric: tabular-nums;
+  }
+  /* Buňky musí mít stejné horizontální paddingy jako thead th, aby ✓ ladilo se středem trim názvu */
+  .compare-table tbody td {
+    padding: 12px 16px;
+  }
+  .compare-cell {
+    padding: 12px 16px !important;
   }
   .compare-cat-row td {
     background: var(--bg-soft);
