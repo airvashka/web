@@ -473,7 +473,7 @@ if (promoActive && promoDescription) {
       {variantModels.length > 1 && (<><span class="subnav-sep">·</span><a class="subnav-link" href="#varianty">Varianty</a></>)}
       {hasConfigurator && (<><span class="subnav-sep">·</span><a class="subnav-link" href="#barvy">Barvy</a></>)}
       <span class="subnav-sep">·</span>
-      <a class="subnav-link" href="#technologie">Technologie</a>
+      <a class="subnav-link" href="#tech-technologie">Technologie</a>
       {galleryFileIds.length > 0 && (<><span class="subnav-sep">·</span><a class="subnav-link" href="#galerie">Galerie</a></>)}
       <span class="subnav-sep">·</span>
       <a class="subnav-link" href="#ceny">Ceny a výbavy</a>
@@ -582,6 +582,56 @@ if (promoActive && promoDescription) {
     </div>
   </section>
 
+  {/* ===== TECH/BEZPEČNOST/KOMFORT — 3 sekce z model.highlights groupované podle `category` ===== */}
+  {(() => {
+    const modelHighlights = Array.isArray((rawModel as any).highlights) ? (rawModel as any).highlights : [];
+    if (modelHighlights.length === 0) return null;
+
+    const CATEGORIES = [
+      { key: 'technologie', label: 'Technologie' },
+      { key: 'bezpecnost', label: 'Bezpečnost' },
+      { key: 'komfort',    label: 'Komfort' },
+    ];
+
+    // Sort by `sort` field (Directus pattern)
+    const sorted = [...modelHighlights].sort((a: any, b: any) => (a.sort ?? 0) - (b.sort ?? 0));
+
+    return CATEGORIES.map((cat) => {
+      const items = sorted.filter((h: any) => (h.category ?? 'technologie') === cat.key).slice(0, 4);
+      if (items.length === 0) return null;
+      return (
+        <section class="section tech-section-dark" id={`tech-${cat.key}`}>
+          <div class="container">
+            <div class="section-eyebrow">Co umí {rawModel.name}</div>
+            <h2 class="section-title">{cat.label}</h2>
+            <div class="tech-grid">
+              {items.map((h: any) => {
+                const photoId = h.photo ?? h.photo_file ?? null;
+                const title = h.title ?? h.t ?? '';
+                const desc  = h.subtitle ?? h.s ?? '';
+                const eyebrow = h.eyebrow ?? h.tagline ?? '';
+                return (
+                  <div class="tech-card">
+                    <div class="pic">
+                      {photoId && <DirectusImage src={photoId} alt={title} aspectRatio="3/4" widths={[400, 600, 900]} />}
+                    </div>
+                    <div class="tech-card-body">
+                      <div class="tech-top">
+                        {eyebrow && <p class="eyebrow">{eyebrow}</p>}
+                        <h3 class="t">{title}</h3>
+                      </div>
+                      {desc && <p class="s">{desc}</p>}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </section>
+      );
+    });
+  })()}
+
   <!-- ===== BARVY (read-only gallery, žádný konfigurátor) ===== -->
   {hasConfigurator && (
     <section class="config" id="barvy">
@@ -686,44 +736,7 @@ if (promoActive && promoDescription) {
     </section>
   )}
 
-  <!-- ===== TECH GRID — KGM-style dark cards (eyebrow + title + description) ===== -->
-  {(() => {
-    const modelHighlights = Array.isArray((rawModel as any).highlights) ? (rawModel as any).highlights : [];
-    const hasHighlights = modelHighlights.length > 0;
-    const fallbackFromTrim = (trims[0]?.features ?? []).slice(0, 4).map((f) => ({ title: f, subtitle: 'Součást základní výbavy', photo: null }));
-    const tech = hasHighlights ? modelHighlights : fallbackFromTrim;
-    if (tech.length === 0) return null;
-    return (
-      <section class="section tech-section-dark" id="technologie">
-        <div class="container">
-          <div class="section-eyebrow">Technologie</div>
-          <h2 class="section-title">Co umí {rawModel.name}</h2>
-          <div class="tech-grid">
-            {tech.map((h: any) => {
-              const photoId = h.photo ?? h.photo_file ?? null;
-              const title = h.title ?? h.t ?? '';
-              const desc  = h.subtitle ?? h.s ?? '';
-              const eyebrow = h.eyebrow ?? h.tagline ?? '';
-              return (
-                <div class="tech-card">
-                  <div class="pic">
-                    {photoId && <DirectusImage src={photoId} alt={title} aspectRatio="3/4" widths={[400, 600, 900]} />}
-                  </div>
-                  <div class="tech-card-body">
-                    <div class="tech-top">
-                      {eyebrow && <p class="eyebrow">{eyebrow}</p>}
-                      <h3 class="t">{title}</h3>
-                    </div>
-                    {desc && <p class="s">{desc}</p>}
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      </section>
-    );
-  })()}
+  {/* Tech grid sekce přesunuta hned za Představení — viz výše. */}
 
   <!-- ===== GALERIE ===== -->
   {galleryFileIds.length > 0 && (
