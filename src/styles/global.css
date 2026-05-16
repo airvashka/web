@@ -24,8 +24,10 @@
   --radius-lg: 20px;
   --max: 1320px;
   --pad: 32px;
-  --font-display: "Space Grotesk", system-ui, sans-serif;
-  --font-body: "Inter", system-ui, sans-serif;
+  /* Noto Sans KR — KGM-style consistent across web. Stejný font pro display i body,
+     liší se jen weight (display = 600-700 bold, body = 400). */
+  --font-display: "Noto Sans KR", "Apple SD Gothic Neo", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-body: "Noto Sans KR", "Apple SD Gothic Neo", system-ui, -apple-system, "Segoe UI", sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, monospace;
 }
 
@@ -2031,6 +2033,18 @@ button.thumb-more {
   .gallery-modal-close { top: 12px; right: 12px; }
   .gallery-modal-nav.prev { left: 8px; }
   .gallery-modal-nav.next { right: 8px; }
+}
+
+/* === Tech section — celá sekce černá (jako KGM) === */
+.tech-section-dark {
+  background: #000;
+  color: #fff;
+}
+.tech-section-dark .section-eyebrow {
+  color: var(--accent, #d96f3a);
+}
+.tech-section-dark .section-title {
+  color: #fff;
 }
 
 /* === Tech grid — KGM-style dark cards (foto nahoře, černý text panel dole) === */
