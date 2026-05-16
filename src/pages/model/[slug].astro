@@ -688,11 +688,13 @@ if (promoActive && promoDescription) {
               return (
                 <div class="tech-card">
                   <div class="pic">
-                    {photoId && <DirectusImage src={photoId} alt={title} aspectRatio="4/3" widths={[400, 800]} />}
+                    {photoId && <DirectusImage src={photoId} alt={title} aspectRatio="3/4" widths={[400, 600, 900]} />}
                   </div>
                   <div class="tech-card-body">
-                    {eyebrow && <p class="eyebrow">{eyebrow}</p>}
-                    <h3 class="t">{title}</h3>
+                    <div class="tech-top">
+                      {eyebrow && <p class="eyebrow">{eyebrow}</p>}
+                      <h3 class="t">{title}</h3>
+                    </div>
                     {desc && <p class="s">{desc}</p>}
                   </div>
                 </div>
