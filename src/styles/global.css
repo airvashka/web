@@ -1870,10 +1870,17 @@ button.thumb-more {
   color: var(--text-muted);
 }
 
-/* === KGM-style Color showroom (exterior) — velká fotka + kruhové swatche === */
+/* === KGM-style Color showroom — fotka + selector pod fotkou (řeší dlouhé názvy + mobil) === */
+.cs-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
 .cs-stage {
   position: relative;
   width: 100%;
+  aspect-ratio: 21 / 9;
   border-radius: var(--radius-lg);
   overflow: hidden;
   background: var(--bg-soft, #fafaf7);
@@ -1889,7 +1896,6 @@ button.thumb-more {
 .cs-photo.is-active {
   opacity: 1;
   pointer-events: auto;
-  position: relative; /* hold layout height z první aktivní fotky */
 }
 .cs-photo img {
   width: 100%;
@@ -1900,44 +1906,44 @@ button.thumb-more {
 .cs-photo-fallback {
   display: block;
   width: 100%;
-  aspect-ratio: 21 / 9;
+  height: 100%;
   background: var(--bg-soft);
 }
 
-/* Selector panel — plovoucí dole, white card s name + řadou kruhů */
+/* Selector — pod fotkou, full width, name vlevo + swatches vpravo */
 .cs-selector {
-  position: absolute;
-  bottom: 24px;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 3;
-  background: #fff;
-  border-radius: 999px;
-  padding: 10px 22px 10px 26px;
   display: flex;
   align-items: center;
-  gap: 22px;
-  box-shadow: 0 10px 36px -10px rgba(0, 0, 0, 0.3), 0 2px 8px rgba(0, 0, 0, 0.06);
-  max-width: calc(100% - 32px);
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px 24px;
+  padding: 4px 4px 0;
 }
 .cs-name {
   font-family: var(--font-display);
   font-weight: 700;
-  font-size: 15px;
+  font-size: 20px;
+  letter-spacing: -0.01em;
   color: var(--ink, #111);
-  white-space: nowrap;
-  flex-shrink: 0;
+  margin: 0;
+  /* Dovolí wrap dlouhým názvům, ale ne nezhroutí na 1 řádek */
+  flex: 1 1 280px;
+  line-height: 1.25;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-size: 14px;
 }
 .cs-swatches {
   display: flex;
-  gap: 8px;
+  gap: 10px;
   align-items: center;
   flex-wrap: wrap;
+  flex-shrink: 0;
 }
 .cs-swatch {
   position: relative;
-  width: 36px;
-  height: 36px;
+  width: 42px;
+  height: 42px;
   padding: 3px;
   border-radius: 50%;
   border: 2px solid transparent;
@@ -1946,7 +1952,7 @@ button.thumb-more {
   transition: border-color .15s ease, transform .15s ease;
   flex-shrink: 0;
 }
-.cs-swatch:hover { transform: scale(1.06); }
+.cs-swatch:hover { transform: scale(1.08); }
 .cs-swatch.is-active { border-color: var(--ink, #111); }
 .cs-swatch img,
 .cs-swatch-fallback {
@@ -1959,18 +1965,25 @@ button.thumb-more {
 }
 
 @media (max-width: 640px) {
+  .cs-wrap { gap: 18px; }
   .cs-selector {
-    bottom: 14px;
-    padding: 8px 16px 8px 18px;
-    gap: 14px;
     flex-direction: column;
     align-items: flex-start;
-    border-radius: 18px;
-    width: calc(100% - 24px);
+    gap: 14px;
   }
-  .cs-name { font-size: 13px; }
-  .cs-swatches { gap: 6px; }
-  .cs-swatch { width: 32px; height: 32px; }
+  .cs-name {
+    font-size: 13px;
+    flex-basis: 100%;
+  }
+  .cs-swatches {
+    width: 100%;
+    gap: 10px;
+    /* Grid s rovnoměrným rozprostřením — řeší 10+ swatchů na úzké obrazovce */
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(44px, 1fr));
+    justify-items: center;
+  }
+  .cs-swatch { width: 40px; height: 40px; }
 }
 
 /* Exterior grid — adapts to count (3 / 4 / 5 / 6+) */

@@ -710,24 +710,26 @@ if (promoActive && promoDescription) {
               }</span>
             </div>
 
-            {/* KGM-style configurator — velká fotka + řada kruhových swatchů */}
-            <div class="cs-stage" data-cs-stage>
-              {colorOptions.map((c, i) => {
-                const photoId = c.photo ?? c.photo_file ?? null;
-                const hex = (c.hex ?? '').trim();
-                return (
-                  <div class={`cs-photo${i === 0 ? ' is-active' : ''}`} data-idx={i}>
-                    {photoId ? (
-                      <DirectusImage src={photoId} alt={c.name ?? ''} aspectRatio="21/9" widths={[800, 1400, 2000]} loading={i === 0 ? 'eager' : 'lazy'} />
-                    ) : (
-                      <span class="cs-photo-fallback" style={hex ? `background:${hex}` : ''}></span>
-                    )}
-                  </div>
-                );
-              })}
+            {/* KGM-style configurator — velká fotka + selector POD fotkou */}
+            <div class="cs-wrap" data-cs-stage>
+              <div class="cs-stage">
+                {colorOptions.map((c, i) => {
+                  const photoId = c.photo ?? c.photo_file ?? null;
+                  const hex = (c.hex ?? '').trim();
+                  return (
+                    <div class={`cs-photo${i === 0 ? ' is-active' : ''}`} data-idx={i}>
+                      {photoId ? (
+                        <DirectusImage src={photoId} alt={c.name ?? ''} aspectRatio="21/9" widths={[800, 1400, 2000]} loading={i === 0 ? 'eager' : 'lazy'} />
+                      ) : (
+                        <span class="cs-photo-fallback" style={hex ? `background:${hex}` : ''}></span>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
 
               <div class="cs-selector">
-                <div class="cs-name" data-cs-name>{colorOptions[0]?.name ?? ''}</div>
+                <h3 class="cs-name" data-cs-name>{colorOptions[0]?.name ?? ''}</h3>
                 <div class="cs-swatches" role="radiogroup" aria-label="Vyberte barvu">
                   {colorOptions.map((c, i) => {
                     const swatchId = (c as any).swatch ?? null;
