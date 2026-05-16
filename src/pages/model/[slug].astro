@@ -310,7 +310,7 @@ const otherModelsRaw = await directusGet<any>('models', {
     status: { _eq: 'published' },
     slug: { _neq: slug ?? '' },
   },
-  fields: ['id', 'slug', 'name', 'tagline', 'price_from', 'fuel_type', 'body_type', 'hero_image'],
+  fields: ['id', 'slug', 'name', 'tagline', 'price_from', 'fuel_type', 'body_type', 'hero_image', 'hero_image_card', 'variant_badge_kind'],
   sort: ['sort'],
   limit: 12,
 });
@@ -1019,10 +1019,10 @@ if (promoActive && promoDescription) {
             const tagCls = fuelTagClass[fk] ?? 'benzin';
             const tagLab = fuelTagLabel[fk] ?? '';
             return (
-              <a class="model-card" href={`/model/${m.slug}`}>
+              <a class={`model-card${m.variant_badge_kind ? ` model-card--${String(m.variant_badge_kind).toLowerCase()}` : ''}`} href={`/model/${m.slug}`}>
                 <div class="pic">
                   {tagLab && <span class={`fuel-tag ${tagCls}`}>{tagLab}</span>}
-                  {m.hero_image && <DirectusImage src={m.hero_image} alt={`${brand.name} ${m.name}`} aspectRatio="4/3" />}
+                  {(m.hero_image_card || m.hero_image) && <DirectusImage src={m.hero_image_card || m.hero_image} alt={`${brand.name} ${m.name}`} aspectRatio="4/3" />}
                 </div>
                 <div class="model-body">
                   <div class="model-name">{m.name}</div>
