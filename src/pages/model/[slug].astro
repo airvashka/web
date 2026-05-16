@@ -586,7 +586,7 @@ if (promoActive && promoDescription) {
     </div>
   </section>
 
-  {/* ===== TECH/BEZPEČNOST/KOMFORT — 3 sekce z model.highlights groupované podle `category` ===== */}
+  {/* ===== CO UMÍ <MODEL> — wrap Technologie / Bezpečnost / Komfort do jedné dark section ===== */}
   {(() => {
     const modelHighlights = Array.isArray((rawModel as any).highlights) ? (rawModel as any).highlights : [];
     if (modelHighlights.length === 0) return null;
@@ -597,42 +597,52 @@ if (promoActive && promoDescription) {
       { key: 'komfort',    label: 'Komfort' },
     ];
 
-    // Sort by `sort` field (Directus pattern)
     const sorted = [...modelHighlights].sort((a: any, b: any) => (a.sort ?? 0) - (b.sort ?? 0));
 
-    return CATEGORIES.map((cat) => {
-      const items = sorted.filter((h: any) => (h.category ?? 'technologie') === cat.key).slice(0, 4);
-      if (items.length === 0) return null;
-      return (
-        <section class="section tech-section-dark" id={`tech-${cat.key}`}>
-          <div class="container">
-            <h2 class="section-title">{cat.label}</h2>
-            <div class="tech-grid">
-              {items.map((h: any) => {
-                const photoId = h.photo ?? h.photo_file ?? null;
-                const title = h.title ?? h.t ?? '';
-                const desc  = h.subtitle ?? h.s ?? '';
-                const eyebrow = h.eyebrow ?? h.tagline ?? '';
-                return (
-                  <div class="tech-card">
-                    <div class="pic">
-                      {photoId && <DirectusImage src={photoId} alt={title} aspectRatio="3/4" widths={[400, 600, 900]} />}
-                    </div>
-                    <div class="tech-card-body">
-                      <div class="tech-top">
-                        {eyebrow && <p class="eyebrow">{eyebrow}</p>}
-                        <h3 class="t">{title}</h3>
+    const groups = CATEGORIES
+      .map((cat) => ({
+        ...cat,
+        items: sorted.filter((h: any) => (h.category ?? 'technologie') === cat.key).slice(0, 4),
+      }))
+      .filter((g) => g.items.length > 0);
+
+    if (groups.length === 0) return null;
+
+    return (
+      <section class="section tech-section-dark" id="tech-technologie">
+        <div class="container">
+          <div class="section-eyebrow">Co umí {rawModel.name}</div>
+
+          {groups.map((g, gIdx) => (
+            <div class={`tech-subsection${gIdx > 0 ? ' tech-subsection--next' : ''}`} id={`tech-${g.key}`}>
+              <h2 class="section-title tech-subsection-title">{g.label}</h2>
+              <div class="tech-grid">
+                {g.items.map((h: any) => {
+                  const photoId = h.photo ?? h.photo_file ?? null;
+                  const title = h.title ?? h.t ?? '';
+                  const desc  = h.subtitle ?? h.s ?? '';
+                  const eyebrow = h.eyebrow ?? h.tagline ?? '';
+                  return (
+                    <div class="tech-card">
+                      <div class="pic">
+                        {photoId && <DirectusImage src={photoId} alt={title} aspectRatio="3/4" widths={[400, 600, 900]} />}
                       </div>
-                      {desc && <p class="s">{desc}</p>}
+                      <div class="tech-card-body">
+                        <div class="tech-top">
+                          {eyebrow && <p class="eyebrow">{eyebrow}</p>}
+                          <h3 class="t">{title}</h3>
+                        </div>
+                        {desc && <p class="s">{desc}</p>}
+                      </div>
                     </div>
-                  </div>
-                );
-              })}
+                  );
+                })}
+              </div>
             </div>
-          </div>
-        </section>
-      );
-    });
+          ))}
+        </div>
+      </section>
+    );
   })()}
 
   <!-- ===== GALERIE (visual exploration — před Barvy) ===== -->
@@ -960,7 +970,7 @@ if (promoActive && promoDescription) {
 
   <!-- ===== TECHNICKÉ ÚDAJE ===== -->
   {tdataRows.length > 0 && (
-    <section class="section" id="data">
+    <section class="section" id="data" style="background: var(--bg-soft);">
       <div class="container">
         <div class="section-eyebrow">Technické údaje</div>
         <h2 class="section-title">Specifikace</h2>
