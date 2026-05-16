@@ -518,19 +518,21 @@ function trimPrice(t: TrimLevel): string {
     box-shadow: 0 1px 0 var(--line);
   }
   .compare-table thead th {
-    padding: 14px 16px;
+    padding: 18px 16px 14px;
     text-align: left;
     border-bottom: 2px solid var(--line-2);
-    vertical-align: middle;
+    vertical-align: top;
+    line-height: 1.3;
   }
   .compare-feature-head {
     width: 42%;
     font-family: var(--font-display);
     font-weight: 600;
-    font-size: 13px;
-    letter-spacing: 0.05em;
+    font-size: 16px;
+    letter-spacing: 0.04em;
     text-transform: uppercase;
     color: var(--text-muted);
+    /* Vyrovnání baseline s první řádkou trim-name (oba na "ose" vrchního textu) */
   }
   .compare-trim-head {
     width: calc(58% / var(--trim-count, 4));
@@ -542,11 +544,12 @@ function trimPrice(t: TrimLevel): string {
   }
   .compare-trim-name {
     font-family: var(--font-display);
-    font-weight: 600;
-    font-size: 18px;
+    font-weight: 700;
+    font-size: 16px;
     letter-spacing: -0.005em;
     color: var(--ink);
     margin-bottom: 4px;
+    line-height: 1.3;
   }
   .compare-trim-price {
     font-family: var(--font-display);
@@ -554,8 +557,9 @@ function trimPrice(t: TrimLevel): string {
     font-size: 13px;
     color: var(--text-muted);
     font-variant-numeric: tabular-nums;
+    line-height: 1.3;
   }
-  /* Buňky musí mít stejné horizontální paddingy jako thead th, aby ✓ ladilo se středem trim názvu */
+  /* Buňky — stejné horizontální paddingy jako thead, aby ✓ ladilo se středem trim názvu */
   .compare-table tbody td {
     padding: 12px 16px;
   }
