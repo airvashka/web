@@ -23,6 +23,7 @@
  *   - trim_levels (features grouped, optional_items)
  *   - option_packages (features, pricing_per_trim)
  *   - model_years.technical_data
+ *   - model_years.pricelist_colors (barvy z ceníku — tabulkový JSON výpis pro /vybavy)
  *
  * Response: { ok: true, summary: {...} }
  */
@@ -179,14 +180,6 @@ export const POST: APIRoute = async ({ request }) => {
       errors: [] as string[],
     };
 
-    // Najít model_id z model_year (potřebné pro upsert barev — barvy jsou per model)
-    let modelId: number | null = null;
-    try {
-      const myResp = await dapi(directus_token, 'GET', `/items/model_years/${model_year_id}?fields=model`);
-      modelId = (myResp as any).data?.model ?? null;
-    } catch (e) {
-      summary.errors.push(`Načtení model_year: ${(e as Error).message}`);
-    }
 
     // Transform matrix → Directus shapes
     const { trims, packages } = transformCenik(data as CenikData);
@@ -274,88 +267,34 @@ export const POST: APIRoute = async ({ request }) => {
       }
     }
 
-    // 4) Barvy — upsert per model (sdílené přes ročníky, dle rozhodnutí 2026-05-16)
-    //    Mapování type → price_type: "základní"→"free", "metalická"→"metallic", "dvoutónová"→"pearl"
-    if (modelId !== null) {
-      const mapPriceType = (type?: string): string => {
-        const t = String(type ?? '').toLowerCase();
-        if (t.includes('základní') || t.includes('zakl')) return 'free';
-        if (t.includes('perl') || t.includes('dvoutón') || t.includes('dvouton')) return 'pearl';
-        if (t.includes('metal')) return 'metallic';
-        return 'free';
-      };
-
-      // 4a) Exterior
-      const ext = Array.isArray(data.colors_exterior) ? data.colors_exterior : [];
-      if (ext.length > 0) {
-        try {
-          const existingResp = await dapi(directus_token, 'GET', `/items/model_color_exterior?filter[model][_eq]=${modelId}&limit=200&fields=id,name`);
-          const existingByName = new Map<string, any>();
-          for (const c of (existingResp as any).data) existingByName.set(String(c.name ?? '').trim().toLowerCase(), c);
-
-          for (const c of ext) {
-            try {
-              const payload: any = {
-                model: modelId,
-                name: String(c.name ?? '').trim(),
-                code: c.code ? String(c.code).trim() : null,
-                price_type: mapPriceType(c.type),
-                pricing_per_trim: c.pricing_per_trim && typeof c.pricing_per_trim === 'object' ? c.pricing_per_trim : null,
-              };
-              const existing = existingByName.get(payload.name.toLowerCase());
-              if (existing) {
-                await dapi(directus_token, 'PATCH', `/items/model_color_exterior/${existing.id}`, payload);
-                summary.colors_ext_updated++;
-              } else {
-                await dapi(directus_token, 'POST', '/items/model_color_exterior', payload);
-                summary.colors_ext_created++;
-              }
-            } catch (e) {
-              summary.errors.push(`Barva ext "${c.name}": ${(e as Error).message}`);
-            }
-          }
-          summary.details.push(`Barvy exteriér: ${summary.colors_ext_created} new, ${summary.colors_ext_updated} updated`);
-        } catch (e) {
-          summary.errors.push(`Barvy ext load: ${(e as Error).message}`);
-        }
+    // 4) Barvy z ceníku → model_years.pricelist_colors (JSON tabulkový výpis).
+    //    NE do model_color_exterior/_interior — ty jsou pro showroom barvy s fotkama,
+    //    manuálně kurátované. Tady jen ceníková data pro tabulku na /vybavy.
+    const extColors = Array.isArray(data.colors_exterior) ? data.colors_exterior : [];
+    const intColors = Array.isArray(data.colors_interior) ? data.colors_interior : [];
+    if (extColors.length > 0 || intColors.length > 0) {
+      try {
+        const pricelistColors = {
+          exterior: extColors.map((c: any) => ({
+            name: String(c.name ?? '').trim(),
+            code: c.code ? String(c.code).trim() : '',
+            type: c.type ? String(c.type).trim() : '',
+            pricing_per_trim: c.pricing_per_trim && typeof c.pricing_per_trim === 'object' ? c.pricing_per_trim : {},
+          })).filter((c) => c.name),
+          interior: intColors.map((c: any) => ({
+            name: String(c.name ?? '').trim(),
+            code: c.code ? String(c.code).trim() : '',
+            material: c.material ? String(c.material).trim() : '',
+            pricing_per_trim: c.pricing_per_trim && typeof c.pricing_per_trim === 'object' ? c.pricing_per_trim : {},
+          })).filter((c) => c.name),
+        };
+        await dapi(directus_token, 'PATCH', `/items/model_years/${model_year_id}`, { pricelist_colors: pricelistColors });
+        summary.colors_ext_updated = pricelistColors.exterior.length;
+        summary.colors_int_updated = pricelistColors.interior.length;
+        summary.details.push(`Pricelist colors: ${pricelistColors.exterior.length} exteriér + ${pricelistColors.interior.length} interiér → model_years.pricelist_colors`);
+      } catch (e) {
+        summary.errors.push(`Pricelist colors: ${(e as Error).message}`);
       }
-
-      // 4b) Interior
-      const intArr = Array.isArray(data.colors_interior) ? data.colors_interior : [];
-      if (intArr.length > 0) {
-        try {
-          const existingResp = await dapi(directus_token, 'GET', `/items/model_color_interior?filter[model][_eq]=${modelId}&limit=200&fields=id,name`);
-          const existingByName = new Map<string, any>();
-          for (const c of (existingResp as any).data) existingByName.set(String(c.name ?? '').trim().toLowerCase(), c);
-
-          for (const c of intArr) {
-            try {
-              const payload: any = {
-                model: modelId,
-                name: String(c.name ?? '').trim(),
-                code: c.code ? String(c.code).trim() : null,
-                material: c.material ? String(c.material).trim() : null,
-                pricing_per_trim: c.pricing_per_trim && typeof c.pricing_per_trim === 'object' ? c.pricing_per_trim : null,
-              };
-              const existing = existingByName.get(payload.name.toLowerCase());
-              if (existing) {
-                await dapi(directus_token, 'PATCH', `/items/model_color_interior/${existing.id}`, payload);
-                summary.colors_int_updated++;
-              } else {
-                await dapi(directus_token, 'POST', '/items/model_color_interior', payload);
-                summary.colors_int_created++;
-              }
-            } catch (e) {
-              summary.errors.push(`Barva int "${c.name}": ${(e as Error).message}`);
-            }
-          }
-          summary.details.push(`Barvy interiér: ${summary.colors_int_created} new, ${summary.colors_int_updated} updated`);
-        } catch (e) {
-          summary.errors.push(`Barvy int load: ${(e as Error).message}`);
-        }
-      }
-    } else if ((data.colors_exterior?.length ?? 0) > 0 || (data.colors_interior?.length ?? 0) > 0) {
-      summary.errors.push('Nelze uložit barvy — nepodařilo se najít model_id z model_year_id.');
     }
 
     return new Response(JSON.stringify({ ok: true, summary }), { status: 200, headers: { 'Content-Type': 'application/json' } });

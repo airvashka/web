@@ -35,13 +35,33 @@ const brands = await directusGet<Brand>('brands', {
 const brand = brands[0];
 if (!brand) return Astro.redirect('/404');
 
-// Nejnovější model_year
-const modelYears = await directusGet<ModelYear>('model_years', {
+// Nejnovější model_year (s pricelist_colors)
+const modelYears = await directusGet<ModelYear & { pricelist_colors?: any }>('model_years', {
   filter: { model: { _eq: rawModel.id } },
   sort: ['-year'],
   limit: 1,
+  fields: ['*'],
 });
 const latestYear = modelYears[0];
+
+// Pricelist colors (z ceníku) — tabulkový výpis pro sekci pod matricí
+type PricelistColor = {
+  name: string;
+  code?: string;
+  type?: string;
+  material?: string;
+  pricing_per_trim?: Record<string, number | string>;
+};
+const pricelistColors: { exterior: PricelistColor[]; interior: PricelistColor[] } = (() => {
+  const raw = (latestYear as any)?.pricelist_colors;
+  if (!raw) return { exterior: [], interior: [] };
+  // Pokud uloženo jako string (legacy), parsuj
+  const obj = typeof raw === 'string' ? (() => { try { return JSON.parse(raw); } catch { return null; } })() : raw;
+  return {
+    exterior: Array.isArray(obj?.exterior) ? obj.exterior : [],
+    interior: Array.isArray(obj?.interior) ? obj.interior : [],
+  };
+})();
 
 // VŠECHNY trimy (i unfeatured)
 const trims: TrimLevel[] = latestYear
@@ -220,6 +240,94 @@ function trimPrice(t: TrimLevel): string {
         </div>
       )}
 
+      {(pricelistColors.exterior.length > 0 || pricelistColors.interior.length > 0) && (() => {
+        // Build slug → trim name map for pricing_per_trim keys
+        const slugify = (s: string) => String(s ?? '')
+          .toLowerCase().trim()
+          .replace(/\+/g, '-plus').replace(/&/g, '-and')
+          .normalize('NFD').replace(/[̀-ͯ]/g, '')
+          .replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '') || 'untitled';
+        const trimSlugs = trims.map((t) => ({ name: t.name, slug: slugify(t.name) }));
+
+        const fmtCell = (v: any) => {
+          if (v === undefined || v === null || v === '' || v === '-' || v === '–') return '–';
+          if (typeof v === 'number') return v === 0 ? '0' : `${v.toLocaleString('cs-CZ')}`;
+          const num = parseInt(String(v).replace(/\s/g, ''), 10);
+          if (Number.isFinite(num)) return num === 0 ? '0' : `${num.toLocaleString('cs-CZ')}`;
+          return String(v);
+        };
+
+        return (
+          <section class="colors-pricelist" style="margin-top: 56px;">
+            <div class="section-eyebrow">Barvy a příplatky</div>
+            <h2 class="section-title">Barevné varianty a jejich cena</h2>
+            <p class="muted" style="max-width: 720px;">Tabulkový přehled barev exteriéru a interiéru přesně dle aktuálního ceníku. Ceny v Kč včetně DPH.</p>
+
+            {pricelistColors.exterior.length > 0 && (
+              <div class="colors-table-wrap">
+                <h3 class="colors-table-title">Exteriér</h3>
+                <div class="table-scroll">
+                  <table class="colors-table">
+                    <thead>
+                      <tr>
+                        <th>Barva</th>
+                        <th>Kód</th>
+                        <th>Typ</th>
+                        {trimSlugs.map((t) => <th class="num">{t.name}</th>)}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {pricelistColors.exterior.map((c) => (
+                        <tr>
+                          <td><strong>{c.name}</strong></td>
+                          <td class="muted-cell">{c.code ?? '—'}</td>
+                          <td>{c.type ?? '—'}</td>
+                          {trimSlugs.map((t) => (
+                            <td class="num">{fmtCell(c.pricing_per_trim?.[t.slug])}<span class="kc"> Kč</span></td>
+                          ))}
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
+
+            {pricelistColors.interior.length > 0 && (
+              <div class="colors-table-wrap" style="margin-top: 24px;">
+                <h3 class="colors-table-title">Interiér</h3>
+                <div class="table-scroll">
+                  <table class="colors-table">
+                    <thead>
+                      <tr>
+                        <th>Čalounění</th>
+                        <th>Kód</th>
+                        <th>Materiál</th>
+                        {trimSlugs.map((t) => <th class="num">{t.name}</th>)}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {pricelistColors.interior.map((c) => (
+                        <tr>
+                          <td><strong>{c.name}</strong></td>
+                          <td class="muted-cell">{c.code ?? '—'}</td>
+                          <td>{c.material ?? '—'}</td>
+                          {trimSlugs.map((t) => (
+                            <td class="num">{fmtCell(c.pricing_per_trim?.[t.slug])}<span class="kc"> Kč</span></td>
+                          ))}
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
+
+            <p class="muted" style="font-size: 12px; margin-top: 12px;">Cena 0 = v základní ceně. „–" = pro daný stupeň výbavy nedostupné. Konkrétní dostupnost ověřte při poptávce.</p>
+          </section>
+        );
+      })()}
+
       <div style="margin-top: 64px; padding: 28px; background: var(--bg-soft); border-radius: var(--radius); display: flex; gap: 16px; align-items: center; flex-wrap: wrap;">
         <div style="flex: 1; min-width: 280px;">
           <h3 style="margin: 0 0 6px; font-family: var(--font-display); font-weight: 600; font-size: 18px;">
@@ -239,6 +347,57 @@ function trimPrice(t: TrimLevel): string {
 </BaseLayout>
 
 <style>
+  /* === Colors pricelist (sekce pod compare matrix) === */
+  .colors-pricelist .colors-table-title {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 16px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--ink);
+    margin: 24px 0 10px;
+  }
+  .colors-table-wrap {
+    border: 1px solid var(--line);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    background: #fff;
+  }
+  .colors-table-wrap .table-scroll {
+    overflow-x: auto;
+    max-width: 100%;
+  }
+  .colors-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+    min-width: 600px;
+  }
+  .colors-table thead th {
+    background: var(--bg-soft, #fafaf7);
+    padding: 12px 14px;
+    text-align: left;
+    font-weight: 600;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-muted, #6b7280);
+    border-bottom: 1px solid var(--line, #e5e5e5);
+    white-space: nowrap;
+  }
+  .colors-table thead th.num,
+  .colors-table tbody td.num { text-align: right; }
+  .colors-table tbody td {
+    padding: 11px 14px;
+    border-bottom: 1px solid var(--line, #e5e5e5);
+    vertical-align: middle;
+  }
+  .colors-table tbody tr:nth-child(odd) td { background: #fff; }
+  .colors-table tbody tr:nth-child(even) td { background: #f9fafe; }
+  .colors-table tbody tr:hover td { background: #eff6ff; }
+  .colors-table .muted-cell { color: var(--text-muted, #6b7280); font-size: 13px; }
+  .colors-table .kc { color: var(--text-muted, #6b7280); font-size: 12px; }
+
   .compare-wrapper {
     border: 1px solid var(--line);
     border-radius: var(--radius-lg);

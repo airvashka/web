@@ -1033,8 +1033,7 @@ function showSaveResult(ok, result) {
       <strong>✓ Uloženo do Directus</strong><br>
       Trim levels: ${s.trims_created} vytvořeno, ${s.trims_updated} aktualizováno<br>
       Pakety: ${s.packages_created} vytvořeno, ${s.packages_updated} aktualizováno<br>
-      Barvy exteriér: ${s.colors_ext_created ?? 0} vytvořeno, ${s.colors_ext_updated ?? 0} aktualizováno<br>
-      Barvy interiér: ${s.colors_int_created ?? 0} vytvořeno, ${s.colors_int_updated ?? 0} aktualizováno<br>
+      Barvy z ceníku: ${(s.colors_ext_updated ?? 0)} exteriér + ${(s.colors_int_updated ?? 0)} interiér → uloženo do model_years.pricelist_colors<br>
       Tech data: ${s.tech_data_updated ? 'updatováno' : 'beze změny'}<br>
       ${s.errors.length ? `<br><strong style="color:#b43a2c;">Chyby (${s.errors.length}):</strong><br>${s.errors.map((e) => escapeHtml(e)).join('<br>')}` : ''}
       <details style="margin-top:8px;"><summary class="muted">Detail (${s.details.length})</summary><pre style="font-size:11px;">${s.details.map((d) => escapeHtml(d)).join('\n')}</pre></details>
