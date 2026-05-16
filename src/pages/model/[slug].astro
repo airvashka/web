@@ -601,31 +601,50 @@ if (promoActive && promoDescription) {
                 : `${colorOptions.length} barev`
               }</span>
             </div>
-            <div class="ext-grid" data-count={Math.min(colorOptions.length, 6)}>
-              {colorOptions.map((c) => {
-                const photoId = c.photo ?? c.photo_file ?? c.swatch_file ?? null;
+
+            {/* KGM-style configurator — velká fotka + řada kruhových swatchů */}
+            <div class="cs-stage" data-cs-stage>
+              {colorOptions.map((c, i) => {
+                const photoId = c.photo ?? c.photo_file ?? null;
                 const hex = (c.hex ?? '').trim();
-                const isLight = hex && /^#[fF][0-9a-fA-F]{5}$/.test(hex);
-                const secondary = c.code ?? (hex ? hex.toUpperCase() : '');
                 return (
-                  <div class="ext-card">
-                    <div class="ext-pic">
-                      {photoId ? (
-                        <DirectusImage src={photoId} alt={c.name ?? ''} aspectRatio="4/3" widths={[300, 600, 900]} />
-                      ) : (
-                        <span class="ext-pic-fallback" style={hex ? `background:${hex}` : ''}></span>
-                      )}
-                    </div>
-                    {hex && (
-                      <div class="ext-strip" style={`background:${hex}; ${isLight ? 'border-top:1px solid var(--line-2);' : ''}`}></div>
+                  <div class={`cs-photo${i === 0 ? ' is-active' : ''}`} data-idx={i}>
+                    {photoId ? (
+                      <DirectusImage src={photoId} alt={c.name ?? ''} aspectRatio="21/9" widths={[800, 1400, 2000]} loading={i === 0 ? 'eager' : 'lazy'} />
+                    ) : (
+                      <span class="cs-photo-fallback" style={hex ? `background:${hex}` : ''}></span>
                     )}
-                    <div class="ext-label">
-                      <span class="nm">{c.name}</span>
-                      {secondary && <span class="cd">{secondary}</span>}
-                    </div>
                   </div>
                 );
               })}
+
+              <div class="cs-selector">
+                <div class="cs-name" data-cs-name>{colorOptions[0]?.name ?? ''}</div>
+                <div class="cs-swatches" role="radiogroup" aria-label="Vyberte barvu">
+                  {colorOptions.map((c, i) => {
+                    const swatchId = (c as any).swatch ?? null;
+                    const hex = (c.hex ?? '').trim();
+                    return (
+                      <button
+                        type="button"
+                        class={`cs-swatch${i === 0 ? ' is-active' : ''}`}
+                        data-idx={i}
+                        data-name={c.name ?? ''}
+                        role="radio"
+                        aria-checked={i === 0 ? 'true' : 'false'}
+                        aria-label={c.name ?? ''}
+                        title={c.name ?? ''}
+                      >
+                        {swatchId ? (
+                          <DirectusImage src={swatchId} alt="" aspectRatio="1/1" widths={[60, 120]} />
+                        ) : (
+                          <span class="cs-swatch-fallback" style={hex ? `background:${hex}` : ''}></span>
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
             </div>
           </div>
         )}
@@ -1097,6 +1116,26 @@ if (promoActive && promoDescription) {
       if (e.key === 'Escape') closeModal();
       if (e.key === 'ArrowLeft') showSlide(current - 1);
       if (e.key === 'ArrowRight') showSlide(current + 1);
+    });
+
+    /* === Color selector — swap aktivní fotky + jména po kliknutí na swatch === */
+    document.querySelectorAll('[data-cs-stage]').forEach((stage) => {
+      const photos = stage.querySelectorAll('.cs-photo');
+      const swatches = stage.querySelectorAll('.cs-swatch');
+      const nameEl = stage.querySelector('[data-cs-name]');
+      swatches.forEach((sw) => {
+        sw.addEventListener('click', () => {
+          const idx = sw.dataset.idx;
+          const name = sw.dataset.name || '';
+          photos.forEach((p) => p.classList.toggle('is-active', p.dataset.idx === idx));
+          swatches.forEach((s) => {
+            const on = s.dataset.idx === idx;
+            s.classList.toggle('is-active', on);
+            s.setAttribute('aria-checked', on ? 'true' : 'false');
+          });
+          if (nameEl) nameEl.textContent = name;
+        });
+      });
     });
   </script>
 </BaseLayout>

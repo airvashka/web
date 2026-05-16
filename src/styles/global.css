@@ -1862,6 +1862,109 @@ button.thumb-more {
   color: var(--text-muted);
 }
 
+/* === KGM-style Color showroom (exterior) — velká fotka + kruhové swatche === */
+.cs-stage {
+  position: relative;
+  width: 100%;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  background: var(--bg-soft, #fafaf7);
+  isolation: isolate;
+}
+.cs-photo {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .35s ease;
+}
+.cs-photo.is-active {
+  opacity: 1;
+  pointer-events: auto;
+  position: relative; /* hold layout height z první aktivní fotky */
+}
+.cs-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.cs-photo-fallback {
+  display: block;
+  width: 100%;
+  aspect-ratio: 21 / 9;
+  background: var(--bg-soft);
+}
+
+/* Selector panel — plovoucí dole, white card s name + řadou kruhů */
+.cs-selector {
+  position: absolute;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 3;
+  background: #fff;
+  border-radius: 999px;
+  padding: 10px 22px 10px 26px;
+  display: flex;
+  align-items: center;
+  gap: 22px;
+  box-shadow: 0 10px 36px -10px rgba(0, 0, 0, 0.3), 0 2px 8px rgba(0, 0, 0, 0.06);
+  max-width: calc(100% - 32px);
+}
+.cs-name {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 15px;
+  color: var(--ink, #111);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.cs-swatches {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.cs-swatch {
+  position: relative;
+  width: 36px;
+  height: 36px;
+  padding: 3px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  background: transparent;
+  cursor: pointer;
+  transition: border-color .15s ease, transform .15s ease;
+  flex-shrink: 0;
+}
+.cs-swatch:hover { transform: scale(1.06); }
+.cs-swatch.is-active { border-color: var(--ink, #111); }
+.cs-swatch img,
+.cs-swatch-fallback {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.08);
+}
+
+@media (max-width: 640px) {
+  .cs-selector {
+    bottom: 14px;
+    padding: 8px 16px 8px 18px;
+    gap: 14px;
+    flex-direction: column;
+    align-items: flex-start;
+    border-radius: 18px;
+    width: calc(100% - 24px);
+  }
+  .cs-name { font-size: 13px; }
+  .cs-swatches { gap: 6px; }
+  .cs-swatch { width: 32px; height: 32px; }
+}
+
 /* Exterior grid — adapts to count (3 / 4 / 5 / 6+) */
 .ext-grid {
   display: grid;
@@ -2134,9 +2237,10 @@ button.thumb-more {
   font-family: var(--font-display);
   font-size: 12px;
   letter-spacing: 0.08em;
-  color: rgba(255, 255, 255, 0.92);
+  color: var(--accent, #d96f3a);
   font-weight: 600;
   margin: 0;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.45);
 }
 .tech-card .t {
   font-family: var(--font-display);
