@@ -667,7 +667,7 @@ if (promoActive && promoDescription) {
     </section>
   )}
 
-  <!-- ===== TECH GRID — z model.highlights O2M collection, nebo fallback ===== -->
+  <!-- ===== TECH GRID — KGM-style dark cards (eyebrow + title + description) ===== -->
   {(() => {
     const modelHighlights = Array.isArray((rawModel as any).highlights) ? (rawModel as any).highlights : [];
     const hasHighlights = modelHighlights.length > 0;
@@ -675,22 +675,25 @@ if (promoActive && promoDescription) {
     const tech = hasHighlights ? modelHighlights : fallbackFromTrim;
     if (tech.length === 0) return null;
     return (
-      <section class="section" id="technologie">
+      <section class="section" id="technologie" style="background: var(--bg-soft);">
         <div class="container">
           <div class="section-eyebrow">Technologie</div>
           <h2 class="section-title">Co umí {rawModel.name}</h2>
           <div class="tech-grid">
             {tech.map((h: any) => {
-              // Priorita: photo (nová O2M collection — UUID) > photo_file (legacy JSON migration)
               const photoId = h.photo ?? h.photo_file ?? null;
+              const title = h.title ?? h.t ?? '';
+              const desc  = h.subtitle ?? h.s ?? '';
+              const eyebrow = h.eyebrow ?? h.tagline ?? '';
               return (
                 <div class="tech-card">
                   <div class="pic">
-                    {photoId && <DirectusImage src={photoId} alt={h.title ?? ''} aspectRatio="4/3" widths={[400, 800]} />}
+                    {photoId && <DirectusImage src={photoId} alt={title} aspectRatio="4/3" widths={[400, 800]} />}
                   </div>
                   <div class="tech-card-body">
-                    <div class="t">{h.title ?? h.t ?? ''}</div>
-                    <div class="s">{h.subtitle ?? h.s ?? ''}</div>
+                    {eyebrow && <p class="eyebrow">{eyebrow}</p>}
+                    <h3 class="t">{title}</h3>
+                    {desc && <p class="s">{desc}</p>}
                   </div>
                 </div>
               );
