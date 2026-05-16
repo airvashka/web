@@ -245,7 +245,7 @@ function trimPrice(t: TrimLevel): string {
                           if (v === 'standard') {
                             return (
                               <td class="compare-cell has">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                                <span class="compare-check">✓</span>
                               </td>
                             );
                           }
@@ -518,7 +518,7 @@ function trimPrice(t: TrimLevel): string {
     box-shadow: 0 1px 0 var(--line);
   }
   .compare-table thead th {
-    padding: 18px 16px 14px;
+    padding: 10px 16px 14px;
     text-align: left;
     border-bottom: 2px solid var(--line-2);
     vertical-align: top;
@@ -568,15 +568,19 @@ function trimPrice(t: TrimLevel): string {
   }
   .compare-cat-row td {
     background: var(--bg-soft);
-    padding: 14px 16px;
+    padding: 16px 16px;
     font-family: var(--font-display);
-    font-weight: 600;
-    font-size: 12px;
-    letter-spacing: 0.08em;
+    font-weight: 700;
+    font-size: 13px;
+    letter-spacing: 0.1em;
     text-transform: uppercase;
     color: var(--accent);
-    border-top: 1px solid var(--line);
+    border-top: 2px solid var(--line-2, #d0d0d5);
     border-bottom: 1px solid var(--line);
+  }
+  /* První section-row přímo pod thead — silnější top border, aby byl jasně oddělený */
+  .compare-table thead + tbody .compare-cat-row:first-child td {
+    border-top: 3px solid var(--accent);
   }
   .compare-table tbody td {
     padding: 12px 16px;
@@ -597,8 +601,13 @@ function trimPrice(t: TrimLevel): string {
     text-align: center;
     white-space: nowrap;
   }
-  .compare-cell.has svg {
+  /* Všechny tři varianty cell-obsahu (✓/—/cena) jsou TEXT — sednou na stejnou osu */
+  .compare-check {
     color: var(--ok, #2f9b5c);
+    font-weight: 700;
+    font-size: 18px;
+    line-height: 1;
+    display: inline-block;
   }
   .compare-cell.optional .compare-price {
     color: var(--accent, #F25C1B);
@@ -608,6 +617,7 @@ function trimPrice(t: TrimLevel): string {
   }
   .compare-dash {
     color: var(--line-2, #d0d0d5);
+    font-size: 18px;
   }
   .compare-table tbody tr:hover td:not(.compare-cat-row td) {
     background: rgba(242, 92, 27, 0.03);
