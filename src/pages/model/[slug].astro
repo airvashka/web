@@ -507,7 +507,7 @@ if (promoActive && promoDescription) {
       {galleryFileIds.length > 0 && (<><span class="subnav-sep">·</span><a class="subnav-link" href="#galerie">Galerie</a></>)}
       {hasConfigurator && (<><span class="subnav-sep">·</span><a class="subnav-link" href="#barvy">Barvy</a></>)}
       <span class="subnav-sep">·</span>
-      <a class="subnav-link" href="#ceny">Ceny a výbavy</a>
+      <a class="subnav-link" href="#ceny">Ceny a výbavové stupně</a>
       <span class="subnav-sep">·</span>
       <a class="subnav-link" href="#skladem">Skladem</a>
       <span class="subnav-sep">·</span>
@@ -830,8 +830,8 @@ if (promoActive && promoDescription) {
   {trims.length > 0 && (
     <section class="section" id="ceny" style="background: var(--bg-soft);">
       <div class="container">
-        <div class="section-eyebrow">Ceny a výbavy</div>
-        <h2 class="section-title">Dostupné výbavy a pakety</h2>
+        <div class="section-eyebrow">Ceny a výbavové stupně</div>
+        <h2 class="section-title">Dostupné výbavové stupně a pakety</h2>
         {(() => {
           // Pre-compute flat features set per trim (lowercased + trimmed for diff)
           const flatPerTrim = trims.map((t) => {
@@ -945,9 +945,9 @@ if (promoActive && promoDescription) {
         <div class="trims-cta-row" style="margin-top: 56px;">
           <a class="trims-cta" href={`/model/${rawModel.slug}/vybavy`}>
             <div>
-              <div class="trims-cta-eyebrow">Srovnání výbav</div>
+              <div class="trims-cta-eyebrow">Srovnání výbavových stupňů</div>
               <div class="trims-cta-title">Kompletní matrice — vidíte přesně co kde je</div>
-              <div class="trims-cta-sub">Sloupce trimů × řádky všech prvků výbavy + paketové ceny + barvy.</div>
+              <div class="trims-cta-sub">Sloupce výbavových stupňů × řádky všech prvků výbavy + paketové ceny + barvy.</div>
             </div>
             <span class="trims-cta-arrow">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>

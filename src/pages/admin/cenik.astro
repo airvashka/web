@@ -184,7 +184,7 @@ const DIRECTUS_URL = import.meta.env.PUBLIC_DIRECTUS_URL || 'https://directus-pr
 </head>
 <body>
   <h1>Ceník uploader</h1>
-  <p class="muted">PDF → AI extract → review po výbavách → uložit do Directus. Pro každou výbavu: <em>co dostane zákazník</em> + <em>co si může dokoupit</em>.</p>
+  <p class="muted">PDF → AI extract → review po výbavových stupních → uložit do Directus. Pro každý výbavový stupeň: <em>co dostane zákazník</em> + <em>co si může dokoupit</em>.</p>
 
   <!-- LOGIN -->
   <div class="panel" id="login-panel">
@@ -236,7 +236,7 @@ const DIRECTUS_URL = import.meta.env.PUBLIC_DIRECTUS_URL || 'https://directus-pr
     <div class="meta" id="result-meta"></div>
 
     <div class="tabs" id="tabs" style="margin-top: 20px;">
-      <button class="tab-btn active" data-tab="trims">🚗 Výbavy (<span id="count-trims">0</span>)</button>
+      <button class="tab-btn active" data-tab="trims">🚗 Výbavové stupně (<span id="count-trims">0</span>)</button>
       <button class="tab-btn" data-tab="packages">📦 Pakety (<span id="count-packages">0</span>)</button>
       <button class="tab-btn" data-tab="colors">🎨 Barvy (<span id="count-colors">0</span>)</button>
       <button class="tab-btn" data-tab="techdata">🔧 Tech data (<span id="count-techdata">0</span>)</button>
@@ -244,7 +244,7 @@ const DIRECTUS_URL = import.meta.env.PUBLIC_DIRECTUS_URL || 'https://directus-pr
     </div>
 
     <div class="tab-content active" data-tab="trims">
-      <p class="muted">Pro každou výbavu: <strong>co dostane zákazník</strong> (features) + <strong>co si může dokoupit</strong> (optional). Klik = editovat.</p>
+      <p class="muted">Pro každý výbavový stupeň: <strong>co dostane zákazník</strong> (features) + <strong>co si může dokoupit</strong> (optional). Klik = editovat.</p>
       <div id="trims-container"></div>
     </div>
 
@@ -522,7 +522,7 @@ function showReview(data) {
 
   $('result-summary').innerHTML = `
     <strong>Detekováno:</strong>
-    ${data.trims.length} výbav (${data.trims.map((t) => escapeHtml(t.name)).join(' · ')}),
+    ${data.trims.length} výbavových stupňů (${data.trims.map((t) => escapeHtml(t.name)).join(' · ')}),
     ${totalFeatures} features celkem, ${totalOptional} dokoupitelných,
     ${data.packages.length} paketů,
     ${colorsTotal} barev,
@@ -550,7 +550,7 @@ function showReview(data) {
 function renderTrims(trims) {
   const container = $('trims-container');
   if (!trims || !trims.length) {
-    container.innerHTML = '<p class="muted">Žádné výbavy detekovány.</p>';
+    container.innerHTML = '<p class="muted">Žádné výbavové stupně detekovány.</p>';
     return;
   }
 
@@ -701,7 +701,7 @@ function renderTrimPane(t, ti) {
   let html = `
     <div class="trim-header-row">
       <div>
-        <label class="pkg-lab">Název výbavy</label>
+        <label class="pkg-lab">Název výbavového stupně</label>
         <input class="trim-name-input" data-trim-idx="${ti}" type="text" value="${escapeAttr(t.name ?? '')}" />
       </div>
       <div>
@@ -781,7 +781,7 @@ function renderPackages(packages, trims) {
         </div>
       </div>
 
-      <p class="pkg-lab" style="margin-top:14px;">Ceny per trim <span class="muted">(klik do buňky — zadej číslo Kč / <code>standard</code> / <code>unavailable</code>)</span></p>
+      <p class="pkg-lab" style="margin-top:14px;">Ceny pro výbavové stupně <span class="muted">(klik do buňky — zadej číslo Kč / <code>standard</code> / <code>unavailable</code>)</span></p>
       <table class="pkg-pricing" data-pkg-idx="${pi}" style="width:100%;border-collapse:collapse;font-size:13px;margin-top:4px;">
         <thead><tr>${trims.map((t) => `<th style="padding:7px;background:#f5f5f7;text-align:center;">${escapeHtml(t.name)}</th>`).join('')}</tr></thead>
         <tbody><tr>${trims.map((t) => {
@@ -991,7 +991,7 @@ $('save-btn').addEventListener('click', async () => {
   const yearId = $('year-select').value;
   if (!yearId) { alert('Vyber model_year'); return; }
   const totalRows = CURRENT_DATA.sections.reduce((a, s) => a + s.rows.length, 0);
-  if (!confirm(`Uložit do "${$('year-select').selectedOptions[0]?.textContent}":\n${CURRENT_DATA.trims.length} trims, ${totalRows} řádků, ${CURRENT_DATA.packages.length} paketů.\n\nPokračovat?`)) return;
+  if (!confirm(`Uložit do "${$('year-select').selectedOptions[0]?.textContent}":\n${CURRENT_DATA.trims.length} výbavových stupňů, ${totalRows} řádků, ${CURRENT_DATA.packages.length} paketů.\n\nPokračovat?`)) return;
 
   $('save-btn').disabled = true;
   $('save-btn').textContent = '⏳ Ukládám...';
@@ -1031,7 +1031,7 @@ function showSaveResult(ok, result) {
     div.className = 'success';
     div.innerHTML = `
       <strong>✓ Uloženo do Directus</strong><br>
-      Trim levels: ${s.trims_created} vytvořeno, ${s.trims_updated} aktualizováno<br>
+      Výbavové stupně: ${s.trims_created} vytvořeno, ${s.trims_updated} aktualizováno<br>
       Pakety: ${s.packages_created} vytvořeno, ${s.packages_updated} aktualizováno<br>
       Barvy z ceníku: ${(s.colors_ext_updated ?? 0)} exteriér + ${(s.colors_int_updated ?? 0)} interiér → uloženo do model_years.pricelist_colors<br>
       Tech data: ${s.tech_data_updated ? 'updatováno' : 'beze změny'}<br>

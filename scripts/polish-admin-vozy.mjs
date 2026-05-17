@@ -143,13 +143,13 @@ const COLLECTIONS = {
     name: 'Výbavové stupně',
     fields: {
       name:           { label: 'Název výbavy',         note: 'Např. "CLUB", "STYLE", "PREMIUM", "SELECT", "EXCLUSIVE".' },
-      slug:           { label: 'URL slug',             note: 'Lowercase verze názvu (např. "club", "style"). Používá se v klíčích pricing per trim.' },
-      model_year:     { label: 'Modelový rok',         note: 'Ke kterému ročníku tato výbava patří.' },
+      slug:           { label: 'URL slug',             note: 'Lowercase verze názvu (např. "club", "style"). Používá se v klíčích cen pro výbavový stupeň.' },
+      model_year:     { label: 'Modelový rok',         note: 'Ke kterému ročníku tento výbavový stupeň patří.' },
       list_price:     { label: 'Ceníková cena (Kč)',   note: 'Základní cena z PDF ceníku.' },
-      promo_price:    { label: 'Akční cena (Kč)',      note: 'Volitelně — pokud má tento konkrétní trim slevu.' },
+      promo_price:    { label: 'Akční cena (Kč)',      note: 'Volitelně — pokud má tento konkrétní výbavový stupeň slevu.' },
       features:       { label: 'Co dostane zákazník',  note: 'Výbavové prvky seskupené po sekcích (Asistent, Bezpečnost, Komfort…). Generuje se z ceník uploaderu.' },
       optional_items: { label: 'Dokoupitelné položky', note: 'Co si zákazník může dokoupit nad rámec — name + code + price.' },
-      description:    { label: 'Popis',                 note: 'Krátký popis trimu (volitelné).' },
+      description:    { label: 'Popis',                 note: 'Krátký popis výbavového stupně (volitelné).' },
       status:         { label: 'Stav publikace' },
       sort:           { label: 'Pořadí' },
       is_highlighted: { label: 'Zvýraznit jako doporučenou' },
@@ -167,7 +167,7 @@ const COLLECTIONS = {
       slug:             { label: 'URL slug' },
       model_year:       { label: 'Modelový rok' },
       features:         { label: 'Obsah paketu',      note: 'Seznam položek, které paket přidává.' },
-      pricing_per_trim: { label: 'Ceny per trim',     note: 'Cena paketu pro každý trim — slug + cena/standard/unavailable.' },
+      pricing_per_trim: { label: 'Ceny pro výbavové stupně', note: 'Cena paketu pro každý výbavový stupeň — slug stupně + cena / standard / unavailable.' },
       description:      { label: 'Popis' },
     },
   },
@@ -196,7 +196,7 @@ const COLLECTIONS = {
       swatch:   { label: 'Swatch ikona',        note: 'Malá kruhová ikona barvy (60×60px, transparentní pozadí) — pro selector pod fotkou.' },
       model:    { label: 'Model' },
       sort:     { label: 'Pořadí' },
-      pricing_per_trim: { label: 'Ceny per trim (z ceníku)', note: 'Pricing per trim slug. Generuje se z ceníku, pro showroom barvy typicky není potřeba.' },
+      pricing_per_trim: { label: 'Ceny pro výbavové stupně (z ceníku)', note: 'Cena barvy pro každý výbavový stupeň. Generuje se z ceníku — pro showroom barvy typicky není potřeba.' },
     },
   },
 
@@ -210,7 +210,7 @@ const COLLECTIONS = {
       photo:    { label: 'Fotka interiéru',     note: 'Foto interiéru s daným čalouněním (16:10).' },
       model:    { label: 'Model' },
       sort:     { label: 'Pořadí' },
-      pricing_per_trim: { label: 'Ceny per trim' },
+      pricing_per_trim: { label: 'Ceny pro výbavové stupně' },
     },
   },
 };
@@ -238,6 +238,21 @@ async function patchField(collection, field, label, note, hidden) {
   if (hidden !== undefined) newMeta.hidden = hidden;
 
   await api('PATCH', `/fields/${collection}/${field}`, { meta: newMeta });
+  return true;
+}
+
+async function patchCollectionLabel(collection, label) {
+  // Translate collection name in sidebar (Directus meta.translations on collection level)
+  let cur;
+  try { cur = await api('GET', `/collections/${collection}`); }
+  catch { return false; }
+  const meta = (cur.data ?? cur).meta ?? {};
+  const existing = Array.isArray(meta.translations) ? meta.translations.filter((t) => t && t.language !== 'cs-CZ') : [];
+  const newTranslations = [
+    ...existing,
+    { language: 'cs-CZ', translation: label, singular: label, plural: label },
+  ];
+  await api('PATCH', `/collections/${collection}`, { meta: { ...meta, translations: newTranslations } });
   return true;
 }
 
@@ -282,6 +297,13 @@ async function main() {
   let totalPatched = 0, totalSkipped = 0;
   for (const [collection, conf] of Object.entries(COLLECTIONS)) {
     console.log(`\n─── ${conf.name ?? collection} (${collection}) ───`);
+    // Sidebar label (collection-level translation)
+    if (conf.name) {
+      try {
+        const patched = await patchCollectionLabel(collection, conf.name);
+        if (patched) ok(`[sidebar] "${collection}" → "${conf.name}"`);
+      } catch (e) { warn(`[sidebar] ${collection} — ${e.message}`); }
+    }
     for (const [field, def] of Object.entries(conf.fields)) {
       try {
         const patched = await patchField(collection, field, def.label, def.note, def.hidden);

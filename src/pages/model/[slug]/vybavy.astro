@@ -220,23 +220,23 @@ function trimPrice(t: TrimLevel): string {
 ---
 
 <BaseLayout
-  title={`Srovnání výbav — ${brand.name} ${rawModel.name}`}
-  description={`Kompletní srovnání výbavových stupňů ${rawModel.name} — co je v jakém trimu, co je za příplatek, co v paketu.`}
+  title={`Srovnání výbavových stupňů — ${brand.name} ${rawModel.name}`}
+  description={`Kompletní srovnání výbavových stupňů ${rawModel.name} — co je v jakém stupni, co je za příplatek, co v paketu.`}
 >
   <Breadcrumbs items={[
     { label: brand.name, href: `/${brand.slug}` },
     { label: rawModel.name, href: `/model/${rawModel.slug}` },
-    { label: 'Srovnání výbav' },
+    { label: 'Srovnání výbavových stupňů' },
   ]} />
 
   <section class="section">
     <div class="container">
-      <div class="section-eyebrow">Srovnání výbav</div>
+      <div class="section-eyebrow">Srovnání výbavových stupňů</div>
       <h1 class="section-title" style="margin-bottom: 8px;">
         {brand.name} {rawModel.name} — co je v jakém stupni
       </h1>
       <p class="lead" style="max-width: 64ch; margin-bottom: 40px;">
-        Matrice všech prvků výbavy. <strong>✓</strong> znamená v ceně, <span style="color: var(--text-muted);">—</span> není k dispozici, číslo je příplatek. Pokud chceš jen rychlý přehled, vrať se na <a href={`/model/${rawModel.slug}#ceny`}>karty trimů</a>.
+        Matrice všech prvků výbavy. <strong>✓</strong> znamená v ceně, <span style="color: var(--text-muted);">—</span> není k dispozici, číslo je příplatek. Pokud chceš jen rychlý přehled, vrať se na <a href={`/model/${rawModel.slug}#ceny`}>karty výbavových stupňů</a>.
       </p>
 
       {trims.length === 0 ? (
@@ -332,7 +332,7 @@ function trimPrice(t: TrimLevel): string {
               Volitelné pakety
             </h2>
             <p style="color: var(--text-muted); margin-bottom: 32px;">
-              Ceny per trim. <strong>V ceně</strong> = standardně, <strong>—</strong> = nedostupné, číslo = příplatek.
+              Ceny pro výbavové stupně. <strong>V ceně</strong> = standardně, <strong>—</strong> = nedostupné, číslo = příplatek.
             </p>
             <div class="compare-packages-grid">
               {optionPackages.map((pkg: any) => (
