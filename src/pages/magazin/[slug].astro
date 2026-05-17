@@ -5,6 +5,7 @@ import Breadcrumbs from '@components/Breadcrumbs.astro';
 import JsonLd from '@components/JsonLd.astro';
 import { directusGet, directusAsset } from '@lib/directus';
 import { articleSchema } from '@lib/schemas';
+import { getReadTime } from '@lib/articles';
 import { marked } from 'marked';
 
 /* ============================================================
@@ -46,11 +47,11 @@ const articles = await directusGet<Article>('articles', {
 const article = articles[0];
 if (!article) return Astro.redirect('/magazin');
 
-// Related (3 ostatní)
+// Related (3 ostatní) — fetchneme i `body` pro auto-výpočet read_time fallbacku
 const related = await directusGet<Article>('articles', {
   filter: { status: { _eq: 'published' }, slug: { _neq: slug } },
   sort: ['-date_published'],
-  fields: ['id', 'slug', 'title', 'excerpt', 'category', 'author', 'date_published', 'read_time', 'cover_image'],
+  fields: ['id', 'slug', 'title', 'excerpt', 'category', 'author', 'date_published', 'read_time', 'cover_image', 'body'],
   limit: 3,
 });
 
@@ -115,7 +116,7 @@ const catLabel = article.category ? (CATEGORY_LABELS[article.category] ?? articl
       <div class="art-meta">
         {catLabel && <span class="cat">{catLabel}</span>}
         {article.date_published && <><span class="dot">·</span><span>{formatDate(article.date_published)}</span></>}
-        {article.read_time && <><span class="dot">·</span><span>{article.read_time}</span></>}
+        <span class="dot">·</span><span>{getReadTime(article)}</span>
       </div>
       <h1>{article.title}</h1>
       {article.excerpt && <p class="lead">{article.excerpt}</p>}
@@ -187,7 +188,7 @@ const catLabel = article.category ? (CATEGORY_LABELS[article.category] ?? articl
                 <div class="acard-body">
                   <div class="acard-meta">
                     {a.date_published && <span>{formatDate(a.date_published)}</span>}
-                    {a.read_time && <><span class="dot">·</span><span>{a.read_time}</span></>}
+                    <span class="dot">·</span><span>{getReadTime(a)}</span>
                   </div>
                   <h3>{a.title}</h3>
                   {a.excerpt && <p>{a.excerpt}</p>}
