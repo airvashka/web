@@ -127,14 +127,20 @@ const year = new Date().getFullYear();
     align-items: center;
   }
   .footer-brand:hover { opacity: 1; }
-  .footer-brand :global(.brand-logo--single) { height: 32px; max-width: 160px; }
-  .footer-brand :global(.brand-logo--combined) { height: 38px; max-width: 180px; }
+  /* Cap heights — IMG má width: auto, takže šířka se odvodí z height × aspect ratio.
+     Pro combined (OMODA+JAECOO) potřebujeme nižší height aby total width zůstal rozumný. */
+  .footer-brand :global(.brand-logo--single) {
+    height: 26px;
+  }
+  .footer-brand :global(.brand-logo--combined) {
+    height: 32px;
+  }
 
   @media (max-width: 700px) {
     .footer-brands { gap: 20px; }
-    .footer-brands-row { gap: 24px; }
-    .footer-brand :global(.brand-logo--single) { height: 24px; max-width: 120px; }
-    .footer-brand :global(.brand-logo--combined) { height: 28px; max-width: 140px; }
+    .footer-brands-row { gap: 20px; }
+    .footer-brand :global(.brand-logo--single) { height: 20px; }
+    .footer-brand :global(.brand-logo--combined) { height: 24px; }
   }
 
   .footer-disclaimer {
