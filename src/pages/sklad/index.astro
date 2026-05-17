@@ -161,13 +161,14 @@ const fmtKm = (n?: number | null) => (n === 0 || !n ? '0 km' : `${n.toLocaleStri
                 const carYear = v.model_year?.year ?? '';
                 const conditionLabel = conditionLabels[v.condition ?? ''] ?? '';
                 const fuelLabel = fuelLabels[v.model?.fuel_type ?? ''] ?? '';
-                // Cena: stock.promo > model promo > list
+                // Cena: stock.promo > model promo (jen u nových vozů) > list
                 const baseList = v.list_price;
                 let displayPrice = v.promo_price ?? baseList;
                 let priceBefore: number | null = null;
                 if (v.promo_price && baseList && v.promo_price < baseList) {
                   priceBefore = baseList;
-                } else if (modelPromoActive && modelPromoDiscount > 0 && baseList) {
+                } else if (modelPromoActive && modelPromoDiscount > 0 && baseList && isNew) {
+                  // Model-level promo se aplikuje JEN na nové vozy (ojeté a předváděcí mají vlastní cenu)
                   displayPrice = baseList - modelPromoDiscount;
                   priceBefore = baseList;
                 }

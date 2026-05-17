@@ -30,15 +30,44 @@ if (!brand) {
 }
 
 // Modely této značky
-type ModelWithSub = Model & { sub_brand?: number | null; hero_image?: string; hero_image_card?: string; fuel_type?: string; variant_badge_kind?: string | null };
+type ModelWithSub = Model & {
+  sub_brand?: number | null;
+  hero_image?: string;
+  hero_image_card?: string;
+  fuel_type?: string;
+  variant_badge_kind?: string | null;
+  promo_active?: boolean;
+  promo_label?: string;
+  promo_discount_amount?: number;
+  promo_valid_to?: string;
+};
 const allModels = await directusGet<ModelWithSub>('models', {
   filter: { brand: { _eq: brand.id }, status: { _eq: 'published' } },
   sort: ['sort'],
   fields: [
     'id', 'slug', 'name', 'tagline', 'price_from', 'fuel_type', 'body_type',
     'sub_brand', 'hero_image', 'hero_image_card', 'variant_badge_kind',
+    'promo_active', 'promo_label', 'promo_discount_amount', 'promo_valid_to',
   ],
 });
+
+/* Helper: vyhodnotí jestli má model aktivní promo akci.
+   Vrací { active, label, discount, finalPrice }. */
+const todayDate = new Date();
+function modelPromo(m: ModelWithSub) {
+  const validTo = m.promo_valid_to ? new Date(m.promo_valid_to) : null;
+  const active = !!m.promo_active
+    && (Boolean(m.promo_label) || Number(m.promo_discount_amount ?? 0) > 0)
+    && (!validTo || validTo >= todayDate);
+  const discount = Number(m.promo_discount_amount ?? 0) || 0;
+  const finalPrice = (active && discount > 0 && m.price_from) ? Number(m.price_from) - discount : Number(m.price_from ?? 0);
+  return {
+    active,
+    label: (m.promo_label || '').trim() || (active && discount > 0 ? `Sleva ${discount.toLocaleString('cs-CZ')} Kč` : 'Akce'),
+    discount,
+    finalPrice,
+  };
+}
 
 // Sub-brandy
 const subBrandIds = [...new Set(allModels.map((m) => m.sub_brand).filter(Boolean))] as number[];
@@ -235,10 +264,12 @@ const activeBrand = Astro.params.brand;
                     const tagClass = fuelTagClass[fuelKey] ?? 'benzin';
                     const tagLabel = fuelLabel[fuelKey] ?? '';
                     const body = bodyLabel[m.body_type ?? ''] ?? m.body_type ?? '';
+                    const promo = modelPromo(m);
                     return (
-                      <a class={`model-card${m.variant_badge_kind ? ` model-card--${String(m.variant_badge_kind).toLowerCase()}` : ''}`} href={`/model/${m.slug}`}>
+                      <a class={`model-card${m.variant_badge_kind ? ` model-card--${String(m.variant_badge_kind).toLowerCase()}` : ''}${promo.active ? ' model-card--promo' : ''}`} href={`/model/${m.slug}`}>
                         <div class="pic">
                           {tagLabel && <span class={`fuel-tag ${tagClass}`}>{tagLabel}</span>}
+                          {promo.active && <span class="promo-tag">{promo.label}</span>}
                           {(m.hero_image_card || m.hero_image) && <DirectusImage src={m.hero_image_card || m.hero_image!} alt={`${brand.name} ${m.name}`} aspectRatio="4/3" />}
                         </div>
                         <div class="model-body">
@@ -247,8 +278,15 @@ const activeBrand = Astro.params.brand;
                           <div class="model-meta">Karoserie: {body || '—'} · Palivo: {tagLabel || '—'}</div>
                           <div class="model-foot">
                             <div>
-                              <div class="price-lab">Cena od</div>
-                              <div class="price-val">{m.price_from ? `${m.price_from.toLocaleString('cs-CZ')} Kč` : '—'}</div>
+                              <div class="price-lab">{promo.active && promo.discount > 0 ? 'Akční cena od' : 'Cena od'}</div>
+                              {promo.active && promo.discount > 0 ? (
+                                <>
+                                  <div class="price-val price-val--promo">{promo.finalPrice.toLocaleString('cs-CZ')} Kč</div>
+                                  <div class="price-strike">{Number(m.price_from).toLocaleString('cs-CZ')} Kč</div>
+                                </>
+                              ) : (
+                                <div class="price-val">{m.price_from ? `${Number(m.price_from).toLocaleString('cs-CZ')} Kč` : '—'}</div>
+                              )}
                             </div>
                             <span class="more">
                               Prozkoumat
@@ -270,10 +308,12 @@ const activeBrand = Astro.params.brand;
                 const fuelKey = m.fuel_type ?? '';
                 const tagClass = fuelTagClass[fuelKey] ?? 'benzin';
                 const tagLabel = fuelLabel[fuelKey] ?? '';
+                const promo = modelPromo(m);
                 return (
-                  <a class={`model-card${m.variant_badge_kind ? ` model-card--${String(m.variant_badge_kind).toLowerCase()}` : ''}`} href={`/model/${m.slug}`}>
+                  <a class={`model-card${m.variant_badge_kind ? ` model-card--${String(m.variant_badge_kind).toLowerCase()}` : ''}${promo.active ? ' model-card--promo' : ''}`} href={`/model/${m.slug}`}>
                     <div class="pic">
                       {tagLabel && <span class={`fuel-tag ${tagClass}`}>{tagLabel}</span>}
+                      {promo.active && <span class="promo-tag">{promo.label}</span>}
                       {(m.hero_image_card || m.hero_image) && <DirectusImage src={m.hero_image_card || m.hero_image!} alt={`${brand.name} ${m.name}`} aspectRatio="4/3" />}
                     </div>
                     <div class="model-body">
@@ -281,8 +321,15 @@ const activeBrand = Astro.params.brand;
                       <p class="model-desc">{m.tagline ?? ''}</p>
                       <div class="model-foot">
                         <div>
-                          <div class="price-lab">Cena od</div>
-                          <div class="price-val">{m.price_from ? `${m.price_from.toLocaleString('cs-CZ')} Kč` : '—'}</div>
+                          <div class="price-lab">{promo.active && promo.discount > 0 ? 'Akční cena od' : 'Cena od'}</div>
+                          {promo.active && promo.discount > 0 ? (
+                            <>
+                              <div class="price-val price-val--promo">{promo.finalPrice.toLocaleString('cs-CZ')} Kč</div>
+                              <div class="price-strike">{Number(m.price_from).toLocaleString('cs-CZ')} Kč</div>
+                            </>
+                          ) : (
+                            <div class="price-val">{m.price_from ? `${Number(m.price_from).toLocaleString('cs-CZ')} Kč` : '—'}</div>
+                          )}
                         </div>
                       </div>
                     </div>
@@ -300,10 +347,12 @@ const activeBrand = Astro.params.brand;
             const tagClass = fuelTagClass[fuelKey] ?? 'benzin';
             const tagLabel = fuelLabel[fuelKey] ?? '';
             const body = bodyLabel[m.body_type ?? ''] ?? m.body_type ?? '';
+            const promo = modelPromo(m);
             return (
-              <a class={`model-card${m.variant_badge_kind ? ` model-card--${String(m.variant_badge_kind).toLowerCase()}` : ''}`} href={`/model/${m.slug}`}>
+              <a class={`model-card${m.variant_badge_kind ? ` model-card--${String(m.variant_badge_kind).toLowerCase()}` : ''}${promo.active ? ' model-card--promo' : ''}`} href={`/model/${m.slug}`}>
                 <div class="pic">
                   {tagLabel && <span class={`fuel-tag ${tagClass}`}>{tagLabel}</span>}
+                  {promo.active && <span class="promo-tag">{promo.label}</span>}
                   {(m.hero_image_card || m.hero_image) && <DirectusImage src={m.hero_image_card || m.hero_image!} alt={`${brand.name} ${m.name}`} aspectRatio="4/3" />}
                 </div>
                 <div class="model-body">
@@ -312,8 +361,15 @@ const activeBrand = Astro.params.brand;
                   <div class="model-meta">Karoserie: {body || '—'} · Palivo: {tagLabel || '—'}</div>
                   <div class="model-foot">
                     <div>
-                      <div class="price-lab">Cena od</div>
-                      <div class="price-val">{m.price_from ? `${m.price_from.toLocaleString('cs-CZ')} Kč` : '—'}</div>
+                      <div class="price-lab">{promo.active && promo.discount > 0 ? 'Akční cena od' : 'Cena od'}</div>
+                      {promo.active && promo.discount > 0 ? (
+                        <>
+                          <div class="price-val price-val--promo">{promo.finalPrice.toLocaleString('cs-CZ')} Kč</div>
+                          <div class="price-strike">{Number(m.price_from).toLocaleString('cs-CZ')} Kč</div>
+                        </>
+                      ) : (
+                        <div class="price-val">{m.price_from ? `${Number(m.price_from).toLocaleString('cs-CZ')} Kč` : '—'}</div>
+                      )}
                     </div>
                     <span class="more">
                       Prozkoumat
@@ -372,7 +428,16 @@ const activeBrand = Astro.params.brand;
             const modelName = v.model?.name ?? 'Vůz';
             const carYear = v.model_year?.year ?? '';
             const conditionLabel = v.condition === 'new' ? 'Nové' : v.condition === 'demo' ? 'Předváděcí' : 'Ojeté';
-            const price = v.promo_price ?? v.list_price;
+            // Cena: stock.promo > model promo (jen u nových vozů) > list
+            const baseList = v.list_price;
+            let price = v.promo_price ?? baseList;
+            let priceBefore: number | null = null;
+            if (v.promo_price && baseList && v.promo_price < baseList) {
+              priceBefore = baseList;
+            } else if (modelPromoActive && modelPromoDiscount > 0 && baseList && isNew) {
+              price = baseList - modelPromoDiscount;
+              priceBefore = baseList;
+            }
             return (
               <a class="scard" href={`/sklad/${buildStockSlug(v, brand, v.model, v.trim_level ?? { name: trim })}`}>
                 <div class="pic">
@@ -387,7 +452,10 @@ const activeBrand = Astro.params.brand;
                     <span class="dot">{fmtKm(v.km)}</span>
                     <span class="dot">{conditionLabel}</span>
                   </div>
-                  <div class="price">{fmtPrice(price)}</div>
+                  <div class="price">
+                    {fmtPrice(price)}
+                    {priceBefore && <span class="price-before">{fmtPrice(priceBefore)}</span>}
+                  </div>
                 </div>
               </a>
             );
