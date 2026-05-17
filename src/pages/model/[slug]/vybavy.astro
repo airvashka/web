@@ -376,7 +376,8 @@ function trimPrice(t: TrimLevel): string {
         //   number/numeric string → "14 900 Kč" (orange)
         //   "standard" / "s" / 0  → "V ceně" (green)
         //   "-" / null / "" / "unavailable" → "—" (gray)
-        const fmtCell = (v: any): { text: string; cls: string } => {
+        // Pozn.: žádné TS anotace tady — JSX expression je JS, ne TS.
+        const fmtCell = (v) => {
           if (v === undefined || v === null || v === '' || v === '-' || v === '–') return { text: '—', cls: 'cell-unavail' };
           const s = typeof v === 'string' ? v.trim().toLowerCase() : '';
           if (s === 'unavailable' || s === 'nedostupné') return { text: '—', cls: 'cell-unavail' };
