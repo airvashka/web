@@ -6,6 +6,7 @@ import Breadcrumbs from '@components/Breadcrumbs.astro';
 import JsonLd from '@components/JsonLd.astro';
 import HighlightsPanel from '@components/HighlightsPanel.astro';
 import VariantBadge from '@components/VariantBadge.astro';
+import Disclaimer from '@components/Disclaimer.astro';
 import { directusGet, directusAsset } from '@lib/directus';
 import { buildStockSlug } from '@lib/stockSlug';
 import { getGroupedFeatures, countFeatures } from '@lib/features';
@@ -954,6 +955,8 @@ if (promoActive && promoDescription) {
             </span>
           </a>
         </div>
+
+        <Disclaimer kind="price" />
       </div>
     </section>
   )}
@@ -1017,6 +1020,7 @@ if (promoActive && promoDescription) {
             </div>
           ))}
         </div>
+        <Disclaimer kind="tech" />
       </div>
     </section>
   )}

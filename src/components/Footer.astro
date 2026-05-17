@@ -1,4 +1,5 @@
 ---
+import Disclaimer from '@components/Disclaimer.astro';
 const year = new Date().getFullYear();
 ---
 
@@ -68,9 +69,27 @@ const year = new Date().getFullYear();
       </div>
     </div>
 
+    <div class="footer-disclaimer">
+      <Disclaimer kind="full" />
+    </div>
+
     <div class="footer-bottom">
       <span>© {year} SFR Motor s.r.o. · IČO 08263523</span>
       <span><a href="/informace/cookies">Cookies</a> · <a href="/informace/ochrana-udaju">GDPR</a></span>
     </div>
   </div>
 </footer>
+
+<style>
+  .footer-disclaimer {
+    margin-top: 32px;
+    padding-top: 20px;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+  }
+  .footer-disclaimer :global(.disclaimer) {
+    color: rgba(255, 255, 255, 0.45);
+    font-size: 11px;
+    max-width: none;
+    margin: 0;
+  }
+</style>

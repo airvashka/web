@@ -1,0 +1,42 @@
+---
+/**
+ * Disclaimer — malé právní upozornění.
+ *
+ * Použití:
+ *   <Disclaimer kind="price" />     — u ceníků, trim karet, srovnání výbav
+ *   <Disclaimer kind="tech" />      — u technických údajů, motor/spotřeba/rozměry
+ *
+ * Vychází z oficiálních KGM disclaimerů, zkráceno do uživatelsky čitelné formy.
+ * Pro kompletní právní výhradu je v patičce stránky (Footer.astro) varianta `kind="full"`.
+ */
+
+interface Props {
+  kind: 'price' | 'tech' | 'full';
+  class?: string;
+}
+
+const { kind, class: className = '' } = Astro.props;
+
+const text =
+  kind === 'price'
+    ? 'Uvedené ceny, údaje a vyobrazení jsou pouze informativní a nezávazné. Vyhrazujeme si právo změny cen a provedení bez předchozího upozornění. Pro konkrétní závaznou nabídku nás kontaktujte. Fotografie jsou ilustrativní.'
+    : kind === 'tech'
+    ? 'Uvedené technické údaje jsou orientační a mohou se mírně lišit podle regionální specifikace, modelového roku nebo finální homologace. Aktuální parametry konkrétního vozu rádi ověříme při poptávce.'
+    : 'Veškeré informace na tomto webu — ceny, výbavy, technické údaje, vyobrazení a dostupnost — jsou pouze informativní a nezávazné. Vyhrazujeme si právo změny bez předchozího upozornění. Technická data se mohou lišit podle regionální specifikace, modelového roku nebo finální homologace. Fotografie jsou ilustrativní. Závaznou nabídku poskytneme po individuální poptávce.';
+---
+
+<p class={`disclaimer ${className}`}>
+  {text}
+</p>
+
+<style>
+  .disclaimer {
+    font-size: 11.5px;
+    line-height: 1.55;
+    color: var(--text-muted, rgba(255, 255, 255, 0.5));
+    max-width: 80ch;
+    margin: 16px 0 0;
+    font-style: italic;
+    opacity: 0.85;
+  }
+</style>

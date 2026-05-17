@@ -1,6 +1,7 @@
 ---
 import BaseLayout from '@layouts/BaseLayout.astro';
 import Breadcrumbs from '@components/Breadcrumbs.astro';
+import Disclaimer from '@components/Disclaimer.astro';
 import { directusGet } from '@lib/directus';
 import { getGroupedFeatures, CATEGORY_ORDER, CATEGORY_LABELS } from '@lib/features';
 import type { Brand, Model, ModelYear, TrimLevel } from '@lib/types';
@@ -477,6 +478,9 @@ function trimPrice(t: TrimLevel): string {
           </section>
         );
       })()}
+
+      <Disclaimer kind="price" />
+
 
       <div style="margin-top: 64px; padding: 28px; background: var(--bg-soft); border-radius: var(--radius); display: flex; gap: 16px; align-items: center; flex-wrap: wrap;">
         <div style="flex: 1; min-width: 280px;">
