@@ -121,7 +121,7 @@ const mapEmbedUrl = 'https://maps.google.com/maps?q=%C4%8Eablicka+553%2F2%2C+182
         <div class="team-block-v2">
           <div class="team-head-v2">
             <h3>{block.title}</h3>
-            <span class="team-count">{block.people.length} {block.people.length === 1 ? 'osoba' : block.people.length <= 4 ? 'osoby' : 'osob'}</span>
+            <span class="team-count">{block.people.length} {block.people.length === 1 ? 'osoba' : block.people.length > 4 ? 'osob' : 'osoby'}</span>
           </div>
           <div class="team-grid-v2">
             {block.people.map((p) => (
