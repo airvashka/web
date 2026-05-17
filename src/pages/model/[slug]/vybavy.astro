@@ -220,12 +220,17 @@ function trimPrice(t: TrimLevel): string {
               <thead>
                 <tr>
                   <th class="compare-feature-head">Prvek výbavy</th>
-                  {trims.map((t) => (
-                    <th class="compare-trim-head">
-                      <div class="compare-trim-name">{t.name}</div>
-                      <div class="compare-trim-price">{trimPrice(t)}</div>
-                    </th>
-                  ))}
+                  {trims.map((t) => {
+                    const isHighlighted = !!(t as any).is_highlighted;
+                    const highlightLabel = ((t as any).highlight_label || '').trim() || 'Doporučujeme';
+                    return (
+                      <th class={`compare-trim-head${isHighlighted ? ' compare-trim-head--highlighted' : ''}`}>
+                        {isHighlighted && <div class="compare-trim-badge">{highlightLabel}</div>}
+                        <div class="compare-trim-name">{t.name}</div>
+                        <div class="compare-trim-price">{trimPrice(t)}</div>
+                      </th>
+                    );
+                  })}
                 </tr>
               </thead>
               <tbody>
@@ -242,22 +247,23 @@ function trimPrice(t: TrimLevel): string {
                         </td>
                         {trims.map((t) => {
                           const v = row.cells[String(t.id)];
+                          const hl = !!(t as any).is_highlighted ? ' compare-cell--highlighted' : '';
                           if (v === 'standard') {
                             return (
-                              <td class="compare-cell has">
+                              <td class={`compare-cell has${hl}`}>
                                 <span class="compare-check">✓</span>
                               </td>
                             );
                           }
                           if (typeof v === 'object' && v && 'price' in v) {
                             return (
-                              <td class="compare-cell optional">
+                              <td class={`compare-cell optional${hl}`}>
                                 <span class="compare-price">{v.price.toLocaleString('cs-CZ')} Kč</span>
                               </td>
                             );
                           }
                           return (
-                            <td class="compare-cell missing">
+                            <td class={`compare-cell missing${hl}`}>
                               <span class="compare-dash">—</span>
                             </td>
                           );
@@ -538,10 +544,42 @@ function trimPrice(t: TrimLevel): string {
   .compare-trim-head {
     width: calc(58% / var(--trim-count, 4));
     text-align: center !important;
+    position: relative;
   }
   .compare-trim-head .compare-trim-name,
   .compare-trim-head .compare-trim-price {
     text-align: center;
+  }
+
+  /* Zvýrazněný trim sloupec — accent border + tmavé pozadí */
+  .compare-trim-head--highlighted {
+    background: linear-gradient(180deg, #0b0b0c 0%, #1a1a1c 100%) !important;
+    box-shadow: inset 3px 0 0 0 var(--accent, #F25C1B), inset -3px 0 0 0 var(--accent, #F25C1B);
+  }
+  .compare-trim-head--highlighted .compare-trim-name { color: #fff; }
+  .compare-trim-head--highlighted .compare-trim-price { color: rgba(255, 255, 255, 0.75); }
+  .compare-trim-badge {
+    display: inline-block;
+    font-family: var(--font-display);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 4px 9px;
+    margin-bottom: 8px;
+    background: var(--accent, #F25C1B);
+    color: #fff;
+    border-radius: 4px;
+    white-space: nowrap;
+  }
+  /* Buňky ve zvýrazněném sloupci — subtle accent strip + bg, ale color cells si drží význam */
+  .compare-cell--highlighted {
+    box-shadow: inset 3px 0 0 0 var(--accent, #F25C1B), inset -3px 0 0 0 var(--accent, #F25C1B);
+    background: rgba(242, 92, 27, 0.04) !important;
+  }
+  /* Hover override pro highlighted column */
+  .compare-table tbody tr:hover td.compare-cell--highlighted {
+    background: rgba(242, 92, 27, 0.10) !important;
   }
   .compare-trim-name {
     font-family: var(--font-display);
