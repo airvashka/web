@@ -190,17 +190,17 @@ const articles = articlesRaw.map((a) => {
             </div>
           );
         })}
-        <!-- 4. dlaždice — Promo skladovka (live status redesign) -->
+        <!-- 4. dlaždice — Promo skladovka (live status redesign + watermark) -->
         <div class="btile is-promo">
           <div class="btile-stripes" aria-hidden="true"></div>
+          <span class="btile-watermark" aria-hidden="true">SKLADOVÉ<br/>VOZY</span>
           <div class="btile-body">
             <div class="btile-live">
               <span class="live-dot" aria-hidden="true"></span>
               <span>Aktualizováno dnes</span>
             </div>
-            <div class="btile-eyebrow">Skladové &amp; předváděcí vozy</div>
             <div class="btile-name">K odjezdu dnes.</div>
-            <p class="btile-lead">Přes {totalStockCount} vozů na skladu napříč všemi značkami. Kompletně připravené k převzetí.</p>
+            <p class="btile-lead">Přes {totalStockCount} vozů na skladu napříč všemi značkami — kompletně připravené k převzetí.</p>
             <div class="btile-stats">
               <div class="btile-stat">
                 <div class="v">{totalStockCount}</div>
