@@ -44,24 +44,43 @@ const modelYears = await directusGet<ModelYear & { pricelist_colors?: any }>('mo
 });
 const latestYear = modelYears[0];
 
-// Pricelist colors (z ceníku) — tabulkový výpis pro sekci pod matricí
+// Pricelist colors (z ceníku) — preferuje NOVÉ tabulkové fieldy, fallback na legacy JSON.
 type PricelistColor = {
   name: string;
   code?: string;
   type?: string;
   material?: string;
-  pricing_per_trim?: Record<string, number | string>;
+  // pricing_per_trim může být buď object {slug: price} (legacy) nebo array [{trim_slug, price}] (nové)
+  pricing_per_trim?: Record<string, number | string> | Array<{ trim_slug: string; price: number }>;
 };
 const pricelistColors: { exterior: PricelistColor[]; interior: PricelistColor[] } = (() => {
-  const raw = (latestYear as any)?.pricelist_colors;
+  const yr = latestYear as any;
+  if (!yr) return { exterior: [], interior: [] };
+
+  // Preferuj nové fieldy
+  const newExt = Array.isArray(yr.pricelist_colors_exterior) ? yr.pricelist_colors_exterior : null;
+  const newInt = Array.isArray(yr.pricelist_colors_interior) ? yr.pricelist_colors_interior : null;
+  if (newExt || newInt) return { exterior: newExt ?? [], interior: newInt ?? [] };
+
+  // Fallback: legacy JSON object pricelist_colors
+  const raw = yr.pricelist_colors;
   if (!raw) return { exterior: [], interior: [] };
-  // Pokud uloženo jako string (legacy), parsuj
   const obj = typeof raw === 'string' ? (() => { try { return JSON.parse(raw); } catch { return null; } })() : raw;
   return {
     exterior: Array.isArray(obj?.exterior) ? obj.exterior : [],
     interior: Array.isArray(obj?.interior) ? obj.interior : [],
   };
 })();
+
+/** Universal pricing accessor — funguje pro object i pole. */
+function getPriceForTrim(pricing: PricelistColor['pricing_per_trim'], trimSlug: string): number | string | undefined {
+  if (!pricing) return undefined;
+  if (Array.isArray(pricing)) {
+    const found = pricing.find((p) => p.trim_slug === trimSlug);
+    return found ? found.price : undefined;
+  }
+  return pricing[trimSlug];
+}
 
 // VŠECHNY trimy (i unfeatured)
 const trims: TrimLevel[] = latestYear
@@ -387,7 +406,7 @@ function trimPrice(t: TrimLevel): string {
                           <td class="muted-cell">{c.code ?? '—'}</td>
                           <td>{c.type ?? '—'}</td>
                           {trimSlugs.map((t) => (
-                            <td class="num">{fmtCell(c.pricing_per_trim?.[t.slug])}<span class="kc"> Kč</span></td>
+                            <td class="num">{fmtCell(getPriceForTrim(c.pricing_per_trim, t.slug))}<span class="kc"> Kč</span></td>
                           ))}
                         </tr>
                       ))}
@@ -417,7 +436,7 @@ function trimPrice(t: TrimLevel): string {
                           <td class="muted-cell">{c.code ?? '—'}</td>
                           <td>{c.material ?? '—'}</td>
                           {trimSlugs.map((t) => (
-                            <td class="num">{fmtCell(c.pricing_per_trim?.[t.slug])}<span class="kc"> Kč</span></td>
+                            <td class="num">{fmtCell(getPriceForTrim(c.pricing_per_trim, t.slug))}<span class="kc"> Kč</span></td>
                           ))}
                         </tr>
                       ))}

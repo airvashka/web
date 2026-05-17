@@ -267,31 +267,44 @@ export const POST: APIRoute = async ({ request }) => {
       }
     }
 
-    // 4) Barvy z ceníku → model_years.pricelist_colors (JSON tabulkový výpis).
-    //    NE do model_color_exterior/_interior — ty jsou pro showroom barvy s fotkama,
-    //    manuálně kurátované. Tady jen ceníková data pro tabulku na /vybavy.
+    // 4) Barvy z ceníku → model_years.pricelist_colors_exterior + _interior (tabulkové fieldy).
+    //    pricing_per_trim ukládáme jako pole [{trim_slug, price}] (kvůli Directus list interface).
+    //    NE do model_color_exterior/_interior — ty jsou pro showroom barvy s fotkama.
     const extColors = Array.isArray(data.colors_exterior) ? data.colors_exterior : [];
     const intColors = Array.isArray(data.colors_interior) ? data.colors_interior : [];
     if (extColors.length > 0 || intColors.length > 0) {
       try {
-        const pricelistColors = {
-          exterior: extColors.map((c: any) => ({
-            name: String(c.name ?? '').trim(),
-            code: c.code ? String(c.code).trim() : '',
-            type: c.type ? String(c.type).trim() : '',
-            pricing_per_trim: c.pricing_per_trim && typeof c.pricing_per_trim === 'object' ? c.pricing_per_trim : {},
-          })).filter((c) => c.name),
-          interior: intColors.map((c: any) => ({
-            name: String(c.name ?? '').trim(),
-            code: c.code ? String(c.code).trim() : '',
-            material: c.material ? String(c.material).trim() : '',
-            pricing_per_trim: c.pricing_per_trim && typeof c.pricing_per_trim === 'object' ? c.pricing_per_trim : {},
-          })).filter((c) => c.name),
+        // {slug: price} → [{trim_slug, price}]
+        const pricingToList = (p: any): Array<{ trim_slug: string; price: number }> => {
+          if (!p) return [];
+          if (Array.isArray(p)) return p.filter((x) => x && x.trim_slug); // už pole
+          if (typeof p !== 'object') return [];
+          return Object.entries(p)
+            .filter(([k, v]) => k && v !== null && v !== undefined && v !== 'unavailable' && v !== 'standard')
+            .map(([trim_slug, v]) => ({ trim_slug: String(trim_slug), price: Number(v) || 0 }));
         };
-        await dapi(directus_token, 'PATCH', `/items/model_years/${model_year_id}`, { pricelist_colors: pricelistColors });
-        summary.colors_ext_updated = pricelistColors.exterior.length;
-        summary.colors_int_updated = pricelistColors.interior.length;
-        summary.details.push(`Pricelist colors: ${pricelistColors.exterior.length} exteriér + ${pricelistColors.interior.length} interiér → model_years.pricelist_colors`);
+
+        const exteriorList = extColors.map((c: any) => ({
+          name: String(c.name ?? '').trim(),
+          code: c.code ? String(c.code).trim() : '',
+          type: c.type ? String(c.type).trim() : '',
+          pricing_per_trim: pricingToList(c.pricing_per_trim),
+        })).filter((c) => c.name);
+
+        const interiorList = intColors.map((c: any) => ({
+          name: String(c.name ?? '').trim(),
+          code: c.code ? String(c.code).trim() : '',
+          material: c.material ? String(c.material).trim() : '',
+          pricing_per_trim: pricingToList(c.pricing_per_trim),
+        })).filter((c) => c.name);
+
+        await dapi(directus_token, 'PATCH', `/items/model_years/${model_year_id}`, {
+          pricelist_colors_exterior: exteriorList,
+          pricelist_colors_interior: interiorList,
+        });
+        summary.colors_ext_updated = exteriorList.length;
+        summary.colors_int_updated = interiorList.length;
+        summary.details.push(`Pricelist colors: ${exteriorList.length} exteriér + ${interiorList.length} interiér → pricelist_colors_exterior/_interior`);
       } catch (e) {
         summary.errors.push(`Pricelist colors: ${(e as Error).message}`);
       }
