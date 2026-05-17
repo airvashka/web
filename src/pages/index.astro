@@ -105,7 +105,7 @@ const articles = [
   <section class="hhero" data-screen-label="01 Hero">
     <div class="hhero-bg">
       {heroImageId ? (
-        <DirectusImage src={heroImageId} alt="" aspectRatio="auto" widths={[1200, 2000, 2400]} loading="eager" fetchpriority="high" />
+        <DirectusImage src={heroImageId} alt="" fill widths={[1280, 1920, 2560, 3200]} sizes="100vw" loading="eager" fetchpriority="high" />
       ) : (
         <img src="/hero-home.jpg" alt="" onerror="this.style.display='none'" />
       )}

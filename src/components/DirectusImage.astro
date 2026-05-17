@@ -26,6 +26,7 @@ interface Props {
   sizes?: string;                     // CSS sizes hint pro browser
   aspectRatio?: string;               // "16/10", "4/3", "1/1"
   fit?: 'cover' | 'contain';
+  fill?: boolean;                     // true = vyplní celý parent (width+height 100%), object-fit: cover
   loading?: 'lazy' | 'eager';
   fetchpriority?: 'high' | 'low' | 'auto';
   class?: string;
@@ -39,6 +40,7 @@ const {
   sizes = '(max-width: 700px) 100vw, (max-width: 1200px) 50vw, 33vw',
   aspectRatio,
   fit = 'cover',
+  fill = false,
   loading = 'lazy',
   fetchpriority,
   class: className = '',
@@ -48,6 +50,10 @@ const {
 const styleParts: string[] = [];
 if (aspectRatio) styleParts.push(`aspect-ratio: ${aspectRatio}`);
 if (fit) styleParts.push(`object-fit: ${fit}`);
+if (fill) {
+  // Fill mode — vyplní celý parent. Použij pro absolutně pozicované hero pozadí.
+  styleParts.push('width: 100%', 'height: 100%');
+}
 const style = styleParts.join('; ');
 
 const hasSrc = !!src;
