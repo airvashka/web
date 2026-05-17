@@ -85,13 +85,40 @@ const services = [
   { nm: 'Přezutí a uskladnění', price: '1 490 Kč' },
 ];
 
-// Magazín placeholder (TODO: vytvořit CMS collection "articles")
-const articles = [
-  { date: '28. 4. 2026', tag: 'Test', title: 'KGM Torres EVX: Elektrický outdoor bez kompromisů' },
-  { date: '12. 4. 2026', tag: 'Servis', title: 'Jak často měnit olej a proč na tom záleží' },
-  { date: '10. 4. 2026', tag: 'Novinky', title: 'Omoda 9 & Jaecoo 7: Technologie, které posouvají hranice' },
-  { date: '3. 4. 2026', tag: 'Tipy', title: 'Přezutí včas: bezpečnost začíná u pneumatik' },
-];
+// Magazín — 4 nejnovější published články z Directusu
+const articlesRaw = await directusGet<any>('articles', {
+  filter: { status: { _eq: 'published' } },
+  sort: ['-date_published', '-id'],
+  limit: 4,
+  fields: ['id', 'slug', 'title', 'category', 'date_published', 'cover_image'],
+});
+
+// Mapování category enum → user-friendly tag label
+const CATEGORY_LABELS: Record<string, string> = {
+  recenze: 'Recenze',
+  test: 'Test',
+  novinka: 'Novinky',
+  srovnani: 'Srovnání',
+  technologie: 'Technologie',
+  servis: 'Servis',
+  znacka: 'Značka',
+  zpravy: 'Zprávy',
+};
+
+const articles = articlesRaw.map((a) => {
+  let dateStr = '';
+  if (a.date_published) {
+    const d = new Date(a.date_published);
+    dateStr = `${d.getDate()}. ${d.getMonth() + 1}. ${d.getFullYear()}`;
+  }
+  return {
+    slug: a.slug,
+    title: a.title,
+    tag: CATEGORY_LABELS[a.category] ?? a.category ?? '',
+    date: dateStr,
+    cover: a.cover_image ?? null,
+  };
+});
 ---
 
 <BaseLayout
@@ -319,36 +346,38 @@ const articles = [
   <InstagramStrip />
 
   <!-- ===== MAGAZÍN ===== -->
-  <section class="magazin" data-screen-label="05 Magazín">
-    <div class="container">
-      <div class="magazin-head">
-        <div>
-          <div class="section-eyebrow">Magazín</div>
-          <h2>Co u nás právě jede</h2>
-        </div>
-        <a class="head-link" href="#">
-          Všechny články
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
-        </a>
-      </div>
-      <div class="mag-grid">
-        {articles.map((a) => (
-          <a class="mag-card" href="#">
-            <div class="pic">
-              {/* TODO: foto k článku */}
-            </div>
-            <div class="mag-meta">
-              <span>{a.date}</span>
-              <span class="tag">{a.tag}</span>
-            </div>
-            <div class="mag-title">{a.title}</div>
-            <span class="mag-link">
-              Číst článek
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
-            </span>
+  {articles.length > 0 && (
+    <section class="magazin" data-screen-label="05 Magazín">
+      <div class="container">
+        <div class="magazin-head">
+          <div>
+            <div class="section-eyebrow">Magazín</div>
+            <h2>Co u nás právě jede</h2>
+          </div>
+          <a class="head-link" href="/magazin">
+            Všechny články
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
           </a>
-        ))}
+        </div>
+        <div class="mag-grid">
+          {articles.map((a) => (
+            <a class="mag-card" href={`/magazin/${a.slug}`}>
+              <div class="pic">
+                {a.cover && <DirectusImage src={a.cover} alt={a.title} aspectRatio="4/3" />}
+              </div>
+              <div class="mag-meta">
+                <span>{a.date}</span>
+                {a.tag && <span class="tag">{a.tag}</span>}
+              </div>
+              <div class="mag-title">{a.title}</div>
+              <span class="mag-link">
+                Číst článek
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+              </span>
+            </a>
+          ))}
+        </div>
       </div>
-    </div>
-  </section>
+    </section>
+  )}
 </BaseLayout>
