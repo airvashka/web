@@ -2780,22 +2780,25 @@ button.thumb-more {
   margin: 0 0 28px;
   display: block;
 }
+/* Single logo (KGM, Farizon) — wordmark vyplňuje celou výšku */
 .bhero-title--with-logo .bhero-logo {
-  height: clamp(48px, 6vw, 80px);
-  max-width: min(540px, 80vw);
+  height: clamp(32px, 3.6vw, 52px);
+  max-width: min(320px, 55vw);
 }
-/* Combined logo (OMODA+JAECOO) je extra široké — cap aby nedominovalo */
+/* Combined logo (OMODA+JAECOO) — vyšší kontejner protože vnitřní wordmarky
+   jsou ztlumené na 60-90 %, ale max-width je menší aby šířka neutíkala */
 .bhero-title--with-logo .brand-logo--combined.bhero-logo {
-  height: clamp(36px, 4.5vw, 56px);
-  max-width: min(440px, 80vw);
+  height: clamp(40px, 5vw, 64px);
+  max-width: min(280px, 55vw);
 }
 @media (max-width: 700px) {
   .bhero-title--with-logo .bhero-logo {
-    height: clamp(36px, 9vw, 56px);
-    max-width: 70vw;
+    height: clamp(24px, 6vw, 36px);
+    max-width: 50vw;
   }
   .bhero-title--with-logo .brand-logo--combined.bhero-logo {
-    height: clamp(28px, 6.5vw, 40px);
+    height: clamp(30px, 7.5vw, 44px);
+    max-width: 60vw;
   }
 }
 .bhero-tagline {

@@ -70,17 +70,18 @@ const isCombined = slug === 'omoda-jaecoo';
     object-fit: contain;
     display: block;
   }
-  /* OMODA má těsnější viewBox (letters fill ~95% výšky SVG) — zmenšit aby
-     vizuálně letter-height seděl s JAECOO (kde letters fill ~76% výšky SVG). */
+  /* OMODA má těsnější viewBox (letters fill ~95 % výšky SVG) — zmenšit aby
+     vizuálně letter-height seděl s JAECOO (kde letters fill ~76 % výšky SVG).
+     Matematicky: OMODA height = JAECOO height × 0.76. */
   .brand-logo-img--omoda {
-    height: 65%;
+    height: 70%;
   }
   .brand-logo-img--jaecoo {
-    height: 85%;
+    height: 92%;
   }
   .brand-logo-divider {
     width: 2px;
-    height: 70%;
+    height: 65%;
     align-self: center;
     background: rgb(209, 0, 16);
     flex-shrink: 0;
