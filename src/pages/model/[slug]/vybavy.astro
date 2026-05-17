@@ -225,7 +225,9 @@ function trimPrice(t: TrimLevel): string {
                     const highlightLabel = ((t as any).highlight_label || '').trim() || 'Doporučujeme';
                     return (
                       <th class={`compare-trim-head${isHighlighted ? ' compare-trim-head--highlighted' : ''}`}>
-                        {isHighlighted && <div class="compare-trim-badge">{highlightLabel}</div>}
+                        {isHighlighted && (
+                          <div class="compare-trim-badge" title={highlightLabel}>{highlightLabel}</div>
+                        )}
                         <div class="compare-trim-name">{t.name}</div>
                         <div class="compare-trim-price">{trimPrice(t)}</div>
                       </th>
@@ -559,18 +561,24 @@ function trimPrice(t: TrimLevel): string {
   .compare-trim-head--highlighted .compare-trim-name { color: #fff; }
   .compare-trim-head--highlighted .compare-trim-price { color: rgba(255, 255, 255, 0.75); }
   .compare-trim-badge {
-    display: inline-block;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    overflow: hidden;
+    text-overflow: ellipsis;
     font-family: var(--font-display);
     font-size: 10px;
     font-weight: 700;
     letter-spacing: 0.12em;
     text-transform: uppercase;
     padding: 4px 9px;
-    margin-bottom: 8px;
+    margin: 0 auto 8px;
     background: var(--accent, #F25C1B);
     color: #fff;
     border-radius: 4px;
-    white-space: nowrap;
+    line-height: 1.25;
+    max-width: 100%;
+    /* Když uživatel hodí dlouhý text, ukáže se v 2 řádcích + ellipsis. Tooltip = title. */
   }
   /* Buňky ve zvýrazněném sloupci — subtle accent strip + bg, ale color cells si drží význam */
   .compare-cell--highlighted {

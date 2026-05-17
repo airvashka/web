@@ -860,9 +860,11 @@ if (promoActive && promoDescription) {
                   extraCount = Math.max(0, diff.length - teaserItems.length);
                 }
 
+                const highlightNote = isRecommended ? ((t as any).highlight_note || '').trim() : '';
                 return (
                   <div class={cls}>
                     {isRecommended && <div class="trim-badge">{highlightLabel}</div>}
+                    {highlightNote && <div class="trim-highlight-note">{highlightNote}</div>}
                     <div class="trim-name">{t.name}</div>
                     <div class="trim-price">{price.toLocaleString('cs-CZ')} Kč</div>
                     <div class="trim-teaser">

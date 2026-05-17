@@ -83,13 +83,31 @@ async function main() {
         interface: 'input',
         width: 'half',
         sort: 15,
-        note: 'Text badge na zvýrazněné kartě (např. "Doporučujeme", "Nejprodávanější", "Akce", "Nejlepší volba"). Pokud prázdné, použije se "Doporučujeme".',
+        note: 'KRÁTKÝ text badge (doporučeno max 20 znaků). Např. "Doporučujeme", "Nejprodávanější", "Akce", "Nejlepší volba". Defaultně "Doporučujeme". Pro delší marketing text použij Highlight Note níže.',
         options: { placeholder: 'Doporučujeme' },
       },
     });
     ok('trim_levels.highlight_label přidán');
   } else {
     info('trim_levels.highlight_label už existuje');
+  }
+
+  if (!(await fieldExists('trim_levels', 'highlight_note'))) {
+    await api('POST', '/fields/trim_levels', {
+      field: 'highlight_note',
+      type: 'text',
+      schema: { is_nullable: true },
+      meta: {
+        interface: 'input-multiline',
+        width: 'full',
+        sort: 16,
+        note: 'Volitelný delší marketing text, zobrazí se POD badge na trim kartě (na model detailu). V srovnávací matrici se NEzobrazí (tam je málo místa). Příklad: "Nadstandardní výbavu zdarma (Style+ paket) v hodnotě 30 000 Kč."',
+        options: { placeholder: 'Např. Nadstandardní výbava v hodnotě 30 000 Kč zdarma.' },
+      },
+    });
+    ok('trim_levels.highlight_note přidán');
+  } else {
+    info('trim_levels.highlight_note už existuje');
   }
 
   console.log('\n═══════════════════════════════════════════════');
