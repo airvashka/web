@@ -1,0 +1,92 @@
+---
+/**
+ * BrandLogo — vykreslí logo značky jako wordmark.
+ *
+ * Použití:
+ *   <BrandLogo slug="kgm" variant="light" height={48} />
+ *   <BrandLogo slug="omoda-jaecoo" variant="dark" />
+ *   <BrandLogo slug="farizon" />
+ *
+ * - `slug` = brand.slug z Directusu (kgm | omoda-jaecoo | farizon)
+ * - `variant` = "dark" (default — černé logo pro světlé pozadí) | "light" (bílé pro tmavé)
+ * - `height` = výška v px (default 48)
+ *
+ * SEO note: logo je VŽDY doplněno o `aria-label` se jménem značky, takže
+ * čtečky obrazovky i Google bot vědí co je v obrázku. H1 textový zůstává.
+ */
+
+interface Props {
+  slug: string;
+  variant?: 'dark' | 'light';
+  height?: number;
+  class?: string;
+}
+
+const { slug, variant = 'dark', height = 48, class: className = '' } = Astro.props;
+
+const BRAND_LABELS: Record<string, string> = {
+  'kgm': 'KGM',
+  'omoda-jaecoo': 'OMODA & JAECOO',
+  'farizon': 'Farizon',
+};
+const label = BRAND_LABELS[slug] ?? slug.toUpperCase();
+
+// OMODA & JAECOO je kombinované logo — dva wordmarky s červeným dělítkem
+const isCombined = slug === 'omoda-jaecoo';
+---
+
+{isCombined ? (
+  <span class={`brand-logo brand-logo--combined ${className} variant-${variant}`} aria-label={label} role="img" style={`height: ${height}px;`}>
+    <img src="/brand-logos/omoda.svg" alt="" class="brand-logo-img" />
+    <span class="brand-logo-divider" aria-hidden="true"></span>
+    <img src="/brand-logos/jaecoo.svg" alt="" class="brand-logo-img" />
+  </span>
+) : (
+  <img
+    src={`/brand-logos/${slug}.svg`}
+    alt={label}
+    class={`brand-logo brand-logo--single ${className} variant-${variant}`}
+    style={`height: ${height}px;`}
+  />
+)}
+
+<style>
+  .brand-logo {
+    display: inline-flex;
+    align-items: center;
+    line-height: 1;
+  }
+  .brand-logo--single {
+    width: auto;
+    object-fit: contain;
+  }
+  .brand-logo--combined {
+    gap: 14px;
+  }
+  .brand-logo-img {
+    height: 100%;
+    width: auto;
+    object-fit: contain;
+    display: block;
+  }
+  .brand-logo-divider {
+    width: 2px;
+    align-self: stretch;
+    background: rgb(209, 0, 16);
+    flex-shrink: 0;
+  }
+
+  /* Tmavé (default) — logo má svojí původní barvu (černé) */
+  .variant-dark {
+    /* nothing — defaultní barva */
+  }
+
+  /* Světlé varianta — invertuje SVG na bílé (zachovává průhledné pozadí) */
+  .variant-light.brand-logo--single {
+    filter: brightness(0) invert(1);
+  }
+  .variant-light .brand-logo-img {
+    filter: brightness(0) invert(1);
+  }
+  /* Červené dělítko ponecháváme i v light variantě (charakteristický prvek brandu) */
+</style>
