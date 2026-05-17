@@ -831,7 +831,14 @@ if (promoActive && promoDescription) {
           return (
             <div class={`trims trims-${trims.length}`}>
               {trims.map((t, i) => {
-                const isRecommended = i === trims.length - 1 && trims.length > 1;
+                // Manuální highlight: trim.is_highlighted (Directus toggle).
+                // Backwards compat: pokud žádný trim nemá is_highlighted nastaveno
+                // a je víc než 1 trim, zvýrazni poslední (původní auto chování).
+                const anyHighlighted = trims.some((x) => (x as any).is_highlighted);
+                const isRecommended = anyHighlighted
+                  ? !!(t as any).is_highlighted
+                  : (i === trims.length - 1 && trims.length > 1);
+                const highlightLabel = ((t as any).highlight_label || '').trim() || 'Doporučujeme';
                 const cls = isRecommended ? 'trim dark' : 'trim light';
                 const price = t.promo_price ?? t.list_price ?? 0;
                 const trimFeatureCount = countFeatures((t as any).features);
@@ -855,7 +862,7 @@ if (promoActive && promoDescription) {
 
                 return (
                   <div class={cls}>
-                    {isRecommended && <div class="trim-badge">Doporučujeme</div>}
+                    {isRecommended && <div class="trim-badge">{highlightLabel}</div>}
                     <div class="trim-name">{t.name}</div>
                     <div class="trim-price">{price.toLocaleString('cs-CZ')} Kč</div>
                     <div class="trim-teaser">
