@@ -3701,27 +3701,16 @@ button.thumb-more {
   justify-content: space-between;
   gap: 24px;
 }
+/* Eyebrow, h3 a lead dědí ze základní .split-card definice (stejné rozměry
+   jako Servis card vlevo). Tady jen override barev pro tmavé pozadí fotky. */
 .split-card--eshop .eyebrow {
   color: var(--accent, #B4762E);
-  font-size: 12px;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  font-weight: 600;
-  margin-bottom: 10px;
 }
 .split-card--eshop h3 {
-  font-family: var(--font-display);
-  font-size: clamp(28px, 3vw, 38px);
-  font-weight: 700;
-  letter-spacing: -0.02em;
-  margin: 0 0 12px;
   color: #fff;
 }
 .split-card--eshop .lead {
   color: rgba(255, 255, 255, 0.85);
-  max-width: 38ch;
-  font-size: 15px;
-  line-height: 1.5;
   margin: 0;
 }
 .split-card--eshop .btn-primary {
