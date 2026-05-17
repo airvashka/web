@@ -45,6 +45,8 @@ const rawModels = await directusGet<ModelRaw>('models', {
     '*',
     'highlights_panel',
     'variant_badge_kind',
+    'hero_video',         // explicit UUID file ref (some Directus versions don't include in *)
+    'hero_image_card',
     'gallery.directus_files_id',
     'color_exterior.*',
     'color_interior.*',
@@ -438,21 +440,32 @@ if (promoActive && promoDescription) {
   <!-- ===== MODEL HERO (dark, full-bleed) ===== -->
   <section class="mhero" data-screen-label="01 Hero">
     <div class="mhero-bg">
-      {(rawModel as any).hero_video ? (
-        <video
-          class="mhero-video"
-          autoplay
-          muted
-          loop
-          playsinline
-          preload="metadata"
-          poster={rawModel.hero_image ? directusAsset(rawModel.hero_image, { width: 1600, format: 'jpg', quality: 80 }) : undefined}
-        >
-          <source src={directusAsset((rawModel as any).hero_video)} />
-        </video>
-      ) : (
-        rawModel.hero_image && <DirectusImage src={rawModel.hero_image} alt={`${brand.name} ${rawModel.name}`} aspectRatio="auto" loading="eager" fetchpriority="high" widths={[1200, 1920, 2400]} />
-      )}
+      {(() => {
+        // hero_video může být UUID string (default M2O) NEBO object { id, type, ... } (s expandem)
+        const hv = (rawModel as any).hero_video;
+        const videoId = typeof hv === 'string' ? hv : hv?.id;
+        const videoType = hv?.type || 'video/mp4';
+        if (videoId) {
+          return (
+            <video
+              class="mhero-video"
+              autoplay
+              muted
+              loop
+              playsinline
+              preload="metadata"
+              poster={rawModel.hero_image ? directusAsset(rawModel.hero_image, { width: 1600, format: 'jpg', quality: 80 }) : undefined}
+            >
+              <source src={directusAsset(videoId)} type={videoType} />
+              {/* Fallback pro browsery bez video support */}
+              {rawModel.hero_image && <img src={directusAsset(rawModel.hero_image, { width: 1600 })} alt={`${brand.name} ${rawModel.name}`} />}
+            </video>
+          );
+        }
+        return rawModel.hero_image
+          ? <DirectusImage src={rawModel.hero_image} alt={`${brand.name} ${rawModel.name}`} aspectRatio="auto" loading="eager" fetchpriority="high" widths={[1200, 1920, 2400]} />
+          : null;
+      })()}
     </div>
     <div class="container mhero-inner">
       <div class="mhero-eyebrow">
