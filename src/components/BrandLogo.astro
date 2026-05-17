@@ -37,9 +37,9 @@ const isCombined = slug === 'omoda-jaecoo';
 
 {isCombined ? (
   <span class={`brand-logo brand-logo--combined ${className} variant-${variant}`} aria-label={label} role="img" style={`height: ${height}px;`}>
-    <img src="/brand-logos/omoda.svg" alt="" class="brand-logo-img" />
+    <img src="/brand-logos/omoda.svg" alt="" class="brand-logo-img brand-logo-img--omoda" />
     <span class="brand-logo-divider" aria-hidden="true"></span>
-    <img src="/brand-logos/jaecoo.svg" alt="" class="brand-logo-img" />
+    <img src="/brand-logos/jaecoo.svg" alt="" class="brand-logo-img brand-logo-img--jaecoo" />
   </span>
 ) : (
   <img
@@ -61,7 +61,8 @@ const isCombined = slug === 'omoda-jaecoo';
     object-fit: contain;
   }
   .brand-logo--combined {
-    gap: 14px;
+    gap: 12px;
+    align-items: center;
   }
   .brand-logo-img {
     height: 100%;
@@ -69,9 +70,18 @@ const isCombined = slug === 'omoda-jaecoo';
     object-fit: contain;
     display: block;
   }
+  /* OMODA má těsnější viewBox (letters fill ~95% výšky SVG) — zmenšit aby
+     vizuálně letter-height seděl s JAECOO (kde letters fill ~76% výšky SVG). */
+  .brand-logo-img--omoda {
+    height: 65%;
+  }
+  .brand-logo-img--jaecoo {
+    height: 85%;
+  }
   .brand-logo-divider {
     width: 2px;
-    align-self: stretch;
+    height: 70%;
+    align-self: center;
     background: rgb(209, 0, 16);
     flex-shrink: 0;
   }
