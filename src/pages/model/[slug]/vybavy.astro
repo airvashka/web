@@ -415,9 +415,10 @@ function trimPrice(t: TrimLevel): string {
                           <td><strong>{c.name}</strong></td>
                           <td class="muted-cell">{c.code ?? '—'}</td>
                           <td>{c.type ?? '—'}</td>
-                          {trimSlugs.map((t) => (
-                            {(() => { const r = fmtCell(getPriceForTrim(c.pricing_per_trim, t.slug)); return <td class={`num ${r.cls}`}>{r.text}</td>; })()}
-                          ))}
+                          {trimSlugs.map((t) => {
+                            const r = fmtCell(getPriceForTrim(c.pricing_per_trim, t.slug));
+                            return <td class={`num ${r.cls}`}>{r.text}</td>;
+                          })}
                         </tr>
                       ))}
                     </tbody>
@@ -445,9 +446,10 @@ function trimPrice(t: TrimLevel): string {
                           <td><strong>{c.name}</strong></td>
                           <td class="muted-cell">{c.code ?? '—'}</td>
                           <td>{c.material ?? '—'}</td>
-                          {trimSlugs.map((t) => (
-                            {(() => { const r = fmtCell(getPriceForTrim(c.pricing_per_trim, t.slug)); return <td class={`num ${r.cls}`}>{r.text}</td>; })()}
-                          ))}
+                          {trimSlugs.map((t) => {
+                            const r = fmtCell(getPriceForTrim(c.pricing_per_trim, t.slug));
+                            return <td class={`num ${r.cls}`}>{r.text}</td>;
+                          })}
                         </tr>
                       ))}
                     </tbody>
