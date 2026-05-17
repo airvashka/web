@@ -275,13 +275,22 @@ export const POST: APIRoute = async ({ request }) => {
     if (extColors.length > 0 || intColors.length > 0) {
       try {
         // {slug: price} → [{trim_slug, price}]
-        const pricingToList = (p: any): Array<{ trim_slug: string; price: number }> => {
+        // Slug normalizujeme přes slugify() — konzistentní s trim_level.slug a frontend slugify.
+        // Dovolíme i string "standard"/"unavailable" jako hodnotu (pro UX dropdown v adminu).
+        const pricingToList = (p: any): Array<{ trim_slug: string; price: string | number }> => {
           if (!p) return [];
-          if (Array.isArray(p)) return p.filter((x) => x && x.trim_slug); // už pole
+          if (Array.isArray(p)) {
+            return p
+              .filter((x) => x && x.trim_slug)
+              .map((x) => ({ trim_slug: slugify(String(x.trim_slug)), price: x.price ?? '' }));
+          }
           if (typeof p !== 'object') return [];
           return Object.entries(p)
-            .filter(([k, v]) => k && v !== null && v !== undefined && v !== 'unavailable' && v !== 'standard')
-            .map(([trim_slug, v]) => ({ trim_slug: String(trim_slug), price: Number(v) || 0 }));
+            .filter(([k]) => Boolean(k))
+            .map(([k, v]) => ({
+              trim_slug: slugify(String(k)),
+              price: (typeof v === 'number' || v === 'standard' || v === 'unavailable') ? v : String(v ?? ''),
+            }));
         };
 
         const exteriorList = extColors.map((c: any) => ({

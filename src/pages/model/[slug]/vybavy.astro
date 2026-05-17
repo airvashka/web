@@ -72,14 +72,23 @@ const pricelistColors: { exterior: PricelistColor[]; interior: PricelistColor[] 
   };
 })();
 
-/** Universal pricing accessor — funguje pro object i pole. */
+/** Universal pricing accessor — zkouší oba slug varianty (_ i -). */
 function getPriceForTrim(pricing: PricelistColor['pricing_per_trim'], trimSlug: string): number | string | undefined {
   if (!pricing) return undefined;
+  // Slug varianty: original, s _, s -
+  const variants = [trimSlug, trimSlug.replace(/-/g, '_'), trimSlug.replace(/_/g, '-')];
   if (Array.isArray(pricing)) {
-    const found = pricing.find((p) => p.trim_slug === trimSlug);
-    return found ? found.price : undefined;
+    for (const k of variants) {
+      const found = pricing.find((p) => p.trim_slug === k);
+      if (found) return found.price;
+    }
+    return undefined;
   }
-  return pricing[trimSlug];
+  // Object tvar (legacy)
+  for (const k of variants) {
+    if (pricing[k] !== undefined) return pricing[k];
+  }
+  return undefined;
 }
 
 // VŠECHNY trimy (i unfeatured)
@@ -345,7 +354,13 @@ function trimPrice(t: TrimLevel): string {
                       <div class="pkg-pricing-label">Cena za paket:</div>
                       <ul class="pkg-pricing-list">
                         {trimSlugs.map((t) => {
-                          const cell = fmtPkgCell(pkg.pricing_per_trim?.[t.slug]);
+                          // Zkus oba slug varianty (_ i -)
+                          const variants = [t.slug, t.slug.replace(/-/g, '_'), t.slug.replace(/_/g, '-')];
+                          let raw;
+                          for (const k of variants) {
+                            if (pkg.pricing_per_trim?.[k] !== undefined) { raw = pkg.pricing_per_trim[k]; break; }
+                          }
+                          const cell = fmtPkgCell(raw);
                           return (
                             <li>
                               <span class="pkg-pricing-trim">{t.name}</span>

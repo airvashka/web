@@ -38,7 +38,7 @@ async function api(method, path, body) {
 const ok = (m) => console.log(`  ✓  ${m}`);
 const info = (m) => console.log(`  ℹ  ${m}`);
 
-// Nová definice pricing_per_trim subfield — price je STRING
+// Nová definice pricing_per_trim subfield — price je STRING + dropdown s předvolbami
 const PRICING_REPEATER = {
   field: 'pricing_per_trim',
   name: 'Ceny per trim',
@@ -47,12 +47,40 @@ const PRICING_REPEATER = {
     interface: 'list',
     special: ['cast-json'],
     width: 'full',
-    note: 'Pro každý trim přidej řádek. Cena: zadej číslo Kč (např. 14900), nebo "standard" pokud je barva v ceně, nebo "-" pokud je pro daný trim nedostupná.',
+    note: 'Pro každý trim přidej řádek. Cena: vyber "V ceně" / "Nedostupné", nebo napiš číslo Kč.',
     options: {
       template: '{{trim_slug}} — {{price}}',
       fields: [
-        { field: 'trim_slug', name: 'Trim slug', type: 'string', meta: { interface: 'input', width: 'half', required: true, options: { placeholder: 'club, style, premium, select, exclusive...' } } },
-        { field: 'price',     name: 'Cena',      type: 'string', meta: { interface: 'input', width: 'half', required: true, options: { placeholder: '14900 / standard / -' } } },
+        {
+          field: 'trim_slug',
+          name: 'Trim slug',
+          type: 'string',
+          meta: {
+            interface: 'input',
+            width: 'half',
+            required: true,
+            options: { placeholder: 'club, style, premium...' },
+          },
+        },
+        {
+          field: 'price',
+          name: 'Cena',
+          type: 'string',
+          meta: {
+            interface: 'select-dropdown',
+            width: 'half',
+            required: true,
+            options: {
+              allowOther: true,
+              allowNone: false,
+              placeholder: 'Vyber, nebo zadej cenu v Kč…',
+              choices: [
+                { text: '🟢 V ceně (standard)', value: 'standard' },
+                { text: '⚪ Nedostupné (—)',     value: 'unavailable' },
+              ],
+            },
+          },
+        },
       ],
     },
   },
