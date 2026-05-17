@@ -20,20 +20,22 @@ const {
 const siteName = 'SFR Motor';
 const fullTitle = title === siteName ? title : `${title} | ${siteName}`;
 
-/* Favicon — fetch z site_settings.favicon (M2O directus_files), fallback /favicon.svg.
-   Try/catch ať se build nezhroutí, pokud field ještě neexistuje (před migrací). */
+/* Favicon — UUID z site_settings.favicon, fallback /favicon.svg.
+   - Fetcheme jen UUID (žádný .type expand) — bezpečné v prefetch cache
+   - V <link> ne uvádíme type → browser auto-detect z Directus Content-Type response */
 let faviconHref = '/favicon.svg';
-let faviconType: string | null = null;
+let faviconIsLocal = true;
 try {
-  const settingsList = await directusGet<any>('site_settings', { limit: 1, fields: ['favicon.id', 'favicon.type'] });
+  const settingsList = await directusGet<any>('site_settings', { limit: 1, fields: ['*'] });
   const fav = settingsList?.[0]?.favicon;
-  const favId = fav?.id ?? (typeof fav === 'string' ? fav : null);
+  // favicon může být: plain UUID string | object {id} | object {directus_files_id}
+  const favId = typeof fav === 'string' ? fav : (fav?.id ?? fav?.directus_files_id ?? null);
   if (favId) {
     faviconHref = directusAsset(favId);
-    if (fav?.type) faviconType = fav.type;
+    faviconIsLocal = false;
   }
 } catch {
-  /* site_settings.favicon ještě neexistuje → použijeme fallback */
+  /* site_settings nebo favicon ještě neexistuje → fallback */
 }
 ---
 
@@ -61,11 +63,17 @@ try {
     rel="stylesheet"
   />
 
-  <!-- Favicons -->
-  {faviconType ? (
-    <link rel="icon" type={faviconType} href={faviconHref} />
-  ) : (
+  <!-- Favicons —
+       Local fallback (/favicon.svg) má fixed type. Directus asset → browser auto-detect
+       z Content-Type response (Directus posílá správný mime). -->
+  {faviconIsLocal ? (
     <link rel="icon" type="image/svg+xml" href={faviconHref} />
+  ) : (
+    <>
+      <link rel="icon" href={faviconHref} />
+      <link rel="shortcut icon" href={faviconHref} />
+      <link rel="apple-touch-icon" href={faviconHref} />
+    </>
   )}
   <meta name="theme-color" content="#FAFAF7" />
 
