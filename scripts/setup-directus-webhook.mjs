@@ -51,15 +51,18 @@ const FLOW_NAME = 'Rebuild Vercel on content change';
 
 // Collections, jejichž změny mají spouštět rebuild
 const WATCH_COLLECTIONS = [
-  'brands',
-  'sub_brands',
-  'models',
-  'model_years',
-  'trim_levels',
-  'option_packages',
-  'stock_vehicles',
-  'branches',
-  'employees',
+  // Vozy
+  'brands', 'sub_brands', 'models', 'model_years', 'trim_levels', 'option_packages',
+  // Modely — content
+  'model_highlights', 'model_color_exterior', 'model_color_interior', 'models_files',
+  // Skladovky
+  'stock_vehicles', 'stock_vehicles_option_packages', 'stock_vehicles_files',
+  // Pobočky/Lidé
+  'branches', 'employees',
+  // Magazín
+  'articles',
+  // Site settings (favicon, header, footer config)
+  'site_settings',
 ];
 
 async function findExistingFlow() {

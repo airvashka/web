@@ -21,6 +21,7 @@
     "jsonrepair": "^3.12.0",
     "marked": "^14.1.4",
     "playwright": "^1.60.0",
+    "turndown": "^7.2.0",
     "typescript": "^5.7.2"
   }
 }
