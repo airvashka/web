@@ -320,17 +320,19 @@ const articles = articlesRaw.map((a) => {
         </div>
         <a class="btn btn-primary" href="/servis">Online objednání</a>
       </div>
-      <div class="split-card is-cream">
-        <div class="eyebrow">E-shop</div>
-        <h3>Originální příslušenství</h3>
-        <p class="lead">Objevte širokou nabídku originálního příslušenství, doplňků a lifestyle produktů pro váš vůz i každodenní život.</p>
-        <div class="eshop-pic">
-          {/* TODO: foto příslušenství */}
+      <div class="split-card split-card--eshop">
+        <div class="split-card-bg" aria-hidden="true">
+          <img src="/eshop-bg.jpg" alt="" loading="lazy" decoding="async" />
         </div>
-        <a class="btn-ghost-dark" href="#">
-          Otevřít e-shop
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7"/><polyline points="7 7 17 7 17 17"/></svg>
-        </a>
+        <div class="split-card-content">
+          <div class="eyebrow">E-shop</div>
+          <h3>Originální příslušenství</h3>
+          <p class="lead">Střešní boxy, nosiče kol, gumové koberce, alu kola — vše originál a v perfektní kvalitě.</p>
+          <a class="btn btn-primary" href="#">
+            Otevřít e-shop
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+          </a>
+        </div>
       </div>
     </div>
   </section>
