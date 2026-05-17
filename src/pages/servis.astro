@@ -3,8 +3,11 @@ import BaseLayout from '@layouts/BaseLayout.astro';
 import Breadcrumbs from '@components/Breadcrumbs.astro';
 import JsonLd from '@components/JsonLd.astro';
 import GoogleReviews from '@components/GoogleReviews.astro';
+import TeamCard from '@components/TeamCard.astro';
+import { directusGet } from '@lib/directus';
 import { autoRepairSchema } from '@lib/schemas';
 import googleReviews from '../data/google-reviews.json';
+import type { Employee } from '@lib/types';
 
 /* ============================================================
    SERVIS — 1:1 podle _design-draft/servis.jsx
@@ -21,6 +24,29 @@ const SERVICES = [
   { t: 'Originální náhradní díly', s: 'KGM, OMODA & JAECOO, Farizon, Dacia, Renault' },
   { t: 'Geometrie', s: 'čištění klimatizace, čištění automatické převodovky' },
 ];
+
+// ── Servis tým — fetch z Directus, mapování per kategorie podle emailu ──
+const allEmployees = await directusGet<Employee>('employees', {
+  sort: ['sort', 'full_name'],
+  fields: ['id', 'full_name', 'role', 'department', 'email', 'phone', 'photo'],
+});
+const byEmail = new Map(allEmployees.map((e) => [e.email, e]));
+
+const TEAM_KGM     = ['hertl@sfr-motor.cz', 'marik@sfr-motor.cz', 'zaruba@sfr-motor.cz']
+  .map((e) => byEmail.get(e)).filter(Boolean) as Employee[];
+const TEAM_DACIA   = ['melisek@sfr-motor.cz']
+  .map((e) => byEmail.get(e)).filter(Boolean) as Employee[];
+const TEAM_NEHODY  = ['bursik@sfr-motor.cz']
+  .map((e) => byEmail.get(e)).filter(Boolean) as Employee[];
+const TEAM_DILY    = ['patzelt@sfr-motor.cz', 'zelenka@sfr-motor.cz']
+  .map((e) => byEmail.get(e)).filter(Boolean) as Employee[];
+
+const SERVIS_TEAM_BLOCKS = [
+  { title: 'KGM, OMODA & JAECOO', tag: 'Servis',         tagClass: 'tag-service', people: TEAM_KGM },
+  { title: 'Dacia, Renault',      tag: 'Servis',         tagClass: 'tag-service', people: TEAM_DACIA },
+  { title: 'Nehody a pojistné události', tag: 'Pojistné',  tagClass: 'tag-service', people: TEAM_NEHODY },
+  { title: 'Náhradní díly',       tag: 'Díly',           tagClass: 'tag-parts',   people: TEAM_DILY },
+].filter((b) => b.people.length > 0);
 ---
 
 <BaseLayout title="Servis" description="Autorizovaný servis pro KGM, OMODA & JAECOO, Farizon, Dacia, Renault. Praha-Ďáblice.">
@@ -103,8 +129,32 @@ const SERVICES = [
     </div>
   </section>
 
+  <!-- ===== SERVIS TÝM ===== -->
+  {SERVIS_TEAM_BLOCKS.length > 0 && (
+    <section class="serv-team" data-screen-label="03 Tym">
+      <div class="container">
+        <div class="serv-team-intro">
+          <div class="section-eyebrow">Náš servis tým</div>
+          <h2>Komu se ozvat</h2>
+          <p class="lead">Volejte přímo svého servisního poradce — podle značky vozu nebo úkonu.</p>
+        </div>
+
+        {SERVIS_TEAM_BLOCKS.map((block) => (
+          <div class="serv-team-block">
+            <div class="serv-team-head">
+              <h3>{block.title}</h3>
+            </div>
+            <div class="serv-team-grid">
+              {block.people.map((p) => <TeamCard person={p} tagLabel={block.tag} tagClass={block.tagClass} />)}
+            </div>
+          </div>
+        ))}
+      </div>
+    </section>
+  )}
+
   <!-- ===== GOOGLE RECENZE SERVIS ===== -->
-  <section class="reviews-section" data-screen-label="03 Recenze">
+  <section class="reviews-section" data-screen-label="04 Recenze">
     <div class="container">
       <div class="section-eyebrow">⭐ Hodnocení servisu</div>
       <GoogleReviews business="servis" layout="cards" limit={5} headingText="Co o servisu říkají zákazníci" />
@@ -157,5 +207,54 @@ const SERVICES = [
 
   <style>
     .lead-status { min-height: 24px; font-size: 13px; margin-top: 8px; }
+
+    /* ===== Servis tým ===== */
+    .serv-team {
+      padding: 72px 0 88px;
+      background: var(--bg-soft);
+    }
+    .serv-team-intro {
+      max-width: 60ch;
+      margin: 0 auto 44px;
+      text-align: center;
+    }
+    .serv-team-intro h2 {
+      font-family: var(--font-display);
+      font-size: clamp(26px, 3vw, 36px);
+      font-weight: 700;
+      margin: 4px 0 10px;
+      letter-spacing: -0.01em;
+    }
+    .serv-team-intro .lead {
+      color: var(--text-muted);
+      font-size: 15px;
+      line-height: 1.6;
+      margin: 0;
+    }
+    .serv-team-block {
+      margin-bottom: 40px;
+    }
+    .serv-team-block:last-child { margin-bottom: 0; }
+    .serv-team-head {
+      margin-bottom: 18px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+    }
+    .serv-team-head h3 {
+      font-family: var(--font-display);
+      font-size: clamp(18px, 2vw, 22px);
+      font-weight: 600;
+      margin: 0;
+      letter-spacing: -0.005em;
+    }
+    .serv-team-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 14px;
+    }
+    @media (max-width: 640px) {
+      .serv-team { padding: 48px 0 64px; }
+      .serv-team-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 10px; }
+    }
   </style>
 </BaseLayout>
