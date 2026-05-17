@@ -3,41 +3,33 @@ import BaseLayout from '@layouts/BaseLayout.astro';
 import Breadcrumbs from '@components/Breadcrumbs.astro';
 import JsonLd from '@components/JsonLd.astro';
 import GoogleReviews from '@components/GoogleReviews.astro';
-import { directusGet } from '@lib/directus';
+import { directusGet, directusAsset } from '@lib/directus';
 import { autoDealerSchema, autoRepairSchema } from '@lib/schemas';
 import googleReviews from '../data/google-reviews.json';
 import type { Branch, Employee } from '@lib/types';
 
-// KONTAKT — 1:1 podle _design-draft/kontakt.jsx
-// Sections: Hero + ContactInfo (map + card) + Team (Prodej/Servis) + MessageForm
+// KONTAKT — Hero + ContactInfo (map + card) + Team (4 departments) + Form
 
 const branches = await directusGet<Branch>('branches');
 const branch = branches[0];
 
-const employees = await directusGet<Employee>('employees', { sort: ['department', 'full_name'] });
-const salesFromDirectus = employees.filter((e) => e.department === 'sales');
-const serviceFromDirectus = employees.filter((e) => e.department === 'service');
+const employees = await directusGet<Employee>('employees', {
+  sort: ['sort', 'full_name'],
+  fields: ['id', 'full_name', 'role', 'department', 'email', 'phone', 'photo'],
+});
 
-// Fallback data z _design-draft/kontakt.jsx (pokud Directus zatím nemá employees)
-const PRODEJ_FALLBACK = [
-  { id: 'petr-paseka', full_name: 'Petr Paseka', role: 'Vedoucí prodeje', department: 'sales', phone: '+420 771 235 458', email: 'petr.paseka@sfr-motor.cz' },
-  { id: 'lukas-jiranek', full_name: 'Lukáš Jiránek', role: 'Prodejce KGM', department: 'sales', phone: '+420 771 235 460', email: 'lukas.jiranek@sfr-motor.cz' },
-  { id: 'marek-safarcik', full_name: 'Marek Šafarčík', role: 'Prodejce Omoda & Jaecoo', department: 'sales', phone: '+420 771 235 461', email: 'marek.safarcik@sfr-motor.cz' },
-  { id: 'michal-hlavac', full_name: 'Michal Hlaváč', role: 'Prodejce Farizon', department: 'sales', phone: '+420 771 235 462', email: 'michal.hlavac@sfr-motor.cz' },
-] as Employee[];
+const management = employees.filter((e) => e.department === 'management');
+const sales      = employees.filter((e) => e.department === 'sales');
+const service    = employees.filter((e) => e.department === 'service');
+const parts      = employees.filter((e) => e.department === 'parts');
 
-const SERVIS_FALLBACK = [
-  { id: 'jiri-hertl', full_name: 'Jiří Hertl', role: 'Vedoucí servisu', department: 'service', phone: '+420 771 259 320', email: 'jiri.hertl@sfr-motor.cz' },
-  { id: 'jiri-patzelt', full_name: 'Jiří Patzelt', role: 'Servisní poradce', department: 'service', phone: '+420 771 259 321', email: 'jiri.patzelt@sfr-motor.cz' },
-  { id: 'karel-marik', full_name: 'Karel Mařík', role: 'Servisní poradce', department: 'service', phone: '+420 771 259 322', email: 'karel.marik@sfr-motor.cz' },
-  { id: 'karel-zelenka', full_name: 'Karel Zelenka', role: 'Servisní technik', department: 'service', phone: '+420 771 259 323', email: 'karel.zelenka@sfr-motor.cz' },
-  { id: 'radek-melisek', full_name: 'Radek Mělíšek', role: 'Servisní technik', department: 'service', phone: '+420 771 259 324', email: 'radek.melisek@sfr-motor.cz' },
-  { id: 'stepan-zaruba', full_name: 'Štěpán Záruba', role: 'Servisní technik', department: 'service', phone: '+420 771 259 325', email: 'stepan.zaruba@sfr-motor.cz' },
-  { id: 'zdenek-bursik', full_name: 'Zdeněk Buršík', role: 'Pneuservis & karosárna', department: 'service', phone: '+420 771 259 326', email: 'zdenek.bursik@sfr-motor.cz' },
-] as Employee[];
-
-const sales = salesFromDirectus.length > 0 ? salesFromDirectus : PRODEJ_FALLBACK;
-const service = serviceFromDirectus.length > 0 ? serviceFromDirectus : SERVIS_FALLBACK;
+// Konfigurace bloků — labels, tagy, ikony barev
+const TEAM_BLOCKS: { key: string; title: string; tag: string; people: Employee[]; tagClass: string }[] = [
+  { key: 'management', title: 'Vedení společnosti', tag: 'Vedení',         people: management, tagClass: 'tag-mgmt' },
+  { key: 'sales',      title: 'Prodej nových vozů', tag: 'Prodej',         people: sales,      tagClass: 'tag-sales' },
+  { key: 'service',    title: 'Servis',             tag: 'Servis',         people: service,    tagClass: 'tag-service' },
+  { key: 'parts',      title: 'Náhradní díly',      tag: 'Náhradní díly',  people: parts,      tagClass: 'tag-parts' },
+].filter((b) => b.people.length > 0);
 
 const branchName = branch?.name ?? 'SFR Motor s.r.o.';
 const branchAddress = branch?.address ?? 'Ďáblická 553/2';
@@ -117,77 +109,66 @@ const mapEmbedUrl = 'https://maps.google.com/maps?q=%C4%8Eablicka+553%2F2%2C+182
     </div>
   </section>
 
-  <section class="team" data-screen-label="03 Tym">
+  <section class="team-v2" data-screen-label="03 Tym">
     <div class="container">
-      <div class="team-block">
-        <div class="team-head">
-          <h2>Prodej</h2>
-          <span class="count">{sales.length} {sales.length === 1 ? 'člověk' : 'lidé'}</span>
-        </div>
-        <div class="team-grid">
-          {sales.map((p) => (
-            <div class="tcard">
-              <div class="face">
-                <span class="role-tag is-sales">Prodej</span>
-                {p.photo_url && <img src={p.photo_url} alt={p.full_name} />}
-              </div>
-              <div class="body">
-                <div class="nm">{p.full_name}</div>
-                <div class="pos">{p.role}</div>
-                <div class="contact">
-                  {p.phone && (
-                    <a href={`tel:${p.phone.replace(/\s/g, '')}`}>
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.86 19.86 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.86 19.86 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-                      {p.phone}
-                    </a>
-                  )}
-                  {p.email && (
-                    <a href={`mailto:${p.email}`}>
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><polyline points="2 6 12 13 22 6"/></svg>
-                      {p.email}
-                    </a>
-                  )}
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
+      <div class="team-intro">
+        <div class="section-eyebrow">Náš tým</div>
+        <h2>Komu se ozvete</h2>
+        <p class="lead">Jsme malý sehraný tým. Najděte si svou kontaktní osobu — telefon a e-mail vedou přímo na konkrétního kolegu.</p>
       </div>
 
-      <div class="team-block">
-        <div class="team-head">
-          <h2>Servis a technici</h2>
-          <span class="count">{service.length} lidé</span>
-        </div>
-        <div class="team-grid">
-          {service.map((p) => (
-            <div class="tcard">
-              <div class="face">
-                <span class="role-tag">Servis</span>
-                {p.photo_url && <img src={p.photo_url} alt={p.full_name} />}
-              </div>
-              <div class="body">
-                <div class="nm">{p.full_name}</div>
-                <div class="pos">{p.role}</div>
-                <div class="contact">
-                  {p.phone && (
-                    <a href={`tel:${p.phone.replace(/\s/g, '')}`}>
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.86 19.86 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.86 19.86 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-                      {p.phone}
-                    </a>
+      {TEAM_BLOCKS.map((block) => (
+        <div class="team-block-v2">
+          <div class="team-head-v2">
+            <h3>{block.title}</h3>
+            <span class="team-count">{block.people.length} {block.people.length === 1 ? 'osoba' : block.people.length <= 4 ? 'osoby' : 'osob'}</span>
+          </div>
+          <div class="team-grid-v2">
+            {block.people.map((p) => (
+              <article class={`tcard-v2 ${block.tagClass}`}>
+                <div class="tcard-face">
+                  {p.photo ? (
+                    <img src={directusAsset(p.photo, { width: 600, height: 600, fit: 'cover', format: 'webp', quality: 80 })} alt={p.full_name} loading="lazy" decoding="async" />
+                  ) : (
+                    <svg class="tcard-silhouette" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                      <defs>
+                        <linearGradient id={`grad-${p.id}`} x1="0%" y1="0%" x2="0%" y2="100%">
+                          <stop offset="0%" stop-color="rgba(255,255,255,0.06)" />
+                          <stop offset="100%" stop-color="rgba(255,255,255,0.00)" />
+                        </linearGradient>
+                      </defs>
+                      <rect width="120" height="120" fill={`url(#grad-${p.id})`} />
+                      {/* hlava */}
+                      <circle cx="60" cy="48" r="20" fill="currentColor" opacity="0.35" />
+                      {/* ramena */}
+                      <path d="M20,120 C20,90 36,76 60,76 C84,76 100,90 100,120 Z" fill="currentColor" opacity="0.35" />
+                    </svg>
                   )}
-                  {p.email && (
-                    <a href={`mailto:${p.email}`}>
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><polyline points="2 6 12 13 22 6"/></svg>
-                      {p.email}
-                    </a>
-                  )}
+                  <span class="tcard-tag">{block.tag}</span>
                 </div>
-              </div>
-            </div>
-          ))}
+                <div class="tcard-body">
+                  <div class="tcard-name">{p.full_name}</div>
+                  <div class="tcard-role">{p.role}</div>
+                  <div class="tcard-contact">
+                    {p.phone && (
+                      <a class="tcard-link" href={`tel:${p.phone.replace(/[^\d+]/g, '').split(',')[0]}`}>
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.86 19.86 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.86 19.86 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                        <span>{p.phone}</span>
+                      </a>
+                    )}
+                    {p.email && (
+                      <a class="tcard-link" href={`mailto:${p.email}`}>
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><polyline points="2 6 12 13 22 6"/></svg>
+                        <span>{p.email}</span>
+                      </a>
+                    )}
+                  </div>
+                </div>
+              </article>
+            ))}
+          </div>
         </div>
-      </div>
+      ))}
     </div>
   </section>
 
@@ -276,5 +257,181 @@ const mapEmbedUrl = 'https://maps.google.com/maps?q=%C4%8Eablicka+553%2F2%2C+182
 
   <style>
     .lead-status { min-height: 24px; font-size: 13px; margin-top: 8px; }
+
+    /* ===== TEAM V2 — Kontakt page redesign ===== */
+    .team-v2 {
+      padding: 80px 0 100px;
+      background: var(--bg-soft);
+    }
+    .team-intro {
+      max-width: 64ch;
+      margin: 0 auto 56px;
+      text-align: center;
+    }
+    .team-intro h2 {
+      font-family: var(--font-display);
+      font-size: clamp(28px, 3.2vw, 40px);
+      font-weight: 700;
+      margin: 4px 0 12px;
+      letter-spacing: -0.01em;
+    }
+    .team-intro .lead {
+      color: var(--text-muted);
+      font-size: 16px;
+      line-height: 1.6;
+      margin: 0;
+    }
+
+    .team-block-v2 {
+      margin-bottom: 56px;
+    }
+    .team-block-v2:last-child { margin-bottom: 0; }
+    .team-head-v2 {
+      display: flex;
+      align-items: baseline;
+      gap: 14px;
+      margin-bottom: 24px;
+      padding-bottom: 14px;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+    }
+    .team-head-v2 h3 {
+      font-family: var(--font-display);
+      font-size: clamp(20px, 2.2vw, 26px);
+      font-weight: 600;
+      margin: 0;
+      letter-spacing: -0.005em;
+    }
+    .team-count {
+      font-size: 13px;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    .team-grid-v2 {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 20px;
+    }
+
+    .tcard-v2 {
+      background: #fff;
+      border-radius: 14px;
+      overflow: hidden;
+      transition: transform .2s ease, box-shadow .2s ease;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+      display: flex;
+      flex-direction: column;
+    }
+    .tcard-v2:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+    }
+
+    /* Face — siluetová varianta */
+    .tcard-face {
+      aspect-ratio: 1 / 1;
+      position: relative;
+      overflow: hidden;
+      background: linear-gradient(160deg, #2a2a30 0%, #1a1a1f 100%);
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      color: rgba(255,255,255,0.4);
+    }
+    .tcard-face img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .tcard-silhouette {
+      width: 88%;
+      height: 88%;
+      align-self: flex-end;
+      display: block;
+    }
+
+    /* Variantní barvy face dle department */
+    .tag-mgmt .tcard-face    { background: linear-gradient(160deg, #2a2030 0%, #1a1420 100%); }
+    .tag-sales .tcard-face   { background: linear-gradient(160deg, #2a2230 0%, #1f1828 100%); }
+    .tag-service .tcard-face { background: linear-gradient(160deg, #1f2a26 0%, #141d1a 100%); }
+    .tag-parts .tcard-face   { background: linear-gradient(160deg, #2a2620 0%, #1c1a15 100%); }
+
+    .tcard-tag {
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      padding: 5px 10px;
+      border-radius: 999px;
+      backdrop-filter: blur(6px);
+      background: rgba(255,255,255,0.92);
+      color: #1a1a1f;
+      z-index: 2;
+    }
+    .tag-mgmt .tcard-tag    { background: rgba(180, 118, 46, 0.95); color: #fff; }
+    .tag-sales .tcard-tag   { background: rgba(47, 155, 92, 0.95);  color: #fff; }
+    .tag-service .tcard-tag { background: rgba(42, 122, 143, 0.95); color: #fff; }
+    .tag-parts .tcard-tag   { background: rgba(150, 100, 35, 0.95); color: #fff; }
+
+    .tcard-body {
+      padding: 16px 18px 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .tcard-name {
+      font-family: var(--font-display);
+      font-size: 17px;
+      font-weight: 700;
+      line-height: 1.25;
+      color: #1a1a1f;
+    }
+    .tcard-role {
+      font-size: 13px;
+      color: var(--text-muted);
+      line-height: 1.4;
+      margin-bottom: 10px;
+      min-height: 18px;
+    }
+    .tcard-contact {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+      border-top: 1px solid rgba(0,0,0,0.06);
+      padding-top: 12px;
+      margin-top: 4px;
+    }
+    .tcard-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      color: #1a1a1f;
+      text-decoration: none;
+      transition: color .15s;
+      word-break: break-all;
+    }
+    .tcard-link svg {
+      flex-shrink: 0;
+      color: var(--text-muted);
+    }
+    .tcard-link:hover {
+      color: var(--accent, #B4762E);
+    }
+    .tcard-link:hover svg {
+      color: var(--accent, #B4762E);
+    }
+
+    @media (max-width: 640px) {
+      .team-v2 { padding: 56px 0 72px; }
+      .team-grid-v2 { grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 14px; }
+      .tcard-body { padding: 14px 14px 16px; }
+      .tcard-name { font-size: 16px; }
+    }
   </style>
 </BaseLayout>

@@ -179,7 +179,8 @@ export interface Employee {
   department: 'sales' | 'service' | 'parts' | 'management';
   email?: string;
   phone?: string;
-  photo_url?: string;
-  business_card_pdf_url?: string;
-  branch_id?: string;
+  photo?: string;                  // UUID Directus file
+  business_card_pdf?: string;      // UUID Directus file
+  branch?: string;                 // UUID branches
+  sort?: number;
 }
