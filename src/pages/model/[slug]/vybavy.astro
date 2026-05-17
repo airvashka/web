@@ -372,12 +372,21 @@ function trimPrice(t: TrimLevel): string {
           .replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '') || 'untitled';
         const trimSlugs = trims.map((t) => ({ name: t.name, slug: slugify(t.name) }));
 
-        const fmtCell = (v: any) => {
-          if (v === undefined || v === null || v === '' || v === '-' || v === '–') return '–';
-          if (typeof v === 'number') return v === 0 ? '0' : `${v.toLocaleString('cs-CZ')}`;
-          const num = parseInt(String(v).replace(/\s/g, ''), 10);
-          if (Number.isFinite(num)) return num === 0 ? '0' : `${num.toLocaleString('cs-CZ')}`;
-          return String(v);
+        // Smart cell — vrátí { text, cls } pro různé hodnoty:
+        //   number/numeric string → "14 900 Kč" (orange)
+        //   "standard" / "s" / 0  → "V ceně" (green)
+        //   "-" / null / "" / "unavailable" → "—" (gray)
+        const fmtCell = (v: any): { text: string; cls: string } => {
+          if (v === undefined || v === null || v === '' || v === '-' || v === '–') return { text: '—', cls: 'cell-unavail' };
+          const s = typeof v === 'string' ? v.trim().toLowerCase() : '';
+          if (s === 'unavailable' || s === 'nedostupné') return { text: '—', cls: 'cell-unavail' };
+          if (s === 'standard' || s === 's' || s === 'v ceně' || s === 'v cene') return { text: 'V ceně', cls: 'cell-standard' };
+          const num = typeof v === 'number' ? v : parseInt(String(v).replace(/\s/g, ''), 10);
+          if (Number.isFinite(num)) {
+            if (num === 0) return { text: 'V ceně', cls: 'cell-standard' };
+            return { text: `${num.toLocaleString('cs-CZ')} Kč`, cls: 'cell-price' };
+          }
+          return { text: String(v), cls: 'cell-other' };
         };
 
         return (
@@ -406,7 +415,7 @@ function trimPrice(t: TrimLevel): string {
                           <td class="muted-cell">{c.code ?? '—'}</td>
                           <td>{c.type ?? '—'}</td>
                           {trimSlugs.map((t) => (
-                            <td class="num">{fmtCell(getPriceForTrim(c.pricing_per_trim, t.slug))}<span class="kc"> Kč</span></td>
+                            {(() => { const r = fmtCell(getPriceForTrim(c.pricing_per_trim, t.slug)); return <td class={`num ${r.cls}`}>{r.text}</td>; })()}
                           ))}
                         </tr>
                       ))}
@@ -436,7 +445,7 @@ function trimPrice(t: TrimLevel): string {
                           <td class="muted-cell">{c.code ?? '—'}</td>
                           <td>{c.material ?? '—'}</td>
                           {trimSlugs.map((t) => (
-                            <td class="num">{fmtCell(getPriceForTrim(c.pricing_per_trim, t.slug))}<span class="kc"> Kč</span></td>
+                            {(() => { const r = fmtCell(getPriceForTrim(c.pricing_per_trim, t.slug)); return <td class={`num ${r.cls}`}>{r.text}</td>; })()}
                           ))}
                         </tr>
                       ))}
@@ -520,6 +529,11 @@ function trimPrice(t: TrimLevel): string {
   .colors-table tbody tr:hover td { background: #eff6ff; }
   .colors-table .muted-cell { color: var(--text-muted, #6b7280); font-size: 13px; }
   .colors-table .kc { color: var(--text-muted, #6b7280); font-size: 12px; }
+  /* 3 stavy pricing cellu — jako u paketů (V ceně / cena / —) */
+  .colors-table .cell-standard { color: #1e7b5f; font-weight: 600; }
+  .colors-table .cell-price    { color: var(--accent, #F25C1B); font-weight: 700; }
+  .colors-table .cell-unavail  { color: var(--text-muted, #9ca3af); font-weight: 400; }
+  .colors-table .cell-other    { color: var(--ink, #111); }
 
   .compare-wrapper {
     border: 1px solid var(--line);
