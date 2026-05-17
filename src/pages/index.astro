@@ -5,6 +5,7 @@ import VideoStrip from '@components/VideoStrip.astro';
 import InstagramStrip from '@components/InstagramStrip.astro';
 import JsonLd from '@components/JsonLd.astro';
 import GoogleReviews from '@components/GoogleReviews.astro';
+import BrandLogo from '@components/BrandLogo.astro';
 import { directusGet } from '@lib/directus';
 import { buildStockSlug } from '@lib/stockSlug';
 import { autoDealerSchema, websiteSchema } from '@lib/schemas';
@@ -174,7 +175,10 @@ const articles = articlesRaw.map((a) => {
                 {b.hero_image && <DirectusImage src={b.hero_image} alt={`${b.name} — hero`} aspectRatio="16/10" />}
               </div>
               <div class="btile-body">
-                <div class="btile-name">{meta.name}</div>
+                <div class="btile-name btile-name--logo">
+                  <BrandLogo slug={b.slug} variant="light" class="btile-logo" />
+                  <span class="sr-only">{meta.name}</span>
+                </div>
                 <div class="btile-tag">{meta.tag}</div>
                 <div class="btile-actions">
                   <a href={`/${b.slug}`}>

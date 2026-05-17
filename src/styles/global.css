@@ -3301,6 +3301,23 @@ button.thumb-more {
   letter-spacing: -0.02em;
   margin: 0 0 4px;
 }
+/* Logo varianta — zobrazí brand wordmark místo textu */
+.btile-name--logo {
+  margin: 0 0 8px;
+  display: block;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+}
+.btile-logo {
+  height: clamp(28px, 3.2vw, 44px);
+  max-width: min(280px, 70%);
+}
+/* Combined OMODA+JAECOO je extra široké, ale zde stačí menší */
+.btile-name--logo .brand-logo--combined.btile-logo {
+  height: clamp(34px, 3.8vw, 50px);
+  max-width: min(260px, 75%);
+}
 .btile-tag {
   font-family: var(--font-display);
   font-size: 15px;
