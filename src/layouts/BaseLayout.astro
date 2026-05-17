@@ -55,11 +55,15 @@ try {
   <meta property="og:site_name" content={siteName} />
   {ogImage && <meta property="og:image" content={ogImage} />}
 
-  <!-- Fonts -->
+  <!-- Fonts —
+       Noto Sans (universal Latin) místo Noto Sans KR — má plnou českou podporu
+       (Latin Extended-A: ř, č, ž, š, ě, ť, ď, ů…). Stejná rodina, ale Korean
+       varianta postrádá glyphy pro Czech diacritics → browser fallbackoval na
+       sys font, takže háčkované znaky vypadaly jinak než zbytek. -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link
-    href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap"
+    href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap&subset=latin-ext"
     rel="stylesheet"
   />
 

@@ -24,10 +24,13 @@
   --radius-lg: 20px;
   --max: 1320px;
   --pad: 32px;
-  /* Noto Sans KR — KGM-style consistent across web. Stejný font pro display i body,
-     liší se jen weight (display = 600-700 bold, body = 400). */
-  --font-display: "Noto Sans KR", "Apple SD Gothic Neo", system-ui, -apple-system, "Segoe UI", sans-serif;
-  --font-body: "Noto Sans KR", "Apple SD Gothic Neo", system-ui, -apple-system, "Segoe UI", sans-serif;
+  /* Noto Sans (universal Latin) — KGM-style consistent across web. Stejný font
+     pro display i body, liší se jen weight (display = 600-700 bold, body = 400).
+     POZN: Použito Noto Sans (ne Noto Sans KR) — Korean varianta nemá Latin
+     Extended-A glyphy, takže ř/č/ž/š/ě/ť/ď/ů fallbackovaly na sys font a vypadaly
+     jinak než zbytek textu. */
+  --font-display: "Noto Sans", "Helvetica Neue", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-body: "Noto Sans", "Helvetica Neue", system-ui, -apple-system, "Segoe UI", sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, monospace;
 }
 
