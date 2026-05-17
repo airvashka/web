@@ -41,8 +41,8 @@ const { modelSlug, modelName, brandName } = Astro.props;
           <div class="chat-header-sub">Ptáte se, odpovídám</div>
         </div>
       </div>
-      <button class="chat-close" type="button" aria-label="Zavřít chat" data-chat-close>
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      <button class="chat-close" type="button" aria-label="Minimalizovat chat" title="Minimalizovat" data-chat-close>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
       </button>
     </div>
 
@@ -52,6 +52,9 @@ const { modelSlug, modelName, brandName } = Astro.props;
 
     <div class="chat-messages" data-chat-messages>
       <div class="chat-msg chat-msg--assistant">
+        <span class="chat-avatar chat-avatar--ai" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        </span>
         <div class="chat-bubble">
           Ahoj! Jsem AI asistent SFR Motor. Můžu vám odpovědět na otázky o <strong>{brandName} {modelName}</strong> — výbavy, ceny, technická data, dostupnost skladem. Co vás zajímá?
         </div>
@@ -117,17 +120,45 @@ const { modelSlug, modelName, brandName } = Astro.props;
       return div.innerHTML;
     }
 
+    const AI_AVATAR_SVG = '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>';
+
+    const USER_AVATAR_SVG = '<svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4,22 C4,16 7.5,13 12,13 C16.5,13 20,16 20,22 Z"/></svg>';
+
+    function markdownToHtml(text: string): string {
+      let s = escapeHtml(text);
+      // Markdown links — [text](url) → <a href="url">text</a>
+      // Interní (začínají /) → stejný tab, externí → nový tab
+      s = s.replace(/\[([^\]]+)\]\(([^)]+)\)/g, (_m, label: string, url: string) => {
+        const isInternal = url.startsWith('/') || url.includes('sfr-motor');
+        const target = isInternal ? '' : ' target="_blank" rel="noopener"';
+        return `<a class="chat-link" href="${url}"${target}>${label}</a>`;
+      });
+      // Bold + italic
+      s = s.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+      s = s.replace(/(?<!\*)\*([^*]+)\*(?!\*)/g, '<em>$1</em>');
+      // Line breaks
+      s = s.replace(/\n/g, '<br />');
+      return s;
+    }
+
     function appendMessage(role: 'user' | 'assistant', text: string) {
       const wrap = document.createElement('div');
       wrap.className = `chat-msg chat-msg--${role}`;
+      const avatar = document.createElement('span');
+      avatar.className = `chat-avatar chat-avatar--${role === 'assistant' ? 'ai' : 'user'}`;
+      avatar.setAttribute('aria-hidden', 'true');
+      avatar.innerHTML = role === 'assistant' ? AI_AVATAR_SVG : USER_AVATAR_SVG;
       const bubble = document.createElement('div');
       bubble.className = 'chat-bubble';
-      // Simple markdown: **bold**, line breaks
-      const html = escapeHtml(text)
-        .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
-        .replace(/\n/g, '<br />');
-      bubble.innerHTML = html;
-      wrap.appendChild(bubble);
+      bubble.innerHTML = markdownToHtml(text);
+      // Order: AI msg → avatar | bubble. User msg → bubble | avatar
+      if (role === 'assistant') {
+        wrap.appendChild(avatar);
+        wrap.appendChild(bubble);
+      } else {
+        wrap.appendChild(bubble);
+        wrap.appendChild(avatar);
+      }
       messagesEl.appendChild(wrap);
       messagesEl.scrollTop = messagesEl.scrollHeight;
     }
@@ -135,7 +166,7 @@ const { modelSlug, modelName, brandName } = Astro.props;
     function appendTyping(): HTMLElement {
       const wrap = document.createElement('div');
       wrap.className = 'chat-msg chat-msg--assistant chat-typing-wrap';
-      wrap.innerHTML = '<div class="chat-bubble chat-typing"><span></span><span></span><span></span></div>';
+      wrap.innerHTML = `<span class="chat-avatar chat-avatar--ai" aria-hidden="true">${AI_AVATAR_SVG}</span><div class="chat-bubble chat-typing"><span></span><span></span><span></span></div>`;
       messagesEl.appendChild(wrap);
       messagesEl.scrollTop = messagesEl.scrollHeight;
       return wrap;
@@ -198,7 +229,7 @@ const { modelSlug, modelName, brandName } = Astro.props;
   }
 </script>
 
-<style>
+<style is:global>
   /* ===== FLOATING TOGGLE BUTTON ===== */
   .chat-widget {
     position: fixed;
@@ -325,17 +356,20 @@ const { modelSlug, modelName, brandName } = Astro.props;
   .chat-msg {
     display: flex;
     max-width: 100%;
+    gap: 8px;
+    align-items: flex-end;
   }
   .chat-msg--user {
     justify-content: flex-end;
   }
   .chat-bubble {
-    max-width: 82%;
+    max-width: 78%;
     padding: 9px 13px;
     border-radius: 16px;
     font-size: 14px;
     line-height: 1.45;
     word-wrap: break-word;
+    overflow-wrap: anywhere;
   }
   .chat-msg--assistant .chat-bubble {
     background: #f1f1ee;
@@ -346,6 +380,41 @@ const { modelSlug, modelName, brandName } = Astro.props;
     background: var(--accent, #B4762E);
     color: #fff;
     border-bottom-right-radius: 5px;
+  }
+
+  /* Avatary — kruhové, malé */
+  .chat-avatar {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-bottom: 2px;
+  }
+  .chat-avatar--ai {
+    background: linear-gradient(135deg, var(--accent, #B4762E) 0%, #d18b3a 100%);
+    color: #fff;
+  }
+  .chat-avatar--user {
+    background: #e6e6e3;
+    color: #6B6B72;
+  }
+
+  /* Markdown linky v bublině */
+  .chat-bubble .chat-link {
+    color: var(--accent, #B4762E);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    font-weight: 500;
+  }
+  .chat-bubble .chat-link:hover {
+    color: #9a6826;
+  }
+  .chat-msg--user .chat-bubble .chat-link {
+    color: #fff;
+    text-decoration: underline;
   }
 
   /* Typing animation */
