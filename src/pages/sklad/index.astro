@@ -1,5 +1,6 @@
 ---
 import BaseLayout from '@layouts/BaseLayout.astro';
+import FuelIcon from '@components/FuelIcon.astro';
 import DirectusImage from '@components/DirectusImage.astro';
 import Breadcrumbs from '@components/Breadcrumbs.astro';
 import { directusGet } from '@lib/directus';
@@ -194,6 +195,7 @@ const fmtKm = (n?: number | null) => (n === 0 || !n ? '0 km' : `${n.toLocaleStr
                         {pillLabel && <span class="pill pill--promo">{pillLabel}</span>}
                         {conditionLabel && <span class={`pill pill--${conditionCls}`}>{conditionLabel}</span>}
                       </div>
+                      <FuelIcon type={v.model?.fuel_type ?? ''} />
                     </div>
                     <div class="body">
                       <div class="nm">{v.brand?.name ?? ''} {v.model?.name ?? ''}</div>

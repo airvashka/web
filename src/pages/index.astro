@@ -1,5 +1,6 @@
 ---
 import BaseLayout from '@layouts/BaseLayout.astro';
+import FuelIcon from '@components/FuelIcon.astro';
 import DirectusImage from '@components/DirectusImage.astro';
 import VideoStrip from '@components/VideoStrip.astro';
 import InstagramStrip from '@components/InstagramStrip.astro';
@@ -294,6 +295,7 @@ const articles = articlesRaw.map((a) => {
                     {pillLabel && <span class="pill pill--promo">{pillLabel}</span>}
                     <span class={`pill pill--${conditionCls}`}>{conditionLabel}</span>
                   </div>
+                  <FuelIcon type={fuelType} />
                 </div>
                 <div class="body">
                   <div class="nm">{brandName} {modelName}</div>

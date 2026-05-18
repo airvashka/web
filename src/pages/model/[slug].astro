@@ -1,5 +1,6 @@
 ---
 import BaseLayout from '@layouts/BaseLayout.astro';
+import FuelIcon from '@components/FuelIcon.astro';
 import DirectusImage from '@components/DirectusImage.astro';
 import VideoStrip from '@components/VideoStrip.astro';
 import Breadcrumbs from '@components/Breadcrumbs.astro';
@@ -1015,6 +1016,7 @@ if (promoActive && promoDescription) {
                     {pillLabel && <span class="pill pill--promo">{pillLabel}</span>}
                     <span class={`pill pill--${conditionCls}`}>{conditionLabel}</span>
                   </div>
+                  <FuelIcon type={fuelType} />
                 </div>
                 <div class="body">
                   <div class="nm">{brand.name} {rawModel.name}</div>

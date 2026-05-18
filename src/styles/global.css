@@ -3585,6 +3585,29 @@ button.thumb-more {
 .scard .pill--new { background: #2F7A4D; color: #fff; }      /* zelená — Nové */
 .scard .pill--demo { background: #2A7A8F; color: #fff; }     /* teal — Předváděcí */
 .scard .pill--used { background: #8A6E50; color: #fff; }     /* warm hnědá — Ojeté */
+
+/* Fuel icon — overlay bottom-right na fotce, barva odpovídá typu pohonu.
+   Vizuálně doplňuje top stripe a chips — okamžitý vizuální signál co je za pohon. */
+.scard .pic .fuel-icon {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  background: #fff;
+  border-radius: 50%;
+  box-shadow: 0 2px 8px -2px rgba(0,0,0,0.25), 0 0 0 1px rgba(0,0,0,0.04);
+  z-index: 2;
+  transition: transform .15s;
+}
+.scard:hover .pic .fuel-icon { transform: scale(1.06); }
+.scard .pic .fuel-icon--ice { color: #B4762E; }   /* benzín — ochre */
+.scard .pic .fuel-icon--hev { color: #2A7A8F; }   /* hybrid — teal */
+.scard .pic .fuel-icon--phev { color: #C76A30; }  /* PHEV — orange */
+.scard .pic .fuel-icon--ev { color: #2F9B5C; }    /* elektro — green */
 .scard .body {
   padding: 16px 16px 18px;
   display: flex; flex-direction: column;

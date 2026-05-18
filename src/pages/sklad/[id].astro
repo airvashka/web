@@ -1,5 +1,6 @@
 ---
 import BaseLayout from '@layouts/BaseLayout.astro';
+import FuelIcon from '@components/FuelIcon.astro';
 import DirectusImage from '@components/DirectusImage.astro';
 import Breadcrumbs from '@components/Breadcrumbs.astro';
 import JsonLd from '@components/JsonLd.astro';
@@ -842,6 +843,7 @@ const description = (v.description ?? '').split(/\n\s*\n/).filter(Boolean);
                       {pillLabel && <span class="pill pill--promo">{pillLabel}</span>}
                       <span class={`pill pill--${conditionCls}`}>{conditionLabel}</span>
                     </div>
+                    <FuelIcon type={fuelType} />
                   </div>
                   <div class="body">
                     <div class="nm">{brandName} {modelName}</div>
