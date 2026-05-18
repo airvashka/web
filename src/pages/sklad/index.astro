@@ -166,6 +166,8 @@ const fmtKm = (n?: number | null) => (n === 0 || !n ? '0 km' : `${n.toLocaleStr
                 const conditionLabel = conditionLabels[v.condition ?? ''] ?? '';
                 const fuelLabel = fuelLabels[v.model?.fuel_type ?? ''] ?? '';
                 const transmissionLabel = v.transmission === 'manual' ? 'Manuál' : v.transmission === 'automatic' ? 'Automat' : '';
+                const is4wd = v.drivetrain === '4wd' || v.drivetrain === 'awd';
+                const conditionCls = v.condition === 'new' ? 'new' : v.condition === 'demo' ? 'demo' : 'used';
                 // Cena: stock.promo > model promo (jen u nových vozů) > list
                 const baseList = v.list_price;
                 let displayPrice = v.promo_price ?? baseList;
@@ -188,16 +190,19 @@ const fmtKm = (n?: number | null) => (n === 0 || !n ? '0 km' : `${n.toLocaleStr
                   >
                     <div class="pic">
                       {photoId && <DirectusImage src={photoId} alt={`${v.brand?.name ?? ''} ${v.model?.name ?? ''}`} aspectRatio="4/3" />}
-                      {pillLabel && <span class="pill">{pillLabel}</span>}
+                      <div class="pill-stack">
+                        {pillLabel && <span class="pill pill--promo">{pillLabel}</span>}
+                        {conditionLabel && <span class={`pill pill--${conditionCls}`}>{conditionLabel}</span>}
+                      </div>
                     </div>
                     <div class="body">
                       <div class="nm">{v.brand?.name ?? ''} {v.model?.name ?? ''}</div>
                       {trimName && <div class="var">{trimName}</div>}
                       <div class="specs">
                         {fuelLabel && <span class="fuel">{fuelLabel}</span>}
-                        {carYear && <span>{carYear}</span>}
-                        {conditionLabel && <span>{conditionLabel}</span>}
                         {transmissionLabel && <span>{transmissionLabel}</span>}
+                        {is4wd && <span>4×4</span>}
+                        {carYear && <span>{carYear}</span>}
                       </div>
                       <div class="foot">
                         <span class="km">{fmtKm(v.km)}</span>
@@ -208,6 +213,7 @@ const fmtKm = (n?: number | null) => (n === 0 || !n ? '0 km' : `${n.toLocaleStr
                           <span>{fmtPrice(displayPrice)}</span>
                         </div>
                       </div>
+                      <div class="stock-state">Skladem v Praze</div>
                     </div>
                   </a>
                 );

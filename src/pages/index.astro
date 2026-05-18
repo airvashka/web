@@ -34,7 +34,7 @@ const stockVehicles = await directusGet<any>('stock_vehicles', {
     'id', 'condition', 'availability', 'km', 'list_price', 'promo_price',
     'highlighted', 'highlight_label', 'listed_at', 'trim_level_snapshot',
     'color_code', 'color_category',
-    'photos.directus_files_id',
+    'photos.directus_files_id', 'transmission', 'drivetrain',
     'model.id', 'model.name', 'model.slug',
     'model.promo_active', 'model.promo_label', 'model.promo_discount_amount', 'model.promo_valid_to',
     'brand.id', 'brand.name', 'brand.slug',
@@ -246,7 +246,7 @@ const articles = articlesRaw.map((a) => {
       {stockVehicles.length === 0 ? (
         <div class="sklad-empty">Skladovka se právě plní — koukněte se za chvíli, nebo nám zavolejte +420 771 235 458.</div>
       ) : (
-        <div class="skladovka-grid" data-stock-shuffle data-visible-count="5">
+        <div class="skladovka-grid" data-stock-shuffle data-visible-count="4">
           {stockVehicles.map((v: any) => {
             const isNew = v.condition === 'new';
             const isHighlighted = v.highlighted;
@@ -269,9 +269,13 @@ const articles = articlesRaw.map((a) => {
             const brandName = v.brand?.name ?? '';
             const carYear = v.model_year?.year ?? '';
             const conditionLabel = v.condition === 'new' ? 'Nové' : v.condition === 'demo' ? 'Předváděcí' : 'Ojeté';
-            const fuelLabel = v.trim_level_snapshot?.fuel_label ?? '';
-            const fuelType = v.model?.fuel_type ?? '';
+            const conditionCls = v.condition === 'new' ? 'new' : v.condition === 'demo' ? 'demo' : 'used';
+            const fuelTypeRaw = v.model?.fuel_type ?? '';
+            const fuelLabelMap = { petrol: 'Benzín', diesel: 'Diesel', hybrid: 'Hybrid', phev: 'PHEV', ev: 'Elektro' };
+            const fuelLabel = fuelLabelMap[fuelTypeRaw] ?? '';
+            const fuelType = fuelTypeRaw;
             const transmissionLabel = v.transmission === 'manual' ? 'Manuál' : v.transmission === 'automatic' ? 'Automat' : '';
+            const is4wd = v.drivetrain === '4wd' || v.drivetrain === 'awd';
             // Cena s ohledem na model promo (jen u nových vozů)
             const baseList = v.list_price;
             let price = v.promo_price ?? baseList;
@@ -286,16 +290,19 @@ const articles = articlesRaw.map((a) => {
               <a class="scard" href={`/sklad/${buildStockSlug(v, v.brand, v.model, v.trim_level ?? { name: trim })}`} data-fuel={fuelType}>
                 <div class="pic">
                   {photoId && <DirectusImage src={photoId} alt={`${brandName} ${modelName}`} aspectRatio="4/3" />}
-                  {pillLabel && <span class="pill">{pillLabel}</span>}
+                  <div class="pill-stack">
+                    {pillLabel && <span class="pill pill--promo">{pillLabel}</span>}
+                    <span class={`pill pill--${conditionCls}`}>{conditionLabel}</span>
+                  </div>
                 </div>
                 <div class="body">
                   <div class="nm">{brandName} {modelName}</div>
                   {trim && <div class="var">{trim}</div>}
                   <div class="specs">
                     {fuelLabel && <span class="fuel">{fuelLabel}</span>}
-                    {carYear && <span>{carYear}</span>}
-                    <span>{conditionLabel}</span>
                     {transmissionLabel && <span>{transmissionLabel}</span>}
+                    {is4wd && <span>4×4</span>}
+                    {carYear && <span>{carYear}</span>}
                   </div>
                   <div class="foot">
                     <span class="km">{fmtKm(v.km)}</span>
@@ -306,6 +313,7 @@ const articles = articlesRaw.map((a) => {
                       <span>{fmtPrice(price)}</span>
                     </div>
                   </div>
+                  <div class="stock-state">Skladem v Praze</div>
                 </div>
               </a>
             );

@@ -290,10 +290,13 @@ const similar = await directusGet<any>('stock_vehicles', {
     status: { _eq: 'published' },
     availability: { _in: ['in_stock', 'on_the_way'] },
   },
-  limit: 3,
+  limit: 4,
   fields: [
     'id', 'condition', 'km', 'list_price', 'promo_price', 'color_code', 'color_category',
+    'transmission', 'drivetrain', 'highlighted', 'highlight_label',
     'trim_level_snapshot', 'photos.directus_files_id', 'trim_level.name',
+    'model_year.year', 'model.fuel_type', 'model.promo_active', 'model.promo_label', 'model.promo_discount_amount', 'model.promo_valid_to',
+    'brand.name', 'brand.slug', 'model.name', 'model.slug',
   ],
 });
 
@@ -798,26 +801,65 @@ const description = (v.description ?? '').split(/\n\s*\n/).filter(Boolean);
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
             </a>
           </div>
-          <div class="cars">
+          <div class="skladovka-grid">
             {similar.map((s: any) => {
               const photoId = s.photos?.[0]?.directus_files_id;
               const trimName = s.trim_level?.name ?? s.trim_level_snapshot?.name ?? '';
-              const price = s.promo_price ?? s.list_price;
+              const carYear = s.model_year?.year ?? '';
+              const conditionLabel = s.condition === 'new' ? 'Nové' : s.condition === 'demo' ? 'Předváděcí' : 'Ojeté';
+              const conditionCls = s.condition === 'new' ? 'new' : s.condition === 'demo' ? 'demo' : 'used';
+              const fuelType = s.model?.fuel_type ?? '';
+              const fuelLabelMap = { petrol: 'Benzín', diesel: 'Diesel', hybrid: 'Hybrid', phev: 'PHEV', ev: 'Elektro' };
+              const fuelLabel = fuelLabelMap[fuelType] ?? '';
+              const transmissionLabel = s.transmission === 'manual' ? 'Manuál' : s.transmission === 'automatic' ? 'Automat' : '';
+              const is4wd = s.drivetrain === '4wd' || s.drivetrain === 'awd';
+              // Pill: promo akce z modelu (jen pro nové)
+              const today = new Date().toISOString().slice(0, 10);
+              const modelPromoActive = !!s.model?.promo_active
+                && (s.model.promo_label || s.model.promo_discount_amount)
+                && (!s.model.promo_valid_to || String(s.model.promo_valid_to) >= today);
+              const modelPromoLabel = (s.model?.promo_label ?? '').toString().trim();
+              const modelPromoDiscount = Number(s.model?.promo_discount_amount ?? 0) || 0;
+              const pillLabel = modelPromoActive && modelPromoLabel ? modelPromoLabel : '';
+              // Cena
+              const baseList = s.list_price;
+              let price = s.promo_price ?? baseList;
+              let priceBefore: number | null = null;
+              if (s.promo_price && baseList && s.promo_price < baseList) priceBefore = baseList;
+              else if (modelPromoActive && modelPromoDiscount > 0 && baseList && s.condition === 'new') {
+                price = baseList - modelPromoDiscount;
+                priceBefore = baseList;
+              }
+              const fmtP = (n?: number | null) => (n ? `${n.toLocaleString('cs-CZ')} Kč` : '—');
+              const fmtK = (n?: number | null) => (n === 0 || !n ? `0 km` : `${n.toLocaleString('cs-CZ')} km`);
+              const brandName = brand?.name ?? s.brand?.name ?? '';
+              const modelName = model?.name ?? s.model?.name ?? '';
               return (
-                <a class="car-card" href={`/sklad/${buildStockSlug(s, brand, model, s.trim_level ?? { name: trimName })}`}>
+                <a class="scard" href={`/sklad/${buildStockSlug(s, brand, model, s.trim_level ?? { name: trimName })}`} data-fuel={fuelType}>
                   <div class="pic">
-                    <span class="tag">Skladem</span>
-                    {photoId && <DirectusImage src={photoId} alt={`${model?.name ?? ''} ${trimName}`} aspectRatio="4/3" />}
-                  </div>
-                  <div class="car-body">
-                    <div class="car-name">{brand?.name ?? ''} {model?.name ?? ''} {trimName}</div>
-                    <div class="car-meta">
-                      {s.color_code && <span class="colordot" style={`background:${s.color_code}`}></span>}
-                      {(s.km ?? 0).toLocaleString('cs-CZ')} km
+                    {photoId && <DirectusImage src={photoId} alt={`${modelName} ${trimName}`} aspectRatio="4/3" />}
+                    <div class="pill-stack">
+                      {pillLabel && <span class="pill pill--promo">{pillLabel}</span>}
+                      <span class={`pill pill--${conditionCls}`}>{conditionLabel}</span>
                     </div>
-                    <hr />
-                    <div class="car-price">{price ? `${price.toLocaleString('cs-CZ')} Kč` : '—'}</div>
-                    <div class="car-stock"><span class="dot"></span>Skladem v Praze</div>
+                  </div>
+                  <div class="body">
+                    <div class="nm">{brandName} {modelName}</div>
+                    {trimName && <div class="var">{trimName}</div>}
+                    <div class="specs">
+                      {fuelLabel && <span class="fuel">{fuelLabel}</span>}
+                      {transmissionLabel && <span>{transmissionLabel}</span>}
+                      {is4wd && <span>4×4</span>}
+                      {carYear && <span>{carYear}</span>}
+                    </div>
+                    <div class="foot">
+                      <span class="km">{fmtK(s.km)}</span>
+                      <div class="price">
+                        {priceBefore && <span class="price-before">{fmtP(priceBefore)}</span>}
+                        <span>{fmtP(price)}</span>
+                      </div>
+                    </div>
+                    <div class="stock-state">Skladem v Praze</div>
                   </div>
                 </a>
               );

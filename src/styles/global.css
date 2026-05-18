@@ -3506,50 +3506,36 @@ button.thumb-more {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 18px;
+  align-items: stretch;
 }
-/* Homepage skladovka — 5 sloupců aby šířka karet matchovala /sklad
-   (kde má sidebar 280px → 4 cols ve zbylé šířce ≈ stejné jako 5 cols full-width). */
-.skladovka-grid[data-stock-shuffle] {
-  grid-template-columns: repeat(5, 1fr);
-}
-/* Shuffle pool — render 16, default zobrazí jen prvních 5. Client JS pak
-   zamíchá DOM order tak že každý F5 vidí jinou náhodnou pětici. */
-.skladovka-grid[data-stock-shuffle] > .scard:nth-child(n+6) {
+/* Shuffle pool — render 16, default zobrazí jen prvních 4. Client JS pak
+   zamíchá DOM order tak že každý F5 vidí jinou náhodnou čtveřici. */
+.skladovka-grid[data-stock-shuffle] > .scard:nth-child(n+5) {
   display: none;
 }
 @media (max-width: 1100px) {
-  .skladovka-grid[data-stock-shuffle] { grid-template-columns: repeat(3, 1fr); }
-  .skladovka-grid[data-stock-shuffle] > .scard:nth-child(n+4) { display: none; }
+  .skladovka-grid[data-stock-shuffle] > .scard:nth-child(n+4) { display: initial; }
+  .skladovka-grid { grid-template-columns: repeat(2, 1fr); }
+  .skladovka-grid[data-stock-shuffle] > .scard:nth-child(n+3) { display: none; }
+}
+@media (max-width: 600px) {
+  .skladovka-grid { grid-template-columns: 1fr; }
+  .skladovka-grid[data-stock-shuffle] > .scard:nth-child(n+2) { display: none; }
 }
 
-/* ===== Barevné akcenty podle typu paliva (spalovák/HEV/PHEV/EV) =====
-   Levý border + barva chip Palivo. Subtílní — neruší celkový design,
-   ale na první pohled signalizuje pohonný typ. */
-.scard[data-fuel="petrol"], .scard[data-fuel="diesel"] {
-  border-left: 3px solid #8a8580;
+/* ===== Top color stripe podle paliva — jako /model boxy =====
+   Tenký 3px proužek nahoře karty, signalizuje pohonný typ.
+   Chips zůstávají neutrální (cream pozadí) aby karty vypadaly konzistentně. */
+.scard[data-fuel]::before {
+  content: ""; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+  z-index: 3; border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  background: transparent;
 }
-.scard[data-fuel="petrol"] .specs span.fuel,
-.scard[data-fuel="diesel"] .specs span.fuel {
-  background: #ece8e0; color: #5c5852;
-}
-.scard[data-fuel="hybrid"] {
-  border-left: 3px solid #6ba368;
-}
-.scard[data-fuel="hybrid"] .specs span.fuel {
-  background: #e3efdf; color: #3d6b3a;
-}
-.scard[data-fuel="phev"] {
-  border-left: 3px solid #4a9b6e;
-}
-.scard[data-fuel="phev"] .specs span.fuel {
-  background: #dcebe1; color: #2a6b48;
-}
-.scard[data-fuel="ev"] {
-  border-left: 3px solid #2d8aa8;
-}
-.scard[data-fuel="ev"] .specs span.fuel {
-  background: #d9eaf1; color: #1e5d76;
-}
+.scard[data-fuel="petrol"]::before { background: #B4762E; }   /* spalovací benzín */
+.scard[data-fuel="diesel"]::before { background: #5C5A52; }   /* diesel */
+.scard[data-fuel="hybrid"]::before { background: #2A7A8F; }   /* hybrid — teal */
+.scard[data-fuel="phev"]::before { background: #C76A30; }     /* PHEV — orange */
+.scard[data-fuel="ev"]::before { background: #2F9B5C; }       /* elektro — green */
 .scard {
   background: #fff;
   border-radius: var(--radius-lg);
@@ -3566,30 +3552,71 @@ button.thumb-more {
   overflow: hidden;
 }
 .scard .pic img { width: 100%; height: 100%; object-fit: cover; display: block; }
-/* Pill jako overlay přes foto — zobrazí se POUZE pro promo/highlight (ne pro 'Skladem'/'Nové',
-   to je v .specs jako chip Stav). */
-.scard .pill {
+/* Pill stack — overlay přes foto, top-left. Až 2 řádky: PROMO (pokud akce) + STAV (Nové/Předváděcí/Ojeté).
+   Stav je vždy viditelný aby návštěvník na první pohled viděl rozdíl mezi novými/předváděcími/ojetými. */
+.scard .pic .pill-stack {
   position: absolute;
   top: 12px;
   left: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-width: calc(100% - 24px);
+  z-index: 2;
+}
+.scard .pill {
   display: inline-flex;
+  align-self: flex-start;
   font-family: var(--font-display);
   font-weight: 600;
-  font-size: 11px;
-  letter-spacing: 0.12em;
+  font-size: 10.5px;
+  letter-spacing: 0.10em;
   text-transform: uppercase;
-  background: var(--accent);
-  color: #fff;
-  padding: 6px 10px;
-  border-radius: 5px;
+  padding: 5px 9px;
+  border-radius: 4px;
+  line-height: 1.2;
+  white-space: nowrap;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
   box-shadow: 0 4px 12px -4px rgba(0,0,0,0.25);
 }
+.scard .pill--promo { background: var(--accent); color: #fff; }
+.scard .pill--new { background: #2F7A4D; color: #fff; }      /* zelená — Nové */
+.scard .pill--demo { background: #2A7A8F; color: #fff; }     /* teal — Předváděcí */
+.scard .pill--used { background: #8A6E50; color: #fff; }     /* warm hnědá — Ojeté */
 .scard .body {
   padding: 16px 16px 18px;
   display: flex; flex-direction: column;
   flex: 1;
-  gap: 12px;
+  gap: 10px;
 }
+/* Skladem dot — malá nenápadná zelená tečka pod cenou, signalizuje že vůz je fyzicky skladem */
+.scard .stock-state {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 11px;
+  color: var(--text-muted);
+  letter-spacing: 0.02em;
+  margin-top: 4px;
+}
+.scard .stock-state::before {
+  content: "";
+  display: inline-block;
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: #2F9B5C;
+  box-shadow: 0 0 0 2px rgba(47, 155, 92, 0.18);
+}
+/* Specs chips — vždy neutrální (cream pozadí), bez fuel-specific barev.
+   Barvu paliva ukazuje top stripe karty. */
+.scard .specs span {
+  background: var(--bg-cream);
+  color: var(--text);
+}
+/* Min-heights aby všechny karty měly stejnou strukturu i s různými daty */
+.scard .nm { min-height: 22px; }
+.scard .var { min-height: 17px; }
+.scard .specs { min-height: 26px; }
 .scard .nm {
   font-family: var(--font-display);
   font-weight: 600;

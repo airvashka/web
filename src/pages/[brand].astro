@@ -97,7 +97,7 @@ const stockSample = await directusGet<any>('stock_vehicles', {
   fields: [
     'id', 'condition', 'km', 'list_price', 'promo_price',
     'highlighted', 'highlight_label', 'trim_level_snapshot',
-    'color_code', 'color_category', 'transmission',
+    'color_code', 'color_category', 'transmission', 'drivetrain',
     'photos.directus_files_id',
     'model.name', 'model.slug', 'model.fuel_type',
     'model.promo_active', 'model.promo_label', 'model.promo_discount_amount', 'model.promo_valid_to',
@@ -411,7 +411,7 @@ const activeBrand = Astro.params.brand;
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
           </a>
         </div>
-        <div class="skladovka-grid" data-stock-shuffle data-visible-count="5">
+        <div class="skladovka-grid" data-stock-shuffle data-visible-count="4">
           {stockSample.map((v: any) => {
             const isNew = v.condition === 'new';
             const isHl = v.highlighted;
@@ -437,6 +437,8 @@ const activeBrand = Astro.params.brand;
             const fuelLabelMap = { petrol: 'Benzín', diesel: 'Diesel', hybrid: 'Hybrid', phev: 'PHEV', ev: 'Elektro' };
             const fuelLabel = fuelLabelMap[fuelType] ?? '';
             const transmissionLabel = v.transmission === 'manual' ? 'Manuál' : v.transmission === 'automatic' ? 'Automat' : '';
+            const is4wd = v.drivetrain === '4wd' || v.drivetrain === 'awd';
+            const conditionCls = v.condition === 'new' ? 'new' : v.condition === 'demo' ? 'demo' : 'used';
             // Cena: stock.promo > model promo (jen u nových vozů) > list
             const baseList = v.list_price;
             let price = v.promo_price ?? baseList;
@@ -451,16 +453,19 @@ const activeBrand = Astro.params.brand;
               <a class="scard" href={`/sklad/${buildStockSlug(v, brand, v.model, v.trim_level ?? { name: trim })}`} data-fuel={fuelType}>
                 <div class="pic">
                   {photoId && <DirectusImage src={photoId} alt={`${brand.name} ${modelName}`} aspectRatio="4/3" />}
-                  {pillLabel && <span class="pill">{pillLabel}</span>}
+                  <div class="pill-stack">
+                    {pillLabel && <span class="pill pill--promo">{pillLabel}</span>}
+                    <span class={`pill pill--${conditionCls}`}>{conditionLabel}</span>
+                  </div>
                 </div>
                 <div class="body">
                   <div class="nm">{brand.name} {modelName}</div>
                   {trim && <div class="var">{trim}</div>}
                   <div class="specs">
                     {fuelLabel && <span class="fuel">{fuelLabel}</span>}
-                    {carYear && <span>{carYear}</span>}
-                    <span>{conditionLabel}</span>
                     {transmissionLabel && <span>{transmissionLabel}</span>}
+                    {is4wd && <span>4×4</span>}
+                    {carYear && <span>{carYear}</span>}
                   </div>
                   <div class="foot">
                     <span class="km">{fmtKm(v.km)}</span>
@@ -469,6 +474,7 @@ const activeBrand = Astro.params.brand;
                       <span>{fmtPrice(price)}</span>
                     </div>
                   </div>
+                  <div class="stock-state">Skladem v Praze</div>
                 </div>
               </a>
             );
