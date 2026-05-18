@@ -520,21 +520,6 @@ if (promoActive && promoDescription) {
     </div>
   </div>
 
-  <!-- ===== MODEL SWITCHER — chips pro rychlé přepnutí na jiný model značky ===== -->
-  {otherModels.length > 0 && (
-    <div class="model-switcher">
-      <div class="container model-switcher-inner">
-        <span class="model-switcher-label">Modely {brand.name}:</span>
-        <div class="model-switcher-chips">
-          <span class="model-chip is-active">{rawModel.name}</span>
-          {otherModels.map((m: any) => (
-            <a class="model-chip" href={`/model/${m.slug}`}>{m.name}</a>
-          ))}
-          <a class="model-chip model-chip--all" href={`/${brand.slug}`}>Všechny →</a>
-        </div>
-      </div>
-    </div>
-  )}
 
   <!-- ===== AKCE BANNER ===== -->
   {promoActive && (

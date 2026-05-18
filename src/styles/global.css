@@ -100,12 +100,21 @@ input, textarea, select { font: inherit; }
   border-bottom: 1px solid var(--line);
   position: sticky; top: 0;
   z-index: 50;
-  transition: transform .25s ease;
+  transition: transform .25s ease, box-shadow .2s ease;
   will-change: transform;
 }
-/* Headroom — při scroll-down se schová, při scroll-up se vrátí.
-   JS přepíná třídu nav--hidden v BaseLayout. */
-.nav.nav--hidden { transform: translateY(-110%); }
+/* Headroom — JS v Header.astro přepíná html.scrolled-down / scrolled-up.
+   Tahle pravidla jsou v global.css aby šly přes Astro CSS bundling spolehlivě
+   (dříve byla v <style is:global> v komponentě a možná se cestou ztratila). */
+@media (min-width: 961px) {
+  html.scrolled-down .nav {
+    transform: translateY(-110%);
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  }
+  html.scrolled-up .nav {
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  }
+}
 .nav-inner {
   display: flex;
   align-items: center;
@@ -1670,67 +1679,6 @@ button.thumb-more {
 /* Když nav schovaný (scroll-down), subnav se posune nahoru aby nezůstal "viset" v mezeře */
 html.scrolled-down .subnav {
   top: 0;
-}
-
-/* ===== Model switcher chips — pod subnavem na /model/[slug] ===== */
-.model-switcher {
-  background: var(--bg-cream);
-  border-bottom: 1px solid var(--line);
-  padding: 12px 0;
-}
-.model-switcher-inner {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  flex-wrap: wrap;
-}
-.model-switcher-label {
-  font-family: var(--font-display);
-  font-size: 12px;
-  font-weight: 600;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--text-muted);
-  white-space: nowrap;
-}
-.model-switcher-chips {
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-  align-items: center;
-}
-.model-chip {
-  display: inline-flex;
-  align-items: center;
-  font-family: var(--font-display);
-  font-size: 13px;
-  font-weight: 500;
-  color: var(--text);
-  background: #fff;
-  border: 1px solid var(--line);
-  padding: 6px 14px;
-  border-radius: 999px;
-  transition: all .15s;
-  cursor: pointer;
-}
-.model-chip:not(.is-active):hover {
-  border-color: var(--accent);
-  color: var(--accent);
-}
-.model-chip.is-active {
-  background: var(--ink);
-  color: #fff;
-  border-color: var(--ink);
-  cursor: default;
-}
-.model-chip--all {
-  background: transparent;
-  border-color: transparent;
-  color: var(--text-muted);
-  font-size: 12px;
-}
-.model-chip--all:hover {
-  color: var(--accent);
 }
 .subnav-inner {
   display: flex;

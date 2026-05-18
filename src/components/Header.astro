@@ -148,8 +148,8 @@ const navItems: Array<{ label: string; href: string; key: NonNullable<Props['act
   (function () {
     let lastY = window.scrollY;
     let ticking = false;
-    const THRESHOLD = 200;  // px from top — pod tím žádné hide/show; klid
-    const DELTA = 10;       // min px scroll change před změnou state (anti-thrash)
+    const THRESHOLD = 100;  // px from top — pod tím žádné hide/show; klid
+    const DELTA = 5;        // min px scroll change před změnou state (anti-thrash)
     const root = document.documentElement;
 
     function update() {
