@@ -144,22 +144,49 @@ const { modelSlug, modelName, brandName } = Astro.props;
       return s;
     }
 
-    function appendMessage(role: 'user' | 'assistant', text: string) {
+    function appendMessage(role: 'user' | 'assistant', text: string, debug: any = null) {
       const wrap = document.createElement('div');
       wrap.className = `chat-msg chat-msg--${role}`;
       const avatar = document.createElement('span');
       avatar.className = `chat-avatar chat-avatar--${role === 'assistant' ? 'ai' : 'user'}`;
       avatar.setAttribute('aria-hidden', 'true');
       avatar.innerHTML = role === 'assistant' ? AI_AVATAR_SVG : USER_AVATAR_SVG;
+
+      const bubbleWrap = document.createElement('div');
+      bubbleWrap.style.maxWidth = '82%';
+      bubbleWrap.style.display = 'flex';
+      bubbleWrap.style.flexDirection = 'column';
+      bubbleWrap.style.gap = '4px';
+
+      // Debug badge — kolik chunků RAG našel (jen u AI odpovědi)
+      if (role === 'assistant' && debug && typeof debug.rag_chunks_count === 'number') {
+        const badge = document.createElement('div');
+        badge.className = 'chat-debug-badge';
+        if (debug.rag_chunks_count > 0) {
+          const sourceList = (debug.rag_chunks ?? [])
+            .map((c: any) => `${c.source}#${c.page}`)
+            .slice(0, 3)
+            .join(', ');
+          badge.innerHTML = `📚 RAG: ${debug.rag_chunks_count} zdrojů · ${sourceList}`;
+          badge.classList.add('chat-debug-badge--found');
+        } else {
+          badge.innerHTML = `📚 RAG: 0 zdrojů — odpovídám z obecného contextu`;
+          badge.classList.add('chat-debug-badge--empty');
+        }
+        bubbleWrap.appendChild(badge);
+      }
+
       const bubble = document.createElement('div');
       bubble.className = 'chat-bubble';
       bubble.innerHTML = markdownToHtml(text);
-      // Order: AI msg → avatar | bubble. User msg → bubble | avatar
+      bubbleWrap.appendChild(bubble);
+
+      // Order: AI msg → avatar | bubbleWrap. User msg → bubbleWrap | avatar
       if (role === 'assistant') {
         wrap.appendChild(avatar);
-        wrap.appendChild(bubble);
+        wrap.appendChild(bubbleWrap);
       } else {
-        wrap.appendChild(bubble);
+        wrap.appendChild(bubbleWrap);
         wrap.appendChild(avatar);
       }
       messagesEl.appendChild(wrap);
@@ -196,7 +223,7 @@ const { modelSlug, modelName, brandName } = Astro.props;
         typing.remove();
         if (!r.ok) throw new Error(j?.error || `HTTP ${r.status}`);
         const reply = j.content || 'Omlouvám se, něco se pokazilo. Zkuste to znovu.';
-        appendMessage('assistant', reply);
+        appendMessage('assistant', reply, j.debug);
         history.push({ role: 'assistant', content: reply });
         if (j.lead_created) {
           // Track conversion v dataLayer
@@ -415,6 +442,26 @@ const { modelSlug, modelName, brandName } = Astro.props;
   .chat-avatar--user {
     background: #e6e6e3;
     color: #6B6B72;
+  }
+
+  /* Debug badge — RAG diagnostika */
+  .chat-debug-badge {
+    font-size: 10.5px;
+    padding: 4px 9px;
+    border-radius: 8px;
+    font-family: var(--font-mono, monospace);
+    word-break: break-all;
+    line-height: 1.4;
+  }
+  .chat-debug-badge--found {
+    background: rgba(74, 222, 128, 0.15);
+    color: #2c7a3e;
+    border: 1px solid rgba(74, 222, 128, 0.3);
+  }
+  .chat-debug-badge--empty {
+    background: rgba(255, 200, 100, 0.15);
+    color: #8a5a00;
+    border: 1px solid rgba(255, 200, 100, 0.3);
   }
 
   /* Markdown linky v bublině */

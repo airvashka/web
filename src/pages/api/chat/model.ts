@@ -535,6 +535,17 @@ export const POST: APIRoute = async ({ request }) => {
         role: 'assistant',
         content: finalText,
         lead_created: leadCreated,
+        // Debug info — co RAG našel
+        debug: {
+          rag_chunks_count: knowledgeChunks.length,
+          rag_chunks: knowledgeChunks.map((c) => ({
+            source: c.source_filename,
+            title: c.title,
+            page: c.page_number,
+            score: c.score,
+            matched: c.matchedKeywords,
+          })),
+        },
       }),
       { status: 200, headers: { 'Content-Type': 'application/json' } },
     );
