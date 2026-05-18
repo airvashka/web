@@ -28,6 +28,90 @@ export const prerender = false;
 const MODEL_ID = 'claude-haiku-4-5-20251001';
 const DIRECTUS_URL = import.meta.env.PUBLIC_DIRECTUS_URL || import.meta.env.DIRECTUS_URL;
 
+/* ──────────── RAG: KNOWLEDGE SEARCH ──────────── */
+
+/**
+ * Extrahuje klíčová slova z otázky pro full-text search.
+ * Filtruje stop words, zachovává jen 2+ znakových slov.
+ */
+const STOP_WORDS = new Set([
+  'a', 'i', 'o', 'u', 'k', 'v', 's', 'z', 'na', 'do', 'po', 'za', 'od', 'pro', 'ze',
+  'je', 'jsou', 'byl', 'byla', 'bylo', 'byli', 'byly',
+  'to', 'ten', 'ta', 'ti', 'ty', 'tato', 'tito', 'tato', 'toto',
+  'jak', 'kdo', 'co', 'kde', 'kdy', 'proč', 'který', 'která', 'které',
+  'mám', 'máte', 'máš', 'mít', 'mohu', 'můžu', 'může',
+  'ale', 'nebo', 'nebo', 'a', 'i', 'pak', 'pak',
+  'no', 'tak', 'už', 'jen', 'jen', 'asi', 'snad',
+]);
+
+function extractKeywords(question) {
+  return question
+    .toLowerCase()
+    .replace(/[^\p{L}\p{N}\s]/gu, ' ')
+    .split(/\s+/)
+    .filter((w) => w.length >= 3 && !STOP_WORDS.has(w))
+    .slice(0, 10); // max 10 keywords
+}
+
+/**
+ * Vyhledá nejrelevantnější chunky v `knowledge_documents` pro otázku uživatele.
+ * Filtruje podle brand_slug a model_slug (chunky pro tento model + univerzální).
+ */
+async function searchKnowledgeBase(question, brandSlug, modelSlug) {
+  if (!question || question.length < 5) return [];
+  const keywords = extractKeywords(question);
+  if (!keywords.length) return [];
+
+  // Filter: chunky které jsou buď pro tento model, nebo pro tuto značku obecně,
+  // nebo univerzální (oba slug prázdné).
+  const slugFilter = {
+    _or: [
+      { model_slug: { _eq: modelSlug } },
+      { _and: [{ model_slug: { _empty: true } }, { brand_slug: { _eq: brandSlug } }] },
+      { _and: [{ model_slug: { _empty: true } }, { brand_slug: { _empty: true } }] },
+    ],
+  };
+
+  // Pro každé keyword zkus najít chunky které ho obsahují. Pak skóruj dle počtu match keywords.
+  const allChunks = [];
+  try {
+    // Z důvodu omezení Directus filteru (OR nelze sloučit s array of contains efektivně),
+    // uděláme 1 fetch s _icontains na nejdůležitější keyword (první) a pak skórujeme v paměti.
+    const primary = keywords[0];
+    const filter = {
+      _and: [
+        { status: { _eq: 'active' } },
+        slugFilter,
+        { content: { _icontains: primary } },
+      ],
+    };
+    const res = await directusGet('knowledge_documents', {
+      filter,
+      fields: ['id', 'title', 'content', 'page_number', 'tag', 'source_filename'],
+      limit: 50,
+    });
+    if (Array.isArray(res)) allChunks.push(...res);
+  } catch (e) {
+    console.warn('knowledge search failed:', e?.message);
+    return [];
+  }
+
+  if (!allChunks.length) return [];
+
+  // Skórování — kolik keywords se v chunku objevuje
+  const scored = allChunks.map((c) => {
+    const lc = (c.content || '').toLowerCase();
+    let score = 0;
+    for (const k of keywords) {
+      if (lc.includes(k)) score++;
+    }
+    return { ...c, score };
+  }).sort((a, b) => b.score - a.score);
+
+  // Vrať top 4 chunky které mají alespoň 2 keyword matches
+  return scored.filter((c) => c.score >= 2).slice(0, 4);
+}
+
 /* ──────────── DATA FETCHERS ──────────── */
 
 async function fetchModelContext(slug: string) {
@@ -115,9 +199,20 @@ function fmtPrice(n: number | null | undefined): string {
   return `${Number(n).toLocaleString('cs-CZ')} Kč`;
 }
 
-function buildSystemPrompt(ctx: NonNullable<Awaited<ReturnType<typeof fetchModelContext>>>): string {
+function buildSystemPrompt(
+  ctx: NonNullable<Awaited<ReturnType<typeof fetchModelContext>>>,
+  knowledgeChunks: any[] = [],
+): string {
   const { model, latestYear, trims, packages, stock, siblingModels, allBrands, allStock, employees } = ctx;
   const brand = model.brand?.name ?? '';
+
+  // ── Knowledge base chunks (RAG) ──
+  const knowledgeBlock = knowledgeChunks.length
+    ? knowledgeChunks.map((k, i) => {
+        const src = `${k.title}${k.page_number ? ` (str. ${k.page_number})` : ''}`;
+        return `### Zdroj ${i + 1}: ${src} [tag: ${k.tag ?? '—'}]\n${k.content}`;
+      }).join('\n\n---\n\n')
+    : '';
 
   // ── Sibling models (alternativy v rámci značky) ──
   const siblingsBlock = siblingModels.length
@@ -276,8 +371,18 @@ ${allStock.length} vozů skladem: ${allStockText}. Vše na /sklad.
 ## NÁŠ TÝM — komu konkrétně doporučit
 ${empBlock}
 
+${knowledgeBlock ? `═══════════════════════════════════════════════════════
+RELEVANTNÍ ÚRYVKY Z BROŽUR / MANUÁLŮ (RAG)
 ═══════════════════════════════════════════════════════
 
+Tyto úryvky jsme našli v naší znalostní bázi na základě uživatelovy otázky.
+Když z nich čerpáš, můžeš odkázat zdrojem (např. "podle brožury…").
+Pokud tě výňatky neodpovídají na konkrétní dotaz, klidně řekni "v naší dokumentaci k tomu mám jen toto..." a navrhni kontakt na prodejce.
+
+${knowledgeBlock}
+
+═══════════════════════════════════════════════════════
+` : ''}
 ## Příklady odpovědí
 
 **Q**: Jakou má spotřebu?
@@ -316,7 +421,12 @@ export const POST: APIRoute = async ({ request }) => {
       return new Response(JSON.stringify({ error: `Model "${slug}" not found` }), { status: 404, headers: { 'Content-Type': 'application/json' } });
     }
 
-    const systemPrompt = buildSystemPrompt(ctx);
+    // RAG: pokud je v poslední user zprávě otázka, najdi relevantní chunky z knowledge base
+    const lastUserMsg = [...messages].reverse().find((m) => m.role === 'user');
+    const question = lastUserMsg?.content ?? '';
+    const knowledgeChunks = await searchKnowledgeBase(question, ctx.model.brand?.slug, slug);
+
+    const systemPrompt = buildSystemPrompt(ctx, knowledgeChunks);
 
     const anthropic = new Anthropic({ apiKey: import.meta.env.ANTHROPIC_API_KEY });
 
