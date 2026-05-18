@@ -455,7 +455,11 @@ if (promoActive && promoDescription) {
               muted
               loop
               playsinline
-              preload="metadata"
+              webkit-playsinline
+              x5-playsinline
+              disablepictureinpicture
+              preload="auto"
+              data-autoplay-hero
               poster={rawModel.hero_image ? directusAsset(rawModel.hero_image, { width: 1600, format: 'jpg', quality: 80 }) : undefined}
             >
               <source src={directusAsset(videoId)} type={videoType} />
@@ -1183,6 +1187,31 @@ if (promoActive && promoDescription) {
       if (e.key === 'Escape') closeModal();
       if (e.key === 'ArrowLeft') showSlide(current - 1);
       if (e.key === 'ArrowRight') showSlide(current + 1);
+    });
+
+    /* === Hero video — Safari autoplay pojistka ===
+       Safari (zvláště iOS) občas přeskočí autoplay i u muted+playsinline videí.
+       Force-play s retry; pokud i tak Safari odmítne, ponecháme poster + AI fallback. */
+    document.querySelectorAll('video[data-autoplay-hero]').forEach((v) => {
+      // Force muted property (atribut nemusí stačit ve všech iOS verzích)
+      try { v.muted = true; v.setAttribute('muted', ''); } catch {}
+      const tryPlay = () => {
+        const p = v.play();
+        if (p && typeof p.then === 'function') {
+          p.catch(() => {
+            // Safari odmítl autoplay. Zkus znovu po user interactionu (jednou).
+            const onInteract = () => {
+              v.play().catch(() => {});
+              document.removeEventListener('touchstart', onInteract);
+              document.removeEventListener('click', onInteract);
+            };
+            document.addEventListener('touchstart', onInteract, { once: true, passive: true });
+            document.addEventListener('click', onInteract, { once: true });
+          });
+        }
+      };
+      if (v.readyState >= 2) tryPlay();
+      else v.addEventListener('loadeddata', tryPlay, { once: true });
     });
 
     /* === Color selector — swap aktivní fotky + jména po kliknutí na swatch === */
