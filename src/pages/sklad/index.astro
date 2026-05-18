@@ -33,7 +33,7 @@ const vehicles = await directusGet<VehicleListItem>('stock_vehicles', {
     'id', 'vin', 'list_price', 'promo_price', 'lowest_price_30d', 'km',
     'condition', 'availability', 'color_code', 'color_category',
     'transmission', 'drivetrain',
-    'highlighted', 'highlight_label',
+    'highlighted', 'highlight_label', 'listed_at',
     'trim_level_snapshot',
     'photos.directus_files_id',
     'brand.name', 'brand.slug',
@@ -60,8 +60,26 @@ const colorCategoryLabels: Record<string, string> = {
 
 // Unique values pro filtry
 const availableFuels = [...new Set(vehicles.map((v) => v.model?.fuel_type).filter(Boolean))] as string[];
-const availableColors = [...new Set(vehicles.map((v) => v.color_category).filter(Boolean))] as string[];
 const availableConditions = [...new Set(vehicles.map((v) => v.condition).filter(Boolean))] as string[];
+const has4wd = vehicles.some((v) => v.drivetrain === '4wd' || v.drivetrain === 'awd');
+
+// Modely seskupené podle značky — pro <select> s <optgroup>
+type ModelOpt = { slug: string; name: string };
+const modelsByBrand = new Map<string, { brandName: string; models: ModelOpt[] }>();
+vehicles.forEach((v) => {
+  if (!v.brand?.slug || !v.model?.slug) return;
+  const bSlug = v.brand.slug;
+  if (!modelsByBrand.has(bSlug)) {
+    modelsByBrand.set(bSlug, { brandName: v.brand.name, models: [] });
+  }
+  const group = modelsByBrand.get(bSlug)!;
+  if (!group.models.find((m) => m.slug === v.model!.slug)) {
+    group.models.push({ slug: v.model.slug, name: v.model.name });
+  }
+});
+const modelGroups = Array.from(modelsByBrand.entries())
+  .sort((a, b) => a[1].brandName.localeCompare(b[1].brandName))
+  .map(([slug, group]) => ({ brandSlug: slug, brandName: group.brandName, models: group.models.sort((a, b) => a.name.localeCompare(b.name)) }));
 
 // Non-breaking space mezi číslem a jednotkou — zabrání zalomení "849 900\nKč" v úzkých kartách.
 const NBSP = String.fromCharCode(160);
@@ -105,6 +123,22 @@ const fmtKm = (n?: number | null) => (n === 0 || !n ? '0 km' : `${n.toLocaleStr
               ))}
             </div>
 
+            {modelGroups.length > 0 && (
+              <div class="fblock">
+                <h4>Model</h4>
+                <select name="model" class="filter-select" data-filter-model>
+                  <option value="all">Všechny modely</option>
+                  {modelGroups.map((g) => (
+                    <optgroup label={g.brandName} data-brand={g.brandSlug}>
+                      {g.models.map((m) => (
+                        <option value={m.slug} data-brand={g.brandSlug}>{m.name}</option>
+                      ))}
+                    </optgroup>
+                  ))}
+                </select>
+              </div>
+            )}
+
             {availableFuels.length > 0 && (
               <div class="fblock">
                 <h4>Palivo</h4>
@@ -125,13 +159,11 @@ const fmtKm = (n?: number | null) => (n === 0 || !n ? '0 km' : `${n.toLocaleStr
               </div>
             )}
 
-            {availableColors.length > 0 && (
+            {has4wd && (
               <div class="fblock">
-                <h4>Barva</h4>
-                <label><input type="radio" name="color" value="all" checked /> Vše</label>
-                {availableColors.map((c) => (
-                  <label><input type="radio" name="color" value={c} /> {colorCategoryLabels[c] ?? c}</label>
-                ))}
+                <h4>Pohon</h4>
+                <label><input type="radio" name="drivetrain" value="all" checked /> Vše</label>
+                <label><input type="radio" name="drivetrain" value="4wd" /> Pouze 4×4</label>
               </div>
             )}
 
@@ -140,6 +172,17 @@ const fmtKm = (n?: number | null) => (n === 0 || !n ? '0 km' : `${n.toLocaleStr
 
           <!-- ===== GRID ===== -->
           <div>
+            <!-- Sort bar nad gridem -->
+            <div class="sort-bar">
+              <label class="sort-label">
+                Seřadit:
+                <select data-sort class="filter-select">
+                  <option value="newest">Nejnovější</option>
+                  <option value="price-asc">Cena ↑</option>
+                  <option value="price-desc">Cena ↓</option>
+                </select>
+              </label>
+            </div>
             <div class="skladovka-grid" data-grid>
               {vehicles.map((v) => {
                 const isNew = v.condition === 'new';
@@ -185,9 +228,12 @@ const fmtKm = (n?: number | null) => (n === 0 || !n ? '0 km' : `${n.toLocaleStr
                     class="scard"
                     href={`/sklad/${buildStockSlug(v, v.brand, v.model, v.trim_level ?? { name: trimName })}`}
                     data-brand={v.brand?.slug ?? ''}
+                    data-model={v.model?.slug ?? ''}
                     data-fuel={v.model?.fuel_type ?? ''}
-                    data-color={v.color_category ?? ''}
                     data-condition={v.condition ?? ''}
+                    data-drivetrain={v.drivetrain ?? ''}
+                    data-price={displayPrice ?? 0}
+                    data-listed-at={(v as any).listed_at ?? ''}
                   >
                     <div class="pic">
                       {photoId && <DirectusImage src={photoId} alt={`${v.brand?.name ?? ''} ${v.model?.name ?? ''}`} aspectRatio="4/3" />}
@@ -228,35 +274,64 @@ const fmtKm = (n?: number | null) => (n === 0 || !n ? '0 km' : `${n.toLocaleStr
   </section>
 
   <script>
-    // ===== Klient-side multi-filtr =====
+    // ===== Klient-side multi-filtr + sort =====
     const filters = {
-      brand: 'all', fuel: 'all', color: 'all', condition: 'all',
+      brand: 'all', model: 'all', fuel: 'all', condition: 'all', drivetrain: 'all',
     };
+    let sortMode = 'newest';
 
     function applyFilters() {
-      const cards = document.querySelectorAll('.scard');
+      const grid = document.querySelector('[data-grid]');
+      if (!grid) return;
+      const cards = Array.from(grid.querySelectorAll('.scard'));
       let visible = 0;
       cards.forEach((c) => {
         const el = c;
+        const dt = el.dataset.drivetrain ?? '';
+        const drivetrainOk = filters.drivetrain === 'all' || (filters.drivetrain === '4wd' && (dt === '4wd' || dt === 'awd'));
         const ok =
           (filters.brand === 'all' || el.dataset.brand === filters.brand) &&
+          (filters.model === 'all' || el.dataset.model === filters.model) &&
           (filters.fuel === 'all' || el.dataset.fuel === filters.fuel) &&
-          (filters.color === 'all' || el.dataset.color === filters.color) &&
-          (filters.condition === 'all' || el.dataset.condition === filters.condition);
-        if (ok) {
-          el.style.display = '';
-          visible++;
-        } else {
-          el.style.display = 'none';
-        }
+          (filters.condition === 'all' || el.dataset.condition === filters.condition) &&
+          drivetrainOk;
+        if (ok) { el.style.display = ''; visible++; }
+        else { el.style.display = 'none'; }
       });
+      // Sort — řazení DOM children podle data-price / data-listed-at
+      const visibleCards = cards.filter((c) => c.style.display !== 'none');
+      visibleCards.sort((a, b) => {
+        if (sortMode === 'price-asc') return Number(a.dataset.price ?? 0) - Number(b.dataset.price ?? 0);
+        if (sortMode === 'price-desc') return Number(b.dataset.price ?? 0) - Number(a.dataset.price ?? 0);
+        // 'newest' default: descending by listed_at
+        return (b.dataset.listedAt ?? '').localeCompare(a.dataset.listedAt ?? '');
+      });
+      visibleCards.forEach((c) => grid.appendChild(c));
+      // Update čítače
       const count = document.querySelector('[data-result-count]');
       if (count) {
         const noun = visible === 1 ? 'vůz' : visible < 5 ? 'vozy' : 'vozů';
         count.textContent = visible === 0 ? 'Žádné vozy nesplňují filtr' : `${visible} ${noun} skladem`;
       }
+      // Model select — dynamicky skryj/ukaž optgroup podle vybrané značky
+      const modelSelect = document.querySelector('[data-filter-model]');
+      if (modelSelect) {
+        modelSelect.querySelectorAll('optgroup').forEach((og) => {
+          const ogBrand = og.dataset.brand ?? '';
+          og.hidden = !(filters.brand === 'all' || filters.brand === ogBrand);
+        });
+        // Pokud aktuálně zvolený model nepatří k vybrané značce, reset model na "all"
+        if (filters.model !== 'all' && modelSelect.value) {
+          const opt = modelSelect.querySelector(`option[value="${modelSelect.value}"]`);
+          if (opt && opt.dataset.brand && filters.brand !== 'all' && opt.dataset.brand !== filters.brand) {
+            modelSelect.value = 'all';
+            filters.model = 'all';
+          }
+        }
+      }
     }
 
+    // Radio button changes (brand, fuel, condition, drivetrain)
     document.querySelectorAll('[data-filters] input[type=radio]').forEach((input) => {
       input.addEventListener('change', (e) => {
         const t = e.target;
@@ -267,27 +342,51 @@ const fmtKm = (n?: number | null) => (n === 0 || !n ? '0 km' : `${n.toLocaleStr
       });
     });
 
-    document.querySelector('[data-reset]')?.addEventListener('click', () => {
-      Object.keys(filters).forEach((k) => { filters[k] = 'all'; });
-      document.querySelectorAll('[data-filters] input[value=all]').forEach((i) => (i.checked = true));
+    // Model select change
+    document.querySelector('[data-filter-model]')?.addEventListener('change', (e) => {
+      filters.model = e.target.value;
+      // Pokud vybraný model patří k jiné značce, auto-set brand
+      const opt = e.target.selectedOptions[0];
+      const optBrand = opt?.dataset.brand;
+      if (optBrand && filters.brand !== optBrand && filters.model !== 'all') {
+        filters.brand = optBrand;
+        const radio = document.querySelector(`[data-filters] input[name=brand][value="${optBrand}"]`);
+        if (radio) radio.checked = true;
+      }
       applyFilters();
     });
 
-    // Aplikuj URL query params (?znacka=kgm)
+    // Sort select change
+    document.querySelector('[data-sort]')?.addEventListener('change', (e) => {
+      sortMode = e.target.value;
+      applyFilters();
+    });
+
+    // Reset
+    document.querySelector('[data-reset]')?.addEventListener('click', () => {
+      Object.keys(filters).forEach((k) => { filters[k] = 'all'; });
+      document.querySelectorAll('[data-filters] input[value=all]').forEach((i) => (i.checked = true));
+      const ms = document.querySelector('[data-filter-model]');
+      if (ms) ms.value = 'all';
+      applyFilters();
+    });
+
+    // URL query params — ?znacka=kgm, ?model=torres
     const params = new URLSearchParams(window.location.search);
     const brandParam = params.get('znacka') ?? params.get('brand');
     if (brandParam) {
       const radio = document.querySelector(`[data-filters] input[name=brand][value="${brandParam}"]`);
-      if (radio) { radio.checked = true; filters.brand = brandParam; applyFilters(); }
+      if (radio) { radio.checked = true; filters.brand = brandParam; }
     }
     const modelParam = params.get('model');
     if (modelParam) {
-      // Filtr podle modelu — jednoduše skryj karty které nematchují
-      document.querySelectorAll('.scard').forEach((c) => {
-        const href = c.getAttribute('href') ?? '';
-        // TODO: lepší filtr by potřeboval data-model atribut. Pro teď přeskočit
-      });
+      const ms = document.querySelector('[data-filter-model]');
+      if (ms) {
+        const opt = ms.querySelector(`option[value="${modelParam}"]`);
+        if (opt) { ms.value = modelParam; filters.model = modelParam; }
+      }
     }
+    if (brandParam || modelParam) applyFilters();
   </script>
 
   <style>
@@ -299,5 +398,44 @@ const fmtKm = (n?: number | null) => (n === 0 || !n ? '0 km' : `${n.toLocaleStr
       color: var(--text);
     }
     .sklad-filters label:hover { color: var(--accent); }
+
+    /* Filter select (Model + Sort) — konzistentní s designem */
+    .filter-select {
+      width: 100%;
+      padding: 8px 10px;
+      font-size: 14px;
+      font-family: inherit;
+      color: var(--text);
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      cursor: pointer;
+      transition: border-color .15s;
+    }
+    .filter-select:hover, .filter-select:focus {
+      border-color: var(--accent);
+      outline: none;
+    }
+
+    /* Sort bar nad gridem */
+    .sort-bar {
+      display: flex;
+      justify-content: flex-end;
+      margin-bottom: 16px;
+    }
+    .sort-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 13px;
+      color: var(--text-muted);
+      letter-spacing: 0.02em;
+    }
+    .sort-label .filter-select {
+      width: auto;
+      min-width: 140px;
+      font-size: 13px;
+      padding: 6px 8px;
+    }
   </style>
 </BaseLayout>
