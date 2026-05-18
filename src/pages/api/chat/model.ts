@@ -28,6 +28,41 @@ export const prerender = false;
 const MODEL_ID = 'claude-haiku-4-5-20251001';
 const DIRECTUS_URL = import.meta.env.PUBLIC_DIRECTUS_URL || import.meta.env.DIRECTUS_URL;
 
+/* ──────────── RATE LIMITING ──────────── */
+/**
+ * Jednoduchý per-IP rate limiter v paměti.
+ * Limity: 20 zpráv / hod / IP. Po překročení → 429 Too Many Requests.
+ *
+ * POZN: paměť per-function-instance. Vercel serverless = krátké životy → ne
+ * 100% efektivní, ale stačí na běžné script-kiddie attacky.
+ * Pro vážnější ochranu použít @upstash/ratelimit (Redis-based, sdílený).
+ */
+const RATE_LIMIT_REQUESTS = 20;
+const RATE_LIMIT_WINDOW_MS = 60 * 60 * 1000; // 1 hod
+const rateLimitStore = new Map<string, { count: number; resetAt: number }>();
+
+function checkRateLimit(ip: string): { allowed: boolean; remaining: number; resetIn: number } {
+  const now = Date.now();
+  const entry = rateLimitStore.get(ip);
+  if (!entry || now > entry.resetAt) {
+    rateLimitStore.set(ip, { count: 1, resetAt: now + RATE_LIMIT_WINDOW_MS });
+    return { allowed: true, remaining: RATE_LIMIT_REQUESTS - 1, resetIn: RATE_LIMIT_WINDOW_MS };
+  }
+  if (entry.count >= RATE_LIMIT_REQUESTS) {
+    return { allowed: false, remaining: 0, resetIn: entry.resetAt - now };
+  }
+  entry.count++;
+  return { allowed: true, remaining: RATE_LIMIT_REQUESTS - entry.count, resetIn: entry.resetAt - now };
+}
+
+function getClientIp(request: Request): string {
+  return (
+    request.headers.get('x-forwarded-for')?.split(',')[0].trim() ||
+    request.headers.get('x-real-ip') ||
+    'unknown'
+  );
+}
+
 /* ──────────── RAG: KNOWLEDGE SEARCH ──────────── */
 
 /**
@@ -635,6 +670,28 @@ ${knowledgeBlock}
 
 export const POST: APIRoute = async ({ request }) => {
   try {
+    // ── Rate limit ──
+    const ip = getClientIp(request);
+    const rl = checkRateLimit(ip);
+    if (!rl.allowed) {
+      const minutes = Math.ceil(rl.resetIn / 60000);
+      return new Response(
+        JSON.stringify({
+          error: `Příliš mnoho zpráv. Zkuste za ${minutes} min. nebo nás kontaktujte přímo na +420 771 235 458.`,
+        }),
+        {
+          status: 429,
+          headers: {
+            'Content-Type': 'application/json',
+            'X-RateLimit-Limit': String(RATE_LIMIT_REQUESTS),
+            'X-RateLimit-Remaining': '0',
+            'X-RateLimit-Reset': String(Math.ceil(rl.resetIn / 1000)),
+            'Retry-After': String(Math.ceil(rl.resetIn / 1000)),
+          },
+        },
+      );
+    }
+
     const body = await request.json();
     // Backwards compat: `slug` = model slug (model mode)
     // Nově: `modelSlug` (model mode) NEBO `brandSlug` bez modelSlug (brand mode)
@@ -732,13 +789,29 @@ export const POST: APIRoute = async ({ request }) => {
         if (tu.name === 'submit_lead') {
           try {
             const input = tu.input || {};
+            // Validate input (proti AI fabulaci + záměrnému spamu)
+            const nameOk = typeof input.name === 'string' && input.name.length >= 2 && input.name.length <= 100;
+            const phoneClean = String(input.phone ?? '').replace(/\s/g, '');
+            const phoneOk = /^(\+?420)?\d{9}$/.test(phoneClean) || /^\+?\d{9,15}$/.test(phoneClean);
+            const emailOk = !input.email || /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(input.email);
+            if (!nameOk || !phoneOk || !emailOk) {
+              toolResults.push({
+                type: 'tool_result',
+                tool_use_id: tu.id,
+                content: 'Lead validation failed: name 2-100 znaků, telefon 9-15 číslic, email validní formát.',
+                is_error: true,
+              });
+              continue;
+            }
+            const modelName = mode === 'model' ? ctx.model.name : '';
+            const brandName = mode === 'model' ? (ctx.model.brand?.name ?? '') : (ctx.brand?.name ?? '');
             const leadPayload = {
               form_type: 'ai_chat',
-              customer_name: input.name,
-              customer_email: input.email || null,
-              customer_phone: input.phone,
-              message: `[AI chat — ${ctx.model.brand?.name ?? ''} ${ctx.model.name}]\n${input.message}`,
-              source_page: `/model/${slug}`,
+              customer_name: input.name.slice(0, 100),
+              customer_email: input.email ? input.email.slice(0, 200) : null,
+              customer_phone: phoneClean,
+              message: `[AI chat — ${brandName} ${modelName}]\n${String(input.message ?? '').slice(0, 1000)}`,
+              source_page: mode === 'model' ? `/model/${resolvedModelSlug}` : `/${resolvedBrandSlug}`,
             };
             const r = await fetch(`${DIRECTUS_URL}/items/leads`, {
               method: 'POST',
