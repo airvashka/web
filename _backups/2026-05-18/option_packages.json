@@ -1,0 +1,1206 @@
+[
+  {
+    "id": 1,
+    "slug": "tech",
+    "name": "TECH paket",
+    "description": "Tivoli TECH paket",
+    "features": [
+      "Bez klíčové odemykání vozu, včetně bez klíčového startování (start-stop button) a elektronického zámku sloupku řízení",
+      "Vnější zpětná zrcátka s LED směrovkami, elektricky sklopná",
+      "LED přední mlhová světla",
+      "Bezdrátové nabíjení (15 W)"
+    ],
+    "pricing_per_trim": {
+      "style": 19900
+    },
+    "model_year": 1
+  },
+  {
+    "id": 2,
+    "slug": "led",
+    "name": "LED paket",
+    "description": "LED paket (dostupné pouze pokud je zvolený TECH paket)",
+    "features": [
+      "LED světlomety s manuálním výškovým nastavením",
+      "LED směrovky",
+      "Automatické přepínání dálkových světel (HBA)"
+    ],
+    "pricing_per_trim": {
+      "style": 16900
+    },
+    "model_year": 1
+  },
+  {
+    "id": 5,
+    "slug": "style-plus",
+    "name": "STYLE+ paket",
+    "description": "Korando STYLE+ paket",
+    "features": [
+      "Dvouzónová automatická klima",
+      "Vyhřívaný kožený volant",
+      "Signalizace vzdálenosti při parkování vpředu",
+      "Textilní koberce",
+      "Pevná podlaha zavazadlového prostoru",
+      "220V el. zásuvka",
+      "Střešní ližiny stříbrné",
+      "Bezdrátové nabíjení (15 W)",
+      "Skla se zvýšeným tónováním včetně solární a hlukové ochrany"
+    ],
+    "pricing_per_trim": {
+      "style": null,
+      "style-plus": 0,
+      "elegant": "standard",
+      "premium": "standard"
+    },
+    "model_year": 2
+  },
+  {
+    "id": 6,
+    "slug": "tech",
+    "name": "TECH paket",
+    "description": "Korando TECH paket",
+    "features": [
+      "Detekce slepého úhlu (BSD)",
+      "Asistent změny jízdního pruhu (LCA)",
+      "Asistent bezpečného vystoupení z vozu (EAF)",
+      "Bezklíčové odemykání a startování",
+      "Elektronický zámek sloupku řízení (ESCL)",
+      "Výstraha zadního příčného provozu (RCTA)",
+      "LED světlomety s manuálním výškovým nastavením"
+    ],
+    "pricing_per_trim": {
+      "style": null,
+      "style-plus": 35900,
+      "elegant": null,
+      "premium": "standard"
+    },
+    "model_year": 2
+  },
+  {
+    "id": 8,
+    "slug": "premium-plus",
+    "name": "PREMIUM+ paket",
+    "description": "Korando PREMIUM+ paket",
+    "features": [
+      "LED ambientní osvětlení přístrojové desky a výplní dveří",
+      "Elektrické ovládání víka kufru SMART",
+      "Detekce slepého úhlu (BSD)",
+      "Asistent pro změnu jízdního pruhu (LCA)",
+      "Asistent pro bezpečné vystoupení z vozu (EAF)",
+      "Výstraha zadního příčného provozu s automatickou intervencí (RCTA-i)",
+      "Adaptivní tempomat",
+      "Elektronická parkovací brzda a funkce „Auto Hold” /CVP/"
+    ],
+    "pricing_per_trim": {
+      "style": null,
+      "style-plus": null,
+      "elegant": null,
+      "premium": "standard"
+    },
+    "model_year": 2
+  },
+  {
+    "id": 9,
+    "slug": "black",
+    "name": "BLACK paket",
+    "description": "Korando BLACK paket",
+    "features": [
+      "19\" černá ALU kola \"Diamond Cutting\"",
+      "Pneumatiky 235/50",
+      "Černé designové prvky",
+      "Černá střecha a zadní spoiler",
+      "Černé pozadí předních světlometů",
+      "Černé logo KGM vpředu a vzadu",
+      "Černá mřížka vstupu vzduchu",
+      "Černá mřížka chladiče",
+      "Černý kryt vnějších zpětných zrcátek",
+      "Černá zadní lišta dveří zavazadlového prostoru",
+      "Černá spodní lišta zadního nárazníku",
+      "Černé logo KORANDO na kapotě a dveří kufru",
+      "Černé ližiny"
+    ],
+    "pricing_per_trim": {
+      "style": null,
+      "style-plus": null,
+      "elegant": null,
+      "premium": 35900
+    },
+    "model_year": 2
+  },
+  {
+    "id": 11,
+    "slug": "club-plus-paket",
+    "name": "CLUB+ paket",
+    "description": "Vyhřívaný volant, vyhřívání předních sedadel, vnitřní zrcátko auto-stmívání. U Style/Premium standardně.",
+    "features": [
+      "Vyhřívaný volant",
+      "Vyhřívání předních sedadel",
+      "Vnitřní zpětné zrcátko s automatickým stmíváním",
+      "Elektrické ovládání předních a zadních oken, okno řidiče na jeden dotek (nahoru a dolů)"
+    ],
+    "pricing_per_trim": {
+      "club": 14900,
+      "style": "standard",
+      "premium": "standard"
+    },
+    "model_year": 3
+  },
+  {
+    "id": 12,
+    "slug": "safety-paket",
+    "name": "SAFETY paket",
+    "description": "Detekce slepého úhlu + varování při změně jízdního pruhu. Vyžadováno pro BLACK paket.",
+    "features": [
+      "Detekce slepého úhlu (BSD)",
+      "Varování při změně jízdního pruhu (LCW)",
+      "Asistent zadního příčného provozu (RCTW)",
+      "Kolenní airbag řidiče"
+    ],
+    "pricing_per_trim": {
+      "club": "unavailable",
+      "style": 14900,
+      "premium": "standard"
+    },
+    "model_year": 3
+  },
+  {
+    "id": 13,
+    "slug": "black-paket",
+    "name": "BLACK paket",
+    "description": "20\" černá ALU \"Diamond Cut\" + SPACE černá metalická + sportovní prvky. POUZE se SAFETY paketem a textilními sedačkami.",
+    "features": [
+      "20'' černá ALU kola 'Diamond Cut', pneumatiky 245/45 R20",
+      "Metalická barva exteriéru SPACE černá",
+      "Černý sloupek",
+      "Černý přední a zadní nárazník",
+      "Černý kryt vnějších zpětných zrcátek"
+    ],
+    "pricing_per_trim": {
+      "club": "unavailable",
+      "style": 24900,
+      "premium": "unavailable"
+    },
+    "model_year": 3
+  },
+  {
+    "id": 15,
+    "slug": "club-plus",
+    "name": "CLUB+ paket",
+    "description": "Stejné jako Torres ICE — vyhřívaný volant, vyhřívání předních sedadel, auto-stmívání.",
+    "features": [
+      "Vyhřívaný volant",
+      "Vyhřívání předních sedadel",
+      "Auto-stmívání vnitřního zrcátka"
+    ],
+    "pricing_per_trim": {
+      "club": 14900,
+      "style": "standard",
+      "premium": "standard"
+    },
+    "model_year": 4
+  },
+  {
+    "id": 16,
+    "slug": "safety",
+    "name": "SAFETY paket",
+    "description": "BSD + LCW.",
+    "features": [
+      "Detekce slepého úhlu (BSD)",
+      "Varování při změně jízdního pruhu (LCW)"
+    ],
+    "pricing_per_trim": {
+      "club": null,
+      "style": 14900,
+      "premium": "standard"
+    },
+    "model_year": 4
+  },
+  {
+    "id": 17,
+    "slug": "black",
+    "name": "BLACK paket",
+    "description": "20\" černá ALU + SPACE černá + sportovní prvky.",
+    "features": [
+      "20\" černá ALU \"Diamond Cut\"",
+      "SPACE černá metalická",
+      "Černé exteriérové prvky"
+    ],
+    "pricing_per_trim": {
+      "club": null,
+      "style": 24900,
+      "premium": null
+    },
+    "model_year": 4
+  },
+  {
+    "id": 18,
+    "slug": "tech",
+    "name": "TECH paket",
+    "description": "Plný bezpečnostní balíček EVX: BSW, BSA, LCW, SEW, RCTA, asistent při křižovatkách (JC), asistent při riziku čelního střetu (HO).",
+    "features": [
+      "Detekce slepého úhlu (BSW)",
+      "Asistent BSA",
+      "Varování při změně pruhu (LCW)",
+      "Varování pro bezpečné vystoupení (SEW)",
+      "RCTA",
+      "Asistent při křižovatkách (JC)",
+      "Asistent při riziku čelního střetu (HO)"
+    ],
+    "pricing_per_trim": {
+      "style": null,
+      "premium": 34900
+    },
+    "model_year": 5
+  },
+  {
+    "id": 19,
+    "slug": "premium-plus",
+    "name": "PREMIUM+ paket",
+    "description": "360° kamera + 20\" Diamond Cut ALU. POUZE v kombinaci s TECH paketem.",
+    "features": [
+      "360° kamera AMS",
+      "20\" ALU \"Diamond Cut\" 245/45 R20"
+    ],
+    "pricing_per_trim": {
+      "style": null,
+      "premium": 29900
+    },
+    "model_year": 5
+  },
+  {
+    "id": 23,
+    "slug": "tech",
+    "name": "TECH paket",
+    "description": "Asistenční balíček: BSD, LCA, RCTA, bezklíčový vstup.",
+    "features": [
+      "Detekce slepého úhlu (BSD)",
+      "Asistent změny pruhu (LCA)",
+      "Výstraha zadního příčného provozu (RCTA)",
+      "Bezklíčové odemykání a startování"
+    ],
+    "pricing_per_trim": {
+      "style": 29900,
+      "premium": "standard"
+    },
+    "model_year": 6
+  },
+  {
+    "id": 24,
+    "slug": "premium-plus",
+    "name": "PREMIUM+ paket",
+    "description": "360° kamera + LED ambient + el. víko kufru SMART. U Premium standardně.",
+    "features": [
+      "360° kamera AMS",
+      "LED ambientní osvětlení",
+      "Elektrické víko kufru SMART",
+      "Bezdrátové nabíjení"
+    ],
+    "pricing_per_trim": {
+      "style": null,
+      "premium": "standard"
+    },
+    "model_year": 6
+  },
+  {
+    "id": 25,
+    "slug": "black",
+    "name": "BLACK paket",
+    "description": "Černé ALU + sportovní prvky exteriéru.",
+    "features": [
+      "Černá ALU kola \"Diamond Cut\"",
+      "Černé exteriérové prvky"
+    ],
+    "pricing_per_trim": {
+      "style": null,
+      "premium": 24900
+    },
+    "model_year": 6
+  },
+  {
+    "id": 26,
+    "slug": "tech",
+    "name": "TECH paket",
+    "description": "Hybridní asistenční balíček: BSD, LCA, RCTA, bezklíčový vstup.",
+    "features": [
+      "Detekce slepého úhlu (BSD)",
+      "Asistent změny pruhu (LCA)",
+      "RCTA",
+      "Bezklíčové odemykání"
+    ],
+    "pricing_per_trim": {
+      "style": 29900,
+      "premium": "standard"
+    },
+    "model_year": 7
+  },
+  {
+    "id": 27,
+    "slug": "premium-plus",
+    "name": "PREMIUM+ paket",
+    "description": "360° kamera + LED ambient. U Premium standardně.",
+    "features": [
+      "360° kamera AMS",
+      "LED ambient",
+      "Elektrické víko kufru SMART"
+    ],
+    "pricing_per_trim": {
+      "style": null,
+      "premium": "standard"
+    },
+    "model_year": 7
+  },
+  {
+    "id": 28,
+    "slug": "black",
+    "name": "BLACK paket",
+    "description": "Černé ALU + sportovní prvky.",
+    "features": [
+      "Černá ALU kola",
+      "Černé exteriérové prvky"
+    ],
+    "pricing_per_trim": {
+      "style": null,
+      "premium": 24900
+    },
+    "model_year": 7
+  },
+  {
+    "id": 29,
+    "slug": "club-plus",
+    "name": "CLUB+ paket",
+    "description": "Vyhřívaný volant, bezklíčové odemykání, el. zámek sloupku řízení. U CLEVER/PREMIUM standardně.",
+    "features": [
+      "Vyhřívaný volant",
+      "Bezklíčové odemykání a startování",
+      "Elektronický zámek sloupku řízení (ESCL)"
+    ],
+    "pricing_per_trim": {
+      "club": 19900,
+      "clever": "standard",
+      "premium": "standard"
+    },
+    "model_year": 8
+  },
+  {
+    "id": 30,
+    "slug": "grip-plus",
+    "name": "GRIP+ paket",
+    "description": "Uzávěrka diferenciálu zadní nápravy + 10-prvková zadní náprava Multilink s nezávislým zavěšením. POUZE u CLEVER trim.",
+    "features": [
+      "Uzávěrka diferenciálu zadní nápravy",
+      "10-prvková zadní náprava Multilink",
+      "Nezávislé zavěšení"
+    ],
+    "pricing_per_trim": {
+      "club": null,
+      "clever": "standard",
+      "premium": null
+    },
+    "model_year": 8
+  },
+  {
+    "id": 31,
+    "slug": "clever-plus",
+    "name": "CLEVER+ paket",
+    "description": "El. víko kufru SMART, bezdrátové nabíjení, ambient osvětlení, podsvícené prahové lišty.",
+    "features": [
+      "Elektrické ovládání víka kufru SMART",
+      "Bezdrátové nabíjení",
+      "Ambientní osvětlení interiéru",
+      "Podsvícené přední prahové lišty"
+    ],
+    "pricing_per_trim": {
+      "club": null,
+      "clever": "standard",
+      "premium": "standard"
+    },
+    "model_year": 8
+  },
+  {
+    "id": 32,
+    "slug": "premium-plus",
+    "name": "PREMIUM+ paket",
+    "description": "360° kamera + paměť sedadla + sluneční roletky 2. řady + el. víko kufru SMART. U Premium standardně.",
+    "features": [
+      "360° kamera AMS",
+      "Paměť el. sedadla řidiče + zrcátek",
+      "Sluneční roletky 2. řady sedadel",
+      "Elektrické víko kufru SMART"
+    ],
+    "pricing_per_trim": {
+      "club": null,
+      "clever": null,
+      "premium": "standard"
+    },
+    "model_year": 8
+  },
+  {
+    "id": 33,
+    "slug": "black",
+    "name": "BLACK paket",
+    "description": "SPACE černá nebo PEARL bílá metalická + 20\" černá SPUTTERING + sportovní prvky. POUZE u PREMIUM.",
+    "features": [
+      "SPACE černá / PEARL bílá metalická",
+      "20\" černá SPUTTERING ALU 255/50 R20",
+      "Černá mřížka chladiče",
+      "Černé ližiny"
+    ],
+    "pricing_per_trim": {
+      "club": null,
+      "clever": null,
+      "premium": 50000
+    },
+    "model_year": 8
+  },
+  {
+    "id": 34,
+    "slug": "stresni-okno",
+    "name": "Střešní okno",
+    "description": "Panoramatická střecha. POUZE v kombinaci s PREMIUM+ paketem.",
+    "features": [
+      "Panoramatická prosklená střecha (ISP)"
+    ],
+    "pricing_per_trim": {
+      "club": null,
+      "clever": null,
+      "premium": 14900
+    },
+    "model_year": 8
+  },
+  {
+    "id": 35,
+    "slug": "sputtering-20",
+    "name": "20\" SPUTTERING ALU",
+    "description": "20\" SPUTTERING ALU kola 255/50 R20. NELZE kombinovat s BLACK paketem.",
+    "features": [
+      "20\" SPUTTERING ALU kola",
+      "Pneumatiky 255/50 R20"
+    ],
+    "pricing_per_trim": {
+      "club": null,
+      "clever": null,
+      "premium": 17900
+    },
+    "model_year": 8
+  },
+  {
+    "id": 36,
+    "slug": "style-plus",
+    "name": "STYLE+ paket",
+    "description": "AKČNÍ CENA 20 000 Kč (původně 24 200). Vyhřívaný kožený volant, dvouzónová klima, LED mlhovky, privacy glass, střešní ližiny.",
+    "features": [
+      "Vyhřívaný kožený volant",
+      "Dvouzónová automatická klima",
+      "LED přední mlhová světla",
+      "Privacy glass + solar/akustické čelní sklo",
+      "Střešní ližiny (stříbrná/černá)"
+    ],
+    "pricing_per_trim": {
+      "style-4wd": 20000,
+      "premium-4wd": "standard"
+    },
+    "model_year": 9
+  },
+  {
+    "id": 37,
+    "slug": "premium-plus",
+    "name": "PREMIUM+ paket",
+    "description": "BSA+LCW, RCTA, SEW, 360° kamera AMS, uzávěrka diferenciálu, mřížka chladiče Premium. U Premium standardně.",
+    "features": [
+      "BSA + LCW",
+      "RCTA (Asistent zadního příčného provozu)",
+      "SEW (Varování pro bezpečné vystoupení)",
+      "360° kamera AMS",
+      "Uzávěrka diferenciálu",
+      "Mřížka chladiče Premium"
+    ],
+    "pricing_per_trim": {
+      "style-4wd": null,
+      "premium-4wd": "standard"
+    },
+    "model_year": 9
+  },
+  {
+    "id": 38,
+    "slug": "black",
+    "name": "BLACK paket",
+    "description": "AKČNÍ CENA 15 000 Kč (původně 18 150). Černá mřížka, černý přední nárazník, černé logo a ližiny. POUZE v kombinaci s PREMIUM+ paketem.",
+    "features": [
+      "Černá mřížka chladiče",
+      "Černý přední nárazník",
+      "Černé logo a ližiny",
+      "Černé kryty zrcátek",
+      "Černý rámeček volantu",
+      "Černé tlačítko start"
+    ],
+    "pricing_per_trim": {
+      "style-4wd": null,
+      "premium-4wd": 15000
+    },
+    "model_year": 9
+  },
+  {
+    "id": 39,
+    "slug": "sputtering-20",
+    "name": "20\" SPUTTERING ALU",
+    "description": "AKČNÍ CENA 10 000 Kč (původně 12 100). NELZE kombinovat s BLACK paketem.",
+    "features": [
+      "20\" SPUTTERING ALU kola 255/50 R20"
+    ],
+    "pricing_per_trim": {
+      "style-4wd": null,
+      "premium-4wd": 10000
+    },
+    "model_year": 9
+  },
+  {
+    "id": 40,
+    "slug": "stresni-okno",
+    "name": "Střešní okno + LED interiér",
+    "description": "AKČNÍ CENA 10 000 Kč (původně 12 100). POUZE v kombinaci s PREMIUM+ paketem.",
+    "features": [
+      "Panoramatická prosklená střecha",
+      "LED osvětlení interiéru"
+    ],
+    "pricing_per_trim": {
+      "style-4wd": null,
+      "premium-4wd": 10000
+    },
+    "model_year": 9
+  },
+  {
+    "id": 45,
+    "slug": "style-plus",
+    "name": "STYLE+ paket",
+    "description": "Korando STYLE+ paket",
+    "features": [
+      "Dvouzónová automatická klima",
+      "Vyhřívaný kožený volant",
+      "Signalizace vzdálenosti při parkování vpředu",
+      "Textilní koberce",
+      "Pevná podlaha zavazadlového prostoru",
+      "220V el. zásuvka",
+      "Střešní ližiny stříbrné",
+      "Bezdrátové nabíjení (15 W)",
+      "Skla se zvýšeným tónováním včetně solární a hlukové ochrany"
+    ],
+    "pricing_per_trim": {
+      "style": null,
+      "style-plus": 0,
+      "elegant": "standard",
+      "premium": "standard"
+    },
+    "model_year": 21
+  },
+  {
+    "id": 46,
+    "slug": "tech",
+    "name": "TECH paket",
+    "description": "Korando TECH paket",
+    "features": [
+      "Detekce slepého úhlu (BSD)",
+      "Asistent změny jízdního pruhu (LCA)",
+      "Asistent bezpečného vystoupení z vozu (EAF)",
+      "Bezklíčové odemykání a startování",
+      "Elektronický zámek sloupku řízení (ESCL)",
+      "Výstraha zadního příčného provozu (RCTA)",
+      "LED světlomety s manuálním výškovým nastavením"
+    ],
+    "pricing_per_trim": {
+      "style": null,
+      "style-plus": 35900,
+      "elegant": null,
+      "premium": "standard"
+    },
+    "model_year": 21
+  },
+  {
+    "id": 47,
+    "slug": "premium-plus",
+    "name": "PREMIUM+ paket",
+    "description": "Korando PREMIUM+ paket",
+    "features": [
+      "LED ambientní osvětlení přístrojové desky a výplní dveří",
+      "Elektrické ovládání víka kufru SMART",
+      "Detekce slepého úhlu (BSD)",
+      "Asistent pro změnu jízdního pruhu (LCA)",
+      "Asistent pro bezpečné vystoupení z vozu (EAF)",
+      "Výstraha zadního příčného provozu s automatickou intervencí (RCTA-i)",
+      "Adaptivní tempomat",
+      "Elektronická parkovací brzda a funkce „Auto Hold” /CVP/"
+    ],
+    "pricing_per_trim": {
+      "style": null,
+      "style-plus": null,
+      "elegant": null,
+      "premium": "standard"
+    },
+    "model_year": 21
+  },
+  {
+    "id": 48,
+    "slug": "black",
+    "name": "BLACK paket",
+    "description": "Korando BLACK paket",
+    "features": [
+      "19\" černá ALU kola \"Diamond Cutting\"",
+      "Pneumatiky 235/50",
+      "Černé designové prvky",
+      "Černá střecha a zadní spoiler",
+      "Černé pozadí předních světlometů",
+      "Černé logo KGM vpředu a vzadu",
+      "Černá mřížka vstupu vzduchu",
+      "Černá mřížka chladiče",
+      "Černý kryt vnějších zpětných zrcátek",
+      "Černá zadní lišta dveří zavazadlového prostoru",
+      "Černá spodní lišta zadního nárazníku",
+      "Černé logo KORANDO na kapotě a dveří kufru",
+      "Černé ližiny"
+    ],
+    "pricing_per_trim": {
+      "style": null,
+      "style-plus": null,
+      "elegant": null,
+      "premium": 35900
+    },
+    "model_year": 21
+  },
+  {
+    "id": 49,
+    "slug": "style-plus",
+    "name": "STYLE+ paket",
+    "description": "Korando STYLE+ paket",
+    "features": [
+      "Dvouzónová automatická klima",
+      "Vyhřívaný kožený volant",
+      "Signalizace vzdálenosti při parkování vpředu",
+      "Textilní koberce",
+      "Pevná podlaha zavazadlového prostoru",
+      "220V el. zásuvka",
+      "Střešní ližiny stříbrné",
+      "Bezdrátové nabíjení (15 W)",
+      "Skla se zvýšeným tónováním včetně solární a hlukové ochrany"
+    ],
+    "pricing_per_trim": {
+      "style": null,
+      "style-plus": 0,
+      "elegant": "standard",
+      "premium": "standard"
+    },
+    "model_year": 19
+  },
+  {
+    "id": 50,
+    "slug": "tech",
+    "name": "TECH paket",
+    "description": "Korando TECH paket",
+    "features": [
+      "Detekce slepého úhlu (BSD)",
+      "Asistent změny jízdního pruhu (LCA)",
+      "Asistent bezpečného vystoupení z vozu (EAF)",
+      "Bezklíčové odemykání a startování",
+      "Elektronický zámek sloupku řízení (ESCL)",
+      "Výstraha zadního příčného provozu (RCTA)",
+      "LED světlomety s manuálním výškovým nastavením"
+    ],
+    "pricing_per_trim": {
+      "style": null,
+      "style-plus": 35900,
+      "elegant": null,
+      "premium": "standard"
+    },
+    "model_year": 19
+  },
+  {
+    "id": 51,
+    "slug": "premium-plus",
+    "name": "PREMIUM+ paket",
+    "description": "Korando PREMIUM+ paket",
+    "features": [
+      "LED ambientní osvětlení přístrojové desky a výplní dveří",
+      "Elektrické ovládání víka kufru SMART",
+      "Detekce slepého úhlu (BSD)",
+      "Asistent pro změnu jízdního pruhu (LCA)",
+      "Asistent pro bezpečné vystoupení z vozu (EAF)",
+      "Výstraha zadního příčného provozu s automatickou intervencí (RCTA-i)",
+      "Adaptivní tempomat",
+      "Elektronická parkovací brzda a funkce „Auto Hold” /CVP/"
+    ],
+    "pricing_per_trim": {
+      "style": null,
+      "style-plus": null,
+      "elegant": null,
+      "premium": "standard"
+    },
+    "model_year": 19
+  },
+  {
+    "id": 52,
+    "slug": "black",
+    "name": "BLACK paket",
+    "description": "Korando BLACK paket",
+    "features": [
+      "19\" černá ALU kola \"Diamond Cutting\"",
+      "Pneumatiky 235/50",
+      "Černé designové prvky",
+      "Černá střecha a zadní spoiler",
+      "Černé pozadí předních světlometů",
+      "Černé logo KGM vpředu a vzadu",
+      "Černá mřížka vstupu vzduchu",
+      "Černá mřížka chladiče",
+      "Černý kryt vnějších zpětných zrcátek",
+      "Černá zadní lišta dveří zavazadlového prostoru",
+      "Černá spodní lišta zadního nárazníku",
+      "Černé logo KORANDO na kapotě a dveří kufru",
+      "Černé ližiny"
+    ],
+    "pricing_per_trim": {
+      "style": null,
+      "style-plus": null,
+      "elegant": null,
+      "premium": 35900
+    },
+    "model_year": 19
+  },
+  {
+    "id": 54,
+    "slug": "tech-paket",
+    "name": "TECH paket",
+    "description": null,
+    "features": [
+      "Detekce slepého úhlu (BSW)",
+      "Asistent detekce slepého úhlu (BSA)",
+      "Varování při změně jízdního pruhu (LCW)",
+      "Varování pro bezpečné vystoupení z vozidla (SEW)",
+      "Výstraha zadního příčného provozu (RCTW)",
+      "Asistent zadního příčného provozu (RCTA)",
+      "Asistent pro odbočení (JT)",
+      "Asistent pro průjezd křižovatkou (JC)",
+      "Asistent při riziku čelního střetu (HO)",
+      "Elektrické ovládání dveří zavazadlového prostoru (E08)"
+    ],
+    "pricing_per_trim": {
+      "premium": 34900,
+      "style": "unavailable"
+    },
+    "model_year": 23
+  },
+  {
+    "id": 55,
+    "slug": "premium-plus-paket",
+    "name": "PREMIUM+ paket",
+    "description": null,
+    "features": [
+      "360 stupňová kamera (AMS)",
+      "20\" ALU kola 'Diamond Cut', pneumatiky 245/45/R20"
+    ],
+    "pricing_per_trim": {
+      "premium": 29900,
+      "style": "unavailable"
+    },
+    "model_year": 23
+  },
+  {
+    "id": 59,
+    "slug": "tech-paket",
+    "name": "TECH paket",
+    "description": null,
+    "features": [
+      "Bezklíčové odemykání vozu, včetně bezklíčového startování (start-stop button) a elektronického zámku sloupku řízení",
+      "Vnější zpětná zrcátka s LED směrovkami, elektricky sklopná",
+      "LED přední mlhová světla",
+      "Bezdrátové nabíjení (15 W)"
+    ],
+    "pricing_per_trim": {
+      "style": 19900
+    },
+    "model_year": 24
+  },
+  {
+    "id": 60,
+    "slug": "led-paket-dostupne-pouze-pokud-je-zvoleny-tech-paket",
+    "name": "LED paket (dostupné pouze pokud je zvolený TECH paket)",
+    "description": null,
+    "features": [
+      "LED světlomety s manuálním výškovým nastavením a LED směrovkami",
+      "Automatické přepínání dálkových světel (HBA)"
+    ],
+    "pricing_per_trim": {
+      "style": 16900
+    },
+    "model_year": 24
+  },
+  {
+    "id": 61,
+    "slug": "style-plus-paket",
+    "name": "STYLE+ paket",
+    "description": null,
+    "features": [
+      "Dvouzónová automatická klimatizace",
+      "Signalizace vzdálenosti při parkování - vpředu",
+      "Vyhřívaný volant",
+      "Textilní koberce",
+      "Pevná podlaha zavazadlového prostoru",
+      "220V elektrická zásuvka umístěná na středové konzoli",
+      "Bezdrátové nabíjení (15 W)",
+      "Skla se zvýšeným tónováním ''PRIVACY GLASS'', včetně solární a hlukové ochrany (skla v zadních bočních dveřích a ve dveřích zavazadlového prostoru)",
+      "Střešní ližiny (stříbrná barva)"
+    ],
+    "pricing_per_trim": {
+      "style": "unavailable",
+      "style-plus": "ZDARMA",
+      "elegant": "unavailable",
+      "premium": "unavailable"
+    },
+    "model_year": 25
+  },
+  {
+    "id": 62,
+    "slug": "tech-paket",
+    "name": "TECH paket",
+    "description": null,
+    "features": [
+      "SAFETY PACK: detekce slepého úhlu (BSD), asistent pro změnu jízdního pruhu (LCA), asistent pro bezpečné vystoupení z vozu (EAF), výstraha zadního příčného provozu (RCTA) - pro AUT6 s automatickou intervencí (RCTA-i)",
+      "Bezklíčové odemykání vozu, včetně bezklíčového startování (start-stop button) a elektronického zámku sloupku řízení",
+      "LED světlomety s manuálním výškovým nastavením"
+    ],
+    "pricing_per_trim": {
+      "style": "unavailable",
+      "style-plus": 35900,
+      "elegant": "unavailable",
+      "premium": "unavailable"
+    },
+    "model_year": 25
+  },
+  {
+    "id": 63,
+    "slug": "premium-plus-paket",
+    "name": "PREMIUM+ paket",
+    "description": null,
+    "features": [
+      "LED ambientní osvětlení přístrojové desky a výplní dveří",
+      "SAFETY PACK: detekce slepého úhlu (BSD), asistent pro změnu jízdního pruhu (LCA), asistent pro bezpečné vystoupení z vozu (EAF), výstraha zadního příčného provozu s automatickou intervencí (RCTA-i)",
+      "ACC PACK: adaptivní tempomat, elektronická parkovací brzda a funkce ''Auto Hold'' /CVP/",
+      "Elektrické ovládání dveří zavazadlového prostoru SMART"
+    ],
+    "pricing_per_trim": {
+      "style": "unavailable",
+      "style-plus": "unavailable",
+      "elegant": "unavailable",
+      "premium": "standard"
+    },
+    "model_year": 25
+  },
+  {
+    "id": 64,
+    "slug": "black-paket",
+    "name": "BLACK paket",
+    "description": null,
+    "features": [
+      "19'' černá ALU kola ''Diamond Cutting'', pneumatiky 235/50 R19",
+      "černá střecha a zadní spoiler",
+      "černé pozadí předních světlometů",
+      "černé logo KGM vpředu a vzadu",
+      "černá mřížka vstupu vzduchu",
+      "černá mřížka chladiče",
+      "černý kryt vnějších zpětných zrcátek",
+      "černá zadní lišta dveří zavazadlového prostoru",
+      "černá spodní lišta zadního nárazníku",
+      "černé logo KORANDO na kapotě a na dveřích zavazadlového prostoru",
+      "černé ližiny"
+    ],
+    "pricing_per_trim": {
+      "style": "unavailable",
+      "style-plus": 19900,
+      "elegant": "unavailable",
+      "premium": 19900
+    },
+    "model_year": 25
+  },
+  {
+    "id": 65,
+    "slug": "club-plus-paket",
+    "name": "CLUB+ paket",
+    "description": null,
+    "features": [
+      "Vyhřívaný volant",
+      "Vyhřívání předních sedadel",
+      "Vnitřní zpětné zrcátko s automatickým stmíváním",
+      "Elektrické ovládání předních a zadních oken, okno řidiče na jeden dotek (nahoru a dolů)"
+    ],
+    "pricing_per_trim": {
+      "club": 14900,
+      "style": "standard",
+      "premium": "standard"
+    },
+    "model_year": 26
+  },
+  {
+    "id": 66,
+    "slug": "safety-paket",
+    "name": "SAFETY paket",
+    "description": null,
+    "features": [
+      "Detekce slepého úhlu (BSD)",
+      "Varování při změně jízdního pruhu (LCW)",
+      "Asistent zadního příčného provozu (RCTW)",
+      "Kolenní airbag řidiče"
+    ],
+    "pricing_per_trim": {
+      "club": "unavailable",
+      "style": 14900,
+      "premium": "standard"
+    },
+    "model_year": 26
+  },
+  {
+    "id": 67,
+    "slug": "black-paket",
+    "name": "BLACK paket",
+    "description": null,
+    "features": [
+      "20' černá ALU kola 'Diamond Cut', pneumatiky 245/45 R20",
+      "Metalická barva exteriéru SPACE černá",
+      "Černý sloupek",
+      "Černý přední a zadní nárazník",
+      "Černý kryt vnějších zpětných zrcátek"
+    ],
+    "pricing_per_trim": {
+      "club": "unavailable",
+      "style": 24900,
+      "premium": "unavailable"
+    },
+    "model_year": 26
+  },
+  {
+    "id": 68,
+    "slug": "club-plus-paket",
+    "name": "CLUB+ paket",
+    "description": null,
+    "features": [
+      "Vyhřívaný volant",
+      "Vyhřívání předních sedadel",
+      "Vnitřní zpětné zrcátko s automatickým stmíváním",
+      "Elektrické ovládání předních a zadních oken, okno řidiče na jeden dotek (nahoru a dolů)"
+    ],
+    "pricing_per_trim": {
+      "club": 14900,
+      "style": "standard",
+      "premium": "standard"
+    },
+    "model_year": 27
+  },
+  {
+    "id": 69,
+    "slug": "safety-paket",
+    "name": "SAFETY paket",
+    "description": null,
+    "features": [
+      "Detekce slepého úhlu (BSD)",
+      "Varování při změně jízdního pruhu (LCW)",
+      "Asistent zadního příčného provozu (RCTW)",
+      "Kolenní airbag řidiče"
+    ],
+    "pricing_per_trim": {
+      "club": "unavailable",
+      "style": 14900,
+      "premium": "standard"
+    },
+    "model_year": 27
+  },
+  {
+    "id": 70,
+    "slug": "black-paket",
+    "name": "BLACK paket",
+    "description": null,
+    "features": [
+      "20'' černá ALU kola 'Diamond Cut', pneumatiky 245/45 R20",
+      "Metalická barva exteriéru SPACE černá",
+      "Černý sloupek",
+      "Černý přední a zadní nárazník",
+      "Černý kryt vnějších zpětných zrcátek"
+    ],
+    "pricing_per_trim": {
+      "club": "unavailable",
+      "style": 24900,
+      "premium": "unavailable"
+    },
+    "model_year": 27
+  },
+  {
+    "id": 71,
+    "slug": "tech-paket",
+    "name": "TECH paket",
+    "description": null,
+    "features": [
+      "Detekce slepého úhlu (BSW)",
+      "asistent detekce slepého úhlu (BSA)",
+      "varování při změně jízdního pruhu (LCW)",
+      "varování pro bezpečné vystoupení z vozidla (SEW)",
+      "výstraha zadního příčného provozu (RCTW)",
+      "asistent zadního příčného provozu (RCTA)",
+      "asistent pro odbočení (JT)",
+      "asistent pro průjezd křižovatkou (JC)",
+      "asistent při riziku čelního střetu (HO)"
+    ],
+    "pricing_per_trim": {
+      "style": "unavailable",
+      "premium": 34900
+    },
+    "model_year": 28
+  },
+  {
+    "id": 72,
+    "slug": "premium-plus-paket",
+    "name": "PREMIUM+ paket",
+    "description": null,
+    "features": [
+      "360 stupňová kamera (AMS)",
+      "20'' ALU kola 'Diamond Cut', pneumatiky 245/45/R20"
+    ],
+    "pricing_per_trim": {
+      "style": "unavailable",
+      "premium": 29900
+    },
+    "model_year": 28
+  },
+  {
+    "id": 73,
+    "slug": "club-plus-paket",
+    "name": "CLUB+ paket",
+    "description": null,
+    "features": [
+      "Vyhřívaný volant",
+      "Bezklíčové odemykání vozu, včetně bezklíčového startování (start-stop button) a elektronického zámku sloupku řízení (ESCL)",
+      "Skla se zvýšeným tónováním 'PRIVACY GLASS' (skla v zadních bočních dveřích a skla v zavazadlovém prostoru) a tónovaná skla se solární a hlukovou ochranou (čelní sklo + skla předních dveří)"
+    ],
+    "pricing_per_trim": {
+      "club-2wd": 19900,
+      "clever-4wd": "unavailable",
+      "premium-4wd": "unavailable"
+    },
+    "model_year": 31
+  },
+  {
+    "id": 74,
+    "slug": "grip-plus-paket",
+    "name": "GRIP+ paket",
+    "description": null,
+    "features": [
+      "Uzávěrka diferenciálu (zadní náprava)",
+      "10-ti prvková zadní náprava Multilink s nezávislým zavěšením"
+    ],
+    "pricing_per_trim": {
+      "club-2wd": 29900,
+      "clever-4wd": "unavailable",
+      "premium-4wd": "unavailable"
+    },
+    "model_year": 31
+  },
+  {
+    "id": 75,
+    "slug": "clever-plus-paket",
+    "name": "CLEVER+ paket",
+    "description": null,
+    "features": [
+      "Elektrické ovládání dveří zavazadlového prostoru SMART",
+      "Sluneční roletky pro okna druhé řady sedadel",
+      "Bezdrátové nabíjení",
+      "Podsvícené přední prahové lišty",
+      "Ambientní osvětlení interiéru"
+    ],
+    "pricing_per_trim": {
+      "club-2wd": "unavailable",
+      "clever-4wd": 59900,
+      "premium-4wd": "unavailable"
+    },
+    "model_year": 31
+  },
+  {
+    "id": 76,
+    "slug": "premium-plus-paket",
+    "name": "PREMIUM+ paket",
+    "description": null,
+    "features": [
+      "360 stupňová kamera (AMS)",
+      "Elektrické ovládání dveří zavazadlového prostoru SMART",
+      "Sluneční roletky pro okna druhé řady sedadel",
+      "Paměť nastavení elektrického sedadla řidiče a vnějších zpětných zrcátek"
+    ],
+    "pricing_per_trim": {
+      "club-2wd": "unavailable",
+      "clever-4wd": "unavailable",
+      "premium-4wd": "standard"
+    },
+    "model_year": 31
+  },
+  {
+    "id": 77,
+    "slug": "black-paket",
+    "name": "BLACK paket",
+    "description": null,
+    "features": [
+      "SPACE černá (LAK) nebo PEARL bílá (WAK) metalická barva exteriéru",
+      "20'' černá SPUTTERING ALU kola, pneumatiky 255/50 R20",
+      "Černá mřížka chladiče",
+      "Černé ližiny"
+    ],
+    "pricing_per_trim": {
+      "club-2wd": "unavailable",
+      "clever-4wd": "unavailable",
+      "premium-4wd": 50000
+    },
+    "model_year": 31
+  },
+  {
+    "id": 78,
+    "slug": "style-plus-paket",
+    "name": "STYLE+ paket",
+    "description": null,
+    "features": [
+      "Signalizace vzdálenosti při parkování vpředu",
+      "Vyhřívaný kožený volant",
+      "Dvouzónová automatická klimatizace",
+      "LED přední mlhová světla",
+      "Zadní skla se zvýšeným tónováním 'PRIVACY GLASS' a čelní sklo se solární a hlukovou ochranou",
+      "Střešní ližiny (stříbrná/černá barva)"
+    ],
+    "pricing_per_trim": {
+      "style-4wd": 24200,
+      "premium-4wd": "unavailable"
+    },
+    "model_year": 32
+  },
+  {
+    "id": 79,
+    "slug": "premium-plus-paket",
+    "name": "PREMIUM+ paket",
+    "description": null,
+    "features": [
+      "Uzávěrka diferenciálu (zadní náprava)",
+      "Asistent detekce slepého úhlu s varováním při změně jízdního pruhu a funkcí nouzového brzdění (BSA+LCW), asistent zadního příčného provozu (RCTA), varování pro bezpečné vystoupení z vozidla (SEW)",
+      "Elektricky nastavitelná přední sedadla (sedadlo řidiče s bederní opěrkou), vyhřívání předních i zadních sedadel",
+      "360-stupňová kamera (AMS)"
+    ],
+    "pricing_per_trim": {
+      "style-4wd": "unavailable",
+      "premium-4wd": 66550
+    },
+    "model_year": 32
+  },
+  {
+    "id": 80,
+    "slug": "black-paket",
+    "name": "BLACK paket",
+    "description": null,
+    "features": [
+      "Černá mřížka chladiče, černý přední nárazník, černé logo, černé ližiny a černé kryty vnějších zpětných zrcátek",
+      "Černý rámeček volantu, černé tlačítko start a černý rámeček ovládání klimatizace"
+    ],
+    "pricing_per_trim": {
+      "style-4wd": "unavailable",
+      "premium-4wd": 18150
+    },
+    "model_year": 32
+  }
+]

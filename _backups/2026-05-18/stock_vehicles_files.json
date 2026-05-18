@@ -1,0 +1,5602 @@
+[
+  {
+    "id": 7,
+    "stock_vehicles_id": 5,
+    "directus_files_id": "e686c708-641a-4aed-a268-cf57053e791e"
+  },
+  {
+    "id": 8,
+    "stock_vehicles_id": 5,
+    "directus_files_id": "f0976f9e-ffde-4fc4-a508-5d707156fe6a"
+  },
+  {
+    "id": 9,
+    "stock_vehicles_id": 5,
+    "directus_files_id": "17748d8b-7706-4812-b602-8a95e0f131ba"
+  },
+  {
+    "id": 10,
+    "stock_vehicles_id": 5,
+    "directus_files_id": "078c97ea-f56c-47c1-9e03-70d1d1a7f282"
+  },
+  {
+    "id": 11,
+    "stock_vehicles_id": 5,
+    "directus_files_id": "58ab0897-f39b-47b0-874b-354332eb0808"
+  },
+  {
+    "id": 12,
+    "stock_vehicles_id": 5,
+    "directus_files_id": "0297e878-73b0-45e2-bb48-18201ec426e6"
+  },
+  {
+    "id": 13,
+    "stock_vehicles_id": 5,
+    "directus_files_id": "7802e5e0-f912-497f-a82f-692e97019645"
+  },
+  {
+    "id": 14,
+    "stock_vehicles_id": 5,
+    "directus_files_id": "cb6641f1-d249-4bfd-951c-ccbbb4483b98"
+  },
+  {
+    "id": 15,
+    "stock_vehicles_id": 5,
+    "directus_files_id": "229660c9-7e6f-4642-8247-5b51b9a76da7"
+  },
+  {
+    "id": 16,
+    "stock_vehicles_id": 5,
+    "directus_files_id": "6e27213d-b858-4f99-9143-0ff4fa0b2460"
+  },
+  {
+    "id": 17,
+    "stock_vehicles_id": 5,
+    "directus_files_id": "b9098e12-8efe-49ca-80e2-8cb42b9046ae"
+  },
+  {
+    "id": 18,
+    "stock_vehicles_id": 5,
+    "directus_files_id": "50089cd0-9882-405f-b8c6-98868057514b"
+  },
+  {
+    "id": 19,
+    "stock_vehicles_id": 5,
+    "directus_files_id": "058c3686-f4d8-4405-8ee6-8a30ac9c0ca3"
+  },
+  {
+    "id": 20,
+    "stock_vehicles_id": 5,
+    "directus_files_id": "bdff9b61-ca1c-440f-a80b-441a096f553e"
+  },
+  {
+    "id": 21,
+    "stock_vehicles_id": 6,
+    "directus_files_id": "4f0d56a7-5e75-46b0-a833-bbe2b373fd31"
+  },
+  {
+    "id": 22,
+    "stock_vehicles_id": 6,
+    "directus_files_id": "105ecf27-a9cc-4589-99ab-1341cd907d5f"
+  },
+  {
+    "id": 23,
+    "stock_vehicles_id": 6,
+    "directus_files_id": "a042b35c-60db-4d1b-936b-7dbadecb2538"
+  },
+  {
+    "id": 24,
+    "stock_vehicles_id": 6,
+    "directus_files_id": "cda8d295-c338-480a-9abc-c253f6d273eb"
+  },
+  {
+    "id": 25,
+    "stock_vehicles_id": 6,
+    "directus_files_id": "96ff597a-7293-4211-a664-c59979e9a7ef"
+  },
+  {
+    "id": 26,
+    "stock_vehicles_id": 6,
+    "directus_files_id": "befde0cf-c0af-4fb4-9f9f-bb76afff28b9"
+  },
+  {
+    "id": 27,
+    "stock_vehicles_id": 6,
+    "directus_files_id": "5b71d096-86b5-42e6-acdc-de3afb538093"
+  },
+  {
+    "id": 28,
+    "stock_vehicles_id": 6,
+    "directus_files_id": "bf08621d-0c87-4c93-9a23-d147e11bb76e"
+  },
+  {
+    "id": 29,
+    "stock_vehicles_id": 6,
+    "directus_files_id": "f87cbe72-c8c4-4ca6-9c80-ef1bbc9b1211"
+  },
+  {
+    "id": 30,
+    "stock_vehicles_id": 6,
+    "directus_files_id": "c09a7a69-5e78-45dd-8224-dafd42a9bfe3"
+  },
+  {
+    "id": 31,
+    "stock_vehicles_id": 6,
+    "directus_files_id": "0df6387a-8101-4484-aa11-aceacba96a9d"
+  },
+  {
+    "id": 32,
+    "stock_vehicles_id": 6,
+    "directus_files_id": "de76ab79-2504-4ee8-a4be-3020bcdcb5e4"
+  },
+  {
+    "id": 33,
+    "stock_vehicles_id": 6,
+    "directus_files_id": "a1685738-f24a-46a6-bfd1-4825442e69c3"
+  },
+  {
+    "id": 34,
+    "stock_vehicles_id": 6,
+    "directus_files_id": "0a6b0480-df28-407e-8261-b1faf2f7396a"
+  },
+  {
+    "id": 35,
+    "stock_vehicles_id": 7,
+    "directus_files_id": "d84e928d-daef-42cd-b28f-16b15aee613c"
+  },
+  {
+    "id": 36,
+    "stock_vehicles_id": 7,
+    "directus_files_id": "2b693fb3-f4eb-4898-b737-e87ce7605481"
+  },
+  {
+    "id": 37,
+    "stock_vehicles_id": 7,
+    "directus_files_id": "c61f8aec-a95a-41ba-9035-d3a7e3f741ea"
+  },
+  {
+    "id": 38,
+    "stock_vehicles_id": 7,
+    "directus_files_id": "63ec3433-c89f-4850-a8ea-d76f4866d321"
+  },
+  {
+    "id": 39,
+    "stock_vehicles_id": 7,
+    "directus_files_id": "730fb1dd-2a20-4579-8d1f-d918185d45fc"
+  },
+  {
+    "id": 40,
+    "stock_vehicles_id": 7,
+    "directus_files_id": "f216d683-d936-4a56-8007-cb006a333070"
+  },
+  {
+    "id": 41,
+    "stock_vehicles_id": 7,
+    "directus_files_id": "4037adec-feaa-4f03-bb7e-67ca679efc4c"
+  },
+  {
+    "id": 42,
+    "stock_vehicles_id": 7,
+    "directus_files_id": "376737c9-bbae-492b-b242-23cd035e763d"
+  },
+  {
+    "id": 43,
+    "stock_vehicles_id": 7,
+    "directus_files_id": "f7d77247-0952-41c6-8ae6-c319c084cd7c"
+  },
+  {
+    "id": 44,
+    "stock_vehicles_id": 7,
+    "directus_files_id": "c3aca6e1-f3b5-45d6-8155-774f27861609"
+  },
+  {
+    "id": 45,
+    "stock_vehicles_id": 7,
+    "directus_files_id": "f1b61f6d-b6eb-45e4-8e01-b786e32b0d13"
+  },
+  {
+    "id": 46,
+    "stock_vehicles_id": 7,
+    "directus_files_id": "2c9b2233-af8b-4782-9480-6bb62b2fc58c"
+  },
+  {
+    "id": 47,
+    "stock_vehicles_id": 7,
+    "directus_files_id": "2a1954ac-1245-4750-a129-c654d2380c17"
+  },
+  {
+    "id": 48,
+    "stock_vehicles_id": 7,
+    "directus_files_id": "6fb0c0d8-3d52-4329-9eec-b52649412818"
+  },
+  {
+    "id": 49,
+    "stock_vehicles_id": 7,
+    "directus_files_id": "db8fc44b-5cc8-4025-b412-5cafc84539cb"
+  },
+  {
+    "id": 50,
+    "stock_vehicles_id": 7,
+    "directus_files_id": "a156e2ca-12c4-4192-8a24-57275e88c6ca"
+  },
+  {
+    "id": 51,
+    "stock_vehicles_id": 7,
+    "directus_files_id": "99ee00d4-6e1b-4fd1-9cbb-49b7d4e3518e"
+  },
+  {
+    "id": 52,
+    "stock_vehicles_id": 7,
+    "directus_files_id": "e60d291c-cfed-4425-9856-92dcb2fd5827"
+  },
+  {
+    "id": 53,
+    "stock_vehicles_id": 7,
+    "directus_files_id": "b1bc01d0-4dca-4b79-966f-4c4219c3825b"
+  },
+  {
+    "id": 54,
+    "stock_vehicles_id": 7,
+    "directus_files_id": "ad134233-d8cb-484d-9cd5-bf9d750d2480"
+  },
+  {
+    "id": 55,
+    "stock_vehicles_id": 7,
+    "directus_files_id": "43a57095-b5f9-417e-96a3-5438224da0b5"
+  },
+  {
+    "id": 56,
+    "stock_vehicles_id": 7,
+    "directus_files_id": "3d50da0a-0485-457d-820f-d3d7cb4d5ce1"
+  },
+  {
+    "id": 57,
+    "stock_vehicles_id": 8,
+    "directus_files_id": "6e657c60-4a70-4136-a08b-67b59b6d425e"
+  },
+  {
+    "id": 58,
+    "stock_vehicles_id": 8,
+    "directus_files_id": "78637ed0-fa6a-4f72-b239-2f343baa7674"
+  },
+  {
+    "id": 59,
+    "stock_vehicles_id": 8,
+    "directus_files_id": "7c385b72-0da9-4e2e-81af-406df9a2e6af"
+  },
+  {
+    "id": 60,
+    "stock_vehicles_id": 8,
+    "directus_files_id": "20af1af8-44f4-4345-b4fc-66577d04571c"
+  },
+  {
+    "id": 61,
+    "stock_vehicles_id": 8,
+    "directus_files_id": "05647292-4ae3-4956-826c-963fa18bff5e"
+  },
+  {
+    "id": 62,
+    "stock_vehicles_id": 8,
+    "directus_files_id": "282b36ef-76ef-40af-a4a9-30d113e6b12a"
+  },
+  {
+    "id": 63,
+    "stock_vehicles_id": 8,
+    "directus_files_id": "070d94a8-6627-45e0-b2bd-33dbc0c487cb"
+  },
+  {
+    "id": 64,
+    "stock_vehicles_id": 8,
+    "directus_files_id": "f047ba51-745b-4aa1-b3c9-62d064a605bc"
+  },
+  {
+    "id": 65,
+    "stock_vehicles_id": 8,
+    "directus_files_id": "4b4a8668-d32d-49f2-87e2-e1d825de5af3"
+  },
+  {
+    "id": 66,
+    "stock_vehicles_id": 8,
+    "directus_files_id": "f5972663-81f4-4fda-a8bb-87895b071410"
+  },
+  {
+    "id": 67,
+    "stock_vehicles_id": 8,
+    "directus_files_id": "1b07b2eb-efcc-4524-b790-147051761134"
+  },
+  {
+    "id": 68,
+    "stock_vehicles_id": 8,
+    "directus_files_id": "c6b24d58-a0e2-4502-b05a-88571b695904"
+  },
+  {
+    "id": 69,
+    "stock_vehicles_id": 8,
+    "directus_files_id": "e4dec3f0-b72d-4985-a716-8299d7f42184"
+  },
+  {
+    "id": 70,
+    "stock_vehicles_id": 8,
+    "directus_files_id": "7f7067ba-5c17-4ac8-be31-ce0e47d09bf4"
+  },
+  {
+    "id": 71,
+    "stock_vehicles_id": 8,
+    "directus_files_id": "451ae5ac-cb43-45f0-b8d1-5fb440b892a2"
+  },
+  {
+    "id": 72,
+    "stock_vehicles_id": 8,
+    "directus_files_id": "8b882d03-2ccc-4d37-b5bc-67bd9222220f"
+  },
+  {
+    "id": 73,
+    "stock_vehicles_id": 8,
+    "directus_files_id": "0199a323-b87b-4a85-9c9d-70a15f49d8d8"
+  },
+  {
+    "id": 74,
+    "stock_vehicles_id": 8,
+    "directus_files_id": "05c534b7-b10a-4679-ab39-9d67cc645b6d"
+  },
+  {
+    "id": 75,
+    "stock_vehicles_id": 8,
+    "directus_files_id": "359c3617-16f9-4b0e-97b8-6e1c8f861e8e"
+  },
+  {
+    "id": 76,
+    "stock_vehicles_id": 8,
+    "directus_files_id": "203a470f-ea40-4345-aeef-2a0e3a8f7a4c"
+  },
+  {
+    "id": 77,
+    "stock_vehicles_id": 8,
+    "directus_files_id": "bd7d85d9-3a89-4637-9124-88e4ff0a4c95"
+  },
+  {
+    "id": 78,
+    "stock_vehicles_id": 8,
+    "directus_files_id": "e94c84d9-b77c-4df5-873f-337fd0641088"
+  },
+  {
+    "id": 79,
+    "stock_vehicles_id": 8,
+    "directus_files_id": "615da2c4-5e2e-4d8f-88eb-cc73049561ec"
+  },
+  {
+    "id": 80,
+    "stock_vehicles_id": 8,
+    "directus_files_id": "383cc71a-59b6-44b6-9b90-f616a329cf62"
+  },
+  {
+    "id": 81,
+    "stock_vehicles_id": 8,
+    "directus_files_id": "70c46d54-5f2c-4cbb-a001-f8ee1a7bab3e"
+  },
+  {
+    "id": 82,
+    "stock_vehicles_id": 8,
+    "directus_files_id": "e74914de-2bb8-4dda-b2d5-b315089bd9b3"
+  },
+  {
+    "id": 83,
+    "stock_vehicles_id": 9,
+    "directus_files_id": "bbdec326-c6f7-4770-801b-6a908939a207"
+  },
+  {
+    "id": 84,
+    "stock_vehicles_id": 9,
+    "directus_files_id": "3eb09ccd-4666-4bb0-b9d3-6c2066c2738c"
+  },
+  {
+    "id": 85,
+    "stock_vehicles_id": 9,
+    "directus_files_id": "46d791d5-fccc-4a13-9d4c-89cd16bd82ed"
+  },
+  {
+    "id": 86,
+    "stock_vehicles_id": 9,
+    "directus_files_id": "441e4d35-e955-4c8f-92e5-d056a0251eb7"
+  },
+  {
+    "id": 87,
+    "stock_vehicles_id": 9,
+    "directus_files_id": "78d02642-d6f1-43cd-96bd-b4127547c59c"
+  },
+  {
+    "id": 88,
+    "stock_vehicles_id": 9,
+    "directus_files_id": "aab09bf8-f4f5-49ec-b056-4f6b4c3aa7ca"
+  },
+  {
+    "id": 89,
+    "stock_vehicles_id": 9,
+    "directus_files_id": "51e89cb4-7750-4282-80f2-36edb5f1b0a7"
+  },
+  {
+    "id": 90,
+    "stock_vehicles_id": 9,
+    "directus_files_id": "4a83be99-3959-4db3-ba9b-b9c1ccd3ce97"
+  },
+  {
+    "id": 91,
+    "stock_vehicles_id": 9,
+    "directus_files_id": "11ccc430-bc4f-4a4c-9cb5-c449e71a1378"
+  },
+  {
+    "id": 92,
+    "stock_vehicles_id": 9,
+    "directus_files_id": "ba8fc3aa-7891-4c5e-8311-a87bfad0e15e"
+  },
+  {
+    "id": 93,
+    "stock_vehicles_id": 9,
+    "directus_files_id": "9334d7a3-2790-4c81-aee9-122884294a33"
+  },
+  {
+    "id": 94,
+    "stock_vehicles_id": 9,
+    "directus_files_id": "3ad6bf5f-c13f-4270-854b-91158703996d"
+  },
+  {
+    "id": 95,
+    "stock_vehicles_id": 9,
+    "directus_files_id": "926c44cc-34fa-4ac8-acc6-e085a8674362"
+  },
+  {
+    "id": 96,
+    "stock_vehicles_id": 9,
+    "directus_files_id": "d8f82730-bdb5-4763-b196-6d2bc2dda007"
+  },
+  {
+    "id": 97,
+    "stock_vehicles_id": 9,
+    "directus_files_id": "2bcd56ae-28db-4792-91e6-d92b555fd02e"
+  },
+  {
+    "id": 98,
+    "stock_vehicles_id": 9,
+    "directus_files_id": "ea89e7d0-a9ef-40d5-9f79-92e7b656e05f"
+  },
+  {
+    "id": 99,
+    "stock_vehicles_id": 9,
+    "directus_files_id": "1eaf96ba-d0c0-4fe4-8621-34d24d557015"
+  },
+  {
+    "id": 100,
+    "stock_vehicles_id": 9,
+    "directus_files_id": "55b954af-49d9-4fc8-8173-8a11552f0edd"
+  },
+  {
+    "id": 101,
+    "stock_vehicles_id": 9,
+    "directus_files_id": "9105baa0-41d0-40ca-92bd-0464c3d1448a"
+  },
+  {
+    "id": 102,
+    "stock_vehicles_id": 9,
+    "directus_files_id": "9120937e-c77f-4cc6-bf74-4249c35dbe60"
+  },
+  {
+    "id": 103,
+    "stock_vehicles_id": 9,
+    "directus_files_id": "ab349af5-36a2-4467-8483-ac253e6c6ba9"
+  },
+  {
+    "id": 104,
+    "stock_vehicles_id": 9,
+    "directus_files_id": "2015f5b1-a96d-4bc4-8c5c-c6ef4fbf20bc"
+  },
+  {
+    "id": 105,
+    "stock_vehicles_id": 9,
+    "directus_files_id": "dfc73918-774b-49ba-9e8d-6efd9d2e84ad"
+  },
+  {
+    "id": 106,
+    "stock_vehicles_id": 9,
+    "directus_files_id": "84e5255d-0287-4f26-ac87-501a00ff48aa"
+  },
+  {
+    "id": 107,
+    "stock_vehicles_id": 10,
+    "directus_files_id": "25c13113-f575-4839-9076-9a0fdd405ce3"
+  },
+  {
+    "id": 108,
+    "stock_vehicles_id": 10,
+    "directus_files_id": "98913fb2-8fe1-4713-856b-5e8d339cc2a7"
+  },
+  {
+    "id": 109,
+    "stock_vehicles_id": 10,
+    "directus_files_id": "b91541fc-2f4f-43be-8afb-c1865a2274db"
+  },
+  {
+    "id": 110,
+    "stock_vehicles_id": 10,
+    "directus_files_id": "c3fc823e-4a3b-4aa1-be68-9228f991d5a7"
+  },
+  {
+    "id": 111,
+    "stock_vehicles_id": 10,
+    "directus_files_id": "18700077-5880-4d58-b2f1-32164b418fa5"
+  },
+  {
+    "id": 112,
+    "stock_vehicles_id": 10,
+    "directus_files_id": "34dab53f-c832-4233-9011-41d43d33ad64"
+  },
+  {
+    "id": 113,
+    "stock_vehicles_id": 10,
+    "directus_files_id": "83dfb380-f01c-48ac-96fe-b8d577c32351"
+  },
+  {
+    "id": 114,
+    "stock_vehicles_id": 10,
+    "directus_files_id": "cfa11bf0-ddcf-4d9e-b6f8-cb9a58b8b5f2"
+  },
+  {
+    "id": 115,
+    "stock_vehicles_id": 10,
+    "directus_files_id": "8144063a-fc75-447b-a16a-ff668c08fdb6"
+  },
+  {
+    "id": 116,
+    "stock_vehicles_id": 10,
+    "directus_files_id": "104bfd92-e896-4b13-8c6b-e9723fcd20ea"
+  },
+  {
+    "id": 117,
+    "stock_vehicles_id": 10,
+    "directus_files_id": "a12c9899-6e2e-406e-8118-b8ee6003a4c3"
+  },
+  {
+    "id": 118,
+    "stock_vehicles_id": 10,
+    "directus_files_id": "1be328ee-0e8a-41a5-bcac-2afb45f90c1c"
+  },
+  {
+    "id": 119,
+    "stock_vehicles_id": 10,
+    "directus_files_id": "7605f3f9-ed0c-46cc-8fc5-87190dfd324a"
+  },
+  {
+    "id": 120,
+    "stock_vehicles_id": 10,
+    "directus_files_id": "00e05306-1cba-4de4-85d2-185c4ae17f4b"
+  },
+  {
+    "id": 121,
+    "stock_vehicles_id": 10,
+    "directus_files_id": "5735716e-bc08-4848-9887-c56c48d609cd"
+  },
+  {
+    "id": 122,
+    "stock_vehicles_id": 10,
+    "directus_files_id": "5a6f8a78-7d7f-4b11-8932-6f0de182b9b7"
+  },
+  {
+    "id": 123,
+    "stock_vehicles_id": 10,
+    "directus_files_id": "2d92f072-b1ec-431d-bb79-5cc0d1c2d4f0"
+  },
+  {
+    "id": 124,
+    "stock_vehicles_id": 10,
+    "directus_files_id": "331e657e-ffcb-4709-af82-fe07201b036e"
+  },
+  {
+    "id": 125,
+    "stock_vehicles_id": 10,
+    "directus_files_id": "bff17265-765d-4e76-aaab-ba0aa6a86694"
+  },
+  {
+    "id": 126,
+    "stock_vehicles_id": 10,
+    "directus_files_id": "9f5d5bc2-7f27-4567-9577-67ad6fae0e08"
+  },
+  {
+    "id": 127,
+    "stock_vehicles_id": 10,
+    "directus_files_id": "59a586f2-90a5-405c-b318-cf893b776a6f"
+  },
+  {
+    "id": 128,
+    "stock_vehicles_id": 10,
+    "directus_files_id": "bbbe5cd7-c1c2-416f-bafb-2e75be41a2ff"
+  },
+  {
+    "id": 129,
+    "stock_vehicles_id": 10,
+    "directus_files_id": "4fcb28aa-b4fc-43ad-96da-da3d823cff87"
+  },
+  {
+    "id": 130,
+    "stock_vehicles_id": 10,
+    "directus_files_id": "957c521f-ed77-4a49-a320-e8a6eb13eb8c"
+  },
+  {
+    "id": 131,
+    "stock_vehicles_id": 11,
+    "directus_files_id": "8abb0287-24f4-4473-b4b0-fca81bab054a"
+  },
+  {
+    "id": 132,
+    "stock_vehicles_id": 11,
+    "directus_files_id": "b41d126f-c9c6-43cf-8731-8792007ada03"
+  },
+  {
+    "id": 133,
+    "stock_vehicles_id": 11,
+    "directus_files_id": "992b95c6-28a2-4e80-a00e-5a30aabbb249"
+  },
+  {
+    "id": 134,
+    "stock_vehicles_id": 11,
+    "directus_files_id": "9d2f9b24-378c-4ca9-96da-021ca980b0bf"
+  },
+  {
+    "id": 135,
+    "stock_vehicles_id": 11,
+    "directus_files_id": "45e94c57-b1bb-4af8-959c-dbb693c540f6"
+  },
+  {
+    "id": 136,
+    "stock_vehicles_id": 11,
+    "directus_files_id": "2b719a77-2240-4f54-91ee-c065963889ac"
+  },
+  {
+    "id": 137,
+    "stock_vehicles_id": 11,
+    "directus_files_id": "abd51f2d-9650-4ede-9f9c-56539cf958db"
+  },
+  {
+    "id": 138,
+    "stock_vehicles_id": 11,
+    "directus_files_id": "5fc2ea39-29a9-4ab0-aac3-5551958e0fe5"
+  },
+  {
+    "id": 139,
+    "stock_vehicles_id": 11,
+    "directus_files_id": "4156ba8d-e179-42f3-9d2a-6e877accda15"
+  },
+  {
+    "id": 140,
+    "stock_vehicles_id": 11,
+    "directus_files_id": "6e9c28a0-f46c-41dc-898e-4d3acf273d94"
+  },
+  {
+    "id": 141,
+    "stock_vehicles_id": 11,
+    "directus_files_id": "c87e02ab-74eb-4b6b-9ebd-52cff13e61dd"
+  },
+  {
+    "id": 142,
+    "stock_vehicles_id": 11,
+    "directus_files_id": "4573ab2b-b208-4ce8-a29b-0328cc3cd0c3"
+  },
+  {
+    "id": 143,
+    "stock_vehicles_id": 11,
+    "directus_files_id": "fb176055-2b84-477d-bb17-2583166be69a"
+  },
+  {
+    "id": 144,
+    "stock_vehicles_id": 11,
+    "directus_files_id": "2d1cb1dd-0a3c-4fd1-bc3b-b3300fe86e33"
+  },
+  {
+    "id": 145,
+    "stock_vehicles_id": 11,
+    "directus_files_id": "8203868a-ca68-4343-8089-de59737f1df2"
+  },
+  {
+    "id": 146,
+    "stock_vehicles_id": 11,
+    "directus_files_id": "339ab2bf-0a8e-41bd-b320-9a9cd55c8c69"
+  },
+  {
+    "id": 147,
+    "stock_vehicles_id": 11,
+    "directus_files_id": "2c71cd8e-13a7-4d81-bb9e-7a65d8202851"
+  },
+  {
+    "id": 148,
+    "stock_vehicles_id": 11,
+    "directus_files_id": "28339d25-ec74-41ae-9e70-7d28d5f2ff82"
+  },
+  {
+    "id": 149,
+    "stock_vehicles_id": 11,
+    "directus_files_id": "98c810b6-de70-41e3-ac5b-a31509243591"
+  },
+  {
+    "id": 150,
+    "stock_vehicles_id": 11,
+    "directus_files_id": "03a8c669-95af-4647-9d1f-04bddac1fefd"
+  },
+  {
+    "id": 151,
+    "stock_vehicles_id": 11,
+    "directus_files_id": "d29b25ed-5309-4c08-899a-50a19389282a"
+  },
+  {
+    "id": 152,
+    "stock_vehicles_id": 11,
+    "directus_files_id": "5a9441a8-a1a0-4fff-b145-f5ed9951513e"
+  },
+  {
+    "id": 153,
+    "stock_vehicles_id": 11,
+    "directus_files_id": "224a41df-b553-448f-b1f8-c96cb44b9580"
+  },
+  {
+    "id": 154,
+    "stock_vehicles_id": 11,
+    "directus_files_id": "0ef81d53-ecea-40f6-8efd-990590c99d7e"
+  },
+  {
+    "id": 155,
+    "stock_vehicles_id": 12,
+    "directus_files_id": "0d76b35e-897f-4efa-96a8-9393d997dacc"
+  },
+  {
+    "id": 156,
+    "stock_vehicles_id": 12,
+    "directus_files_id": "d5ea64be-eb64-478d-b4ba-f690165e6615"
+  },
+  {
+    "id": 157,
+    "stock_vehicles_id": 12,
+    "directus_files_id": "adc8c765-3a1b-44ce-87e5-ced8ff41db42"
+  },
+  {
+    "id": 158,
+    "stock_vehicles_id": 12,
+    "directus_files_id": "c99f5636-ea56-4c68-be1d-2b2f438ea11a"
+  },
+  {
+    "id": 159,
+    "stock_vehicles_id": 12,
+    "directus_files_id": "cd7275b9-e528-4a42-b68a-4546800ca624"
+  },
+  {
+    "id": 160,
+    "stock_vehicles_id": 12,
+    "directus_files_id": "74dea19d-3eff-4a23-9d23-9ce40ac86189"
+  },
+  {
+    "id": 161,
+    "stock_vehicles_id": 12,
+    "directus_files_id": "4000f8d4-c142-419e-8e44-03f9bd204f88"
+  },
+  {
+    "id": 162,
+    "stock_vehicles_id": 12,
+    "directus_files_id": "d8c0b591-67a8-40a4-b9e3-3a4b2bd66eb0"
+  },
+  {
+    "id": 163,
+    "stock_vehicles_id": 12,
+    "directus_files_id": "eef539ab-dbdc-43b6-b120-1bd601d689e0"
+  },
+  {
+    "id": 164,
+    "stock_vehicles_id": 12,
+    "directus_files_id": "abe4c73b-435d-4bea-9e5e-203654ff92ad"
+  },
+  {
+    "id": 165,
+    "stock_vehicles_id": 12,
+    "directus_files_id": "31099c9f-8124-4abe-b35e-8e1fa3285c32"
+  },
+  {
+    "id": 166,
+    "stock_vehicles_id": 12,
+    "directus_files_id": "5f1a715e-f89d-4665-be1e-d9e104073bf7"
+  },
+  {
+    "id": 167,
+    "stock_vehicles_id": 12,
+    "directus_files_id": "4d73c92d-27cb-41ee-870b-83e810fdc61b"
+  },
+  {
+    "id": 168,
+    "stock_vehicles_id": 12,
+    "directus_files_id": "f9155886-05f5-49d2-b14f-6c00d3cbbdfc"
+  },
+  {
+    "id": 169,
+    "stock_vehicles_id": 12,
+    "directus_files_id": "b03f5e18-61ca-4b06-93a8-99553bcf2c6a"
+  },
+  {
+    "id": 170,
+    "stock_vehicles_id": 12,
+    "directus_files_id": "606f2619-d574-4469-b20e-708d40b7ce64"
+  },
+  {
+    "id": 171,
+    "stock_vehicles_id": 12,
+    "directus_files_id": "b51d2873-6449-45e0-a03d-2fb3456fe235"
+  },
+  {
+    "id": 172,
+    "stock_vehicles_id": 12,
+    "directus_files_id": "706fdf43-01ee-494d-a681-d7309e525991"
+  },
+  {
+    "id": 173,
+    "stock_vehicles_id": 12,
+    "directus_files_id": "5fe08411-9a51-4388-b498-4ce19274cfeb"
+  },
+  {
+    "id": 174,
+    "stock_vehicles_id": 12,
+    "directus_files_id": "931238dd-0762-4a2b-ad3e-ab8715991e51"
+  },
+  {
+    "id": 175,
+    "stock_vehicles_id": 12,
+    "directus_files_id": "73ce96c6-96c2-4868-bd36-325709cefc5c"
+  },
+  {
+    "id": 176,
+    "stock_vehicles_id": 12,
+    "directus_files_id": "a3227953-fbf4-4405-9c89-4faee6bdc5fd"
+  },
+  {
+    "id": 177,
+    "stock_vehicles_id": 12,
+    "directus_files_id": "e3f5386f-713c-44a4-87c5-66c890bc3138"
+  },
+  {
+    "id": 178,
+    "stock_vehicles_id": 12,
+    "directus_files_id": "782cb734-1dcc-4a6c-9bd5-578bffea13f5"
+  },
+  {
+    "id": 179,
+    "stock_vehicles_id": 13,
+    "directus_files_id": "12d796d8-ac21-4a24-b3c6-e4e627c56226"
+  },
+  {
+    "id": 180,
+    "stock_vehicles_id": 13,
+    "directus_files_id": "d03fa3d7-ce25-47d7-bbf2-ffceb3be6509"
+  },
+  {
+    "id": 181,
+    "stock_vehicles_id": 13,
+    "directus_files_id": "3e76d478-6a24-434c-af54-596ca8dac240"
+  },
+  {
+    "id": 182,
+    "stock_vehicles_id": 13,
+    "directus_files_id": "3fe6d1ae-a823-4017-9459-d0efcf35b511"
+  },
+  {
+    "id": 183,
+    "stock_vehicles_id": 13,
+    "directus_files_id": "0f565887-57d0-4f04-a94b-b5729af24d68"
+  },
+  {
+    "id": 184,
+    "stock_vehicles_id": 13,
+    "directus_files_id": "6a5611d0-70aa-4788-87ce-93d289807bb2"
+  },
+  {
+    "id": 185,
+    "stock_vehicles_id": 13,
+    "directus_files_id": "4ae3cf2c-ba59-42cc-9f8c-372deb0b0ffb"
+  },
+  {
+    "id": 186,
+    "stock_vehicles_id": 13,
+    "directus_files_id": "dde319a9-9c65-4b9a-a967-703aebb172e8"
+  },
+  {
+    "id": 187,
+    "stock_vehicles_id": 13,
+    "directus_files_id": "5a6d39b5-02ec-42f3-93de-1a36ef1699f9"
+  },
+  {
+    "id": 188,
+    "stock_vehicles_id": 13,
+    "directus_files_id": "a5ad2ee2-03a7-472c-9d58-d3686434cc5b"
+  },
+  {
+    "id": 189,
+    "stock_vehicles_id": 13,
+    "directus_files_id": "60bc1452-f851-4a27-95ee-e22ab0711e63"
+  },
+  {
+    "id": 190,
+    "stock_vehicles_id": 13,
+    "directus_files_id": "899055ee-9d92-4c7c-8c04-8d920d656b69"
+  },
+  {
+    "id": 191,
+    "stock_vehicles_id": 13,
+    "directus_files_id": "e8f6b5e7-f9cc-4781-b7e1-80f3b1e00a56"
+  },
+  {
+    "id": 192,
+    "stock_vehicles_id": 13,
+    "directus_files_id": "a12dcd0e-ca8d-4cd4-bbc8-358604991e8d"
+  },
+  {
+    "id": 193,
+    "stock_vehicles_id": 13,
+    "directus_files_id": "2183c6e3-b5c5-4976-96d4-28aab3cd47c1"
+  },
+  {
+    "id": 194,
+    "stock_vehicles_id": 13,
+    "directus_files_id": "934f62b0-4419-4755-8c0f-04e7c3b32c11"
+  },
+  {
+    "id": 195,
+    "stock_vehicles_id": 13,
+    "directus_files_id": "ca6df0ed-da14-45c0-a4a2-fdea5dbef402"
+  },
+  {
+    "id": 196,
+    "stock_vehicles_id": 13,
+    "directus_files_id": "f4614454-706c-4972-b372-bc6bce4da169"
+  },
+  {
+    "id": 197,
+    "stock_vehicles_id": 13,
+    "directus_files_id": "138e9616-6fbe-4f4d-973e-8029c0a45aee"
+  },
+  {
+    "id": 198,
+    "stock_vehicles_id": 13,
+    "directus_files_id": "837b700a-c598-40f0-b3c4-d2d4bc31a239"
+  },
+  {
+    "id": 199,
+    "stock_vehicles_id": 13,
+    "directus_files_id": "91982d8e-4da9-444c-ac9d-25ada2ad382d"
+  },
+  {
+    "id": 200,
+    "stock_vehicles_id": 13,
+    "directus_files_id": "dd4f72a6-a63c-4c0c-99fc-a09637358766"
+  },
+  {
+    "id": 201,
+    "stock_vehicles_id": 13,
+    "directus_files_id": "c6fb7fd3-e2ca-401a-8240-166a8bb281f5"
+  },
+  {
+    "id": 202,
+    "stock_vehicles_id": 13,
+    "directus_files_id": "2b664163-12c6-491c-b7dd-876368f0bbd7"
+  },
+  {
+    "id": 203,
+    "stock_vehicles_id": 14,
+    "directus_files_id": "83c3b528-70c3-4cab-af6b-41f792e63846"
+  },
+  {
+    "id": 204,
+    "stock_vehicles_id": 14,
+    "directus_files_id": "bd6b4e7f-f79d-4378-afc9-2d4ee40619f9"
+  },
+  {
+    "id": 205,
+    "stock_vehicles_id": 14,
+    "directus_files_id": "b062a4b9-4cdc-4efc-81dd-2088c52b20a4"
+  },
+  {
+    "id": 206,
+    "stock_vehicles_id": 14,
+    "directus_files_id": "737c7b51-381c-412a-aefd-e9e08df769e5"
+  },
+  {
+    "id": 207,
+    "stock_vehicles_id": 15,
+    "directus_files_id": "2f7143d2-fddc-471b-a5ad-9adcba30e244"
+  },
+  {
+    "id": 208,
+    "stock_vehicles_id": 15,
+    "directus_files_id": "317e1a19-24f2-4ef0-ab23-3fdf30757f84"
+  },
+  {
+    "id": 209,
+    "stock_vehicles_id": 15,
+    "directus_files_id": "113a0bd5-f0af-49b3-968e-6950e3f708cd"
+  },
+  {
+    "id": 210,
+    "stock_vehicles_id": 15,
+    "directus_files_id": "39e1512d-a98a-4e5a-8eb6-21113251c1d1"
+  },
+  {
+    "id": 211,
+    "stock_vehicles_id": 15,
+    "directus_files_id": "f06fed00-da70-4321-b2db-397ef380e4d1"
+  },
+  {
+    "id": 212,
+    "stock_vehicles_id": 15,
+    "directus_files_id": "5ebfe4ce-3ac7-4388-ba26-e0fe8d6e0ad7"
+  },
+  {
+    "id": 213,
+    "stock_vehicles_id": 15,
+    "directus_files_id": "4585ce3c-4fb9-4ded-b7e1-e1b1cfd61c9e"
+  },
+  {
+    "id": 214,
+    "stock_vehicles_id": 15,
+    "directus_files_id": "7970d66b-5475-4d54-b6b6-45cb480b155c"
+  },
+  {
+    "id": 215,
+    "stock_vehicles_id": 15,
+    "directus_files_id": "31bfe135-e8a5-4be1-a16a-56486acafde0"
+  },
+  {
+    "id": 216,
+    "stock_vehicles_id": 15,
+    "directus_files_id": "98931c03-6417-4aec-ac0c-0320a337be00"
+  },
+  {
+    "id": 217,
+    "stock_vehicles_id": 15,
+    "directus_files_id": "37a2c675-963b-4a03-ae1a-aaded68e8a47"
+  },
+  {
+    "id": 218,
+    "stock_vehicles_id": 15,
+    "directus_files_id": "b9a55b0d-a87a-4999-a152-6d2afdfce283"
+  },
+  {
+    "id": 219,
+    "stock_vehicles_id": 15,
+    "directus_files_id": "50f1a83c-9945-4086-bd38-bbe26db5ba96"
+  },
+  {
+    "id": 220,
+    "stock_vehicles_id": 15,
+    "directus_files_id": "c23d5209-60fc-4a9b-8647-6cc497a9646a"
+  },
+  {
+    "id": 221,
+    "stock_vehicles_id": 15,
+    "directus_files_id": "02a57522-6492-41f7-ac76-fd7bd9fa2bb0"
+  },
+  {
+    "id": 222,
+    "stock_vehicles_id": 15,
+    "directus_files_id": "93af0b36-24df-4f38-9c40-0224af2d0fa5"
+  },
+  {
+    "id": 223,
+    "stock_vehicles_id": 15,
+    "directus_files_id": "5d18ee36-1530-4534-879c-fbc399d57de8"
+  },
+  {
+    "id": 224,
+    "stock_vehicles_id": 15,
+    "directus_files_id": "c7a6f24c-4faf-4594-93da-5cfc89b945db"
+  },
+  {
+    "id": 225,
+    "stock_vehicles_id": 15,
+    "directus_files_id": "d4579609-fb56-44fa-9982-7792e7e83574"
+  },
+  {
+    "id": 226,
+    "stock_vehicles_id": 15,
+    "directus_files_id": "9e6fcf55-485a-400d-9166-f26c17683cda"
+  },
+  {
+    "id": 227,
+    "stock_vehicles_id": 15,
+    "directus_files_id": "1e2a0057-b896-4df7-a87b-1c7046f03ef9"
+  },
+  {
+    "id": 228,
+    "stock_vehicles_id": 15,
+    "directus_files_id": "29dedde1-61b6-47e0-bfb8-a4f884035a2f"
+  },
+  {
+    "id": 229,
+    "stock_vehicles_id": 15,
+    "directus_files_id": "b143b01d-8ccf-4842-bf77-b1927c8327bb"
+  },
+  {
+    "id": 230,
+    "stock_vehicles_id": 15,
+    "directus_files_id": "717a4f6b-0a87-4c75-821e-a819f90b83c8"
+  },
+  {
+    "id": 231,
+    "stock_vehicles_id": 15,
+    "directus_files_id": "7f381525-ab2b-436e-81e6-3ebfa6b47b8b"
+  },
+  {
+    "id": 232,
+    "stock_vehicles_id": 15,
+    "directus_files_id": "c7be9049-e542-446c-9ca6-a4e085a2798f"
+  },
+  {
+    "id": 233,
+    "stock_vehicles_id": 16,
+    "directus_files_id": "64bc90b1-099b-4d30-9083-1db98fc75ec1"
+  },
+  {
+    "id": 234,
+    "stock_vehicles_id": 16,
+    "directus_files_id": "c2289ac8-6b5d-441f-a62d-e745e08670d7"
+  },
+  {
+    "id": 235,
+    "stock_vehicles_id": 16,
+    "directus_files_id": "41072c99-00f1-4af4-a114-4e5548fdb608"
+  },
+  {
+    "id": 236,
+    "stock_vehicles_id": 16,
+    "directus_files_id": "852015b1-31d5-4cce-b84a-e16f13016a32"
+  },
+  {
+    "id": 237,
+    "stock_vehicles_id": 16,
+    "directus_files_id": "e0106496-755e-4660-a5e9-5bed30549895"
+  },
+  {
+    "id": 238,
+    "stock_vehicles_id": 16,
+    "directus_files_id": "691cdca3-ccf5-44de-914c-c8ee2aa8b630"
+  },
+  {
+    "id": 239,
+    "stock_vehicles_id": 16,
+    "directus_files_id": "1fe04254-13b7-4e9b-84b1-9ffdbf13bcd8"
+  },
+  {
+    "id": 240,
+    "stock_vehicles_id": 16,
+    "directus_files_id": "a3640e9a-ebd4-42d4-82e8-6e92c7d932fb"
+  },
+  {
+    "id": 241,
+    "stock_vehicles_id": 16,
+    "directus_files_id": "0f690955-d15f-4c2b-8e35-40acd5b70dd0"
+  },
+  {
+    "id": 242,
+    "stock_vehicles_id": 16,
+    "directus_files_id": "7574474c-8e02-4f25-b081-51caa12b7013"
+  },
+  {
+    "id": 243,
+    "stock_vehicles_id": 16,
+    "directus_files_id": "fc485954-f35e-4612-a419-91f21286e800"
+  },
+  {
+    "id": 244,
+    "stock_vehicles_id": 16,
+    "directus_files_id": "2755942e-adc8-4928-848e-cf0a1f698577"
+  },
+  {
+    "id": 245,
+    "stock_vehicles_id": 16,
+    "directus_files_id": "c348da58-539b-4bf1-a642-497d0aad6f2f"
+  },
+  {
+    "id": 246,
+    "stock_vehicles_id": 16,
+    "directus_files_id": "49d2abc3-7261-49a6-9188-b75502409d7c"
+  },
+  {
+    "id": 247,
+    "stock_vehicles_id": 16,
+    "directus_files_id": "e243778b-d775-4df0-aff8-06a7ede730fc"
+  },
+  {
+    "id": 248,
+    "stock_vehicles_id": 16,
+    "directus_files_id": "cfff5ffa-f6e0-458a-ae4e-7330082a418f"
+  },
+  {
+    "id": 249,
+    "stock_vehicles_id": 16,
+    "directus_files_id": "f62d6c53-f3d2-4372-91a5-ef752cc1417f"
+  },
+  {
+    "id": 250,
+    "stock_vehicles_id": 16,
+    "directus_files_id": "fd822ce9-ee6a-4e5a-a7ac-fc51f95c312d"
+  },
+  {
+    "id": 251,
+    "stock_vehicles_id": 16,
+    "directus_files_id": "05ccc48b-3f39-469e-b1dd-96f2082a941a"
+  },
+  {
+    "id": 252,
+    "stock_vehicles_id": 16,
+    "directus_files_id": "376de0b3-ee74-4f41-921a-809ac2375c3b"
+  },
+  {
+    "id": 253,
+    "stock_vehicles_id": 16,
+    "directus_files_id": "ef3da8c6-a9df-4dd9-b1fe-78f223969fa9"
+  },
+  {
+    "id": 254,
+    "stock_vehicles_id": 16,
+    "directus_files_id": "aa51db3d-8630-4766-b2e7-c60bd2094598"
+  },
+  {
+    "id": 255,
+    "stock_vehicles_id": 16,
+    "directus_files_id": "3810f70f-33a7-4cc0-8da3-b910cfd5b5f3"
+  },
+  {
+    "id": 256,
+    "stock_vehicles_id": 16,
+    "directus_files_id": "74338c74-8a85-404a-9b12-4d2ab4fc8a1e"
+  },
+  {
+    "id": 257,
+    "stock_vehicles_id": 16,
+    "directus_files_id": "5677c6c9-d796-4caa-85de-be9462c23e8d"
+  },
+  {
+    "id": 258,
+    "stock_vehicles_id": 16,
+    "directus_files_id": "d6c58c68-40f3-4d9c-81f8-4b8b01519d7b"
+  },
+  {
+    "id": 259,
+    "stock_vehicles_id": 16,
+    "directus_files_id": "96e83fe4-6187-4538-9ffe-70886d319a97"
+  },
+  {
+    "id": 260,
+    "stock_vehicles_id": 16,
+    "directus_files_id": "a100120c-2427-480f-bb26-024fcfe6967e"
+  },
+  {
+    "id": 261,
+    "stock_vehicles_id": 17,
+    "directus_files_id": "7e205e68-0db9-4a81-9f4e-6228c5502b4d"
+  },
+  {
+    "id": 262,
+    "stock_vehicles_id": 17,
+    "directus_files_id": "7732a530-785b-4e7e-8299-09006311f8d4"
+  },
+  {
+    "id": 263,
+    "stock_vehicles_id": 17,
+    "directus_files_id": "f392cc18-5ce7-4da0-bd78-11a62ae860a3"
+  },
+  {
+    "id": 264,
+    "stock_vehicles_id": 17,
+    "directus_files_id": "c6b2379a-ba63-4cfa-8de3-b35a827e1367"
+  },
+  {
+    "id": 265,
+    "stock_vehicles_id": 17,
+    "directus_files_id": "9e60d6f0-a072-4a06-a02c-aaabc01d4574"
+  },
+  {
+    "id": 266,
+    "stock_vehicles_id": 17,
+    "directus_files_id": "0d2e9e54-be06-408e-b512-09d6c5233add"
+  },
+  {
+    "id": 267,
+    "stock_vehicles_id": 17,
+    "directus_files_id": "ac5c9c34-9078-4a07-a8c3-a41058d75558"
+  },
+  {
+    "id": 268,
+    "stock_vehicles_id": 17,
+    "directus_files_id": "40080aa5-a43b-4a0c-9ea8-5e2ef9ed439e"
+  },
+  {
+    "id": 269,
+    "stock_vehicles_id": 17,
+    "directus_files_id": "000f3feb-8dce-429d-9ec4-dbbf0cdc2d74"
+  },
+  {
+    "id": 270,
+    "stock_vehicles_id": 17,
+    "directus_files_id": "da6be902-64af-4b4a-be83-af94c1fb60af"
+  },
+  {
+    "id": 271,
+    "stock_vehicles_id": 17,
+    "directus_files_id": "ed1e6e99-e327-475d-86ef-831219ef50f9"
+  },
+  {
+    "id": 272,
+    "stock_vehicles_id": 17,
+    "directus_files_id": "3fe71505-949f-4505-85e8-1019e8f1c446"
+  },
+  {
+    "id": 273,
+    "stock_vehicles_id": 17,
+    "directus_files_id": "4319aaa6-1b77-4a1a-b342-ab368ac6307c"
+  },
+  {
+    "id": 274,
+    "stock_vehicles_id": 17,
+    "directus_files_id": "f4557557-5db6-4cff-a492-c33493761fbc"
+  },
+  {
+    "id": 275,
+    "stock_vehicles_id": 17,
+    "directus_files_id": "d9efed41-0f80-482d-a924-c848b5ca3c56"
+  },
+  {
+    "id": 276,
+    "stock_vehicles_id": 17,
+    "directus_files_id": "1650a0a5-c83a-466b-9d83-6db7135039f0"
+  },
+  {
+    "id": 277,
+    "stock_vehicles_id": 17,
+    "directus_files_id": "d4081227-1bb1-4d6f-b1f1-dcb505ace493"
+  },
+  {
+    "id": 278,
+    "stock_vehicles_id": 17,
+    "directus_files_id": "575b6826-fc13-41d8-97bd-46279d944814"
+  },
+  {
+    "id": 279,
+    "stock_vehicles_id": 17,
+    "directus_files_id": "0c27abc3-7e98-405e-af60-62906649aed4"
+  },
+  {
+    "id": 280,
+    "stock_vehicles_id": 17,
+    "directus_files_id": "e5b0fe17-2e1a-4d93-9ced-88c71346a378"
+  },
+  {
+    "id": 281,
+    "stock_vehicles_id": 17,
+    "directus_files_id": "6427ae66-b14e-4ac8-a8be-850b0b9191a2"
+  },
+  {
+    "id": 282,
+    "stock_vehicles_id": 17,
+    "directus_files_id": "52c95746-baa0-4f2f-83bd-a64a783c52ab"
+  },
+  {
+    "id": 283,
+    "stock_vehicles_id": 17,
+    "directus_files_id": "eb5bc9a2-786a-4e31-b5d8-2bb2e8cd5c18"
+  },
+  {
+    "id": 284,
+    "stock_vehicles_id": 17,
+    "directus_files_id": "98caaccd-3a5b-482f-b0d7-6810f10adb50"
+  },
+  {
+    "id": 285,
+    "stock_vehicles_id": 18,
+    "directus_files_id": "9ee80929-0e09-4514-ba2a-0338a9788c7f"
+  },
+  {
+    "id": 286,
+    "stock_vehicles_id": 18,
+    "directus_files_id": "f4521dde-9f09-4e38-aa11-688445d9727c"
+  },
+  {
+    "id": 287,
+    "stock_vehicles_id": 18,
+    "directus_files_id": "38c8887a-670a-4371-99d4-06634e9c2a5b"
+  },
+  {
+    "id": 288,
+    "stock_vehicles_id": 18,
+    "directus_files_id": "7e0dcb1e-e319-441c-ab73-e49bf376af26"
+  },
+  {
+    "id": 289,
+    "stock_vehicles_id": 18,
+    "directus_files_id": "c23dcd30-c3f7-4033-914b-573c2c76b190"
+  },
+  {
+    "id": 290,
+    "stock_vehicles_id": 18,
+    "directus_files_id": "df1b6707-b96c-4251-b188-3b6cacf94ef4"
+  },
+  {
+    "id": 291,
+    "stock_vehicles_id": 18,
+    "directus_files_id": "021fdb37-d8e1-44e8-ad4b-db16b3a5f0cb"
+  },
+  {
+    "id": 292,
+    "stock_vehicles_id": 18,
+    "directus_files_id": "29c2c7ea-87af-4118-9f4b-67f273244ccf"
+  },
+  {
+    "id": 293,
+    "stock_vehicles_id": 18,
+    "directus_files_id": "2280efa1-8bb7-406f-adda-16585fed7e59"
+  },
+  {
+    "id": 294,
+    "stock_vehicles_id": 18,
+    "directus_files_id": "86b755ba-de0a-4c77-91f1-dd3a85daf449"
+  },
+  {
+    "id": 295,
+    "stock_vehicles_id": 18,
+    "directus_files_id": "5014cf63-8a21-4f72-a4f6-581b0a2a8a6b"
+  },
+  {
+    "id": 296,
+    "stock_vehicles_id": 18,
+    "directus_files_id": "0c17e8c0-ce15-4932-90e5-cd0b2a8e7b41"
+  },
+  {
+    "id": 297,
+    "stock_vehicles_id": 18,
+    "directus_files_id": "34cfd89f-fdfe-4cad-a24e-216fa05b358c"
+  },
+  {
+    "id": 298,
+    "stock_vehicles_id": 18,
+    "directus_files_id": "3a246422-152b-45ca-960d-08efdea4b014"
+  },
+  {
+    "id": 299,
+    "stock_vehicles_id": 18,
+    "directus_files_id": "ca4c67af-f74c-474b-964a-275d3d7b3aca"
+  },
+  {
+    "id": 300,
+    "stock_vehicles_id": 18,
+    "directus_files_id": "da327844-609c-46d3-9668-6331013aeb8b"
+  },
+  {
+    "id": 301,
+    "stock_vehicles_id": 18,
+    "directus_files_id": "a9875743-b005-46ab-a544-15c1225343fc"
+  },
+  {
+    "id": 302,
+    "stock_vehicles_id": 18,
+    "directus_files_id": "131ab2b1-1ae9-4b4c-a714-781e1f476fb4"
+  },
+  {
+    "id": 303,
+    "stock_vehicles_id": 18,
+    "directus_files_id": "fb66e093-6ff4-4a5f-896a-fd8b2405e526"
+  },
+  {
+    "id": 304,
+    "stock_vehicles_id": 18,
+    "directus_files_id": "d680800d-15c2-49fb-94eb-8df218932374"
+  },
+  {
+    "id": 305,
+    "stock_vehicles_id": 18,
+    "directus_files_id": "4d17cb99-43ed-4db5-8bb8-3f363aa1aad3"
+  },
+  {
+    "id": 306,
+    "stock_vehicles_id": 18,
+    "directus_files_id": "6722dba4-67a4-4945-8bcb-9a067ff58360"
+  },
+  {
+    "id": 307,
+    "stock_vehicles_id": 18,
+    "directus_files_id": "de876d83-2768-45d1-bc48-6520062d049a"
+  },
+  {
+    "id": 308,
+    "stock_vehicles_id": 18,
+    "directus_files_id": "c13be84a-4d70-4737-b97e-52979e901a9a"
+  },
+  {
+    "id": 309,
+    "stock_vehicles_id": 18,
+    "directus_files_id": "db3b7a78-aef2-47cb-ac4a-39d32e4236be"
+  },
+  {
+    "id": 310,
+    "stock_vehicles_id": 18,
+    "directus_files_id": "db634574-4bb1-4868-ac5c-727f4f374265"
+  },
+  {
+    "id": 311,
+    "stock_vehicles_id": 19,
+    "directus_files_id": "49320b93-9088-4574-ba77-893317b7a3e3"
+  },
+  {
+    "id": 312,
+    "stock_vehicles_id": 19,
+    "directus_files_id": "784235ee-2595-4255-8c31-ad302b7ec89f"
+  },
+  {
+    "id": 313,
+    "stock_vehicles_id": 19,
+    "directus_files_id": "ca1f3b8e-1427-477a-894d-062c0ad50ff4"
+  },
+  {
+    "id": 314,
+    "stock_vehicles_id": 19,
+    "directus_files_id": "e92161c2-823e-4799-be95-50a8b5b4618e"
+  },
+  {
+    "id": 315,
+    "stock_vehicles_id": 19,
+    "directus_files_id": "7bfdbbc4-4324-4d1e-8570-b3b285ee95d8"
+  },
+  {
+    "id": 316,
+    "stock_vehicles_id": 19,
+    "directus_files_id": "5c3481f0-f848-4aeb-bd28-438027dbb42e"
+  },
+  {
+    "id": 317,
+    "stock_vehicles_id": 19,
+    "directus_files_id": "456e1e0e-2c45-4a4b-9908-b60e9f7018b7"
+  },
+  {
+    "id": 318,
+    "stock_vehicles_id": 19,
+    "directus_files_id": "5aaa3ca4-3f82-4259-a675-2d2c75daeb26"
+  },
+  {
+    "id": 319,
+    "stock_vehicles_id": 19,
+    "directus_files_id": "03c40259-910f-4e4a-8a44-3ff35acb3e69"
+  },
+  {
+    "id": 320,
+    "stock_vehicles_id": 19,
+    "directus_files_id": "a33e151c-453b-43d9-a050-4432261e9eeb"
+  },
+  {
+    "id": 321,
+    "stock_vehicles_id": 19,
+    "directus_files_id": "964180b0-f935-473f-98c2-3a53b713eb5c"
+  },
+  {
+    "id": 322,
+    "stock_vehicles_id": 19,
+    "directus_files_id": "7c365414-b7b6-4d90-b8ca-fbdde7a2ce84"
+  },
+  {
+    "id": 323,
+    "stock_vehicles_id": 19,
+    "directus_files_id": "3af38f70-e155-4aaf-8f8d-4eb253bd6040"
+  },
+  {
+    "id": 324,
+    "stock_vehicles_id": 19,
+    "directus_files_id": "95bf16c9-85cb-464a-8bbd-8aa19384ba35"
+  },
+  {
+    "id": 325,
+    "stock_vehicles_id": 19,
+    "directus_files_id": "630169ec-8a7b-4a66-9d89-0df45b38581b"
+  },
+  {
+    "id": 326,
+    "stock_vehicles_id": 19,
+    "directus_files_id": "cd8cfb55-975d-434c-b3d4-0006f22c8e47"
+  },
+  {
+    "id": 327,
+    "stock_vehicles_id": 19,
+    "directus_files_id": "dad8fc7d-9879-44ff-aa59-737f23aff890"
+  },
+  {
+    "id": 328,
+    "stock_vehicles_id": 19,
+    "directus_files_id": "5a8a8029-2988-4060-ba1a-f20faaa6a0ce"
+  },
+  {
+    "id": 329,
+    "stock_vehicles_id": 19,
+    "directus_files_id": "ac685107-8398-48cd-ab11-ec3a3b736bb6"
+  },
+  {
+    "id": 330,
+    "stock_vehicles_id": 19,
+    "directus_files_id": "1c32b7cf-8805-403f-9472-69ecf1371607"
+  },
+  {
+    "id": 331,
+    "stock_vehicles_id": 19,
+    "directus_files_id": "6da7b52b-8114-4ca2-852a-115d0c79338f"
+  },
+  {
+    "id": 332,
+    "stock_vehicles_id": 19,
+    "directus_files_id": "610c6b23-b564-42b3-9427-f64e6294feff"
+  },
+  {
+    "id": 333,
+    "stock_vehicles_id": 20,
+    "directus_files_id": "3a7f0e66-5d4a-4684-bf80-0566b5a5c7b5"
+  },
+  {
+    "id": 334,
+    "stock_vehicles_id": 20,
+    "directus_files_id": "324d9c6b-ea40-4fc0-b262-3c0212160eba"
+  },
+  {
+    "id": 335,
+    "stock_vehicles_id": 20,
+    "directus_files_id": "9a4b6426-ab11-4df1-8e9d-077759bae41b"
+  },
+  {
+    "id": 336,
+    "stock_vehicles_id": 20,
+    "directus_files_id": "7c06fe9b-774a-4944-bac1-14a63f3027c0"
+  },
+  {
+    "id": 337,
+    "stock_vehicles_id": 20,
+    "directus_files_id": "d446ee1b-3bf1-4d50-9c0b-9720700da1f7"
+  },
+  {
+    "id": 338,
+    "stock_vehicles_id": 20,
+    "directus_files_id": "e689211f-dce7-41e9-8d51-cc1d46b8a5cb"
+  },
+  {
+    "id": 339,
+    "stock_vehicles_id": 20,
+    "directus_files_id": "c1bf2350-ccad-4142-9afa-779a64c89c26"
+  },
+  {
+    "id": 340,
+    "stock_vehicles_id": 20,
+    "directus_files_id": "bbe21d16-9c7a-4ca9-aded-0c75bb5e984c"
+  },
+  {
+    "id": 341,
+    "stock_vehicles_id": 20,
+    "directus_files_id": "ed9f8587-6a1b-4374-b97d-3279eb66d406"
+  },
+  {
+    "id": 342,
+    "stock_vehicles_id": 20,
+    "directus_files_id": "e35aca16-6f62-498d-ba28-ec20801785e7"
+  },
+  {
+    "id": 343,
+    "stock_vehicles_id": 20,
+    "directus_files_id": "761f78b3-2cbe-4e17-93c1-41c3e790081b"
+  },
+  {
+    "id": 344,
+    "stock_vehicles_id": 20,
+    "directus_files_id": "2f3be94e-49a1-4de5-b891-d61813c34367"
+  },
+  {
+    "id": 345,
+    "stock_vehicles_id": 20,
+    "directus_files_id": "ecf0e5a7-72ea-4e37-abe9-005bd3911601"
+  },
+  {
+    "id": 346,
+    "stock_vehicles_id": 20,
+    "directus_files_id": "b044a04e-861b-46a6-94e1-3e6d683aa840"
+  },
+  {
+    "id": 347,
+    "stock_vehicles_id": 20,
+    "directus_files_id": "a458f510-bb6b-45cf-aa35-6f6cc054aae6"
+  },
+  {
+    "id": 348,
+    "stock_vehicles_id": 20,
+    "directus_files_id": "66333d34-448a-4715-80d5-27b729426a19"
+  },
+  {
+    "id": 349,
+    "stock_vehicles_id": 20,
+    "directus_files_id": "4d1fb01a-afba-46f6-b1f9-586c0a6843af"
+  },
+  {
+    "id": 350,
+    "stock_vehicles_id": 20,
+    "directus_files_id": "9404a596-7c1d-4c1c-975b-ece6bf102acd"
+  },
+  {
+    "id": 351,
+    "stock_vehicles_id": 20,
+    "directus_files_id": "c83a52cd-6abb-41a0-b1d7-757407ca8b05"
+  },
+  {
+    "id": 352,
+    "stock_vehicles_id": 20,
+    "directus_files_id": "39892d0d-2742-47c9-861b-3e7d137e55f4"
+  },
+  {
+    "id": 353,
+    "stock_vehicles_id": 20,
+    "directus_files_id": "6fd93ab7-da56-40f1-bfed-eaf83feea38e"
+  },
+  {
+    "id": 354,
+    "stock_vehicles_id": 20,
+    "directus_files_id": "3345982a-28f9-4493-8d1d-125a43e48d78"
+  },
+  {
+    "id": 355,
+    "stock_vehicles_id": 20,
+    "directus_files_id": "72529f8f-4181-469d-9748-265831d3e28f"
+  },
+  {
+    "id": 356,
+    "stock_vehicles_id": 20,
+    "directus_files_id": "6c2d7819-b5a0-4c06-a7af-3ab212ff3b88"
+  },
+  {
+    "id": 357,
+    "stock_vehicles_id": 20,
+    "directus_files_id": "a4d03ade-c888-4224-9c27-7349633ce9a1"
+  },
+  {
+    "id": 358,
+    "stock_vehicles_id": 20,
+    "directus_files_id": "78d31420-1064-4ee2-b811-50c00405ec8f"
+  },
+  {
+    "id": 359,
+    "stock_vehicles_id": 21,
+    "directus_files_id": "3173ed83-c570-4c40-94cc-8b1c7d37a0d5"
+  },
+  {
+    "id": 360,
+    "stock_vehicles_id": 21,
+    "directus_files_id": "adae8710-cbdf-4efb-abc7-2f323e38bc26"
+  },
+  {
+    "id": 361,
+    "stock_vehicles_id": 21,
+    "directus_files_id": "7bd5960f-9049-4352-8f0b-ebe611caf824"
+  },
+  {
+    "id": 362,
+    "stock_vehicles_id": 21,
+    "directus_files_id": "a5cb10b0-bba5-4ff9-8dd5-c07b2930c8ab"
+  },
+  {
+    "id": 363,
+    "stock_vehicles_id": 21,
+    "directus_files_id": "6496cefa-f051-4aa1-9a80-ab758fc258d4"
+  },
+  {
+    "id": 364,
+    "stock_vehicles_id": 21,
+    "directus_files_id": "c58fa9ce-facc-4cd7-9759-271f0755f5e3"
+  },
+  {
+    "id": 365,
+    "stock_vehicles_id": 21,
+    "directus_files_id": "8e05ee03-b0d2-4f94-8c8c-ec47c0a4e722"
+  },
+  {
+    "id": 366,
+    "stock_vehicles_id": 21,
+    "directus_files_id": "e42c6ef8-58ec-4de9-9ac6-1396b62cff06"
+  },
+  {
+    "id": 367,
+    "stock_vehicles_id": 21,
+    "directus_files_id": "4fea0a8b-2b0c-43e8-9405-649fe4f90e46"
+  },
+  {
+    "id": 368,
+    "stock_vehicles_id": 21,
+    "directus_files_id": "f5b0f6e8-d083-4939-a935-071eafbb295f"
+  },
+  {
+    "id": 369,
+    "stock_vehicles_id": 21,
+    "directus_files_id": "9de23519-2a62-457b-98cf-b8bc599d2a14"
+  },
+  {
+    "id": 370,
+    "stock_vehicles_id": 21,
+    "directus_files_id": "2b4800ab-0b22-4406-9120-48c2d251c02e"
+  },
+  {
+    "id": 371,
+    "stock_vehicles_id": 21,
+    "directus_files_id": "9ed1ffb5-cd26-49dd-a9e6-9aa8425a00cd"
+  },
+  {
+    "id": 372,
+    "stock_vehicles_id": 21,
+    "directus_files_id": "1bde541d-3ab7-45ca-8dee-6b27a38e6fd9"
+  },
+  {
+    "id": 373,
+    "stock_vehicles_id": 21,
+    "directus_files_id": "139e48ed-af21-4775-9334-2eddcedf2dbf"
+  },
+  {
+    "id": 374,
+    "stock_vehicles_id": 21,
+    "directus_files_id": "2bdfe8b6-7a3f-4362-a64f-5911d9a1df60"
+  },
+  {
+    "id": 375,
+    "stock_vehicles_id": 21,
+    "directus_files_id": "4132c5f7-b22c-4ae5-b431-22cc4d550060"
+  },
+  {
+    "id": 376,
+    "stock_vehicles_id": 21,
+    "directus_files_id": "30b22648-ca01-4d14-b1e9-d721ef7dc485"
+  },
+  {
+    "id": 377,
+    "stock_vehicles_id": 21,
+    "directus_files_id": "c68f8c14-75e9-47f4-b7f9-cd10a67427c3"
+  },
+  {
+    "id": 378,
+    "stock_vehicles_id": 21,
+    "directus_files_id": "0a0e5171-d702-4976-a2f9-83dcc75828e9"
+  },
+  {
+    "id": 379,
+    "stock_vehicles_id": 21,
+    "directus_files_id": "c50d6269-7897-436a-a0ba-f34316faf331"
+  },
+  {
+    "id": 380,
+    "stock_vehicles_id": 21,
+    "directus_files_id": "a3a9225c-d251-4052-8641-832e7450947f"
+  },
+  {
+    "id": 381,
+    "stock_vehicles_id": 21,
+    "directus_files_id": "6137b6a8-6706-4723-ba21-810b685e5e4d"
+  },
+  {
+    "id": 382,
+    "stock_vehicles_id": 21,
+    "directus_files_id": "95aa28a0-686f-40c8-97f6-9fe7ba0b460a"
+  },
+  {
+    "id": 383,
+    "stock_vehicles_id": 21,
+    "directus_files_id": "1ef9db0d-7ad5-48e6-8b4e-8e9b62000033"
+  },
+  {
+    "id": 384,
+    "stock_vehicles_id": 21,
+    "directus_files_id": "0a0fd409-c26c-4bbb-ba45-468b01d7b1ed"
+  },
+  {
+    "id": 385,
+    "stock_vehicles_id": 21,
+    "directus_files_id": "ebc822af-d6f9-4bfd-bd3f-d952781358b8"
+  },
+  {
+    "id": 386,
+    "stock_vehicles_id": 21,
+    "directus_files_id": "13d01a92-ae08-4ab0-82bc-caadbd6047ed"
+  },
+  {
+    "id": 387,
+    "stock_vehicles_id": 21,
+    "directus_files_id": "68645fca-0f1c-4bfb-ad9c-7b91a1acecd4"
+  },
+  {
+    "id": 388,
+    "stock_vehicles_id": 21,
+    "directus_files_id": "a2c56545-b1ae-4460-8c56-7b771833943d"
+  },
+  {
+    "id": 389,
+    "stock_vehicles_id": 22,
+    "directus_files_id": "297f374b-7883-4254-a07b-c5944a88af2d"
+  },
+  {
+    "id": 390,
+    "stock_vehicles_id": 22,
+    "directus_files_id": "17d63d5a-10cb-4800-b5f9-a3ea05fb8cfd"
+  },
+  {
+    "id": 391,
+    "stock_vehicles_id": 22,
+    "directus_files_id": "68ba47e0-18b8-4acd-88a2-15419352f83f"
+  },
+  {
+    "id": 392,
+    "stock_vehicles_id": 22,
+    "directus_files_id": "d74b4f73-d968-4458-9742-b9db2970d5dd"
+  },
+  {
+    "id": 393,
+    "stock_vehicles_id": 22,
+    "directus_files_id": "90e081f4-9065-45b2-afbd-e5a19e423aee"
+  },
+  {
+    "id": 394,
+    "stock_vehicles_id": 22,
+    "directus_files_id": "4de9ae30-2084-42b0-b2e0-ca0ea461aec1"
+  },
+  {
+    "id": 395,
+    "stock_vehicles_id": 22,
+    "directus_files_id": "dabe683c-4b2f-4b31-b611-fd335ad68613"
+  },
+  {
+    "id": 396,
+    "stock_vehicles_id": 22,
+    "directus_files_id": "513d1722-d2e4-4292-b699-f0e349b61655"
+  },
+  {
+    "id": 397,
+    "stock_vehicles_id": 22,
+    "directus_files_id": "b031a520-7a97-4b69-b90e-33b6ddfc621a"
+  },
+  {
+    "id": 398,
+    "stock_vehicles_id": 22,
+    "directus_files_id": "495bec0b-8da3-4eb6-bab9-9372e11f4516"
+  },
+  {
+    "id": 399,
+    "stock_vehicles_id": 22,
+    "directus_files_id": "14b43d56-51f0-4119-85cb-94be33fe6d2d"
+  },
+  {
+    "id": 400,
+    "stock_vehicles_id": 22,
+    "directus_files_id": "467fc61c-71d4-4bad-8b6f-25ac220a3846"
+  },
+  {
+    "id": 401,
+    "stock_vehicles_id": 22,
+    "directus_files_id": "daf899ce-c163-428a-bcdc-4e5f011e168d"
+  },
+  {
+    "id": 402,
+    "stock_vehicles_id": 22,
+    "directus_files_id": "b856939d-27be-4607-9942-74a33306ed78"
+  },
+  {
+    "id": 403,
+    "stock_vehicles_id": 22,
+    "directus_files_id": "b70cf3fa-21e6-44f6-bcc7-40ea4dfb01a4"
+  },
+  {
+    "id": 404,
+    "stock_vehicles_id": 22,
+    "directus_files_id": "a484e7e5-1518-459c-842c-8052a5494b48"
+  },
+  {
+    "id": 405,
+    "stock_vehicles_id": 22,
+    "directus_files_id": "707f74bc-713b-4e3a-97b0-888ec36b5c43"
+  },
+  {
+    "id": 406,
+    "stock_vehicles_id": 22,
+    "directus_files_id": "2388a1ac-57b6-491c-942e-900981ec7d2f"
+  },
+  {
+    "id": 407,
+    "stock_vehicles_id": 22,
+    "directus_files_id": "15560ddc-a73e-4de4-a9bf-858d5835aca0"
+  },
+  {
+    "id": 408,
+    "stock_vehicles_id": 22,
+    "directus_files_id": "8aad017d-a44a-45fc-9ed9-131edcd2dda2"
+  },
+  {
+    "id": 409,
+    "stock_vehicles_id": 22,
+    "directus_files_id": "21f53aee-f947-4a01-9eae-1ce9413de2f9"
+  },
+  {
+    "id": 410,
+    "stock_vehicles_id": 22,
+    "directus_files_id": "dda01c50-5b72-4f99-a08f-b742f487b82f"
+  },
+  {
+    "id": 411,
+    "stock_vehicles_id": 22,
+    "directus_files_id": "eda5b8ba-10b2-4e05-b790-56fdeb3076b8"
+  },
+  {
+    "id": 412,
+    "stock_vehicles_id": 22,
+    "directus_files_id": "d5b0fa53-acde-45cf-bbc3-051f24773e2f"
+  },
+  {
+    "id": 413,
+    "stock_vehicles_id": 22,
+    "directus_files_id": "7a7f70da-1884-4a7c-82d3-23588fcafd53"
+  },
+  {
+    "id": 414,
+    "stock_vehicles_id": 22,
+    "directus_files_id": "110a0cbd-f1db-44d2-af57-cc2ea354ace8"
+  },
+  {
+    "id": 415,
+    "stock_vehicles_id": 22,
+    "directus_files_id": "35dd93de-2d81-4993-9f4a-f4ff97164b3e"
+  },
+  {
+    "id": 416,
+    "stock_vehicles_id": 22,
+    "directus_files_id": "37e2112b-8622-47d2-b127-c085fdd3edcb"
+  },
+  {
+    "id": 417,
+    "stock_vehicles_id": 22,
+    "directus_files_id": "a53aa799-01c3-4919-94b7-b99b00de9fe7"
+  },
+  {
+    "id": 418,
+    "stock_vehicles_id": 22,
+    "directus_files_id": "da9c0115-74ea-41dc-b637-6e564e71688a"
+  },
+  {
+    "id": 419,
+    "stock_vehicles_id": 23,
+    "directus_files_id": "e14d5980-dcc5-45c9-8fb0-9151f8046302"
+  },
+  {
+    "id": 420,
+    "stock_vehicles_id": 23,
+    "directus_files_id": "a1288760-e2c4-408b-97af-bc87290f99f9"
+  },
+  {
+    "id": 421,
+    "stock_vehicles_id": 23,
+    "directus_files_id": "04edfe51-c33e-4189-8a38-56c7f814b0f9"
+  },
+  {
+    "id": 422,
+    "stock_vehicles_id": 23,
+    "directus_files_id": "e1cc2ce0-dd69-46bd-9fee-67cbad325c75"
+  },
+  {
+    "id": 423,
+    "stock_vehicles_id": 23,
+    "directus_files_id": "3bed0b51-dfd2-4a0f-9522-6e513e7f98b0"
+  },
+  {
+    "id": 424,
+    "stock_vehicles_id": 23,
+    "directus_files_id": "c8a9adf9-f983-4f08-b965-b4966d234c28"
+  },
+  {
+    "id": 425,
+    "stock_vehicles_id": 23,
+    "directus_files_id": "5d58e7c1-5aa6-4303-8db3-2d7591c6ac80"
+  },
+  {
+    "id": 426,
+    "stock_vehicles_id": 23,
+    "directus_files_id": "0f615425-f490-457a-9896-6d353eec3354"
+  },
+  {
+    "id": 427,
+    "stock_vehicles_id": 23,
+    "directus_files_id": "449ace54-ba69-427e-909d-135cf7217199"
+  },
+  {
+    "id": 428,
+    "stock_vehicles_id": 23,
+    "directus_files_id": "184b5fd6-c6b0-46b2-ae38-11ee3d5a0804"
+  },
+  {
+    "id": 429,
+    "stock_vehicles_id": 23,
+    "directus_files_id": "76d1fd06-be48-438b-ad4d-bd59cf9d32a3"
+  },
+  {
+    "id": 430,
+    "stock_vehicles_id": 23,
+    "directus_files_id": "57458cc0-1866-4764-a1e0-891737f367cc"
+  },
+  {
+    "id": 431,
+    "stock_vehicles_id": 23,
+    "directus_files_id": "945790be-f72e-401f-9892-5257c147a1a9"
+  },
+  {
+    "id": 432,
+    "stock_vehicles_id": 23,
+    "directus_files_id": "faf8d1de-61fb-45f8-b77c-cd299779e823"
+  },
+  {
+    "id": 433,
+    "stock_vehicles_id": 23,
+    "directus_files_id": "30bfbceb-0402-4f77-936f-dc2f8e0f9310"
+  },
+  {
+    "id": 434,
+    "stock_vehicles_id": 23,
+    "directus_files_id": "5fe8fd76-68d4-430d-89b8-034a2e3f0a8b"
+  },
+  {
+    "id": 435,
+    "stock_vehicles_id": 23,
+    "directus_files_id": "8707cd8d-2e6e-4622-899a-daca94b94754"
+  },
+  {
+    "id": 436,
+    "stock_vehicles_id": 23,
+    "directus_files_id": "c3f04093-f680-477c-a932-f7a1591a7df1"
+  },
+  {
+    "id": 437,
+    "stock_vehicles_id": 23,
+    "directus_files_id": "6f2e3438-0714-46c3-b7e9-50ae48064fe7"
+  },
+  {
+    "id": 438,
+    "stock_vehicles_id": 23,
+    "directus_files_id": "a7fc9b08-d031-4b61-b118-eddc00d86bf7"
+  },
+  {
+    "id": 439,
+    "stock_vehicles_id": 23,
+    "directus_files_id": "1f4cde36-deea-4f22-95cf-8be070de9e52"
+  },
+  {
+    "id": 440,
+    "stock_vehicles_id": 23,
+    "directus_files_id": "f0ebd41d-8e48-45da-bd81-a0eace553713"
+  },
+  {
+    "id": 441,
+    "stock_vehicles_id": 23,
+    "directus_files_id": "5750d66d-a174-45dd-bc60-b7d4c55724d7"
+  },
+  {
+    "id": 442,
+    "stock_vehicles_id": 23,
+    "directus_files_id": "856877b0-d3c6-449e-8142-7f56ca31a3a5"
+  },
+  {
+    "id": 443,
+    "stock_vehicles_id": 24,
+    "directus_files_id": "66480426-c946-4d07-b7f7-6333e3f3d6f8"
+  },
+  {
+    "id": 444,
+    "stock_vehicles_id": 24,
+    "directus_files_id": "0f8456ca-9e30-4fa8-9a95-e7dfcab94bd4"
+  },
+  {
+    "id": 445,
+    "stock_vehicles_id": 24,
+    "directus_files_id": "c152c24d-471a-4711-8b24-a479cc9c7e0c"
+  },
+  {
+    "id": 446,
+    "stock_vehicles_id": 24,
+    "directus_files_id": "a0691ad7-8c71-4c57-87ab-e136a96d2872"
+  },
+  {
+    "id": 447,
+    "stock_vehicles_id": 24,
+    "directus_files_id": "e7e53522-40c6-4d80-8656-2f554edb4a26"
+  },
+  {
+    "id": 448,
+    "stock_vehicles_id": 24,
+    "directus_files_id": "4de398dd-8c83-4c4f-ad84-16682a890ed2"
+  },
+  {
+    "id": 449,
+    "stock_vehicles_id": 24,
+    "directus_files_id": "cb81a2c9-8480-46e2-a26a-6097385ccbdd"
+  },
+  {
+    "id": 450,
+    "stock_vehicles_id": 24,
+    "directus_files_id": "3be3d8ff-4139-4b1a-99c4-5190b80ae644"
+  },
+  {
+    "id": 451,
+    "stock_vehicles_id": 24,
+    "directus_files_id": "9258b897-e968-42c1-9c8d-8f16a641b230"
+  },
+  {
+    "id": 452,
+    "stock_vehicles_id": 24,
+    "directus_files_id": "06c2d5ac-43c1-4ca2-b0da-13cd28743d2e"
+  },
+  {
+    "id": 453,
+    "stock_vehicles_id": 24,
+    "directus_files_id": "3bf93705-a277-4af9-aca6-233fcd796aaf"
+  },
+  {
+    "id": 454,
+    "stock_vehicles_id": 24,
+    "directus_files_id": "cff07d01-fc46-4411-a6e7-40fa30e3cc61"
+  },
+  {
+    "id": 455,
+    "stock_vehicles_id": 24,
+    "directus_files_id": "ace84b23-0ac0-4fd8-8c78-a73dfc4fdb60"
+  },
+  {
+    "id": 456,
+    "stock_vehicles_id": 24,
+    "directus_files_id": "3ebb8738-899e-463d-95df-4dc71fc14f65"
+  },
+  {
+    "id": 457,
+    "stock_vehicles_id": 24,
+    "directus_files_id": "b4a5c940-e08e-4008-9fa5-7a8985e19395"
+  },
+  {
+    "id": 458,
+    "stock_vehicles_id": 24,
+    "directus_files_id": "22a27c08-f3aa-4814-a0c0-0d1d72d3f61b"
+  },
+  {
+    "id": 459,
+    "stock_vehicles_id": 24,
+    "directus_files_id": "b6a984bf-9204-44f3-99b3-8fe60703e3cb"
+  },
+  {
+    "id": 460,
+    "stock_vehicles_id": 24,
+    "directus_files_id": "f6947175-6a67-46b7-9f73-b2382e6a94ad"
+  },
+  {
+    "id": 461,
+    "stock_vehicles_id": 24,
+    "directus_files_id": "bf9dcdb3-076f-447d-bccb-ea93f8c7b126"
+  },
+  {
+    "id": 462,
+    "stock_vehicles_id": 24,
+    "directus_files_id": "0a54cb49-4258-4854-8b80-20acdf77e38c"
+  },
+  {
+    "id": 463,
+    "stock_vehicles_id": 24,
+    "directus_files_id": "708dda00-7262-49af-88a0-765264061170"
+  },
+  {
+    "id": 464,
+    "stock_vehicles_id": 24,
+    "directus_files_id": "47318a35-bb4a-4440-945e-71e03fa5a9b2"
+  },
+  {
+    "id": 465,
+    "stock_vehicles_id": 24,
+    "directus_files_id": "e0039fd0-e01e-4323-9351-8e780964c22f"
+  },
+  {
+    "id": 466,
+    "stock_vehicles_id": 24,
+    "directus_files_id": "b2698fc7-e6b7-45e1-a036-5df8a042c6f7"
+  },
+  {
+    "id": 467,
+    "stock_vehicles_id": 24,
+    "directus_files_id": "ce00c127-8c65-47a7-a0b5-97e9bc7502ab"
+  },
+  {
+    "id": 468,
+    "stock_vehicles_id": 24,
+    "directus_files_id": "fb12f77e-15eb-414d-bb08-9c471826a44c"
+  },
+  {
+    "id": 469,
+    "stock_vehicles_id": 24,
+    "directus_files_id": "d5d44b7e-70a4-4ca2-b982-3342d862912f"
+  },
+  {
+    "id": 470,
+    "stock_vehicles_id": 24,
+    "directus_files_id": "61ef3d2e-3475-4380-92f3-9f7e16ea2d51"
+  },
+  {
+    "id": 471,
+    "stock_vehicles_id": 25,
+    "directus_files_id": "a04c59aa-3b0e-45f9-b7c9-08bfa58f6e38"
+  },
+  {
+    "id": 472,
+    "stock_vehicles_id": 25,
+    "directus_files_id": "11674714-0cad-4e10-b8cf-d4f47ba348d7"
+  },
+  {
+    "id": 473,
+    "stock_vehicles_id": 25,
+    "directus_files_id": "f3777dd1-aa2d-4cd5-ba99-5cd6e8d60e24"
+  },
+  {
+    "id": 474,
+    "stock_vehicles_id": 25,
+    "directus_files_id": "477b1fc0-3667-4bda-bb17-c2ab99d84429"
+  },
+  {
+    "id": 475,
+    "stock_vehicles_id": 25,
+    "directus_files_id": "4fc2a7ab-0c1c-4995-b998-41dbf54ab207"
+  },
+  {
+    "id": 476,
+    "stock_vehicles_id": 25,
+    "directus_files_id": "82b10db0-d6b7-43a7-992c-f8965ab5b4d2"
+  },
+  {
+    "id": 477,
+    "stock_vehicles_id": 25,
+    "directus_files_id": "d33e749e-b0ae-4729-9027-103bfc8065ae"
+  },
+  {
+    "id": 478,
+    "stock_vehicles_id": 25,
+    "directus_files_id": "d2fa0747-171e-4000-95ef-f50a4cf37d89"
+  },
+  {
+    "id": 479,
+    "stock_vehicles_id": 25,
+    "directus_files_id": "ae50c925-923f-4720-89e5-3abf8f36b8ff"
+  },
+  {
+    "id": 480,
+    "stock_vehicles_id": 25,
+    "directus_files_id": "e55a7e9f-b5cc-48f0-96ea-1d2c8a9a01a5"
+  },
+  {
+    "id": 481,
+    "stock_vehicles_id": 25,
+    "directus_files_id": "96144201-65bc-43e6-a5eb-fb2f8d7dee8d"
+  },
+  {
+    "id": 482,
+    "stock_vehicles_id": 25,
+    "directus_files_id": "0e7057dd-2821-4e4e-92fc-eb2cc0c0c9a2"
+  },
+  {
+    "id": 483,
+    "stock_vehicles_id": 25,
+    "directus_files_id": "0cad0ba1-f784-4edf-b727-7c3fa6684f00"
+  },
+  {
+    "id": 484,
+    "stock_vehicles_id": 25,
+    "directus_files_id": "e22cb777-b8d5-4c2b-b147-02151b4f89ba"
+  },
+  {
+    "id": 485,
+    "stock_vehicles_id": 25,
+    "directus_files_id": "4ff06740-d1ed-4df3-8b57-fb6ec26fd712"
+  },
+  {
+    "id": 486,
+    "stock_vehicles_id": 25,
+    "directus_files_id": "b4ab9b3a-0e20-4aa6-8267-6387a5963dd9"
+  },
+  {
+    "id": 487,
+    "stock_vehicles_id": 25,
+    "directus_files_id": "02f0e6d3-2c9f-4cba-81b2-6939fbb745e9"
+  },
+  {
+    "id": 488,
+    "stock_vehicles_id": 25,
+    "directus_files_id": "3b9de461-ce58-4f67-b111-c4ddb63e2beb"
+  },
+  {
+    "id": 489,
+    "stock_vehicles_id": 25,
+    "directus_files_id": "0b666db4-48d2-41de-987c-71802e48016a"
+  },
+  {
+    "id": 490,
+    "stock_vehicles_id": 25,
+    "directus_files_id": "aba60c39-f3cc-4b58-ab34-b62d88aee3f0"
+  },
+  {
+    "id": 491,
+    "stock_vehicles_id": 25,
+    "directus_files_id": "4dc0d249-46b6-4bd8-a7f6-6c3eb9175e32"
+  },
+  {
+    "id": 492,
+    "stock_vehicles_id": 25,
+    "directus_files_id": "00f72327-8331-49c6-bca5-eefacb861cff"
+  },
+  {
+    "id": 493,
+    "stock_vehicles_id": 26,
+    "directus_files_id": "2bc5c60a-febc-484e-be81-c73d1af47e60"
+  },
+  {
+    "id": 494,
+    "stock_vehicles_id": 26,
+    "directus_files_id": "45f219f4-2649-4c11-b73a-4cdfb719f439"
+  },
+  {
+    "id": 495,
+    "stock_vehicles_id": 26,
+    "directus_files_id": "d8f64f31-5caa-49e8-bd8d-6c92c2055ec4"
+  },
+  {
+    "id": 496,
+    "stock_vehicles_id": 26,
+    "directus_files_id": "6f023400-9f26-40fa-87ff-8ae8930e07be"
+  },
+  {
+    "id": 497,
+    "stock_vehicles_id": 26,
+    "directus_files_id": "4c1e350d-4836-48d3-a9ce-a5a3abf7c3c4"
+  },
+  {
+    "id": 498,
+    "stock_vehicles_id": 26,
+    "directus_files_id": "1d46dbd4-25f8-4a30-8e6e-8d7e5ba550f2"
+  },
+  {
+    "id": 499,
+    "stock_vehicles_id": 26,
+    "directus_files_id": "69b10f98-44b9-4536-9982-b5ef243c492e"
+  },
+  {
+    "id": 500,
+    "stock_vehicles_id": 26,
+    "directus_files_id": "2c3596ce-9065-4fac-98d1-fe569b50b7d9"
+  },
+  {
+    "id": 501,
+    "stock_vehicles_id": 26,
+    "directus_files_id": "6723ece3-7c2d-419b-9cda-a80423ddf227"
+  },
+  {
+    "id": 502,
+    "stock_vehicles_id": 26,
+    "directus_files_id": "2622d758-1d24-4efc-911b-87090a5c10b3"
+  },
+  {
+    "id": 503,
+    "stock_vehicles_id": 26,
+    "directus_files_id": "6799ac02-f13d-4488-8dd2-21d8784ebff9"
+  },
+  {
+    "id": 504,
+    "stock_vehicles_id": 26,
+    "directus_files_id": "ac11c104-f429-47b4-b849-432390881e23"
+  },
+  {
+    "id": 505,
+    "stock_vehicles_id": 26,
+    "directus_files_id": "0a00b758-c9c0-4014-9dea-3517cbbdabc9"
+  },
+  {
+    "id": 506,
+    "stock_vehicles_id": 26,
+    "directus_files_id": "cf4e4772-10e3-40cf-85ce-57055a2a33fd"
+  },
+  {
+    "id": 507,
+    "stock_vehicles_id": 26,
+    "directus_files_id": "14c3ad70-ce69-4425-91ec-0ad1c00f8e97"
+  },
+  {
+    "id": 508,
+    "stock_vehicles_id": 26,
+    "directus_files_id": "da33c869-e749-43a4-9a05-595ac1bbc784"
+  },
+  {
+    "id": 509,
+    "stock_vehicles_id": 26,
+    "directus_files_id": "3c93971d-99f8-4c44-965f-df044fc0994d"
+  },
+  {
+    "id": 510,
+    "stock_vehicles_id": 26,
+    "directus_files_id": "eb8f1d92-2f8b-4b67-bdb9-5e31dbec8cf8"
+  },
+  {
+    "id": 511,
+    "stock_vehicles_id": 26,
+    "directus_files_id": "f37e494d-4a53-4108-8195-e3c64f25014a"
+  },
+  {
+    "id": 512,
+    "stock_vehicles_id": 26,
+    "directus_files_id": "61387cae-1007-41b7-bcbe-98d66c27100d"
+  },
+  {
+    "id": 513,
+    "stock_vehicles_id": 26,
+    "directus_files_id": "8e8497ca-9aee-4e34-ab6c-227107a54810"
+  },
+  {
+    "id": 514,
+    "stock_vehicles_id": 26,
+    "directus_files_id": "6309fd03-6ca7-4a44-a937-6c9f19eef112"
+  },
+  {
+    "id": 515,
+    "stock_vehicles_id": 26,
+    "directus_files_id": "a6fc0c42-a77a-4175-bcc1-1e79aac5cbbf"
+  },
+  {
+    "id": 516,
+    "stock_vehicles_id": 26,
+    "directus_files_id": "31a97b42-e850-44d6-9758-fccf4144a0ce"
+  },
+  {
+    "id": 517,
+    "stock_vehicles_id": 26,
+    "directus_files_id": "ccf5ce67-a8dd-4d81-8fb2-30006b3d7ce3"
+  },
+  {
+    "id": 518,
+    "stock_vehicles_id": 26,
+    "directus_files_id": "c5fc7c26-d07a-4f75-9bfa-2edfa0ed3106"
+  },
+  {
+    "id": 519,
+    "stock_vehicles_id": 26,
+    "directus_files_id": "00e0851e-faf6-43d2-bd8c-b3a7f5661abf"
+  },
+  {
+    "id": 520,
+    "stock_vehicles_id": 26,
+    "directus_files_id": "9536b222-b207-42d5-9472-9ca68d4605bf"
+  },
+  {
+    "id": 521,
+    "stock_vehicles_id": 26,
+    "directus_files_id": "e3fdadb9-6d6c-408d-811d-a9940ea8df41"
+  },
+  {
+    "id": 522,
+    "stock_vehicles_id": 26,
+    "directus_files_id": "698c7d3a-4ff3-4e59-9575-2ff558e15fa3"
+  },
+  {
+    "id": 523,
+    "stock_vehicles_id": 27,
+    "directus_files_id": "1f29544a-eb02-4fc2-8ead-9ce79622aa28"
+  },
+  {
+    "id": 524,
+    "stock_vehicles_id": 27,
+    "directus_files_id": "0ab90fac-0cec-4589-96f3-99ee683e90f2"
+  },
+  {
+    "id": 525,
+    "stock_vehicles_id": 27,
+    "directus_files_id": "9ab18b0e-10cb-4f56-85b9-7e3884425524"
+  },
+  {
+    "id": 526,
+    "stock_vehicles_id": 27,
+    "directus_files_id": "b3a3ab62-8bd1-4661-ab34-119739b7b63f"
+  },
+  {
+    "id": 527,
+    "stock_vehicles_id": 27,
+    "directus_files_id": "0a43ef20-2235-4e7a-a311-4894b75270b4"
+  },
+  {
+    "id": 528,
+    "stock_vehicles_id": 27,
+    "directus_files_id": "b2cd6efc-0ed9-4d72-bbdf-c560710d9811"
+  },
+  {
+    "id": 529,
+    "stock_vehicles_id": 27,
+    "directus_files_id": "71155f49-dc3d-4d19-9b85-afa7b79a357f"
+  },
+  {
+    "id": 530,
+    "stock_vehicles_id": 27,
+    "directus_files_id": "4fe534b1-9d40-4b80-a3b0-b1d725269f3e"
+  },
+  {
+    "id": 531,
+    "stock_vehicles_id": 27,
+    "directus_files_id": "acb99cc9-78ed-4b4e-bdd9-f2a0ac77483b"
+  },
+  {
+    "id": 532,
+    "stock_vehicles_id": 27,
+    "directus_files_id": "7e787e3d-1f59-4465-839c-979bd0048c67"
+  },
+  {
+    "id": 533,
+    "stock_vehicles_id": 27,
+    "directus_files_id": "9d539926-1e8e-4b73-bd50-b8201c1feb75"
+  },
+  {
+    "id": 534,
+    "stock_vehicles_id": 27,
+    "directus_files_id": "852e7cbe-a9a9-4569-9597-937712928925"
+  },
+  {
+    "id": 535,
+    "stock_vehicles_id": 27,
+    "directus_files_id": "73b5480c-417f-4f48-a715-4c31fa0139a4"
+  },
+  {
+    "id": 536,
+    "stock_vehicles_id": 27,
+    "directus_files_id": "c0e8cdb9-5158-43e8-81a6-983bfbced1a8"
+  },
+  {
+    "id": 537,
+    "stock_vehicles_id": 27,
+    "directus_files_id": "37737ab5-ef31-4673-b0a5-e73d3feacb3a"
+  },
+  {
+    "id": 538,
+    "stock_vehicles_id": 27,
+    "directus_files_id": "c2d67ba0-9503-4356-9878-67ff0be8163c"
+  },
+  {
+    "id": 539,
+    "stock_vehicles_id": 27,
+    "directus_files_id": "766720eb-bd3a-4e0a-a35c-52c5055e63c6"
+  },
+  {
+    "id": 540,
+    "stock_vehicles_id": 27,
+    "directus_files_id": "fedfc765-85a0-4489-a612-acdb40f01fe3"
+  },
+  {
+    "id": 541,
+    "stock_vehicles_id": 27,
+    "directus_files_id": "2690ecc1-6a55-4f5a-9162-4d03c90f601f"
+  },
+  {
+    "id": 542,
+    "stock_vehicles_id": 27,
+    "directus_files_id": "3f5c81ac-8fdc-4bab-9cdb-fadb92658343"
+  },
+  {
+    "id": 543,
+    "stock_vehicles_id": 27,
+    "directus_files_id": "5800f066-aee9-480a-8699-a4f51ab9224a"
+  },
+  {
+    "id": 544,
+    "stock_vehicles_id": 27,
+    "directus_files_id": "4439e56e-cabe-4bac-8638-b8f7ddfc36a7"
+  },
+  {
+    "id": 545,
+    "stock_vehicles_id": 27,
+    "directus_files_id": "9e171b9c-aa47-4076-a89f-ce4553a682e5"
+  },
+  {
+    "id": 546,
+    "stock_vehicles_id": 27,
+    "directus_files_id": "241994f8-2d6e-48a8-999a-b02360a805a7"
+  },
+  {
+    "id": 547,
+    "stock_vehicles_id": 27,
+    "directus_files_id": "44a47793-1096-4aaa-b20d-6346432e2573"
+  },
+  {
+    "id": 548,
+    "stock_vehicles_id": 27,
+    "directus_files_id": "cf3beecb-8fb5-4877-a797-c26e86e50c97"
+  },
+  {
+    "id": 549,
+    "stock_vehicles_id": 27,
+    "directus_files_id": "93be53db-d5b6-4d13-bbd1-dcb084925984"
+  },
+  {
+    "id": 550,
+    "stock_vehicles_id": 27,
+    "directus_files_id": "b9ae69d8-f253-4ddf-82e5-d6afdcd85567"
+  },
+  {
+    "id": 551,
+    "stock_vehicles_id": 27,
+    "directus_files_id": "f55b78c0-bd76-4953-933f-595c3f2d4d1a"
+  },
+  {
+    "id": 552,
+    "stock_vehicles_id": 27,
+    "directus_files_id": "c5095fd4-8824-4948-b5f3-eaa61b967c35"
+  },
+  {
+    "id": 553,
+    "stock_vehicles_id": 27,
+    "directus_files_id": "eb7c386b-c5b0-4e01-af4a-92abe1f75f10"
+  },
+  {
+    "id": 554,
+    "stock_vehicles_id": 27,
+    "directus_files_id": "dfa015c8-e6cb-4933-86ca-df80f521c461"
+  },
+  {
+    "id": 555,
+    "stock_vehicles_id": 28,
+    "directus_files_id": "ef6ec82b-2e35-439b-84f8-d6d4fbea41d4"
+  },
+  {
+    "id": 556,
+    "stock_vehicles_id": 28,
+    "directus_files_id": "01ebfcce-bb79-45e8-b25c-2117385e9251"
+  },
+  {
+    "id": 557,
+    "stock_vehicles_id": 28,
+    "directus_files_id": "74351f77-fdb9-4e57-b272-68f901549d75"
+  },
+  {
+    "id": 558,
+    "stock_vehicles_id": 28,
+    "directus_files_id": "fa11dafb-ad2e-4113-baf1-4a43ac926112"
+  },
+  {
+    "id": 559,
+    "stock_vehicles_id": 28,
+    "directus_files_id": "ab912073-5340-4c43-8182-4bdffb1b0ade"
+  },
+  {
+    "id": 560,
+    "stock_vehicles_id": 28,
+    "directus_files_id": "fb30d778-ef8b-43e5-a4eb-cd01f508566e"
+  },
+  {
+    "id": 561,
+    "stock_vehicles_id": 28,
+    "directus_files_id": "f23d80db-5af7-49dd-ace0-9723fefd07c9"
+  },
+  {
+    "id": 562,
+    "stock_vehicles_id": 28,
+    "directus_files_id": "1d317ab7-a030-4314-8913-1867fd08361e"
+  },
+  {
+    "id": 563,
+    "stock_vehicles_id": 28,
+    "directus_files_id": "33bb8869-0c42-4bc9-b127-eae682e5f727"
+  },
+  {
+    "id": 564,
+    "stock_vehicles_id": 28,
+    "directus_files_id": "a13b1815-c4e5-4bd9-ab9c-403dbdba78ed"
+  },
+  {
+    "id": 565,
+    "stock_vehicles_id": 28,
+    "directus_files_id": "fc9e0e4b-49a6-42a0-90ee-5c95e05cf207"
+  },
+  {
+    "id": 566,
+    "stock_vehicles_id": 28,
+    "directus_files_id": "d4251238-7f89-46ab-ae1a-4ea517ec7ef9"
+  },
+  {
+    "id": 567,
+    "stock_vehicles_id": 28,
+    "directus_files_id": "3f1d98c8-3b65-46d1-bc93-e14938dfe7d2"
+  },
+  {
+    "id": 568,
+    "stock_vehicles_id": 28,
+    "directus_files_id": "90d60d22-3c22-4f8f-b1be-71e5fb2852fd"
+  },
+  {
+    "id": 569,
+    "stock_vehicles_id": 28,
+    "directus_files_id": "d5ac38b0-c760-414e-9939-b5219e601632"
+  },
+  {
+    "id": 570,
+    "stock_vehicles_id": 28,
+    "directus_files_id": "4fe6b5e7-0041-426f-9092-a5768a9b6616"
+  },
+  {
+    "id": 571,
+    "stock_vehicles_id": 28,
+    "directus_files_id": "3356abc5-d8fc-4166-90c3-c9923a6648b8"
+  },
+  {
+    "id": 572,
+    "stock_vehicles_id": 28,
+    "directus_files_id": "75b3e0c5-d4ae-4f9b-b4b8-2d7ce71fe72e"
+  },
+  {
+    "id": 573,
+    "stock_vehicles_id": 28,
+    "directus_files_id": "0c88e2f9-7b5c-4693-8c09-f7563bf38fe2"
+  },
+  {
+    "id": 574,
+    "stock_vehicles_id": 28,
+    "directus_files_id": "40509f8e-627c-4f02-84a5-4f66d6310e9f"
+  },
+  {
+    "id": 575,
+    "stock_vehicles_id": 28,
+    "directus_files_id": "37117caf-4445-4c15-bb32-06eb848c0f62"
+  },
+  {
+    "id": 576,
+    "stock_vehicles_id": 28,
+    "directus_files_id": "4e3a4ff5-979a-4b50-833c-0aefd351718f"
+  },
+  {
+    "id": 577,
+    "stock_vehicles_id": 28,
+    "directus_files_id": "de03b041-b496-4735-9aa1-25dd487c3381"
+  },
+  {
+    "id": 578,
+    "stock_vehicles_id": 28,
+    "directus_files_id": "72a62b3c-101d-4b92-a075-899bb7096732"
+  },
+  {
+    "id": 579,
+    "stock_vehicles_id": 28,
+    "directus_files_id": "08fcccde-3ecf-403c-b839-c0b6e0712e61"
+  },
+  {
+    "id": 580,
+    "stock_vehicles_id": 28,
+    "directus_files_id": "8dd62651-5d12-4069-a1f5-7645f4e56040"
+  },
+  {
+    "id": 581,
+    "stock_vehicles_id": 29,
+    "directus_files_id": "22f77190-eb1a-4175-b09f-f37a531548c4"
+  },
+  {
+    "id": 582,
+    "stock_vehicles_id": 29,
+    "directus_files_id": "14cbba8f-7487-472d-a646-d5e0585bef9d"
+  },
+  {
+    "id": 583,
+    "stock_vehicles_id": 29,
+    "directus_files_id": "19f50752-f852-4441-84d1-6764b6acb2a4"
+  },
+  {
+    "id": 584,
+    "stock_vehicles_id": 29,
+    "directus_files_id": "f505b22b-07c8-4968-a4ce-8fe5828b26a1"
+  },
+  {
+    "id": 585,
+    "stock_vehicles_id": 29,
+    "directus_files_id": "6b3de83d-70e7-489a-a3bd-b2882e309638"
+  },
+  {
+    "id": 586,
+    "stock_vehicles_id": 29,
+    "directus_files_id": "3cb1848f-4477-4cc9-8e07-a5ba8f7a3952"
+  },
+  {
+    "id": 587,
+    "stock_vehicles_id": 29,
+    "directus_files_id": "676f5e95-0ba6-44d1-8f80-cab08789283f"
+  },
+  {
+    "id": 588,
+    "stock_vehicles_id": 29,
+    "directus_files_id": "7a399b58-1c01-43cc-8a6a-2ae82ad24976"
+  },
+  {
+    "id": 589,
+    "stock_vehicles_id": 29,
+    "directus_files_id": "bbfda0a3-f275-45c6-9cdc-6259a9251f14"
+  },
+  {
+    "id": 590,
+    "stock_vehicles_id": 29,
+    "directus_files_id": "d4f2569e-91c0-4753-b9d2-b2a5033d2ee6"
+  },
+  {
+    "id": 591,
+    "stock_vehicles_id": 29,
+    "directus_files_id": "696c1d02-5c9f-4382-83b9-39a8175d11f7"
+  },
+  {
+    "id": 592,
+    "stock_vehicles_id": 29,
+    "directus_files_id": "1e4af88a-2c77-4854-8af7-0e11223122ed"
+  },
+  {
+    "id": 593,
+    "stock_vehicles_id": 29,
+    "directus_files_id": "5425041e-59f7-4d1d-b0fc-20383a163d53"
+  },
+  {
+    "id": 594,
+    "stock_vehicles_id": 29,
+    "directus_files_id": "1bc48c47-d89c-474a-9ff1-0859a26de2dd"
+  },
+  {
+    "id": 595,
+    "stock_vehicles_id": 29,
+    "directus_files_id": "8c40f2e3-9a30-4eec-adf8-f8012e97c30d"
+  },
+  {
+    "id": 596,
+    "stock_vehicles_id": 29,
+    "directus_files_id": "c58c0331-4fe2-4f36-8d6f-8e384a98ddfc"
+  },
+  {
+    "id": 597,
+    "stock_vehicles_id": 29,
+    "directus_files_id": "d878cae3-6b58-4e02-aac4-4774ff07e0c2"
+  },
+  {
+    "id": 598,
+    "stock_vehicles_id": 29,
+    "directus_files_id": "e4495b2e-cc3c-4907-8fed-803f488e5d6f"
+  },
+  {
+    "id": 599,
+    "stock_vehicles_id": 29,
+    "directus_files_id": "15d04292-1964-4fb2-bb4f-2876eb06a10d"
+  },
+  {
+    "id": 600,
+    "stock_vehicles_id": 29,
+    "directus_files_id": "b9ea993a-ff8f-4124-8cf3-7220c856e922"
+  },
+  {
+    "id": 601,
+    "stock_vehicles_id": 29,
+    "directus_files_id": "0ead7f2e-0bb3-4d3a-a760-aec80446b5fc"
+  },
+  {
+    "id": 602,
+    "stock_vehicles_id": 29,
+    "directus_files_id": "b16a88d0-52a3-4ed8-8cbe-a395a459dd07"
+  },
+  {
+    "id": 603,
+    "stock_vehicles_id": 29,
+    "directus_files_id": "82a29587-8fdf-4bb6-99b1-0bf1be6af98b"
+  },
+  {
+    "id": 604,
+    "stock_vehicles_id": 29,
+    "directus_files_id": "1899c3b9-8015-4977-a61e-46aad12c4294"
+  },
+  {
+    "id": 605,
+    "stock_vehicles_id": 29,
+    "directus_files_id": "22044291-6f04-48eb-beaf-1cbc5a591964"
+  },
+  {
+    "id": 606,
+    "stock_vehicles_id": 29,
+    "directus_files_id": "621d3ace-545a-4029-8f5c-3efb0de8197b"
+  },
+  {
+    "id": 607,
+    "stock_vehicles_id": 29,
+    "directus_files_id": "45a1a3d7-284e-47f0-b25f-40ff55702b79"
+  },
+  {
+    "id": 608,
+    "stock_vehicles_id": 29,
+    "directus_files_id": "c1c7d40a-bb02-4abf-938a-748192559122"
+  },
+  {
+    "id": 609,
+    "stock_vehicles_id": 29,
+    "directus_files_id": "cb826ed1-9e29-4085-a5ad-ce4a38b7f77c"
+  },
+  {
+    "id": 610,
+    "stock_vehicles_id": 29,
+    "directus_files_id": "6d008105-3ceb-46fd-85f7-20b1ec950941"
+  },
+  {
+    "id": 611,
+    "stock_vehicles_id": 29,
+    "directus_files_id": "0b0f81fd-b7c7-4c30-a72d-625d6426fd91"
+  },
+  {
+    "id": 612,
+    "stock_vehicles_id": 29,
+    "directus_files_id": "3c809eb7-6838-4f53-ba33-a274121e4e36"
+  },
+  {
+    "id": 613,
+    "stock_vehicles_id": 29,
+    "directus_files_id": "31364854-9766-4a4b-8a8c-71e8893bef14"
+  },
+  {
+    "id": 614,
+    "stock_vehicles_id": 29,
+    "directus_files_id": "42947633-d7a3-4a2d-afe0-5b1f9dfb2f53"
+  },
+  {
+    "id": 615,
+    "stock_vehicles_id": 29,
+    "directus_files_id": "b08b470d-24cd-4067-852e-fc1ed867efe1"
+  },
+  {
+    "id": 616,
+    "stock_vehicles_id": 29,
+    "directus_files_id": "8044517a-fadd-473b-8179-b609322ad8bc"
+  },
+  {
+    "id": 617,
+    "stock_vehicles_id": 29,
+    "directus_files_id": "86d9c33d-d79b-4ba0-8b85-a1efcf0ab18f"
+  },
+  {
+    "id": 618,
+    "stock_vehicles_id": 29,
+    "directus_files_id": "6f5169f1-08a4-48a7-9b6f-3b32463c5f6d"
+  },
+  {
+    "id": 619,
+    "stock_vehicles_id": 29,
+    "directus_files_id": "0e7aba86-bc58-487c-ae21-f054e53af3eb"
+  },
+  {
+    "id": 620,
+    "stock_vehicles_id": 29,
+    "directus_files_id": "4762f464-4d55-46ea-b98d-a14d37692e45"
+  },
+  {
+    "id": 621,
+    "stock_vehicles_id": 29,
+    "directus_files_id": "3c3d1d6a-5e88-41db-9f29-1dfdfca6678d"
+  },
+  {
+    "id": 622,
+    "stock_vehicles_id": 29,
+    "directus_files_id": "3bc83156-70e2-4ae6-af73-b8a82648b6cc"
+  },
+  {
+    "id": 623,
+    "stock_vehicles_id": 29,
+    "directus_files_id": "3cae2f7f-2e56-4217-a2a9-253fd28a061d"
+  },
+  {
+    "id": 624,
+    "stock_vehicles_id": 29,
+    "directus_files_id": "9f347b44-b8f0-4c52-9c25-27f1fae9fdf1"
+  },
+  {
+    "id": 625,
+    "stock_vehicles_id": 29,
+    "directus_files_id": "1cb3fd54-eb36-447c-9722-39a6d017ae24"
+  },
+  {
+    "id": 626,
+    "stock_vehicles_id": 29,
+    "directus_files_id": "c4c4d102-01dc-4de3-9c60-128f290860c6"
+  },
+  {
+    "id": 627,
+    "stock_vehicles_id": 29,
+    "directus_files_id": "7447ebd3-7bc7-4c1d-af1f-0108b6843ff5"
+  },
+  {
+    "id": 628,
+    "stock_vehicles_id": 29,
+    "directus_files_id": "c657b629-bc60-4c3a-b657-cf3cf77184ea"
+  },
+  {
+    "id": 629,
+    "stock_vehicles_id": 31,
+    "directus_files_id": "4279eab8-fc7a-4806-9aa1-fd9d8d74ec9a"
+  },
+  {
+    "id": 630,
+    "stock_vehicles_id": 31,
+    "directus_files_id": "ebb02781-dd96-4b3f-8ab4-0c5dab270580"
+  },
+  {
+    "id": 631,
+    "stock_vehicles_id": 31,
+    "directus_files_id": "2e51f044-3170-4b93-a7dc-fb80415ccd1b"
+  },
+  {
+    "id": 632,
+    "stock_vehicles_id": 31,
+    "directus_files_id": "96c16dca-c75c-4c84-a192-36e8f6aa8dbc"
+  },
+  {
+    "id": 633,
+    "stock_vehicles_id": 31,
+    "directus_files_id": "4a810d33-faf5-4435-855a-362be0a1f90d"
+  },
+  {
+    "id": 634,
+    "stock_vehicles_id": 31,
+    "directus_files_id": "d46fcb5b-e359-4349-b233-7daa4ba11a82"
+  },
+  {
+    "id": 635,
+    "stock_vehicles_id": 31,
+    "directus_files_id": "aef74dc3-dedd-428b-98de-2a01df15be93"
+  },
+  {
+    "id": 636,
+    "stock_vehicles_id": 31,
+    "directus_files_id": "e3db034a-483c-4e54-a7c0-316728b8ea1e"
+  },
+  {
+    "id": 637,
+    "stock_vehicles_id": 31,
+    "directus_files_id": "025e0888-e068-423e-89ab-e69662434618"
+  },
+  {
+    "id": 638,
+    "stock_vehicles_id": 31,
+    "directus_files_id": "4a5909cb-5fd3-4c3f-8bc1-acde043f0fe0"
+  },
+  {
+    "id": 639,
+    "stock_vehicles_id": 31,
+    "directus_files_id": "5a0c36d8-dffb-4634-a63f-fe439c9a98d2"
+  },
+  {
+    "id": 640,
+    "stock_vehicles_id": 31,
+    "directus_files_id": "ba446f1f-f316-4fb0-9123-98a2e888cc1b"
+  },
+  {
+    "id": 641,
+    "stock_vehicles_id": 31,
+    "directus_files_id": "e6ff0a28-c93d-471a-951b-81bfa2560fe9"
+  },
+  {
+    "id": 642,
+    "stock_vehicles_id": 31,
+    "directus_files_id": "ff2ea2a8-eb96-430c-8be1-1662da9d04c1"
+  },
+  {
+    "id": 643,
+    "stock_vehicles_id": 31,
+    "directus_files_id": "e02c54d0-2296-4f90-8a00-38a72d2dd632"
+  },
+  {
+    "id": 644,
+    "stock_vehicles_id": 31,
+    "directus_files_id": "b8e7df3d-2aa2-4c84-af2e-a5352e631018"
+  },
+  {
+    "id": 645,
+    "stock_vehicles_id": 31,
+    "directus_files_id": "b530d714-371b-48c2-af1e-3de13e12eb06"
+  },
+  {
+    "id": 646,
+    "stock_vehicles_id": 31,
+    "directus_files_id": "2fcba37f-a53c-40bc-a5e5-0a10a16851c9"
+  },
+  {
+    "id": 647,
+    "stock_vehicles_id": 31,
+    "directus_files_id": "0ed81146-7808-4c2f-b952-506c20237d67"
+  },
+  {
+    "id": 648,
+    "stock_vehicles_id": 31,
+    "directus_files_id": "3b6ae3e2-690a-494f-9262-b165c18a8304"
+  },
+  {
+    "id": 649,
+    "stock_vehicles_id": 31,
+    "directus_files_id": "a7e753b7-7ad8-4137-9458-0f7b2fc6d61d"
+  },
+  {
+    "id": 650,
+    "stock_vehicles_id": 31,
+    "directus_files_id": "ce8a3118-98c9-4f0b-ae09-6b703fa389f1"
+  },
+  {
+    "id": 651,
+    "stock_vehicles_id": 31,
+    "directus_files_id": "696de6fd-c327-4044-bc43-280b3faa6a4f"
+  },
+  {
+    "id": 652,
+    "stock_vehicles_id": 31,
+    "directus_files_id": "1cfe018a-cffa-4bf8-a19f-0b51fee74474"
+  },
+  {
+    "id": 653,
+    "stock_vehicles_id": 31,
+    "directus_files_id": "04aa21f1-2185-44c0-87f6-ddb7066e3767"
+  },
+  {
+    "id": 654,
+    "stock_vehicles_id": 31,
+    "directus_files_id": "401f01f4-0aab-41fa-b8dc-a3f77d72449d"
+  },
+  {
+    "id": 655,
+    "stock_vehicles_id": 31,
+    "directus_files_id": "341716c3-855f-4a83-a2f4-d55974509385"
+  },
+  {
+    "id": 656,
+    "stock_vehicles_id": 31,
+    "directus_files_id": "27dc91c7-2217-4543-ad96-099e049d9d84"
+  },
+  {
+    "id": 657,
+    "stock_vehicles_id": 31,
+    "directus_files_id": "9063f675-0835-4deb-acdf-623729680132"
+  },
+  {
+    "id": 658,
+    "stock_vehicles_id": 31,
+    "directus_files_id": "cab4d0aa-d2ac-4464-8f88-b6fa73ca59ef"
+  },
+  {
+    "id": 659,
+    "stock_vehicles_id": 31,
+    "directus_files_id": "19c69a74-dfed-4ed3-8698-bd8c2ff152ad"
+  },
+  {
+    "id": 660,
+    "stock_vehicles_id": 31,
+    "directus_files_id": "4c36380b-9cc8-4b66-b4b2-cd0af58ce0b9"
+  },
+  {
+    "id": 661,
+    "stock_vehicles_id": 32,
+    "directus_files_id": "a18bc4c6-6a60-4329-a925-6d4869cc83c7"
+  },
+  {
+    "id": 662,
+    "stock_vehicles_id": 32,
+    "directus_files_id": "0ad3ac1f-7de8-4e6e-8fca-2873875f20ea"
+  },
+  {
+    "id": 663,
+    "stock_vehicles_id": 32,
+    "directus_files_id": "980e075b-c204-49b0-b8fc-f6201b5f2aa4"
+  },
+  {
+    "id": 664,
+    "stock_vehicles_id": 32,
+    "directus_files_id": "cb409732-76db-48ce-8c76-73dc1cd62ebf"
+  },
+  {
+    "id": 665,
+    "stock_vehicles_id": 32,
+    "directus_files_id": "2f91b21f-b40a-46ef-9948-3702fffafefc"
+  },
+  {
+    "id": 666,
+    "stock_vehicles_id": 32,
+    "directus_files_id": "dfcd88a5-fa99-4647-b0e0-ce38bd4dc293"
+  },
+  {
+    "id": 667,
+    "stock_vehicles_id": 32,
+    "directus_files_id": "b1c1d535-7c10-4694-a98a-31a67365e0a7"
+  },
+  {
+    "id": 668,
+    "stock_vehicles_id": 32,
+    "directus_files_id": "d1cf085e-b46b-446c-9c62-bc9049a0d957"
+  },
+  {
+    "id": 669,
+    "stock_vehicles_id": 32,
+    "directus_files_id": "1a40e394-5820-4a4a-a2e0-8378b921dd8b"
+  },
+  {
+    "id": 670,
+    "stock_vehicles_id": 32,
+    "directus_files_id": "2b1abbb4-13d2-4c93-92f9-b63d4b785976"
+  },
+  {
+    "id": 671,
+    "stock_vehicles_id": 32,
+    "directus_files_id": "77ecafcb-31c8-498f-8c50-7754bd6e6668"
+  },
+  {
+    "id": 672,
+    "stock_vehicles_id": 32,
+    "directus_files_id": "8d4a00bf-1e95-4e98-b804-b400ad8008c2"
+  },
+  {
+    "id": 673,
+    "stock_vehicles_id": 32,
+    "directus_files_id": "4d2ad06d-f2c5-4331-876a-43863a48c6ee"
+  },
+  {
+    "id": 674,
+    "stock_vehicles_id": 32,
+    "directus_files_id": "ab64f774-7478-4681-ab3f-4973f6de3a45"
+  },
+  {
+    "id": 675,
+    "stock_vehicles_id": 32,
+    "directus_files_id": "b27230e6-ddde-4900-b9f8-ff1bf7fefbfc"
+  },
+  {
+    "id": 676,
+    "stock_vehicles_id": 32,
+    "directus_files_id": "e6839210-502f-4844-b180-46c62dfa175c"
+  },
+  {
+    "id": 677,
+    "stock_vehicles_id": 32,
+    "directus_files_id": "64ea48e2-6a3f-410a-86bb-c492b2254067"
+  },
+  {
+    "id": 678,
+    "stock_vehicles_id": 32,
+    "directus_files_id": "4b712594-0a49-4eaa-9c21-3ccfd9ed59e1"
+  },
+  {
+    "id": 679,
+    "stock_vehicles_id": 32,
+    "directus_files_id": "3512ee54-1071-4afe-9ce0-bb188c4437e0"
+  },
+  {
+    "id": 680,
+    "stock_vehicles_id": 32,
+    "directus_files_id": "9a425b6e-f87b-4d81-9a12-58f69cec4e30"
+  },
+  {
+    "id": 681,
+    "stock_vehicles_id": 32,
+    "directus_files_id": "9ec2cc0f-49f1-42e1-a20e-15c2deed823c"
+  },
+  {
+    "id": 682,
+    "stock_vehicles_id": 32,
+    "directus_files_id": "6eb105cd-9bf9-4b6f-93e8-25060e62ec68"
+  },
+  {
+    "id": 683,
+    "stock_vehicles_id": 32,
+    "directus_files_id": "378572c9-a403-481f-9526-887de2a05e32"
+  },
+  {
+    "id": 684,
+    "stock_vehicles_id": 32,
+    "directus_files_id": "8289cb16-aba3-412f-9438-0829c4db7c71"
+  },
+  {
+    "id": 685,
+    "stock_vehicles_id": 32,
+    "directus_files_id": "d46d687a-8d50-43eb-9fcf-f86e81f2f947"
+  },
+  {
+    "id": 686,
+    "stock_vehicles_id": 32,
+    "directus_files_id": "cf7cb29e-9ef2-4353-a938-2fc03619317a"
+  },
+  {
+    "id": 687,
+    "stock_vehicles_id": 32,
+    "directus_files_id": "fb4d0f6c-e1d8-411e-879c-416b2695eaa1"
+  },
+  {
+    "id": 688,
+    "stock_vehicles_id": 32,
+    "directus_files_id": "5a130aa2-4b9c-466b-a4ae-96d797918e00"
+  },
+  {
+    "id": 689,
+    "stock_vehicles_id": 32,
+    "directus_files_id": "480d94bf-cd80-439d-81d5-0aaf10391c6f"
+  },
+  {
+    "id": 690,
+    "stock_vehicles_id": 32,
+    "directus_files_id": "11d6a386-bdca-411c-b0a4-24b57bae263e"
+  },
+  {
+    "id": 691,
+    "stock_vehicles_id": 32,
+    "directus_files_id": "25f04750-c680-4714-ad0a-060cd524ebad"
+  },
+  {
+    "id": 692,
+    "stock_vehicles_id": 32,
+    "directus_files_id": "e7f37c8b-e58a-4959-85c9-5637d49d3288"
+  },
+  {
+    "id": 693,
+    "stock_vehicles_id": 32,
+    "directus_files_id": "2193314d-0e5d-47ed-8d7d-c9646afbc2ec"
+  },
+  {
+    "id": 694,
+    "stock_vehicles_id": 32,
+    "directus_files_id": "4513dd54-8cbe-4106-93de-c02de4014785"
+  },
+  {
+    "id": 695,
+    "stock_vehicles_id": 32,
+    "directus_files_id": "8ddbc42a-807c-4902-8f33-013eeda36165"
+  },
+  {
+    "id": 696,
+    "stock_vehicles_id": 32,
+    "directus_files_id": "5585233b-22f8-4c6a-803d-de6c64eda6c1"
+  },
+  {
+    "id": 697,
+    "stock_vehicles_id": 32,
+    "directus_files_id": "62ce7d74-71a6-4dac-80a2-9c52011bda97"
+  },
+  {
+    "id": 698,
+    "stock_vehicles_id": 32,
+    "directus_files_id": "d0ff082f-8c25-417b-bed9-e0621d597088"
+  },
+  {
+    "id": 699,
+    "stock_vehicles_id": 32,
+    "directus_files_id": "b4e751cc-e4d4-48b4-af2f-61bac1ad1583"
+  },
+  {
+    "id": 700,
+    "stock_vehicles_id": 32,
+    "directus_files_id": "905f36cc-bc01-4fb3-9666-719c3ef62850"
+  },
+  {
+    "id": 701,
+    "stock_vehicles_id": 33,
+    "directus_files_id": "56f64ba4-c663-47d3-a189-6947d7e70c7b"
+  },
+  {
+    "id": 702,
+    "stock_vehicles_id": 33,
+    "directus_files_id": "335e82c5-d649-4fc8-925c-4572e29c22d5"
+  },
+  {
+    "id": 703,
+    "stock_vehicles_id": 33,
+    "directus_files_id": "7e5b2ded-9bc7-42eb-8c02-a7849184add9"
+  },
+  {
+    "id": 704,
+    "stock_vehicles_id": 33,
+    "directus_files_id": "8e67fee3-866a-45cb-acfd-b6ebbd2fb28e"
+  },
+  {
+    "id": 705,
+    "stock_vehicles_id": 33,
+    "directus_files_id": "835f8c8a-1fd5-4a07-b134-502f1be3b80d"
+  },
+  {
+    "id": 706,
+    "stock_vehicles_id": 33,
+    "directus_files_id": "d4f5b98f-b2d9-46bb-afe7-19444902360e"
+  },
+  {
+    "id": 707,
+    "stock_vehicles_id": 33,
+    "directus_files_id": "bb2d0ffd-062e-4d63-bf42-65376b42d2db"
+  },
+  {
+    "id": 708,
+    "stock_vehicles_id": 33,
+    "directus_files_id": "10184f24-469b-4feb-b6dc-df0973a17ea3"
+  },
+  {
+    "id": 709,
+    "stock_vehicles_id": 33,
+    "directus_files_id": "700ab4d0-032a-471d-b751-f363c6eaa152"
+  },
+  {
+    "id": 710,
+    "stock_vehicles_id": 33,
+    "directus_files_id": "d419bf8b-9f4a-44a6-a345-780ea846029b"
+  },
+  {
+    "id": 711,
+    "stock_vehicles_id": 33,
+    "directus_files_id": "1c9b07e2-e48f-4ae4-b2dd-eed4689aa5d6"
+  },
+  {
+    "id": 712,
+    "stock_vehicles_id": 33,
+    "directus_files_id": "c9bed1bd-2050-45a7-92ef-69631ed622ed"
+  },
+  {
+    "id": 713,
+    "stock_vehicles_id": 33,
+    "directus_files_id": "775c0bcb-2fa8-4d36-85d3-d2376d2ae314"
+  },
+  {
+    "id": 714,
+    "stock_vehicles_id": 33,
+    "directus_files_id": "60291a37-fd18-4a07-a288-a51a96944c56"
+  },
+  {
+    "id": 715,
+    "stock_vehicles_id": 33,
+    "directus_files_id": "eb4aea84-f3b7-438a-ba06-b6e19d3417a5"
+  },
+  {
+    "id": 716,
+    "stock_vehicles_id": 33,
+    "directus_files_id": "ba330f98-008a-45df-a84a-826429e5c41d"
+  },
+  {
+    "id": 717,
+    "stock_vehicles_id": 33,
+    "directus_files_id": "54956530-46e9-4642-9ec1-291438d39e78"
+  },
+  {
+    "id": 718,
+    "stock_vehicles_id": 33,
+    "directus_files_id": "9a4980d2-ba01-42f5-b139-92df5549e84c"
+  },
+  {
+    "id": 719,
+    "stock_vehicles_id": 33,
+    "directus_files_id": "1e1b81a1-df61-4642-a39b-afe1d7d85d75"
+  },
+  {
+    "id": 720,
+    "stock_vehicles_id": 33,
+    "directus_files_id": "84a6b20f-bb44-4547-bcca-377117ae99b8"
+  },
+  {
+    "id": 721,
+    "stock_vehicles_id": 33,
+    "directus_files_id": "da8a0056-cc72-48ba-bddf-5056b268e42c"
+  },
+  {
+    "id": 722,
+    "stock_vehicles_id": 33,
+    "directus_files_id": "68536144-5cc2-4015-811f-17e5081a542a"
+  },
+  {
+    "id": 723,
+    "stock_vehicles_id": 33,
+    "directus_files_id": "49b05431-2ddb-44f1-9776-d13e1c0c8ff1"
+  },
+  {
+    "id": 724,
+    "stock_vehicles_id": 33,
+    "directus_files_id": "a30deaa7-32ff-4163-bb09-115c4aca0a3a"
+  },
+  {
+    "id": 725,
+    "stock_vehicles_id": 34,
+    "directus_files_id": "9f6481f0-2d47-467f-b1be-24b96eab4076"
+  },
+  {
+    "id": 726,
+    "stock_vehicles_id": 34,
+    "directus_files_id": "9205f29d-18fe-441c-9a81-7b7398806a67"
+  },
+  {
+    "id": 727,
+    "stock_vehicles_id": 34,
+    "directus_files_id": "d5e37281-5034-4941-949f-90a38916db46"
+  },
+  {
+    "id": 728,
+    "stock_vehicles_id": 34,
+    "directus_files_id": "23981814-d8ac-47df-8ec9-69eb7a2cfff7"
+  },
+  {
+    "id": 729,
+    "stock_vehicles_id": 34,
+    "directus_files_id": "4b0ee848-8285-4aee-9ed8-0a87b2e00d7b"
+  },
+  {
+    "id": 730,
+    "stock_vehicles_id": 34,
+    "directus_files_id": "47166269-d0fd-4214-972d-37a57d886c7d"
+  },
+  {
+    "id": 731,
+    "stock_vehicles_id": 34,
+    "directus_files_id": "fe087d1d-4c6b-4777-982b-c06f1d567ac8"
+  },
+  {
+    "id": 732,
+    "stock_vehicles_id": 34,
+    "directus_files_id": "3dad541c-632f-4291-bdfd-91099b557166"
+  },
+  {
+    "id": 733,
+    "stock_vehicles_id": 34,
+    "directus_files_id": "8eede815-f783-4bb0-bb20-9f30c0a1f706"
+  },
+  {
+    "id": 734,
+    "stock_vehicles_id": 34,
+    "directus_files_id": "231eab47-d824-4739-8cad-66fb96f55c68"
+  },
+  {
+    "id": 735,
+    "stock_vehicles_id": 34,
+    "directus_files_id": "837b49f2-4a62-42c2-8f15-3195be2adf6d"
+  },
+  {
+    "id": 736,
+    "stock_vehicles_id": 34,
+    "directus_files_id": "dea8a14b-a96f-4a49-a4ac-316176b3097a"
+  },
+  {
+    "id": 737,
+    "stock_vehicles_id": 34,
+    "directus_files_id": "a952ff6d-f73c-499d-b720-f7cb71b980c0"
+  },
+  {
+    "id": 738,
+    "stock_vehicles_id": 34,
+    "directus_files_id": "b1eeadee-fd7b-4211-86a9-41b34ac67da3"
+  },
+  {
+    "id": 739,
+    "stock_vehicles_id": 34,
+    "directus_files_id": "f3509aee-d0b8-49d5-8db1-be196e42b9ff"
+  },
+  {
+    "id": 740,
+    "stock_vehicles_id": 34,
+    "directus_files_id": "1d738dba-757d-4d2f-bea8-24bf315951a0"
+  },
+  {
+    "id": 741,
+    "stock_vehicles_id": 34,
+    "directus_files_id": "33cc731e-5b0e-4457-9ec7-75c9ca5f10d1"
+  },
+  {
+    "id": 742,
+    "stock_vehicles_id": 34,
+    "directus_files_id": "308f8c50-6cea-493a-963c-7ef42d92b04e"
+  },
+  {
+    "id": 743,
+    "stock_vehicles_id": 34,
+    "directus_files_id": "95cd6829-a840-44ee-bca2-8353d5068a68"
+  },
+  {
+    "id": 744,
+    "stock_vehicles_id": 34,
+    "directus_files_id": "8c889190-1a19-4c20-9a67-6ec80277fc00"
+  },
+  {
+    "id": 745,
+    "stock_vehicles_id": 34,
+    "directus_files_id": "5e8f72a9-8571-4b83-adc6-8b83fa24cfbc"
+  },
+  {
+    "id": 746,
+    "stock_vehicles_id": 34,
+    "directus_files_id": "03200a9f-e08c-4d63-be40-f56fb63bcdcd"
+  },
+  {
+    "id": 747,
+    "stock_vehicles_id": 34,
+    "directus_files_id": "dba5a2de-0a4f-4f56-bdd4-57fd5f285c0b"
+  },
+  {
+    "id": 748,
+    "stock_vehicles_id": 34,
+    "directus_files_id": "00bddd25-ee96-480f-89f3-09ef5cd650da"
+  },
+  {
+    "id": 749,
+    "stock_vehicles_id": 34,
+    "directus_files_id": "455a697f-4bac-4895-88aa-d3fdd9a63761"
+  },
+  {
+    "id": 750,
+    "stock_vehicles_id": 34,
+    "directus_files_id": "8ff09ab7-b0d1-496a-9877-e5997d3735ee"
+  },
+  {
+    "id": 751,
+    "stock_vehicles_id": 34,
+    "directus_files_id": "e24711c3-be5c-458d-b7cd-2313f7a799d7"
+  },
+  {
+    "id": 752,
+    "stock_vehicles_id": 34,
+    "directus_files_id": "2eab0fe0-94d3-4bb0-a5b1-b31003a033e1"
+  },
+  {
+    "id": 753,
+    "stock_vehicles_id": 34,
+    "directus_files_id": "7e4ca6d0-de59-4ed5-b141-d150aaceaccc"
+  },
+  {
+    "id": 754,
+    "stock_vehicles_id": 34,
+    "directus_files_id": "fa4a3dcd-c5ef-47d2-b288-173a88ced1bc"
+  },
+  {
+    "id": 755,
+    "stock_vehicles_id": 34,
+    "directus_files_id": "94261dbb-2a29-4af8-b553-07701b2658bb"
+  },
+  {
+    "id": 756,
+    "stock_vehicles_id": 34,
+    "directus_files_id": "918016e0-8f4a-434d-b646-1768482e149e"
+  },
+  {
+    "id": 757,
+    "stock_vehicles_id": 35,
+    "directus_files_id": "6ddd3f8b-ec36-44e1-b890-d444d56915c9"
+  },
+  {
+    "id": 758,
+    "stock_vehicles_id": 35,
+    "directus_files_id": "b9c2d937-d45f-4d3f-adae-d38d075167e5"
+  },
+  {
+    "id": 759,
+    "stock_vehicles_id": 35,
+    "directus_files_id": "5db224cf-3f71-4e50-b5f8-d11f21683dc0"
+  },
+  {
+    "id": 760,
+    "stock_vehicles_id": 35,
+    "directus_files_id": "21b9f2ee-a4d1-4318-92f9-c7b39c2a88e1"
+  },
+  {
+    "id": 761,
+    "stock_vehicles_id": 35,
+    "directus_files_id": "349d905e-69da-40d3-855c-b38900be5e2e"
+  },
+  {
+    "id": 762,
+    "stock_vehicles_id": 35,
+    "directus_files_id": "f3fda4a6-449a-43dd-991e-926e65fc6875"
+  },
+  {
+    "id": 763,
+    "stock_vehicles_id": 35,
+    "directus_files_id": "9da07f9e-b6e8-4c76-96c0-7360b29b7620"
+  },
+  {
+    "id": 764,
+    "stock_vehicles_id": 35,
+    "directus_files_id": "21e9cd76-916b-4258-9703-8f0868ba70b7"
+  },
+  {
+    "id": 765,
+    "stock_vehicles_id": 35,
+    "directus_files_id": "821f2ff7-fe87-48f6-a324-012910f761f2"
+  },
+  {
+    "id": 766,
+    "stock_vehicles_id": 35,
+    "directus_files_id": "855acaf0-16fc-40ae-93d9-f3753f66f3bc"
+  },
+  {
+    "id": 767,
+    "stock_vehicles_id": 35,
+    "directus_files_id": "7df1b0fd-a640-469d-b992-8a98fc335784"
+  },
+  {
+    "id": 768,
+    "stock_vehicles_id": 35,
+    "directus_files_id": "1a33f56f-6ead-4b29-93c2-3f37e34d6cce"
+  },
+  {
+    "id": 769,
+    "stock_vehicles_id": 35,
+    "directus_files_id": "c4bcfb5a-9dbb-48ce-ab3d-0251b6ed6649"
+  },
+  {
+    "id": 770,
+    "stock_vehicles_id": 35,
+    "directus_files_id": "eb98fb07-cc58-4f15-ae54-549fb83dac11"
+  },
+  {
+    "id": 771,
+    "stock_vehicles_id": 35,
+    "directus_files_id": "147ce9e2-c4ae-4cb6-948e-842283b591ad"
+  },
+  {
+    "id": 772,
+    "stock_vehicles_id": 35,
+    "directus_files_id": "9011eb5e-75fe-41ab-8881-ce5bd329ae38"
+  },
+  {
+    "id": 773,
+    "stock_vehicles_id": 35,
+    "directus_files_id": "dc11d5bb-408c-47d1-b41d-ea03f0cbb384"
+  },
+  {
+    "id": 774,
+    "stock_vehicles_id": 35,
+    "directus_files_id": "ba49ba38-54bd-4666-99c2-60c9032e9414"
+  },
+  {
+    "id": 775,
+    "stock_vehicles_id": 35,
+    "directus_files_id": "077c8f0d-07d3-47e0-bf10-a8add9638065"
+  },
+  {
+    "id": 776,
+    "stock_vehicles_id": 35,
+    "directus_files_id": "634319b1-afe5-4111-91e1-52d7cfd37bd1"
+  },
+  {
+    "id": 777,
+    "stock_vehicles_id": 35,
+    "directus_files_id": "99667a6c-c91a-4d7f-b939-a683f1bb7410"
+  },
+  {
+    "id": 778,
+    "stock_vehicles_id": 35,
+    "directus_files_id": "cba928f8-8f5c-41ef-b077-1c9de3752f45"
+  },
+  {
+    "id": 779,
+    "stock_vehicles_id": 35,
+    "directus_files_id": "2195bc43-fda9-412a-b06e-d619455fa597"
+  },
+  {
+    "id": 780,
+    "stock_vehicles_id": 35,
+    "directus_files_id": "07bcd9c0-4e8a-47c0-b07c-db5f455cf646"
+  },
+  {
+    "id": 781,
+    "stock_vehicles_id": 35,
+    "directus_files_id": "60305daf-596f-4504-b883-27a7887cbb12"
+  },
+  {
+    "id": 782,
+    "stock_vehicles_id": 35,
+    "directus_files_id": "9167b948-33fb-4d56-b713-e43694cfb912"
+  },
+  {
+    "id": 783,
+    "stock_vehicles_id": 35,
+    "directus_files_id": "d8ee3dc8-5cfe-422f-a5cf-788180541f39"
+  },
+  {
+    "id": 784,
+    "stock_vehicles_id": 35,
+    "directus_files_id": "f79fb1ae-5159-4450-b051-5f547aa3d26d"
+  },
+  {
+    "id": 785,
+    "stock_vehicles_id": 35,
+    "directus_files_id": "7946cd61-1ce5-44af-9268-130e782f36f0"
+  },
+  {
+    "id": 786,
+    "stock_vehicles_id": 35,
+    "directus_files_id": "fb7ba251-59e1-4a3f-8d1b-81c642bd9984"
+  },
+  {
+    "id": 787,
+    "stock_vehicles_id": 35,
+    "directus_files_id": "a37222cc-fa0d-4c7b-b3cb-b4635be0d444"
+  },
+  {
+    "id": 788,
+    "stock_vehicles_id": 35,
+    "directus_files_id": "847e8e50-4913-48c9-81ea-286a0a1df5ec"
+  },
+  {
+    "id": 789,
+    "stock_vehicles_id": 35,
+    "directus_files_id": "79f08fec-8310-4396-a4ce-5ff441d382cb"
+  },
+  {
+    "id": 790,
+    "stock_vehicles_id": 35,
+    "directus_files_id": "9e4c46df-5320-4d4d-b5db-18bd281d2244"
+  },
+  {
+    "id": 791,
+    "stock_vehicles_id": 36,
+    "directus_files_id": "1c6d7d60-038d-4a8e-8d7b-ed6630e84b4c"
+  },
+  {
+    "id": 792,
+    "stock_vehicles_id": 36,
+    "directus_files_id": "2c6a6603-95ff-441d-bbc8-a88403b01dc3"
+  },
+  {
+    "id": 793,
+    "stock_vehicles_id": 36,
+    "directus_files_id": "6ac65257-be39-4872-88bd-f4e0ccfa2ffe"
+  },
+  {
+    "id": 794,
+    "stock_vehicles_id": 36,
+    "directus_files_id": "8e1e4665-71b7-4f84-b888-ff409f0aa719"
+  },
+  {
+    "id": 795,
+    "stock_vehicles_id": 36,
+    "directus_files_id": "58a140b4-892f-4b87-9e81-d7d15f4a635f"
+  },
+  {
+    "id": 796,
+    "stock_vehicles_id": 36,
+    "directus_files_id": "51588eed-bcae-4157-b8de-031d7d309550"
+  },
+  {
+    "id": 797,
+    "stock_vehicles_id": 36,
+    "directus_files_id": "1795123a-e9ed-432e-9c83-63cb58d89100"
+  },
+  {
+    "id": 798,
+    "stock_vehicles_id": 36,
+    "directus_files_id": "55dfd4c0-1a3c-4e87-aec9-381197acc44a"
+  },
+  {
+    "id": 799,
+    "stock_vehicles_id": 36,
+    "directus_files_id": "fdd70ad3-d047-449c-8638-824efdeb6225"
+  },
+  {
+    "id": 800,
+    "stock_vehicles_id": 36,
+    "directus_files_id": "c6958b96-2b38-4068-9361-b8cfcd9b8986"
+  },
+  {
+    "id": 801,
+    "stock_vehicles_id": 36,
+    "directus_files_id": "3ac0aba1-3dd1-44d8-8715-f59db1faa584"
+  },
+  {
+    "id": 802,
+    "stock_vehicles_id": 36,
+    "directus_files_id": "08e4effe-6649-4277-9e32-a97f65ecf927"
+  },
+  {
+    "id": 803,
+    "stock_vehicles_id": 36,
+    "directus_files_id": "444998a4-f299-448d-bde3-cf88ae50f7e2"
+  },
+  {
+    "id": 804,
+    "stock_vehicles_id": 36,
+    "directus_files_id": "32d317ed-0a4e-450e-92b1-1fe2b0319099"
+  },
+  {
+    "id": 805,
+    "stock_vehicles_id": 36,
+    "directus_files_id": "434e9045-dc42-4030-9300-b4af5e000c0a"
+  },
+  {
+    "id": 806,
+    "stock_vehicles_id": 36,
+    "directus_files_id": "fecfb88d-1c73-4831-b9c4-da91fe3a8b29"
+  },
+  {
+    "id": 807,
+    "stock_vehicles_id": 36,
+    "directus_files_id": "107f9c3c-874f-479a-9ab6-a49f3cc59c39"
+  },
+  {
+    "id": 808,
+    "stock_vehicles_id": 36,
+    "directus_files_id": "42044d60-1fca-49df-93d3-91fbb9a0a370"
+  },
+  {
+    "id": 809,
+    "stock_vehicles_id": 36,
+    "directus_files_id": "82375782-1d6e-4737-8a04-5439db854902"
+  },
+  {
+    "id": 810,
+    "stock_vehicles_id": 36,
+    "directus_files_id": "3c72fae9-6a0c-46ea-8cf6-71efaad0ac67"
+  },
+  {
+    "id": 811,
+    "stock_vehicles_id": 36,
+    "directus_files_id": "493d33bb-c53d-4f47-ab46-1c17fb9220d9"
+  },
+  {
+    "id": 812,
+    "stock_vehicles_id": 36,
+    "directus_files_id": "6ace1026-865f-4d38-ba54-833e34945afc"
+  },
+  {
+    "id": 813,
+    "stock_vehicles_id": 36,
+    "directus_files_id": "2d793af9-92ea-439f-ad34-0505e9d4d866"
+  },
+  {
+    "id": 814,
+    "stock_vehicles_id": 36,
+    "directus_files_id": "8f6a701f-1ded-4811-bb4b-ea9d5499311b"
+  },
+  {
+    "id": 815,
+    "stock_vehicles_id": 36,
+    "directus_files_id": "9fbf37c3-8b6b-40e6-9844-ab0dfe398e01"
+  },
+  {
+    "id": 816,
+    "stock_vehicles_id": 36,
+    "directus_files_id": "e63b61ba-7f1b-43fd-aba1-be70b5fa56cf"
+  },
+  {
+    "id": 817,
+    "stock_vehicles_id": 36,
+    "directus_files_id": "bd99c031-ec2e-4783-ba8e-63ed56c1bc40"
+  },
+  {
+    "id": 818,
+    "stock_vehicles_id": 36,
+    "directus_files_id": "9c1b09b3-f550-4bab-965e-0b0234ca91e7"
+  },
+  {
+    "id": 819,
+    "stock_vehicles_id": 36,
+    "directus_files_id": "6a71c724-67fb-4c35-8495-25d13c20780f"
+  },
+  {
+    "id": 820,
+    "stock_vehicles_id": 36,
+    "directus_files_id": "60133fa9-c99d-44ca-b852-2851cd72a898"
+  },
+  {
+    "id": 821,
+    "stock_vehicles_id": 36,
+    "directus_files_id": "1432b049-bc0f-44a2-9590-c939237c9bf9"
+  },
+  {
+    "id": 822,
+    "stock_vehicles_id": 36,
+    "directus_files_id": "aad5148b-ae14-41a7-ae6d-05a1be962f9d"
+  },
+  {
+    "id": 823,
+    "stock_vehicles_id": 36,
+    "directus_files_id": "862c109b-84eb-41ad-9ba1-745eda4330d4"
+  },
+  {
+    "id": 824,
+    "stock_vehicles_id": 36,
+    "directus_files_id": "6b485278-d092-4b8f-949f-32ac20d25212"
+  },
+  {
+    "id": 825,
+    "stock_vehicles_id": 36,
+    "directus_files_id": "5db6544d-22a1-40a0-8e79-1c3319240301"
+  },
+  {
+    "id": 826,
+    "stock_vehicles_id": 36,
+    "directus_files_id": "a94ec9a0-78a1-449e-8e5b-e39417e7ec91"
+  },
+  {
+    "id": 827,
+    "stock_vehicles_id": 36,
+    "directus_files_id": "9790020a-6ed7-4c99-989d-6b5dacd174e2"
+  },
+  {
+    "id": 828,
+    "stock_vehicles_id": 36,
+    "directus_files_id": "653c4619-dc30-4cf9-884a-b64bc7be6b66"
+  },
+  {
+    "id": 829,
+    "stock_vehicles_id": 36,
+    "directus_files_id": "fa932cd6-c487-4668-bb95-daa7400df993"
+  },
+  {
+    "id": 830,
+    "stock_vehicles_id": 36,
+    "directus_files_id": "92ecaf4a-bd5f-46e4-8471-5a3aee38b6c9"
+  },
+  {
+    "id": 831,
+    "stock_vehicles_id": 36,
+    "directus_files_id": "9e7d278d-d5b1-4c75-bc6c-190812c2a283"
+  },
+  {
+    "id": 832,
+    "stock_vehicles_id": 36,
+    "directus_files_id": "35473ec7-77fc-4fc9-a6d4-8b1f8a807dde"
+  },
+  {
+    "id": 833,
+    "stock_vehicles_id": 36,
+    "directus_files_id": "91c8e46f-da7a-4890-a623-69dcc03ddd3e"
+  },
+  {
+    "id": 834,
+    "stock_vehicles_id": 36,
+    "directus_files_id": "8fe2e9ae-0a71-401d-b49f-cb77d6e239a0"
+  },
+  {
+    "id": 835,
+    "stock_vehicles_id": 36,
+    "directus_files_id": "7e207d2d-44f7-4ef0-9182-36565fd30b2e"
+  },
+  {
+    "id": 836,
+    "stock_vehicles_id": 36,
+    "directus_files_id": "68fcddc1-da18-4417-a86c-3d245ec8d464"
+  },
+  {
+    "id": 837,
+    "stock_vehicles_id": 37,
+    "directus_files_id": "1bfbbda4-47f4-46e4-9b7a-693a20da9309"
+  },
+  {
+    "id": 838,
+    "stock_vehicles_id": 37,
+    "directus_files_id": "f4677148-1ef0-4b7a-98da-846272c42def"
+  },
+  {
+    "id": 839,
+    "stock_vehicles_id": 37,
+    "directus_files_id": "52fd2833-7609-4427-a7a7-76b5b93294f0"
+  },
+  {
+    "id": 840,
+    "stock_vehicles_id": 37,
+    "directus_files_id": "eeb81e51-8d65-485b-b4fa-9a8234a99ae9"
+  },
+  {
+    "id": 841,
+    "stock_vehicles_id": 37,
+    "directus_files_id": "f57204b3-18ce-4ca3-a8c0-31de8782bd5c"
+  },
+  {
+    "id": 842,
+    "stock_vehicles_id": 37,
+    "directus_files_id": "2983bdda-85dc-4aaf-a344-f326003b8e81"
+  },
+  {
+    "id": 843,
+    "stock_vehicles_id": 37,
+    "directus_files_id": "79c5bc19-8c0a-4738-9075-32b115a64e58"
+  },
+  {
+    "id": 844,
+    "stock_vehicles_id": 37,
+    "directus_files_id": "6c1d8459-8c65-4b32-89d9-d78879a9ac8f"
+  },
+  {
+    "id": 845,
+    "stock_vehicles_id": 37,
+    "directus_files_id": "9b820749-c44f-49ae-bbfe-aa383efd8186"
+  },
+  {
+    "id": 846,
+    "stock_vehicles_id": 37,
+    "directus_files_id": "bb9e4d57-5246-4a4d-9bd4-d5851835747f"
+  },
+  {
+    "id": 847,
+    "stock_vehicles_id": 37,
+    "directus_files_id": "d7f53221-c46b-4d01-a415-33e0741393b5"
+  },
+  {
+    "id": 848,
+    "stock_vehicles_id": 37,
+    "directus_files_id": "fcc47e3a-fdf7-4b7e-8e31-87e557b0f657"
+  },
+  {
+    "id": 849,
+    "stock_vehicles_id": 37,
+    "directus_files_id": "db00520a-396d-4c56-b15f-1c92d0bfe0ba"
+  },
+  {
+    "id": 850,
+    "stock_vehicles_id": 37,
+    "directus_files_id": "904ac2a9-7849-4c42-a49f-02e971d19081"
+  },
+  {
+    "id": 851,
+    "stock_vehicles_id": 37,
+    "directus_files_id": "fe274f6e-684a-4243-a744-a79c030f847e"
+  },
+  {
+    "id": 852,
+    "stock_vehicles_id": 37,
+    "directus_files_id": "d05e9eda-0c04-4ccd-91ff-51efd46cad5d"
+  },
+  {
+    "id": 853,
+    "stock_vehicles_id": 37,
+    "directus_files_id": "61e8e33a-4e89-4a41-974c-c77212047b70"
+  },
+  {
+    "id": 854,
+    "stock_vehicles_id": 37,
+    "directus_files_id": "20a67ac2-3066-4109-9873-316ce44907ec"
+  },
+  {
+    "id": 855,
+    "stock_vehicles_id": 37,
+    "directus_files_id": "1f8becc6-9f2a-4cfc-b9b8-619085217af3"
+  },
+  {
+    "id": 856,
+    "stock_vehicles_id": 37,
+    "directus_files_id": "0f7634c4-cd12-4d5c-b4b6-2705a8e3341c"
+  },
+  {
+    "id": 857,
+    "stock_vehicles_id": 37,
+    "directus_files_id": "433ba2f0-8159-42d3-a86b-88594c08bf38"
+  },
+  {
+    "id": 858,
+    "stock_vehicles_id": 37,
+    "directus_files_id": "f1e881dd-79e9-4eb8-ba9a-1f9b2aecd081"
+  },
+  {
+    "id": 859,
+    "stock_vehicles_id": 37,
+    "directus_files_id": "361f2f24-8fa9-4f88-b06a-9744c868eebe"
+  },
+  {
+    "id": 860,
+    "stock_vehicles_id": 37,
+    "directus_files_id": "afbea9cd-5d05-4a49-b386-d1f1d9b0eb05"
+  },
+  {
+    "id": 861,
+    "stock_vehicles_id": 37,
+    "directus_files_id": "ae4e7114-569d-4c0e-b2fe-6d1c260e861f"
+  },
+  {
+    "id": 862,
+    "stock_vehicles_id": 37,
+    "directus_files_id": "a4e4395c-5b42-423f-a05c-a3546ad6d380"
+  },
+  {
+    "id": 863,
+    "stock_vehicles_id": 37,
+    "directus_files_id": "093eb0e2-8be9-4123-9752-363490b85df9"
+  },
+  {
+    "id": 864,
+    "stock_vehicles_id": 37,
+    "directus_files_id": "2278f58a-fe53-4995-aa7e-e4ff41d99153"
+  },
+  {
+    "id": 865,
+    "stock_vehicles_id": 37,
+    "directus_files_id": "a1b46f87-188c-4804-beea-aae41355b685"
+  },
+  {
+    "id": 866,
+    "stock_vehicles_id": 37,
+    "directus_files_id": "d4484f76-ddd5-4b22-8b17-f51cf6ac61c9"
+  },
+  {
+    "id": 867,
+    "stock_vehicles_id": 37,
+    "directus_files_id": "2e995550-65ea-4141-8623-4f10d4040d37"
+  },
+  {
+    "id": 868,
+    "stock_vehicles_id": 37,
+    "directus_files_id": "bf0b680b-a259-4a07-93c8-c6260f493fa0"
+  },
+  {
+    "id": 869,
+    "stock_vehicles_id": 37,
+    "directus_files_id": "aa57b713-b27f-430b-a397-056e04fae5e0"
+  },
+  {
+    "id": 870,
+    "stock_vehicles_id": 37,
+    "directus_files_id": "efa23a28-4c7f-4e62-9543-0428ff4e658a"
+  },
+  {
+    "id": 871,
+    "stock_vehicles_id": 37,
+    "directus_files_id": "00f557ff-2ec7-4333-adcb-47d3a511e46c"
+  },
+  {
+    "id": 872,
+    "stock_vehicles_id": 37,
+    "directus_files_id": "753c7215-a1ec-4e96-874f-2a9fc68503b2"
+  },
+  {
+    "id": 873,
+    "stock_vehicles_id": 37,
+    "directus_files_id": "66ca5fc0-7592-48d8-8e43-898af24701bb"
+  },
+  {
+    "id": 874,
+    "stock_vehicles_id": 37,
+    "directus_files_id": "f0456f4d-c478-4b5c-8777-62b202330612"
+  },
+  {
+    "id": 875,
+    "stock_vehicles_id": 37,
+    "directus_files_id": "4e245b60-2fb7-4c79-96be-892fa6651397"
+  },
+  {
+    "id": 876,
+    "stock_vehicles_id": 37,
+    "directus_files_id": "80d6069f-0d49-425b-89a0-6ce474c900b0"
+  },
+  {
+    "id": 877,
+    "stock_vehicles_id": 38,
+    "directus_files_id": "46474713-5c0f-49ec-8f37-215965dee752"
+  },
+  {
+    "id": 878,
+    "stock_vehicles_id": 38,
+    "directus_files_id": "3a58a134-40d7-4e1b-b86c-2e170c4c65f8"
+  },
+  {
+    "id": 879,
+    "stock_vehicles_id": 38,
+    "directus_files_id": "16cd62da-9a96-4358-8205-166879e610f0"
+  },
+  {
+    "id": 880,
+    "stock_vehicles_id": 38,
+    "directus_files_id": "2e0fea46-8fca-4804-a681-ce41952c2358"
+  },
+  {
+    "id": 881,
+    "stock_vehicles_id": 38,
+    "directus_files_id": "a61fb292-fa6e-4db8-8039-19824814b596"
+  },
+  {
+    "id": 882,
+    "stock_vehicles_id": 38,
+    "directus_files_id": "2908c898-da5f-4083-a878-d41cfc81360d"
+  },
+  {
+    "id": 883,
+    "stock_vehicles_id": 38,
+    "directus_files_id": "a31bff2f-63f6-429f-831c-cd8c3b70f90e"
+  },
+  {
+    "id": 884,
+    "stock_vehicles_id": 38,
+    "directus_files_id": "c42060f8-3c46-4033-ad4c-a5748cc45d61"
+  },
+  {
+    "id": 885,
+    "stock_vehicles_id": 38,
+    "directus_files_id": "f4b4421f-b0e8-4a77-ae40-3adb2ce97732"
+  },
+  {
+    "id": 886,
+    "stock_vehicles_id": 38,
+    "directus_files_id": "d18e1a0e-43fd-4023-8439-fe3a6b0f587e"
+  },
+  {
+    "id": 887,
+    "stock_vehicles_id": 38,
+    "directus_files_id": "602632e9-03c8-4770-9c5c-1d31946492f0"
+  },
+  {
+    "id": 888,
+    "stock_vehicles_id": 38,
+    "directus_files_id": "fbdb8c5b-fef3-40f2-b4fb-28025e858e4c"
+  },
+  {
+    "id": 889,
+    "stock_vehicles_id": 38,
+    "directus_files_id": "a4b168f1-c43e-43ba-9482-cf84d1225762"
+  },
+  {
+    "id": 890,
+    "stock_vehicles_id": 38,
+    "directus_files_id": "f3284420-20cc-44fe-8028-b6773bdd9567"
+  },
+  {
+    "id": 891,
+    "stock_vehicles_id": 38,
+    "directus_files_id": "038c5182-d5d8-4441-988a-dd1dea754a98"
+  },
+  {
+    "id": 892,
+    "stock_vehicles_id": 38,
+    "directus_files_id": "7a12138d-98d8-4e60-8b50-17c6f658364d"
+  },
+  {
+    "id": 893,
+    "stock_vehicles_id": 38,
+    "directus_files_id": "3a8f9156-ba0b-49e4-b12a-9d09c388017e"
+  },
+  {
+    "id": 894,
+    "stock_vehicles_id": 38,
+    "directus_files_id": "902c528e-be55-4fac-acb7-f29748bff1bb"
+  },
+  {
+    "id": 895,
+    "stock_vehicles_id": 38,
+    "directus_files_id": "c4bd5b22-476b-4063-ab48-8e3088549ee8"
+  },
+  {
+    "id": 896,
+    "stock_vehicles_id": 38,
+    "directus_files_id": "df0ef45c-115d-46b3-a94e-9cb4671ae968"
+  },
+  {
+    "id": 897,
+    "stock_vehicles_id": 38,
+    "directus_files_id": "70a6aa34-4419-46d7-9c4d-51bbadca487e"
+  },
+  {
+    "id": 898,
+    "stock_vehicles_id": 38,
+    "directus_files_id": "a1dad821-30e1-4a1b-8366-24ff79b20ebc"
+  },
+  {
+    "id": 899,
+    "stock_vehicles_id": 38,
+    "directus_files_id": "94e6d772-28bd-4b65-990e-566ba7d6f6b9"
+  },
+  {
+    "id": 900,
+    "stock_vehicles_id": 38,
+    "directus_files_id": "ab9c360e-c185-4236-89ea-fc1fa994b5fd"
+  },
+  {
+    "id": 901,
+    "stock_vehicles_id": 38,
+    "directus_files_id": "4d1f78c9-1a6c-48bc-ab9a-d167908d3d76"
+  },
+  {
+    "id": 902,
+    "stock_vehicles_id": 38,
+    "directus_files_id": "54cf300f-3fb3-4d66-96a0-11f1461fb85f"
+  },
+  {
+    "id": 903,
+    "stock_vehicles_id": 38,
+    "directus_files_id": "8a268dd9-b9d8-4632-bd85-563b50d48aad"
+  },
+  {
+    "id": 904,
+    "stock_vehicles_id": 38,
+    "directus_files_id": "053dd16e-416d-40b2-846a-2be1d37ca718"
+  },
+  {
+    "id": 905,
+    "stock_vehicles_id": 38,
+    "directus_files_id": "2eee0ddc-88bc-4105-a372-04472938a547"
+  },
+  {
+    "id": 906,
+    "stock_vehicles_id": 38,
+    "directus_files_id": "c74bce77-ea38-445f-8dd4-d3cbd1a35f85"
+  },
+  {
+    "id": 907,
+    "stock_vehicles_id": 38,
+    "directus_files_id": "0b5504a1-8c3d-4914-be63-94d0cd4f2528"
+  },
+  {
+    "id": 908,
+    "stock_vehicles_id": 38,
+    "directus_files_id": "3b75bd2b-6353-4e1d-9e60-e2c2de9e76c4"
+  },
+  {
+    "id": 909,
+    "stock_vehicles_id": 38,
+    "directus_files_id": "1cd4d912-09c7-4c87-8066-5813b0b0f42b"
+  },
+  {
+    "id": 910,
+    "stock_vehicles_id": 38,
+    "directus_files_id": "8b166d18-3cf4-462f-ad43-06c1ee665fe4"
+  },
+  {
+    "id": 911,
+    "stock_vehicles_id": 39,
+    "directus_files_id": "13fe93dc-5dae-4337-9729-33ff213bb7f4"
+  },
+  {
+    "id": 912,
+    "stock_vehicles_id": 39,
+    "directus_files_id": "085bd8c9-0a23-40d1-864c-4a5cba76975b"
+  },
+  {
+    "id": 913,
+    "stock_vehicles_id": 39,
+    "directus_files_id": "9241184c-86ff-47e8-97c1-65aae9d395a9"
+  },
+  {
+    "id": 914,
+    "stock_vehicles_id": 39,
+    "directus_files_id": "599e0eba-1ac5-451e-981b-5bbd03f6a087"
+  },
+  {
+    "id": 915,
+    "stock_vehicles_id": 39,
+    "directus_files_id": "0c945575-f081-4d23-a32d-ed9f28f17ca2"
+  },
+  {
+    "id": 916,
+    "stock_vehicles_id": 39,
+    "directus_files_id": "920536f0-0e47-49e0-a5c3-11e686202859"
+  },
+  {
+    "id": 917,
+    "stock_vehicles_id": 39,
+    "directus_files_id": "df892a8a-384c-443d-8b33-2430ff46ee00"
+  },
+  {
+    "id": 918,
+    "stock_vehicles_id": 39,
+    "directus_files_id": "1617e2f5-003b-41de-9ff8-83aac824ab82"
+  },
+  {
+    "id": 919,
+    "stock_vehicles_id": 39,
+    "directus_files_id": "7041f7b3-d202-4243-ac6e-e780fa209459"
+  },
+  {
+    "id": 920,
+    "stock_vehicles_id": 39,
+    "directus_files_id": "6dcbbd2c-9ce6-413f-a832-ee825a62d37c"
+  },
+  {
+    "id": 921,
+    "stock_vehicles_id": 39,
+    "directus_files_id": "ba032e32-8442-4fc1-b992-022d83b61477"
+  },
+  {
+    "id": 922,
+    "stock_vehicles_id": 39,
+    "directus_files_id": "2be2a39e-2be8-4756-b23e-ba7a1c86d10c"
+  },
+  {
+    "id": 923,
+    "stock_vehicles_id": 39,
+    "directus_files_id": "e46645a2-e194-4d6c-94ab-90a2898fbfd7"
+  },
+  {
+    "id": 924,
+    "stock_vehicles_id": 39,
+    "directus_files_id": "b80f16c8-59ae-42e4-a3e8-9b9c8629572a"
+  },
+  {
+    "id": 925,
+    "stock_vehicles_id": 39,
+    "directus_files_id": "e9a7f631-fc6d-445a-9f91-92d87c08b30c"
+  },
+  {
+    "id": 926,
+    "stock_vehicles_id": 39,
+    "directus_files_id": "4fb312ed-8e6c-4d7e-b240-d26f1c658ce6"
+  },
+  {
+    "id": 927,
+    "stock_vehicles_id": 39,
+    "directus_files_id": "28a3b5f4-3c67-4228-b454-edd63a7dae35"
+  },
+  {
+    "id": 928,
+    "stock_vehicles_id": 39,
+    "directus_files_id": "c0feeb2f-9aff-4200-a4d2-cc2af32c36ea"
+  },
+  {
+    "id": 929,
+    "stock_vehicles_id": 39,
+    "directus_files_id": "7add9db3-421b-4ce6-b4e6-3544973fdbf5"
+  },
+  {
+    "id": 930,
+    "stock_vehicles_id": 39,
+    "directus_files_id": "6c18c4ba-51da-4c71-bc6d-f3560dc22b3c"
+  },
+  {
+    "id": 931,
+    "stock_vehicles_id": 39,
+    "directus_files_id": "bafbdb38-a2d4-4116-b8a1-e30abda150c9"
+  },
+  {
+    "id": 932,
+    "stock_vehicles_id": 39,
+    "directus_files_id": "d6caef83-d24c-4df0-a291-bd712a35b09a"
+  },
+  {
+    "id": 933,
+    "stock_vehicles_id": 39,
+    "directus_files_id": "437e888f-824f-4d42-bf64-27db49997335"
+  },
+  {
+    "id": 934,
+    "stock_vehicles_id": 39,
+    "directus_files_id": "674da233-d208-46db-b908-ab870e6d0f66"
+  },
+  {
+    "id": 935,
+    "stock_vehicles_id": 39,
+    "directus_files_id": "60c180ce-c4cd-4053-8582-38828dbefafc"
+  },
+  {
+    "id": 936,
+    "stock_vehicles_id": 39,
+    "directus_files_id": "99dad612-f549-493c-81df-b85a6bcef7f0"
+  },
+  {
+    "id": 937,
+    "stock_vehicles_id": 39,
+    "directus_files_id": "33703ac5-8c41-414f-b20e-d7d8f0dbff67"
+  },
+  {
+    "id": 938,
+    "stock_vehicles_id": 39,
+    "directus_files_id": "e3097b2b-a229-47a7-87da-f5a8e2140c86"
+  },
+  {
+    "id": 939,
+    "stock_vehicles_id": 39,
+    "directus_files_id": "df8f666c-421d-460d-bc26-2976658c863f"
+  },
+  {
+    "id": 940,
+    "stock_vehicles_id": 39,
+    "directus_files_id": "84b7b7f5-cb43-46a5-a05e-e5e2b26068b3"
+  },
+  {
+    "id": 941,
+    "stock_vehicles_id": 39,
+    "directus_files_id": "c2840921-2bdd-44a1-ad89-4c740bfd861c"
+  },
+  {
+    "id": 942,
+    "stock_vehicles_id": 39,
+    "directus_files_id": "6bdce8f8-0d1b-4998-b5f8-e1c2751cb878"
+  },
+  {
+    "id": 943,
+    "stock_vehicles_id": 40,
+    "directus_files_id": "42f81f55-9da1-438b-8d8b-29dd27eb374c"
+  },
+  {
+    "id": 944,
+    "stock_vehicles_id": 40,
+    "directus_files_id": "f58bff43-1734-47b9-9d65-b3cc5c7aa02d"
+  },
+  {
+    "id": 945,
+    "stock_vehicles_id": 40,
+    "directus_files_id": "b62915d9-c5bf-413d-ab6b-d8b83564a363"
+  },
+  {
+    "id": 946,
+    "stock_vehicles_id": 40,
+    "directus_files_id": "43c1d341-b381-4ff2-a1fa-911514dc44ff"
+  },
+  {
+    "id": 947,
+    "stock_vehicles_id": 40,
+    "directus_files_id": "c793e1c4-00ee-4d0a-8c3d-de87d74900d9"
+  },
+  {
+    "id": 948,
+    "stock_vehicles_id": 40,
+    "directus_files_id": "5e9533cb-83b0-49a7-a250-4928605002dd"
+  },
+  {
+    "id": 949,
+    "stock_vehicles_id": 40,
+    "directus_files_id": "bee8290f-83d7-432e-b463-7832d9c517d2"
+  },
+  {
+    "id": 950,
+    "stock_vehicles_id": 40,
+    "directus_files_id": "d9ca144b-e476-4653-bc92-e8a15d10ef29"
+  },
+  {
+    "id": 951,
+    "stock_vehicles_id": 40,
+    "directus_files_id": "b358ec5b-6791-47f0-92c0-7f500c9fd48e"
+  },
+  {
+    "id": 952,
+    "stock_vehicles_id": 40,
+    "directus_files_id": "0d30c784-79fc-46cf-9f6e-aa2558edef1b"
+  },
+  {
+    "id": 953,
+    "stock_vehicles_id": 40,
+    "directus_files_id": "973c4d8e-8e8f-44bc-943e-dbe50b6ffea5"
+  },
+  {
+    "id": 954,
+    "stock_vehicles_id": 40,
+    "directus_files_id": "18463f86-18fa-4e5a-8ed2-0d61b09769e9"
+  },
+  {
+    "id": 955,
+    "stock_vehicles_id": 40,
+    "directus_files_id": "ce4da56f-d60a-474f-aa58-6ec80a847d90"
+  },
+  {
+    "id": 956,
+    "stock_vehicles_id": 40,
+    "directus_files_id": "5fda416c-06f3-41b5-9984-d7c75fd3630b"
+  },
+  {
+    "id": 957,
+    "stock_vehicles_id": 40,
+    "directus_files_id": "47f00a14-ce1c-4383-a234-0252e3cafb67"
+  },
+  {
+    "id": 958,
+    "stock_vehicles_id": 40,
+    "directus_files_id": "0e22d64b-e78a-4354-b77b-4be40ac26ad1"
+  },
+  {
+    "id": 959,
+    "stock_vehicles_id": 40,
+    "directus_files_id": "a9b6f34f-b11a-46b3-aeee-8d79517fe3ad"
+  },
+  {
+    "id": 960,
+    "stock_vehicles_id": 40,
+    "directus_files_id": "e358fd53-3c5d-488e-9fe8-aed152684007"
+  },
+  {
+    "id": 961,
+    "stock_vehicles_id": 40,
+    "directus_files_id": "9cba5f30-35bc-46be-903f-f49757ef9a6f"
+  },
+  {
+    "id": 962,
+    "stock_vehicles_id": 40,
+    "directus_files_id": "cde44a13-4814-45bb-9cd1-70fdd6073656"
+  },
+  {
+    "id": 963,
+    "stock_vehicles_id": 40,
+    "directus_files_id": "1c0e7623-fd36-4735-b4e3-7ba5d9bc3ad5"
+  },
+  {
+    "id": 964,
+    "stock_vehicles_id": 40,
+    "directus_files_id": "aa90d00c-ee57-4088-a9ec-3445080c3081"
+  },
+  {
+    "id": 965,
+    "stock_vehicles_id": 40,
+    "directus_files_id": "c13fb2fa-5104-4709-a6ed-e1968ce103ad"
+  },
+  {
+    "id": 966,
+    "stock_vehicles_id": 40,
+    "directus_files_id": "3e869d1c-7466-4032-b6fd-d77f90cc8106"
+  },
+  {
+    "id": 967,
+    "stock_vehicles_id": 40,
+    "directus_files_id": "dcd31727-7f26-46e6-8094-3620f4dff1bb"
+  },
+  {
+    "id": 968,
+    "stock_vehicles_id": 40,
+    "directus_files_id": "158a8f8b-e2ee-4156-8ccf-e3b71589a763"
+  },
+  {
+    "id": 969,
+    "stock_vehicles_id": 40,
+    "directus_files_id": "8ae72893-1a4c-4f0f-989e-b57cdf15b9ca"
+  },
+  {
+    "id": 970,
+    "stock_vehicles_id": 40,
+    "directus_files_id": "d69e0626-adbc-4852-8710-6108aba13cc9"
+  },
+  {
+    "id": 971,
+    "stock_vehicles_id": 41,
+    "directus_files_id": "87366f5f-d2ea-4b63-b5b2-815d1583729f"
+  },
+  {
+    "id": 972,
+    "stock_vehicles_id": 41,
+    "directus_files_id": "ca89d17c-d5de-47ed-be38-89d639183e56"
+  },
+  {
+    "id": 973,
+    "stock_vehicles_id": 41,
+    "directus_files_id": "8be0b7b9-b5fe-4b99-b5d2-36cf57fb83da"
+  },
+  {
+    "id": 974,
+    "stock_vehicles_id": 41,
+    "directus_files_id": "f62a5c4b-c4c1-4d3d-9433-ef53cc5135b9"
+  },
+  {
+    "id": 975,
+    "stock_vehicles_id": 41,
+    "directus_files_id": "8f370cb5-d524-4dce-ab26-f1efe67ab437"
+  },
+  {
+    "id": 976,
+    "stock_vehicles_id": 41,
+    "directus_files_id": "f67b5bb8-35a8-4758-aecf-055f694b9243"
+  },
+  {
+    "id": 977,
+    "stock_vehicles_id": 41,
+    "directus_files_id": "47b7d77a-7e7b-4b75-b20d-3ede72b7bb10"
+  },
+  {
+    "id": 978,
+    "stock_vehicles_id": 41,
+    "directus_files_id": "7ddd14fc-2e04-4999-bcab-416a4f4e3063"
+  },
+  {
+    "id": 979,
+    "stock_vehicles_id": 41,
+    "directus_files_id": "6b7b2480-fbce-4de6-b6f1-af213075c257"
+  },
+  {
+    "id": 980,
+    "stock_vehicles_id": 41,
+    "directus_files_id": "3937db9d-fdfd-4584-b733-64a4925b01bc"
+  },
+  {
+    "id": 981,
+    "stock_vehicles_id": 42,
+    "directus_files_id": "b1920039-2ad0-4a71-b109-614645c39b93"
+  },
+  {
+    "id": 982,
+    "stock_vehicles_id": 42,
+    "directus_files_id": "a2865d6d-1490-40ea-9c45-ef9b588bdcee"
+  },
+  {
+    "id": 983,
+    "stock_vehicles_id": 42,
+    "directus_files_id": "6b447111-8c4d-40da-9183-667ea31fe99d"
+  },
+  {
+    "id": 984,
+    "stock_vehicles_id": 42,
+    "directus_files_id": "ce6def00-bcf3-4066-a7ba-b441cf825d0a"
+  },
+  {
+    "id": 985,
+    "stock_vehicles_id": 42,
+    "directus_files_id": "b8d1456a-9df8-451b-af40-11ff40f5dc5f"
+  },
+  {
+    "id": 986,
+    "stock_vehicles_id": 42,
+    "directus_files_id": "f64a9c78-4467-4377-a9da-aa02c31a8d77"
+  },
+  {
+    "id": 987,
+    "stock_vehicles_id": 42,
+    "directus_files_id": "239533b2-33e5-4ac2-a43a-b724845d0c87"
+  },
+  {
+    "id": 988,
+    "stock_vehicles_id": 42,
+    "directus_files_id": "e564e741-2af0-47ae-b484-537385297bf7"
+  },
+  {
+    "id": 989,
+    "stock_vehicles_id": 42,
+    "directus_files_id": "a776c5be-83ce-4a2e-b313-839f12c208ce"
+  },
+  {
+    "id": 990,
+    "stock_vehicles_id": 42,
+    "directus_files_id": "9dc518d6-0c28-483f-b58c-faa2e5ffa479"
+  },
+  {
+    "id": 991,
+    "stock_vehicles_id": 42,
+    "directus_files_id": "8143c8f6-d9ce-43c6-b168-2371456e96dc"
+  },
+  {
+    "id": 992,
+    "stock_vehicles_id": 42,
+    "directus_files_id": "466e8cc7-734e-43b5-a8fd-7fe038d90684"
+  },
+  {
+    "id": 993,
+    "stock_vehicles_id": 42,
+    "directus_files_id": "91bbd021-4222-46f8-855d-f4b6c9f1039c"
+  },
+  {
+    "id": 994,
+    "stock_vehicles_id": 42,
+    "directus_files_id": "0c957b33-4f1e-4cae-baa5-f7dc18f3f051"
+  },
+  {
+    "id": 995,
+    "stock_vehicles_id": 42,
+    "directus_files_id": "57beb56e-6c56-4218-bfc8-d622812f4569"
+  },
+  {
+    "id": 996,
+    "stock_vehicles_id": 42,
+    "directus_files_id": "2fe4f014-deec-46b7-838e-f2361206f200"
+  },
+  {
+    "id": 997,
+    "stock_vehicles_id": 42,
+    "directus_files_id": "81cc44a5-7e07-4441-92db-fddfb9043cb3"
+  },
+  {
+    "id": 998,
+    "stock_vehicles_id": 42,
+    "directus_files_id": "c594156c-17f2-46c6-aa57-842355137449"
+  },
+  {
+    "id": 999,
+    "stock_vehicles_id": 42,
+    "directus_files_id": "927a0fbf-453e-4467-8f78-4f8a74eb90ef"
+  },
+  {
+    "id": 1000,
+    "stock_vehicles_id": 42,
+    "directus_files_id": "49cbb99f-916d-4beb-b872-6220518cd07b"
+  },
+  {
+    "id": 1001,
+    "stock_vehicles_id": 42,
+    "directus_files_id": "8509ebf0-d6e4-438f-843c-20e03f5b6d07"
+  },
+  {
+    "id": 1002,
+    "stock_vehicles_id": 42,
+    "directus_files_id": "aa7b1c7a-ceaa-4de5-95e0-5866eda01ca9"
+  },
+  {
+    "id": 1003,
+    "stock_vehicles_id": 43,
+    "directus_files_id": "a52d90e6-5d20-4f4f-bcf0-c017a8149f01"
+  },
+  {
+    "id": 1004,
+    "stock_vehicles_id": 43,
+    "directus_files_id": "e4647b1d-24b3-4883-976b-6a3b4962f17c"
+  },
+  {
+    "id": 1005,
+    "stock_vehicles_id": 43,
+    "directus_files_id": "8a63464c-71cf-4238-9b96-d9f3bfa57d42"
+  },
+  {
+    "id": 1006,
+    "stock_vehicles_id": 43,
+    "directus_files_id": "de634784-2438-43d9-9aa5-e0bdb8851d2d"
+  },
+  {
+    "id": 1007,
+    "stock_vehicles_id": 43,
+    "directus_files_id": "3c5f22a1-487c-4264-9c88-0e11bc511caf"
+  },
+  {
+    "id": 1008,
+    "stock_vehicles_id": 43,
+    "directus_files_id": "752d1f2d-0f18-4196-8f9c-9ff3ea2b5ed3"
+  },
+  {
+    "id": 1009,
+    "stock_vehicles_id": 43,
+    "directus_files_id": "81479fc0-d09f-4e77-9709-c56c35fc4a22"
+  },
+  {
+    "id": 1010,
+    "stock_vehicles_id": 43,
+    "directus_files_id": "fa158575-7db8-4948-946c-de9519fd1dc5"
+  },
+  {
+    "id": 1011,
+    "stock_vehicles_id": 43,
+    "directus_files_id": "44a4220f-4c90-47f5-a95f-7590dcd1ad05"
+  },
+  {
+    "id": 1012,
+    "stock_vehicles_id": 43,
+    "directus_files_id": "7afd298d-7321-4b30-889e-9c104b63f287"
+  },
+  {
+    "id": 1013,
+    "stock_vehicles_id": 43,
+    "directus_files_id": "fd27023b-8288-4db0-b4db-cf5ea59c29bb"
+  },
+  {
+    "id": 1014,
+    "stock_vehicles_id": 43,
+    "directus_files_id": "4a36da54-d69a-42f2-bf8d-ceb147c06992"
+  },
+  {
+    "id": 1015,
+    "stock_vehicles_id": 43,
+    "directus_files_id": "589231c6-df58-48fa-b31b-cf51a7e6ada5"
+  },
+  {
+    "id": 1016,
+    "stock_vehicles_id": 43,
+    "directus_files_id": "ce63749f-fabf-48e3-b18c-9a1e26d7eedb"
+  },
+  {
+    "id": 1017,
+    "stock_vehicles_id": 43,
+    "directus_files_id": "ff912656-cfe6-4ec6-b3a2-155fe7ae597c"
+  },
+  {
+    "id": 1018,
+    "stock_vehicles_id": 43,
+    "directus_files_id": "30c231a5-d65e-4ce9-a204-4953f2a50e71"
+  },
+  {
+    "id": 1019,
+    "stock_vehicles_id": 43,
+    "directus_files_id": "64dac790-dbca-45b0-b24f-27ebdb94cfc1"
+  },
+  {
+    "id": 1020,
+    "stock_vehicles_id": 43,
+    "directus_files_id": "0b7455ca-1ab7-44b3-a80f-c80d0e2e51e5"
+  },
+  {
+    "id": 1021,
+    "stock_vehicles_id": 43,
+    "directus_files_id": "c61b4309-26f5-4938-8d61-d48e70cd1e32"
+  },
+  {
+    "id": 1022,
+    "stock_vehicles_id": 43,
+    "directus_files_id": "d51d99a3-f7ba-4764-a65b-914b6c6fe9ba"
+  },
+  {
+    "id": 1023,
+    "stock_vehicles_id": 43,
+    "directus_files_id": "afb42fd1-40e8-45ff-a108-65a146ff239e"
+  },
+  {
+    "id": 1024,
+    "stock_vehicles_id": 43,
+    "directus_files_id": "22eaddb8-3b82-45a8-a4e4-bd5e75bfeb8a"
+  },
+  {
+    "id": 1025,
+    "stock_vehicles_id": 43,
+    "directus_files_id": "5b0c86b4-6624-4134-877f-8014318d11ae"
+  },
+  {
+    "id": 1026,
+    "stock_vehicles_id": 43,
+    "directus_files_id": "3bb82920-d1ea-4a9d-9e85-c4235f716151"
+  },
+  {
+    "id": 1027,
+    "stock_vehicles_id": 43,
+    "directus_files_id": "7952e6ad-173c-41b7-8bc2-f1fcdbfaaea1"
+  },
+  {
+    "id": 1028,
+    "stock_vehicles_id": 43,
+    "directus_files_id": "bea20698-03e6-43fd-a81f-e1a14defd3d9"
+  },
+  {
+    "id": 1029,
+    "stock_vehicles_id": 44,
+    "directus_files_id": "43d81bb0-6b53-4697-aa97-9580f243d9ec"
+  },
+  {
+    "id": 1030,
+    "stock_vehicles_id": 44,
+    "directus_files_id": "0c1bfe06-611b-4d78-a00c-f2fc788f5877"
+  },
+  {
+    "id": 1031,
+    "stock_vehicles_id": 44,
+    "directus_files_id": "a14c8c7d-4179-4f77-9760-0683fddbe9a5"
+  },
+  {
+    "id": 1032,
+    "stock_vehicles_id": 44,
+    "directus_files_id": "d778f211-26a7-4c45-bef1-1f968c11aba0"
+  },
+  {
+    "id": 1033,
+    "stock_vehicles_id": 44,
+    "directus_files_id": "aa697678-dff6-4358-aa00-9c64261c15c2"
+  },
+  {
+    "id": 1034,
+    "stock_vehicles_id": 44,
+    "directus_files_id": "1ee36975-54d0-477b-abcc-f3c703200b99"
+  },
+  {
+    "id": 1035,
+    "stock_vehicles_id": 44,
+    "directus_files_id": "cbee1608-8e3a-4062-af33-2cfcc9c25121"
+  },
+  {
+    "id": 1036,
+    "stock_vehicles_id": 44,
+    "directus_files_id": "fa23e6a4-9605-41be-bd28-d9a1ab49c46b"
+  },
+  {
+    "id": 1037,
+    "stock_vehicles_id": 44,
+    "directus_files_id": "e820e059-7be1-46a6-a258-62e805a68356"
+  },
+  {
+    "id": 1038,
+    "stock_vehicles_id": 44,
+    "directus_files_id": "200bdb66-13ab-4dc4-aa62-874f1c7d8b37"
+  },
+  {
+    "id": 1039,
+    "stock_vehicles_id": 44,
+    "directus_files_id": "baa4e7ab-48b8-496b-b2ee-f2d7007ca13a"
+  },
+  {
+    "id": 1040,
+    "stock_vehicles_id": 44,
+    "directus_files_id": "554c4bfd-010f-4894-bc03-4e45c3188118"
+  },
+  {
+    "id": 1041,
+    "stock_vehicles_id": 44,
+    "directus_files_id": "3b056f95-bf28-477b-9ab9-b87036139fa5"
+  },
+  {
+    "id": 1042,
+    "stock_vehicles_id": 44,
+    "directus_files_id": "104efd39-a8f8-4615-9bc2-5ce5665cb54a"
+  },
+  {
+    "id": 1043,
+    "stock_vehicles_id": 44,
+    "directus_files_id": "03e632dc-6a5d-46f6-ba69-1204d9bc1978"
+  },
+  {
+    "id": 1044,
+    "stock_vehicles_id": 44,
+    "directus_files_id": "9f92a067-00bc-4cc9-a424-4aff2cae0d36"
+  },
+  {
+    "id": 1045,
+    "stock_vehicles_id": 44,
+    "directus_files_id": "5b435752-a9d4-40f3-ab87-543e2e4e3e6a"
+  },
+  {
+    "id": 1046,
+    "stock_vehicles_id": 44,
+    "directus_files_id": "675169bc-8f76-4d47-a607-72e9e71b69fd"
+  },
+  {
+    "id": 1047,
+    "stock_vehicles_id": 44,
+    "directus_files_id": "e891abad-e331-43d4-beec-e74eba76a1e0"
+  },
+  {
+    "id": 1048,
+    "stock_vehicles_id": 44,
+    "directus_files_id": "2d47f3e1-8c7c-40df-959f-e0f973daa6da"
+  },
+  {
+    "id": 1049,
+    "stock_vehicles_id": 44,
+    "directus_files_id": "fdb2e9ca-c7c1-4818-a1a1-2c55f90bf4b7"
+  },
+  {
+    "id": 1050,
+    "stock_vehicles_id": 44,
+    "directus_files_id": "210e41a0-a51e-4732-9fbd-3906dff059d1"
+  },
+  {
+    "id": 1051,
+    "stock_vehicles_id": 44,
+    "directus_files_id": "6da49181-82a0-4651-aef9-44d2fedf8fb7"
+  },
+  {
+    "id": 1052,
+    "stock_vehicles_id": 44,
+    "directus_files_id": "730f3564-32b8-4c08-801d-3c1d734907b2"
+  },
+  {
+    "id": 1053,
+    "stock_vehicles_id": 44,
+    "directus_files_id": "dd6ed608-3f72-4a52-b1ba-8db082b36bed"
+  },
+  {
+    "id": 1054,
+    "stock_vehicles_id": 44,
+    "directus_files_id": "ad186091-7b86-4e28-9c15-465a4eaf1e88"
+  },
+  {
+    "id": 1055,
+    "stock_vehicles_id": 44,
+    "directus_files_id": "d9672b90-5f2d-4c89-b386-655add65833e"
+  },
+  {
+    "id": 1056,
+    "stock_vehicles_id": 44,
+    "directus_files_id": "a63f8469-f4c9-40f5-ae05-6079d9416723"
+  },
+  {
+    "id": 1057,
+    "stock_vehicles_id": 44,
+    "directus_files_id": "ace20caf-46c5-4ad0-ba1d-951e9569aad5"
+  },
+  {
+    "id": 1058,
+    "stock_vehicles_id": 44,
+    "directus_files_id": "6fe600d9-5366-4469-b6ce-e99d1f9b0286"
+  },
+  {
+    "id": 1059,
+    "stock_vehicles_id": 44,
+    "directus_files_id": "92273378-38b2-4e3a-b24d-d80efc4b88bc"
+  },
+  {
+    "id": 1060,
+    "stock_vehicles_id": 44,
+    "directus_files_id": "785a7120-c139-4cb5-b2e6-31619db85424"
+  },
+  {
+    "id": 1061,
+    "stock_vehicles_id": 44,
+    "directus_files_id": "35221d9e-d9a8-4e55-bc66-ee1e54b1bfc4"
+  },
+  {
+    "id": 1062,
+    "stock_vehicles_id": 44,
+    "directus_files_id": "7fad88f2-6fe2-421e-a77b-868c5e5d3cae"
+  },
+  {
+    "id": 1063,
+    "stock_vehicles_id": 44,
+    "directus_files_id": "4e334620-30e9-4ffe-a153-45e2b19b0177"
+  },
+  {
+    "id": 1064,
+    "stock_vehicles_id": 44,
+    "directus_files_id": "f283d034-e9ae-49e3-96b9-ce38aa7e5c3e"
+  },
+  {
+    "id": 1065,
+    "stock_vehicles_id": 45,
+    "directus_files_id": "29afbf00-537c-4d82-bde1-f99f833f6337"
+  },
+  {
+    "id": 1066,
+    "stock_vehicles_id": 45,
+    "directus_files_id": "fccd3959-7c9f-4c00-b754-2334b974a14f"
+  },
+  {
+    "id": 1067,
+    "stock_vehicles_id": 45,
+    "directus_files_id": "04bc1999-44d3-407a-9412-53f5499bd9c3"
+  },
+  {
+    "id": 1068,
+    "stock_vehicles_id": 45,
+    "directus_files_id": "b91dd3c2-14bd-4e6a-bed5-8ea4a1cbba0a"
+  },
+  {
+    "id": 1069,
+    "stock_vehicles_id": 45,
+    "directus_files_id": "fe6494f4-b0be-43e6-a686-96fcdf03b4f6"
+  },
+  {
+    "id": 1070,
+    "stock_vehicles_id": 45,
+    "directus_files_id": "ae4d9018-a339-4fad-b698-efd705b5410c"
+  },
+  {
+    "id": 1071,
+    "stock_vehicles_id": 45,
+    "directus_files_id": "586671da-7f01-4573-8a8d-74ffbd25a13d"
+  },
+  {
+    "id": 1072,
+    "stock_vehicles_id": 45,
+    "directus_files_id": "15dfb661-4073-49be-b323-0c1682dc4095"
+  },
+  {
+    "id": 1073,
+    "stock_vehicles_id": 45,
+    "directus_files_id": "b812b005-077b-4d91-a973-6f91e3da7838"
+  },
+  {
+    "id": 1074,
+    "stock_vehicles_id": 45,
+    "directus_files_id": "2c07dbf3-8e7c-4bca-bd23-e1375936bd44"
+  },
+  {
+    "id": 1075,
+    "stock_vehicles_id": 45,
+    "directus_files_id": "2fc8edbe-a190-4bc1-a8b4-09619e281e63"
+  },
+  {
+    "id": 1076,
+    "stock_vehicles_id": 45,
+    "directus_files_id": "38817b5b-b93c-462b-a316-13953129fc71"
+  },
+  {
+    "id": 1077,
+    "stock_vehicles_id": 45,
+    "directus_files_id": "bd96383e-93c9-4ecb-9e0d-ae1dd78388a2"
+  },
+  {
+    "id": 1078,
+    "stock_vehicles_id": 45,
+    "directus_files_id": "28a18c15-6ec3-4ffe-8957-4f42bf98e080"
+  },
+  {
+    "id": 1079,
+    "stock_vehicles_id": 45,
+    "directus_files_id": "21670138-92de-4647-a96a-99934c018d5d"
+  },
+  {
+    "id": 1080,
+    "stock_vehicles_id": 45,
+    "directus_files_id": "3e187bfe-52cd-4531-bcab-c03ec079516c"
+  },
+  {
+    "id": 1081,
+    "stock_vehicles_id": 45,
+    "directus_files_id": "c2b3f290-1508-487b-9e84-22f4c6c39961"
+  },
+  {
+    "id": 1082,
+    "stock_vehicles_id": 45,
+    "directus_files_id": "bbacd57f-b220-4b8a-93b6-73449a2e5d35"
+  },
+  {
+    "id": 1083,
+    "stock_vehicles_id": 45,
+    "directus_files_id": "6443713e-65a6-4c3f-856b-ae12ec7e0b10"
+  },
+  {
+    "id": 1084,
+    "stock_vehicles_id": 45,
+    "directus_files_id": "81f73cc2-b5e8-4536-b408-943bb249d5fb"
+  },
+  {
+    "id": 1085,
+    "stock_vehicles_id": 45,
+    "directus_files_id": "4909b1f9-2e4f-4d17-a3f8-16433fd9dc2a"
+  },
+  {
+    "id": 1086,
+    "stock_vehicles_id": 45,
+    "directus_files_id": "73b1fef6-e736-46e1-91cc-7038e4c2559c"
+  },
+  {
+    "id": 1087,
+    "stock_vehicles_id": 45,
+    "directus_files_id": "454ca237-cea8-4239-835b-96ba4b8e083f"
+  },
+  {
+    "id": 1088,
+    "stock_vehicles_id": 45,
+    "directus_files_id": "33af5b33-32ba-43e0-83a3-9c1ce5a24256"
+  },
+  {
+    "id": 1089,
+    "stock_vehicles_id": 45,
+    "directus_files_id": "9a4a4de2-f524-4312-a590-af432d7de089"
+  },
+  {
+    "id": 1090,
+    "stock_vehicles_id": 45,
+    "directus_files_id": "df5f85a4-e290-4a5a-9b2e-aa3660e4d9a8"
+  },
+  {
+    "id": 1091,
+    "stock_vehicles_id": 45,
+    "directus_files_id": "c77776d2-32ca-4b72-969e-68bdd9f36de2"
+  },
+  {
+    "id": 1092,
+    "stock_vehicles_id": 45,
+    "directus_files_id": "b55b01cf-1d4b-4589-881d-236d579b89e6"
+  },
+  {
+    "id": 1093,
+    "stock_vehicles_id": 45,
+    "directus_files_id": "f5a80754-9495-4f67-bc67-505658ba9974"
+  },
+  {
+    "id": 1094,
+    "stock_vehicles_id": 45,
+    "directus_files_id": "d5e2c05c-fb0b-4614-831a-005074e67207"
+  },
+  {
+    "id": 1095,
+    "stock_vehicles_id": 45,
+    "directus_files_id": "427c315d-54c0-468f-9a53-099455dff46a"
+  },
+  {
+    "id": 1096,
+    "stock_vehicles_id": 45,
+    "directus_files_id": "60d19d28-0efa-44e6-85d2-544ea5a26a25"
+  },
+  {
+    "id": 1097,
+    "stock_vehicles_id": 45,
+    "directus_files_id": "6e3afcf4-5b61-4f10-b666-70a3cade0af0"
+  },
+  {
+    "id": 1098,
+    "stock_vehicles_id": 45,
+    "directus_files_id": "e77696d7-98f3-44e7-a80b-8c1a803626d7"
+  },
+  {
+    "id": 1099,
+    "stock_vehicles_id": 46,
+    "directus_files_id": "8789e14a-915e-4cab-abc7-890a416fc40b"
+  },
+  {
+    "id": 1100,
+    "stock_vehicles_id": 46,
+    "directus_files_id": "d9a54e02-0a61-4778-a045-12c48b2aeeaf"
+  },
+  {
+    "id": 1101,
+    "stock_vehicles_id": 46,
+    "directus_files_id": "f2471e58-330d-4613-98c8-fed8fefea9af"
+  },
+  {
+    "id": 1102,
+    "stock_vehicles_id": 46,
+    "directus_files_id": "1a6d0959-375a-43e5-b99e-c7aa50bb2e68"
+  },
+  {
+    "id": 1103,
+    "stock_vehicles_id": 46,
+    "directus_files_id": "af40a8c1-7078-4873-98e6-3b0d2d94bb81"
+  },
+  {
+    "id": 1104,
+    "stock_vehicles_id": 46,
+    "directus_files_id": "6b6eb7a9-8dd5-4590-a7a2-ec4608703ae1"
+  },
+  {
+    "id": 1105,
+    "stock_vehicles_id": 46,
+    "directus_files_id": "17327300-49c2-467d-9feb-35fea0cd72ab"
+  },
+  {
+    "id": 1106,
+    "stock_vehicles_id": 46,
+    "directus_files_id": "d3e7a9aa-4265-4c3d-98c3-bea04f0e04e2"
+  },
+  {
+    "id": 1107,
+    "stock_vehicles_id": 46,
+    "directus_files_id": "bf19d708-cb11-4298-9469-df9ac7b0920e"
+  },
+  {
+    "id": 1108,
+    "stock_vehicles_id": 46,
+    "directus_files_id": "543ad0fb-0359-4769-8fe0-2f9b92ae4cf7"
+  },
+  {
+    "id": 1109,
+    "stock_vehicles_id": 46,
+    "directus_files_id": "58285745-acf9-48b8-8860-002f19fa642a"
+  },
+  {
+    "id": 1110,
+    "stock_vehicles_id": 46,
+    "directus_files_id": "9c8d81bc-891d-4a37-8938-9f83c7fa06d2"
+  },
+  {
+    "id": 1111,
+    "stock_vehicles_id": 46,
+    "directus_files_id": "e2570cc3-54f2-4b4b-9475-4c70df527618"
+  },
+  {
+    "id": 1112,
+    "stock_vehicles_id": 46,
+    "directus_files_id": "e49b6efc-16bd-4e4e-b6d2-e6049dd0756d"
+  },
+  {
+    "id": 1113,
+    "stock_vehicles_id": 46,
+    "directus_files_id": "e0ea33e7-82d2-41b2-b7bf-d02a7d14b6e8"
+  },
+  {
+    "id": 1114,
+    "stock_vehicles_id": 46,
+    "directus_files_id": "8a4f3831-9da5-473b-90f6-ef048dbef823"
+  },
+  {
+    "id": 1115,
+    "stock_vehicles_id": 46,
+    "directus_files_id": "9b4e7e92-82c2-49de-ab2b-f4f722229b2d"
+  },
+  {
+    "id": 1116,
+    "stock_vehicles_id": 46,
+    "directus_files_id": "723db16b-4637-480e-9076-fd49527d47e6"
+  },
+  {
+    "id": 1117,
+    "stock_vehicles_id": 46,
+    "directus_files_id": "dcb6f1d6-1828-4451-a979-857896b9ca1e"
+  },
+  {
+    "id": 1118,
+    "stock_vehicles_id": 46,
+    "directus_files_id": "67fa5515-05e8-4b74-a1ab-001d96143827"
+  },
+  {
+    "id": 1119,
+    "stock_vehicles_id": 46,
+    "directus_files_id": "e80fa695-d120-4fc4-9e32-a659ece47c2d"
+  },
+  {
+    "id": 1120,
+    "stock_vehicles_id": 46,
+    "directus_files_id": "3a24e8ea-1644-4efa-ba72-74226bde0ebd"
+  },
+  {
+    "id": 1121,
+    "stock_vehicles_id": 46,
+    "directus_files_id": "638f5bb8-5aec-4c3a-921d-904e29b4f569"
+  },
+  {
+    "id": 1122,
+    "stock_vehicles_id": 46,
+    "directus_files_id": "badba989-b82b-447c-9997-8a6e13cea943"
+  },
+  {
+    "id": 1123,
+    "stock_vehicles_id": 46,
+    "directus_files_id": "7de37461-4d90-47e7-8088-a5dea5b47a23"
+  },
+  {
+    "id": 1124,
+    "stock_vehicles_id": 46,
+    "directus_files_id": "84c6f6ed-280b-44b3-9820-75bc3b165448"
+  },
+  {
+    "id": 1125,
+    "stock_vehicles_id": 46,
+    "directus_files_id": "e08e5814-519f-4202-b85a-82641fd03ec8"
+  },
+  {
+    "id": 1126,
+    "stock_vehicles_id": 46,
+    "directus_files_id": "c412d10a-2db4-4eb8-9083-02ace5eb16ad"
+  }
+]

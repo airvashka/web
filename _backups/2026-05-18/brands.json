@@ -1,0 +1,161 @@
+[
+  {
+    "id": 1,
+    "slug": "kgm",
+    "name": "KGM",
+    "tagline": "Korejské SUV s charakterem",
+    "description": null,
+    "primary_color": "#0E1F3D",
+    "logo": "330e273a-9a75-46b0-ab0a-466dfeeef506",
+    "hero_image": "3568b3f9-a18f-4fd0-9f2c-9a81c61538ea",
+    "previous_names": [
+      "SsangYong"
+    ],
+    "status": "published",
+    "sort": 1,
+    "youtube_video_ids": [
+      "eSfJXjNV8Mg",
+      "SybpHjEJP1s",
+      "kiLUnbiHH4s",
+      "jiwsBjr9q6s"
+    ],
+    "eyebrow_line1": "KGM Mobility",
+    "eyebrow_line2": "Dříve SsangYong",
+    "tagline_line1": "Korejský charakter, evropský komfort.",
+    "tagline_line2": "Od kompaktního Tivoli po flagship Rexton.",
+    "hero_cta_primary_label": null,
+    "hero_cta_primary_url": null,
+    "hero_cta_secondary_label": "Modely",
+    "hero_cta_secondary_url": "#modely",
+    "why_eyebrow": "Proč KGM?",
+    "why_title": "Auta, která pracují stejně dobře, jako vy.",
+    "why_intro": "KGM (KG Mobility) je nástupce SsangYong — značky s 70letou historií výroby SUV a pickupů. Spolehlivé pohony 4×4, štědrá základní výbava a servisní síť, na kterou se dá spolehnout.",
+    "why_cards": [
+      {
+        "icon": "shield",
+        "title": "5letá záruka",
+        "subtitle": "Bez omezení nájezdu na vybrané modely"
+      },
+      {
+        "icon": "axle",
+        "title": "Pohon 4×4",
+        "subtitle": "U Korando, Torres, Rextonu i Musso Grand"
+      },
+      {
+        "icon": "bolt",
+        "title": "Elektrifikace",
+        "subtitle": "Torres EVX a HEV varianty"
+      },
+      {
+        "icon": "hook",
+        "title": "Tažné až 3,5 t",
+        "subtitle": "Rexton a Musso Grand jako pracovní partneři"
+      }
+    ],
+    "models_headline": "9 modelů. Od městského SUV po pickup.",
+    "banner_title": "Vidíte vybraný model? Pojďte ho vyzkoušet."
+  },
+  {
+    "id": 2,
+    "slug": "omoda-jaecoo",
+    "name": "OMODA & JAECOO",
+    "tagline": "Nová generace prémiových SUV",
+    "description": null,
+    "primary_color": "#2A2D3A",
+    "logo": "9a73874f-a53d-4d64-bdeb-1dcd6c65919a",
+    "hero_image": "da3ff935-9e34-4970-988c-5fbd099f74ca",
+    "previous_names": null,
+    "status": "published",
+    "sort": 2,
+    "youtube_video_ids": [
+      "XEjT-sqCxZw",
+      "piG8UO24WUk",
+      "FO0x0tz0fis",
+      "ujM_LiQSNic"
+    ],
+    "eyebrow_line1": "Chery Group",
+    "eyebrow_line2": "Nová generace",
+    "tagline_line1": "Dvě tváře jednoho moderního pohledu na SUV.",
+    "tagline_line2": "Omoda pro město, Jaecoo pro dobrodružství. ",
+    "hero_cta_primary_label": null,
+    "hero_cta_primary_url": null,
+    "hero_cta_secondary_label": "Modely",
+    "hero_cta_secondary_url": "#modely",
+    "why_eyebrow": "Proč Omoda & Jaecoo?",
+    "why_title": "Nová značka. Štědrá výbava od první ceny.",
+    "why_intro": "Omoda & Jaecoo přicházejí jako svěží alternativa s odvážným designem a velkorysou výbavou. V základu dostanete to, co konkurence prodává v drahých příplatcích.",
+    "why_cards": [
+      {
+        "icon": "shield",
+        "title": "7letá záruka",
+        "subtitle": "Nebo 150 000 km — co nastane dřív"
+      },
+      {
+        "icon": "bolt",
+        "title": "Plug-in i elektro",
+        "subtitle": "SHS hybrid s dojezdem přes 1 100 km"
+      },
+      {
+        "icon": "spark",
+        "title": "Odvážný design",
+        "subtitle": "Diamantová maska a LED architektura"
+      },
+      {
+        "icon": "globe",
+        "title": "Globální značka",
+        "subtitle": "Chery — 4. největší výrobce v Číně"
+      }
+    ],
+    "models_headline": "7 modelů. Městský crossover i opravdové SUV.",
+    "banner_title": "Líbí se vám Omoda nebo Jaecoo? Domluvíme jízdu."
+  },
+  {
+    "id": 3,
+    "slug": "farizon",
+    "name": "Farizon",
+    "tagline": "Elektrické dodávky pro podnikatele",
+    "description": null,
+    "primary_color": "#1E2A3A",
+    "logo": null,
+    "hero_image": "94532abb-741f-48df-8b93-b5485519fb7d",
+    "previous_names": null,
+    "status": "published",
+    "sort": 3,
+    "youtube_video_ids": null,
+    "eyebrow_line1": "Geely Group",
+    "eyebrow_line2": "Užitková elektromobilita",
+    "tagline_line1": "Elektrická dodávka pro práci od pondělí do pátku.",
+    "tagline_line2": "Žádný kompromis. Žádné palivo.",
+    "hero_cta_primary_label": null,
+    "hero_cta_primary_url": null,
+    "hero_cta_secondary_label": "Modely",
+    "hero_cta_secondary_url": "#modely",
+    "why_eyebrow": "Proč Farizon?",
+    "why_title": "Užitkové vozy, které se počítají.",
+    "why_intro": "Farizon je užitková značka skupiny Geely — největšího čínského výrobce automobilů. SuperVan kombinuje nákladový prostor evropského formátu s plně elektrickým pohonem a 7letou zárukou.",
+    "why_cards": [
+      {
+        "icon": "bolt",
+        "title": "100% elektro",
+        "subtitle": "Dojezd až 247 km v městském cyklu"
+      },
+      {
+        "icon": "cargo",
+        "title": "Náklad 1 350 kg",
+        "subtitle": "Objem 13 m³ ve verzi L3H2"
+      },
+      {
+        "icon": "shield",
+        "title": "7letá záruka",
+        "subtitle": "Na baterii i pohon. Nula starostí."
+      },
+      {
+        "icon": "globe",
+        "title": "Geely Group",
+        "subtitle": "Globální zázemí, evropská homologace"
+      }
+    ],
+    "models_headline": "Užitková řada. Dodávka i podvozek.",
+    "banner_title": "Hledáte flotilové řešení? Probereme to."
+  }
+]

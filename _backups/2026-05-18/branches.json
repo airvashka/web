@@ -1,0 +1,18 @@
+[
+  {
+    "id": 1,
+    "slug": "praha-dablice",
+    "name": "SFR Motor Praha-Ďáblice",
+    "address": "Ďáblická 553/2",
+    "city": "Praha 8",
+    "postal_code": "182 00",
+    "phone": "+420 771 235 458",
+    "email": "info@sfr-motor.cz",
+    "google_maps_url": null,
+    "opening_hours": {
+      "po-pa": "8:00-17:00",
+      "so": "9:00-12:00",
+      "ne": "zavřeno"
+    }
+  }
+]

@@ -1,0 +1,5999 @@
+[
+  {
+    "id": 1,
+    "year": 2025,
+    "technical_data": [
+      {
+        "label": "Typ motoru",
+        "value": "1.5 GDi-Turbo benzín"
+      },
+      {
+        "label": "Max. výkon",
+        "value": "163 k (120 kW) / 5 000 – 5 500 ot./min"
+      },
+      {
+        "label": "Max. točivý moment",
+        "value": "280 Nm (MT) / 260 Nm (AT) / 1 500 – 4 000 ot./min"
+      },
+      {
+        "label": "Zdvihový objem",
+        "value": "1 497 cm³"
+      },
+      {
+        "label": "Převodovka",
+        "value": "6st. manuální nebo 6st. automatická AISIN"
+      },
+      {
+        "label": "Pohon",
+        "value": "FWD / AWD s uzamčením"
+      },
+      {
+        "label": "Zavazadlový prostor",
+        "value": "423 l / 1 115 l (sklopená sedadla)"
+      },
+      {
+        "label": "Airbagy",
+        "value": "7"
+      },
+      {
+        "label": "HSS ocel v karoserii",
+        "value": "79 %"
+      }
+    ],
+    "status": "archived",
+    "model": 2,
+    "version": null,
+    "pricelist_colors": null,
+    "pricelist_colors_exterior": null,
+    "pricelist_colors_interior": null,
+    "trim_levels": [
+      1
+    ],
+    "option_packages": [
+      1,
+      2
+    ]
+  },
+  {
+    "id": 2,
+    "year": 2025,
+    "technical_data": [
+      {
+        "label": "Typ motoru",
+        "value": "1.5 GDi-Turbo benzín"
+      },
+      {
+        "label": "Max. výkon",
+        "value": "163 k / 5 000 – 5 500 ot./min"
+      },
+      {
+        "label": "Max. točivý moment",
+        "value": "280 Nm / 1 500 – 4 000 ot./min"
+      },
+      {
+        "label": "Zdvihový objem",
+        "value": "1 497 cm³"
+      },
+      {
+        "label": "Převodovka",
+        "value": "6st. MT / 6st. AT AISIN"
+      },
+      {
+        "label": "Pohon",
+        "value": "FWD / AWD"
+      },
+      {
+        "label": "Tažná schopnost (brzděný přívěs)",
+        "value": "1 500 kg"
+      },
+      {
+        "label": "Tažná schopnost (nebrzděný přívěs)",
+        "value": "750 kg (2WD/MT) / 500 kg (AT)"
+      },
+      {
+        "label": "Zavazadlový prostor",
+        "value": "551 l"
+      },
+      {
+        "label": "Euro NCAP (2019)",
+        "value": "5 hvězdiček"
+      },
+      {
+        "label": "HSS ocel v karoserii",
+        "value": "74 %"
+      },
+      {
+        "label": "Airbagy",
+        "value": "7"
+      }
+    ],
+    "status": "archived",
+    "model": 1,
+    "version": null,
+    "pricelist_colors": null,
+    "pricelist_colors_exterior": null,
+    "pricelist_colors_interior": null,
+    "trim_levels": [
+      2,
+      3,
+      4,
+      5
+    ],
+    "option_packages": [
+      5,
+      6,
+      8,
+      9
+    ]
+  },
+  {
+    "id": 5,
+    "year": 2025,
+    "technical_data": [
+      {
+        "label": "Pohon",
+        "value": "Elektromotor (rear-wheel drive)"
+      },
+      {
+        "label": "Max. výkon",
+        "value": "152,2 kW (206,9 k)"
+      },
+      {
+        "label": "Max. točivý moment",
+        "value": "339 Nm"
+      },
+      {
+        "label": "Kapacita baterie",
+        "value": "80,6 kWh (LFP, cell-to-pack)"
+      },
+      {
+        "label": "Dojezd WLTP (kombinovaný)",
+        "value": "462 km"
+      },
+      {
+        "label": "Rychlonabíjení DC 10 – 80 %",
+        "value": "cca 28 min"
+      },
+      {
+        "label": "AC nabíjení 11 kW 0 – 100 %",
+        "value": "cca 9 hodin"
+      },
+      {
+        "label": "V2L napájení",
+        "value": "ano (např. mikrovlnka cca 40 h)"
+      },
+      {
+        "label": "Tažná schopnost (brzděný přívěs)",
+        "value": "1 500 kg"
+      },
+      {
+        "label": "Zavazadlový prostor",
+        "value": "839 l / 1 662 l (dvojité dno)"
+      },
+      {
+        "label": "Airbagy",
+        "value": "8"
+      },
+      {
+        "label": "HSS ocel v karoserii",
+        "value": "81 %"
+      }
+    ],
+    "status": "archived",
+    "model": 5,
+    "version": null,
+    "pricelist_colors": null,
+    "pricelist_colors_exterior": null,
+    "pricelist_colors_interior": null,
+    "trim_levels": [
+      12,
+      13
+    ],
+    "option_packages": [
+      18,
+      19
+    ]
+  },
+  {
+    "id": 6,
+    "year": 2025,
+    "technical_data": [
+      {
+        "label": "Typ motoru",
+        "value": "1.5 GDI Turbo benzín"
+      },
+      {
+        "label": "Max. výkon",
+        "value": "163 k / 5 000 – 5 500 ot./min"
+      },
+      {
+        "label": "Max. točivý moment",
+        "value": "280 Nm / 1 500 – 4 000 ot./min"
+      },
+      {
+        "label": "Převodovka",
+        "value": "6st. AT (Shift-by-Wire)"
+      },
+      {
+        "label": "Pohon",
+        "value": "FWD / AWD"
+      },
+      {
+        "label": "Zavazadlový prostor",
+        "value": "668 l / 1 568 l"
+      },
+      {
+        "label": "Airbagy",
+        "value": "8"
+      },
+      {
+        "label": "HSS ocel v karoserii",
+        "value": "78 %"
+      },
+      {
+        "label": "Infotainment",
+        "value": "12,3\" Athena 2.0 + Apple CarPlay / Android Auto"
+      },
+      {
+        "label": "Disky",
+        "value": "20\" Diamond Cut (245/45 R20)"
+      }
+    ],
+    "status": "archived",
+    "model": 6,
+    "version": null,
+    "pricelist_colors": null,
+    "pricelist_colors_exterior": null,
+    "pricelist_colors_interior": null,
+    "trim_levels": [
+      14,
+      15
+    ],
+    "option_packages": [
+      23,
+      24,
+      25
+    ]
+  },
+  {
+    "id": 7,
+    "year": 2025,
+    "technical_data": [
+      {
+        "label": "Pohon",
+        "value": "Dual-Tech Hybrid (self-charging)"
+      },
+      {
+        "label": "Max. kombinovaný výkon",
+        "value": "150 kW (204 k)"
+      },
+      {
+        "label": "Převodovka",
+        "value": "e-DHT"
+      },
+      {
+        "label": "EV jízda do",
+        "value": "72 km/h"
+      },
+      {
+        "label": "Zavazadlový prostor",
+        "value": "668 l / 1 568 l"
+      },
+      {
+        "label": "Airbagy",
+        "value": "8"
+      },
+      {
+        "label": "HSS ocel v karoserii",
+        "value": "78 %"
+      },
+      {
+        "label": "Infotainment",
+        "value": "12,3\" Athena 2.0"
+      }
+    ],
+    "status": "archived",
+    "model": 7,
+    "version": null,
+    "pricelist_colors": null,
+    "pricelist_colors_exterior": null,
+    "pricelist_colors_interior": null,
+    "trim_levels": [
+      16,
+      17
+    ],
+    "option_packages": [
+      26,
+      27,
+      28
+    ]
+  },
+  {
+    "id": 8,
+    "year": 2025,
+    "technical_data": [
+      {
+        "label": "Typ motoru",
+        "value": "2.2 e-XDi turbodiesel"
+      },
+      {
+        "label": "Max. výkon",
+        "value": "202 k / 3 800 ot./min"
+      },
+      {
+        "label": "Max. točivý moment",
+        "value": "441 Nm / 1 600 – 2 600 ot./min"
+      },
+      {
+        "label": "Zdvihový objem",
+        "value": "2 157 cm³"
+      },
+      {
+        "label": "Převodovka",
+        "value": "8st. AT (Shift-by-Wire)"
+      },
+      {
+        "label": "Pohon",
+        "value": "Přepínatelný 4WD s uzávěrkou diferenciálu"
+      },
+      {
+        "label": "Konfigurace sedadel",
+        "value": "5-místná / 7-místná"
+      },
+      {
+        "label": "Zavazadlový prostor (5-místná)",
+        "value": "1 051 l / 1 977 l"
+      },
+      {
+        "label": "Airbagy",
+        "value": "9 (vč. postranních zadních)"
+      },
+      {
+        "label": "HSS ocel v karoserii",
+        "value": "81,7 %"
+      },
+      {
+        "label": "Disky",
+        "value": "20\""
+      }
+    ],
+    "status": "archived",
+    "model": 8,
+    "version": null,
+    "pricelist_colors": null,
+    "pricelist_colors_exterior": null,
+    "pricelist_colors_interior": null,
+    "trim_levels": [
+      18,
+      19,
+      20
+    ],
+    "option_packages": [
+      29,
+      30,
+      31,
+      32,
+      33,
+      34,
+      35
+    ]
+  },
+  {
+    "id": 9,
+    "year": 2025,
+    "technical_data": [
+      {
+        "label": "Typ motoru",
+        "value": "2.2 e-XDi turbodiesel"
+      },
+      {
+        "label": "Max. výkon",
+        "value": "202 k / 3 800 ot./min"
+      },
+      {
+        "label": "Max. točivý moment",
+        "value": "441 Nm (AT) / 400 Nm (MT) / 1 600 – 2 600 ot./min (resp. 1 400 – 2 800 MT)"
+      },
+      {
+        "label": "Převodovka",
+        "value": "6st. MT / 6st. AT AISIN"
+      },
+      {
+        "label": "Pohon",
+        "value": "Přepínatelný 4×4 s uzávěrkou diferenciálu"
+      },
+      {
+        "label": "Nákladový prostor",
+        "value": "1 262 l (VDA), 1 610 × 1 570 × 570 mm"
+      },
+      {
+        "label": "Užitečné zatížení",
+        "value": "785 – 805 kg (5-prvková náprava) / 1 000 – 1 010 kg (listové pružiny)"
+      },
+      {
+        "label": "Airbagy",
+        "value": "6"
+      },
+      {
+        "label": "Infotainment",
+        "value": "12,3\" Smart Audio + 12,3\" digitální panel"
+      },
+      {
+        "label": "Konstrukce",
+        "value": "Quad Frame čtyřvrstvý žebřinový rám"
+      }
+    ],
+    "status": "archived",
+    "model": 9,
+    "version": null,
+    "pricelist_colors": null,
+    "pricelist_colors_exterior": null,
+    "pricelist_colors_interior": null,
+    "trim_levels": [
+      21,
+      22
+    ],
+    "option_packages": [
+      36,
+      37,
+      38,
+      39,
+      40
+    ]
+  },
+  {
+    "id": 10,
+    "year": 2026,
+    "technical_data": [
+      {
+        "label": "Poháněná náprava",
+        "value": "FWD"
+      },
+      {
+        "label": "Převodovka",
+        "value": "7DCT automatická"
+      },
+      {
+        "label": "Motor",
+        "value": "1.6TGDI"
+      },
+      {
+        "label": "Počet válců",
+        "value": "4"
+      },
+      {
+        "label": "Zdvihový objem (cm³)",
+        "value": "1598"
+      },
+      {
+        "label": "Objem palivové nádrže (l)",
+        "value": "51"
+      },
+      {
+        "label": "Čistý výkon motoru (kW)",
+        "value": "108"
+      },
+      {
+        "label": "Maximální točivý moment (Nm)",
+        "value": "275"
+      },
+      {
+        "label": "Emise CO₂ - kombinované (g/km)",
+        "value": "159"
+      },
+      {
+        "label": "Emisní norma",
+        "value": "EURO 6e"
+      },
+      {
+        "label": "Průměrná spotřeba paliva (l/100km)",
+        "value": "7,0"
+      },
+      {
+        "label": "Maximální rychlost (km/h)",
+        "value": "195"
+      },
+      {
+        "label": "Zrychlení 0-100 km/h (s)",
+        "value": "10,1"
+      },
+      {
+        "label": "Počet sedadel",
+        "value": "5"
+      },
+      {
+        "label": "Délka × Šířka × Výška (mm)",
+        "value": "4447 × 1824 × 1588"
+      },
+      {
+        "label": "Rozvor kol (mm)",
+        "value": "2610"
+      },
+      {
+        "label": "Světlá výška (mm)",
+        "value": "170"
+      },
+      {
+        "label": "Maximální hmotnost vozidla (kg)",
+        "value": "1849"
+      },
+      {
+        "label": "Pohotovostní hmotnost (kg)",
+        "value": "1530"
+      },
+      {
+        "label": "Objem zavazadlového prostoru (l)",
+        "value": "360"
+      },
+      {
+        "label": "Maximální hmotnost přívěsu bržděný (kg)",
+        "value": "750"
+      },
+      {
+        "label": "Velikost ráfků",
+        "value": "18×7J"
+      },
+      {
+        "label": "Rozměr pneumatik",
+        "value": "215/55 R18"
+      }
+    ],
+    "status": "published",
+    "model": 10,
+    "version": null,
+    "pricelist_colors": null,
+    "pricelist_colors_exterior": null,
+    "pricelist_colors_interior": null,
+    "trim_levels": [
+      23,
+      24,
+      25
+    ],
+    "option_packages": []
+  },
+  {
+    "id": 11,
+    "year": 2026,
+    "technical_data": [
+      {
+        "label": "Poháněná náprava",
+        "value": "FWD"
+      },
+      {
+        "label": "Převodovka",
+        "value": "1DHT aut."
+      },
+      {
+        "label": "Pohon",
+        "value": "1.5TGDI Hybrid"
+      },
+      {
+        "label": "Počet válců",
+        "value": "4"
+      },
+      {
+        "label": "Zdvihový objem (cm³)",
+        "value": "1499"
+      },
+      {
+        "label": "Objem palivové nádrže (l)",
+        "value": "51"
+      },
+      {
+        "label": "Čistý výkon motoru (kW)",
+        "value": "165"
+      },
+      {
+        "label": "Maximální točivý moment (Nm)",
+        "value": "215"
+      },
+      {
+        "label": "Maximální výkon trakčního elektromotoru (kW)",
+        "value": "150"
+      },
+      {
+        "label": "Kapacita baterie (kWh)",
+        "value": "1,83"
+      },
+      {
+        "label": "Celkový (systémový) výkon (kW/k)",
+        "value": "165/224"
+      },
+      {
+        "label": "Emise CO₂ - kombinované (g/km)",
+        "value": "120"
+      },
+      {
+        "label": "Emisní norma",
+        "value": "EURO 6e"
+      },
+      {
+        "label": "Průměrná spotřeba paliva (l/100km)",
+        "value": "5,3"
+      },
+      {
+        "label": "Maximální rychlost (km/h)",
+        "value": "175"
+      },
+      {
+        "label": "Zrychlení 0-100 km/h (s)",
+        "value": "7,9"
+      },
+      {
+        "label": "Počet sedadel",
+        "value": "5"
+      },
+      {
+        "label": "Délka × Šířka × Výška (mm)",
+        "value": "4447 × 1824 × 1588"
+      },
+      {
+        "label": "Rozvor kol (mm)",
+        "value": "2610"
+      },
+      {
+        "label": "Světlá výška (mm)",
+        "value": "170"
+      },
+      {
+        "label": "Maximální hmotnost vozidla / pohotovostní (kg)",
+        "value": "2052 / 1621"
+      },
+      {
+        "label": "Objem zavazadlového prostoru (l)",
+        "value": "442"
+      },
+      {
+        "label": "Maximální hmotnost přívěsu bržděný (kg)",
+        "value": "750"
+      },
+      {
+        "label": "Velikost ráfků BASIC",
+        "value": "17x6 1/2J"
+      },
+      {
+        "label": "Velikost ráfků PREMIUM",
+        "value": "18×7J"
+      },
+      {
+        "label": "Rozměr pneumatik BASIC",
+        "value": "215/60 R17"
+      },
+      {
+        "label": "Rozměr pneumatik PREMIUM",
+        "value": "215/55 R18"
+      }
+    ],
+    "status": "published",
+    "model": 11,
+    "version": null,
+    "pricelist_colors": null,
+    "pricelist_colors_exterior": null,
+    "pricelist_colors_interior": null,
+    "trim_levels": [
+      26,
+      27
+    ],
+    "option_packages": []
+  },
+  {
+    "id": 12,
+    "year": 2026,
+    "technical_data": [
+      {
+        "label": "Poháněná náprava",
+        "value": "FWD"
+      },
+      {
+        "label": "Kapacita baterie (kWh)",
+        "value": "61.06"
+      },
+      {
+        "label": "Typ baterie",
+        "value": "Lithium Iron Phosphate (LiFePO4)"
+      },
+      {
+        "label": "Dojezd dle WLTP (km)",
+        "value": "402"
+      },
+      {
+        "label": "Spotřeba energie dle WLTP (kWh/100 km)",
+        "value": "16.9"
+      },
+      {
+        "label": "Emise CO₂ dle WLTP (g/km)",
+        "value": "0"
+      },
+      {
+        "label": "Výkon (kW)",
+        "value": "155"
+      },
+      {
+        "label": "Typ nabíjecího konektoru",
+        "value": "CCS Type 2"
+      },
+      {
+        "label": "Max. výkon nabíjení AC (kW)",
+        "value": "11"
+      },
+      {
+        "label": "Max. výkon nabíjení DC (kW)",
+        "value": "80"
+      },
+      {
+        "label": "Max. rychlost (km/h)",
+        "value": "171"
+      },
+      {
+        "label": "Počet sedadel",
+        "value": "5"
+      },
+      {
+        "label": "Délka × Šířka × Výška (mm)",
+        "value": "4 424 × 1 830 × 1 588"
+      },
+      {
+        "label": "Rozvor kol (mm)",
+        "value": "2 630"
+      },
+      {
+        "label": "Rozchod kol (mm)",
+        "value": "1 550 / 1 550"
+      },
+      {
+        "label": "Maximální hmotnost vozidla (kg)",
+        "value": "2 246"
+      },
+      {
+        "label": "Pohotovostní hmotnost (kg)",
+        "value": "1 785"
+      },
+      {
+        "label": "Maximální zatížení nápravy přední/zadní (kg)",
+        "value": "1 104 / 1 242"
+      },
+      {
+        "label": "Velikost ráfků",
+        "value": "18×7J"
+      },
+      {
+        "label": "Rozměr pneumatik",
+        "value": "215/55R18"
+      },
+      {
+        "label": "Úložný box v přední části (frunk)",
+        "value": "COMFORT ano, PREMIUM ne"
+      },
+      {
+        "label": "Aktivní mřížka",
+        "value": "COMFORT ne, PREMIUM ano"
+      },
+      {
+        "label": "Kryt motoru",
+        "value": "PREMIUM"
+      },
+      {
+        "label": "Integrovaná konstrukce",
+        "value": "ano"
+      },
+      {
+        "label": "Záruka",
+        "value": "7 let nebo 150 000 km"
+      },
+      {
+        "label": "Importér (ČR)",
+        "value": "Grand Automotive East Kft."
+      },
+      {
+        "label": "Ceník platný od",
+        "value": "11. 5. 2026"
+      }
+    ],
+    "status": "published",
+    "model": 12,
+    "version": null,
+    "pricelist_colors": null,
+    "pricelist_colors_exterior": null,
+    "pricelist_colors_interior": null,
+    "trim_levels": [
+      28,
+      29
+    ],
+    "option_packages": []
+  },
+  {
+    "id": 14,
+    "year": 2026,
+    "technical_data": [
+      {
+        "label": "Poháněná náprava",
+        "value": "FWD"
+      },
+      {
+        "label": "Převodovka",
+        "value": "7DCT"
+      },
+      {
+        "label": "Motor",
+        "value": "1.6TGDI"
+      },
+      {
+        "label": "Počet válců",
+        "value": "4"
+      },
+      {
+        "label": "Zdvihový objem (cm³)",
+        "value": "1598"
+      },
+      {
+        "label": "Čistý výkon motoru (kW)",
+        "value": "108"
+      },
+      {
+        "label": "Emise CO₂ - kombinované (g/km)",
+        "value": "159"
+      },
+      {
+        "label": "Maximální rychlost (km/h)",
+        "value": "190"
+      },
+      {
+        "label": "Emisní norma",
+        "value": "Euro 6e"
+      },
+      {
+        "label": "Kombinovaná spotřeba paliva (l/100 km)",
+        "value": "7.0"
+      },
+      {
+        "label": "Zrychlení 0–100 km/h (s)",
+        "value": "10.2"
+      },
+      {
+        "label": "Délka × Šířka × Výška (mm)",
+        "value": "4380 × 1860 × 1650"
+      },
+      {
+        "label": "Rozvor kol (mm)",
+        "value": "2620"
+      },
+      {
+        "label": "Rozchod kol vpředu/vzadu (mm)",
+        "value": "1580 / 1590"
+      },
+      {
+        "label": "Maximální celková hmotnost (kg)",
+        "value": "1943"
+      },
+      {
+        "label": "Maximální zatížení nápravy přední/zadní (kg)",
+        "value": "997 / 1046"
+      },
+      {
+        "label": "Max. hmotnost nebrzděného / brzděného přívěsu (kg)",
+        "value": "750 / 1250"
+      },
+      {
+        "label": "Max. svislé zatížení tažného zařízení (kg)",
+        "value": "75"
+      },
+      {
+        "label": "Objem zav. prostoru – opěradla vzpřímená/sklopená (l)",
+        "value": "480 / 1284"
+      },
+      {
+        "label": "Objem palivové nádrže (l)",
+        "value": "51"
+      },
+      {
+        "label": "Přední nájezdový úhel",
+        "value": "20°"
+      },
+      {
+        "label": "Zadní sjezdový úhel",
+        "value": "29,8°"
+      },
+      {
+        "label": "Brodicí hloubka (mm)",
+        "value": "450"
+      },
+      {
+        "label": "Velikost ráfků",
+        "value": "18×7 1/2J"
+      },
+      {
+        "label": "Rozměr pneumatik",
+        "value": "235/55 R18"
+      }
+    ],
+    "status": "published",
+    "model": 14,
+    "version": null,
+    "pricelist_colors": null,
+    "pricelist_colors_exterior": null,
+    "pricelist_colors_interior": null,
+    "trim_levels": [
+      31,
+      32
+    ],
+    "option_packages": []
+  },
+  {
+    "id": 15,
+    "year": 2026,
+    "technical_data": [
+      {
+        "label": "Typ motoru",
+        "value": "1.6TGDI benzín"
+      },
+      {
+        "label": "Počet válců",
+        "value": "4"
+      },
+      {
+        "label": "Zdvihový objem",
+        "value": "1598 cm³"
+      },
+      {
+        "label": "Max. výkon",
+        "value": "108 kW"
+      },
+      {
+        "label": "Převodovka",
+        "value": "7DCT"
+      },
+      {
+        "label": "Pohon LUXURY",
+        "value": "FWD"
+      },
+      {
+        "label": "Pohon EXCLUSIVE",
+        "value": "AWD"
+      },
+      {
+        "label": "Emisní norma",
+        "value": "EURO 6e"
+      },
+      {
+        "label": "Emise CO₂ LUXURY",
+        "value": "159 g/km"
+      },
+      {
+        "label": "Emise CO₂ EXCLUSIVE",
+        "value": "182 g/km"
+      },
+      {
+        "label": "Kombinovaná spotřeba LUXURY",
+        "value": "7.0 l/100 km"
+      },
+      {
+        "label": "Kombinovaná spotřeba EXCLUSIVE",
+        "value": "8.0 l/100 km"
+      },
+      {
+        "label": "Maximální rychlost",
+        "value": "180 km/h"
+      },
+      {
+        "label": "Počet sedadel",
+        "value": "5"
+      },
+      {
+        "label": "Délka",
+        "value": "4500 mm"
+      },
+      {
+        "label": "Šířka",
+        "value": "1865 mm"
+      },
+      {
+        "label": "Výška",
+        "value": "1680 mm"
+      },
+      {
+        "label": "Rozvor kol",
+        "value": "2672 mm"
+      },
+      {
+        "label": "Rozchod kol",
+        "value": "1582 / 1604 mm"
+      },
+      {
+        "label": "Max. hmotnost / pohotovostní hmotnost LUXURY",
+        "value": "1922 / 1599 kg"
+      },
+      {
+        "label": "Max. hmotnost / pohotovostní hmotnost EXCLUSIVE",
+        "value": "2138 / 1724 kg"
+      },
+      {
+        "label": "Max. zatížení nápravy přední/zadní LUXURY",
+        "value": "1075 / 947 kg"
+      },
+      {
+        "label": "Max. zatížení nápravy přední/zadní EXCLUSIVE",
+        "value": "1109 / 1158 kg"
+      },
+      {
+        "label": "Přední náprava",
+        "value": "McPherson"
+      },
+      {
+        "label": "Zadní zavěšení",
+        "value": "Nezávislé"
+      },
+      {
+        "label": "Objem palivové nádrže",
+        "value": "57 l"
+      },
+      {
+        "label": "Velikost ráfků",
+        "value": "19×7 1/2J"
+      },
+      {
+        "label": "Rozměr pneumatik",
+        "value": "235/50 R19"
+      }
+    ],
+    "status": "published",
+    "model": 15,
+    "version": null,
+    "pricelist_colors": null,
+    "pricelist_colors_exterior": null,
+    "pricelist_colors_interior": null,
+    "trim_levels": [
+      33,
+      34
+    ],
+    "option_packages": []
+  },
+  {
+    "id": 16,
+    "year": 2026,
+    "technical_data": [
+      {
+        "label": "Pohon (motor)",
+        "value": "1.5TGDI"
+      },
+      {
+        "label": "Převodovka",
+        "value": "1DHT"
+      },
+      {
+        "label": "Poháněná náprava",
+        "value": "FWD"
+      },
+      {
+        "label": "Celkový výkon (kW)",
+        "value": "205"
+      },
+      {
+        "label": "Výkon elektromotoru (kW)",
+        "value": "150"
+      },
+      {
+        "label": "Výkon spalovacího motoru (kW)",
+        "value": "105"
+      },
+      {
+        "label": "Délka × Šířka × Výška (mm)",
+        "value": "4500 × 1865 × 1670"
+      },
+      {
+        "label": "Rozvor kol (mm)",
+        "value": "2672"
+      },
+      {
+        "label": "Rozchod kol - přední/zadní (mm)",
+        "value": "1582 / 1604"
+      },
+      {
+        "label": "Maximální hmotnost vozidla (kg)",
+        "value": "2310"
+      },
+      {
+        "label": "Pohotovostní hmotnost (kg)",
+        "value": "1795"
+      },
+      {
+        "label": "Počet sedadel",
+        "value": "5"
+      },
+      {
+        "label": "Kapacita baterie (kWh)",
+        "value": "18.3"
+      },
+      {
+        "label": "Typ baterie",
+        "value": "NMC"
+      },
+      {
+        "label": "Čistě elektrický dojezd dle WLTP (km)",
+        "value": "91"
+      },
+      {
+        "label": "Celkový dojezd dle WLTP (km)",
+        "value": "1200+"
+      },
+      {
+        "label": "Kombinovaná spotřeba paliva dle WLTP (l/100 km)",
+        "value": "2.4"
+      },
+      {
+        "label": "Spotřeba energie dle WLTP (kWh/100 km)",
+        "value": "20.8"
+      },
+      {
+        "label": "Emise CO2 dle WLTP (g/km)",
+        "value": "54"
+      },
+      {
+        "label": "Max. výkon nabíjení AC (kW)",
+        "value": "6"
+      },
+      {
+        "label": "Max. výkon nabíjení DC (kW)",
+        "value": "45"
+      },
+      {
+        "label": "Emisní norma",
+        "value": "EURO 6e"
+      },
+      {
+        "label": "Přední náprava",
+        "value": "McPherson"
+      },
+      {
+        "label": "Zadní náprava",
+        "value": "Multi-link"
+      },
+      {
+        "label": "Velikost ráfků",
+        "value": "19x7 1/2J"
+      },
+      {
+        "label": "Rozměr pneumatik",
+        "value": "235/50 R19"
+      }
+    ],
+    "status": "published",
+    "model": 16,
+    "version": null,
+    "pricelist_colors": null,
+    "pricelist_colors_exterior": null,
+    "pricelist_colors_interior": null,
+    "trim_levels": [
+      36
+    ],
+    "option_packages": []
+  },
+  {
+    "id": 17,
+    "year": 2025,
+    "technical_data": null,
+    "status": "published",
+    "model": 17,
+    "version": null,
+    "pricelist_colors": null,
+    "pricelist_colors_exterior": null,
+    "pricelist_colors_interior": null,
+    "trim_levels": [
+      37
+    ],
+    "option_packages": []
+  },
+  {
+    "id": 18,
+    "year": 2025,
+    "technical_data": [
+      {
+        "label": "Pohon",
+        "value": "Synchronní motor s permanentními magnety (zadní)"
+      },
+      {
+        "label": "Jmenovitý výkon",
+        "value": "50 kW"
+      },
+      {
+        "label": "Max. výkon",
+        "value": "100 kW"
+      },
+      {
+        "label": "Kapacita baterie",
+        "value": "42 kWh (LFP, CATL)"
+      },
+      {
+        "label": "Dojezd WLTP (kombinovaný)",
+        "value": "195 km"
+      },
+      {
+        "label": "Dojezd WLTP (městský)",
+        "value": "265 km"
+      },
+      {
+        "label": "Rychlonabíjení 20 – 80 %",
+        "value": "50 min"
+      },
+      {
+        "label": "Max. rychlost",
+        "value": "110 km/h"
+      },
+      {
+        "label": "Max. stoupavost",
+        "value": "≥ 28 %"
+      },
+      {
+        "label": "Celková hmotnost",
+        "value": "2 715 kg"
+      },
+      {
+        "label": "Hmotnost bez nákladu",
+        "value": "1 565 kg"
+      },
+      {
+        "label": "Rozměry vozidla (D × Š × V)",
+        "value": "4 855 × 1 730 × 1 985 mm"
+      },
+      {
+        "label": "Rozvor",
+        "value": "3 100 mm"
+      },
+      {
+        "label": "Nákladový prostor (objem)",
+        "value": "5,9 / 5,7 m³ (resp. 6 m³ marketingově)"
+      },
+      {
+        "label": "Nákladový prostor (rozměry)",
+        "value": "2 800 × 1 600 × 1 320 / 1 270 mm"
+      },
+      {
+        "label": "Otevírání zadních dveří",
+        "value": "270° (poměr 2:3)"
+      },
+      {
+        "label": "Brzdy",
+        "value": "Přední kotoučové, zadní bubnové + rekuperace"
+      },
+      {
+        "label": "Asistenty",
+        "value": "ESC, ABS, EBD, TCS, HBB, HBA, HHC, HDC"
+      },
+      {
+        "label": "Materiál sedadel",
+        "value": "PVC"
+      },
+      {
+        "label": "Počet míst",
+        "value": "2"
+      }
+    ],
+    "status": "published",
+    "model": 18,
+    "version": null,
+    "pricelist_colors": null,
+    "pricelist_colors_exterior": null,
+    "pricelist_colors_interior": null,
+    "trim_levels": [
+      38
+    ],
+    "option_packages": []
+  },
+  {
+    "id": 22,
+    "year": 2025,
+    "technical_data": [
+      {
+        "label": "Motor",
+        "value": "1.5TGDI"
+      },
+      {
+        "label": "Převodovka",
+        "value": "3DHT"
+      },
+      {
+        "label": "Poháněná náprava",
+        "value": "AWD"
+      },
+      {
+        "label": "Délka × Šířka × Výška (mm)",
+        "value": "4775 × 1920 × 1671"
+      },
+      {
+        "label": "Rozvor kol (mm)",
+        "value": "2800"
+      },
+      {
+        "label": "Rozchod kol (mm)",
+        "value": "1641/1642"
+      },
+      {
+        "label": "Počet válců",
+        "value": "4"
+      },
+      {
+        "label": "Zdvihový objem (cm3)",
+        "value": "1499"
+      },
+      {
+        "label": "Objem palivové nádrže (L)",
+        "value": "70"
+      },
+      {
+        "label": "Kapacita baterie (kWh)",
+        "value": "34,46"
+      },
+      {
+        "label": "Typ baterie",
+        "value": "NCM battery (Nickel Cobalt Manganese)"
+      },
+      {
+        "label": "Čistě elektrický dojezd dle WLTP (km)",
+        "value": "145"
+      },
+      {
+        "label": "Celkový dojezd dle WLTP (km)",
+        "value": "1100"
+      },
+      {
+        "label": "Spotřeba paliva dle WLTP (l/100 km)",
+        "value": "1.7"
+      },
+      {
+        "label": "Spotřeba energie dle WLTP (kWh/100 km)",
+        "value": "18,1"
+      },
+      {
+        "label": "Emise CO2 dle WLTP (g/km)",
+        "value": "38"
+      },
+      {
+        "label": "Výkon elektromotorů přední náprava EM1/EM2 (kW)",
+        "value": "75/90"
+      },
+      {
+        "label": "Výkon elektromotoru zadní náprava (kW)",
+        "value": "175"
+      },
+      {
+        "label": "Výkon spalovacího motoru (kW)",
+        "value": "105"
+      },
+      {
+        "label": "Celkový výkon (kW)",
+        "value": "395"
+      },
+      {
+        "label": "Celkový točivý moment (Nm)",
+        "value": "700"
+      },
+      {
+        "label": "Zrychlení 0–100 km/h (s)",
+        "value": "4,9"
+      },
+      {
+        "label": "Max. výkon nabíjení AC (kW)",
+        "value": "6,6"
+      },
+      {
+        "label": "Max. výkon nabíjení DC (kW)",
+        "value": "65"
+      },
+      {
+        "label": "Maximální hmotnost přívěsu nebržděný/bržděný (kg)",
+        "value": "750/1500"
+      },
+      {
+        "label": "Maximální rychlost (km/h)",
+        "value": "180"
+      },
+      {
+        "label": "Objem zavazadlového prostoru (l)",
+        "value": "660/1783"
+      },
+      {
+        "label": "Velikost ráfků",
+        "value": "20×7 1/2J"
+      },
+      {
+        "label": "Rozměr pneumatik",
+        "value": "245/50 R20"
+      }
+    ],
+    "status": "published",
+    "model": 13,
+    "version": null,
+    "pricelist_colors": null,
+    "pricelist_colors_exterior": null,
+    "pricelist_colors_interior": null,
+    "trim_levels": [
+      51
+    ],
+    "option_packages": []
+  },
+  {
+    "id": 24,
+    "year": 2026,
+    "technical_data": [
+      {
+        "label": "Motor",
+        "value": "Benzín 1.5 GDI Turbo"
+      },
+      {
+        "label": "Zdvihový objem",
+        "value": "1497 cm3"
+      },
+      {
+        "label": "Maximální výkon",
+        "value": "120 kW / 163 k / 5 000–5 500 ot./min"
+      },
+      {
+        "label": "Maximální točivý moment",
+        "value": "280 Nm / 1 500–4 000 ot./min (6MT), 260 Nm / 1 500–4 000 ot./min (6AT)"
+      },
+      {
+        "label": "Emisní norma",
+        "value": "Euro 6e"
+      },
+      {
+        "label": "Počet a uspořádání válců",
+        "value": "4 v řadě"
+      },
+      {
+        "label": "Vrtání x zdvih",
+        "value": "76 x 82,5 mm"
+      },
+      {
+        "label": "Kompresní poměr",
+        "value": "9,5 : 1"
+      },
+      {
+        "label": "Palivo",
+        "value": "Benzín"
+      },
+      {
+        "label": "Objem palivové nádrže",
+        "value": "50 l"
+      },
+      {
+        "label": "Převodovka",
+        "value": "6MT / 6AT"
+      },
+      {
+        "label": "Druh pohonu",
+        "value": "2WD / AWD"
+      },
+      {
+        "label": "Maximální rychlost",
+        "value": "181 km/h (6MT) / 175 km/h (6AT)"
+      },
+      {
+        "label": "Spotřeba paliva kombinovaná (2WD 6MT)",
+        "value": "6,910 l/100 km"
+      },
+      {
+        "label": "Spotřeba paliva kombinovaná (2WD 6AT)",
+        "value": "7,042 l/100 km"
+      },
+      {
+        "label": "Spotřeba paliva kombinovaná (AWD 6MT)",
+        "value": "7,650 / 7,479 l/100 km"
+      },
+      {
+        "label": "Spotřeba paliva kombinovaná (AWD 6AT)",
+        "value": "8,349 l/100 km"
+      },
+      {
+        "label": "Kombinované emise CO2 (2WD 6MT)",
+        "value": "158 g/km"
+      },
+      {
+        "label": "Kombinované emise CO2 (2WD 6AT)",
+        "value": "161 g/km"
+      },
+      {
+        "label": "Kombinované emise CO2 (AWD 6MT)",
+        "value": "175 / 171 g/km"
+      },
+      {
+        "label": "Kombinované emise CO2 (AWD 6AT)",
+        "value": "191 g/km"
+      },
+      {
+        "label": "Vnější délka",
+        "value": "4225 mm"
+      },
+      {
+        "label": "Vnější šířka",
+        "value": "1810 mm"
+      },
+      {
+        "label": "Vnější výška",
+        "value": "1613 mm (1621 mm se střešními ližinami)"
+      },
+      {
+        "label": "Rozvor",
+        "value": "2600 mm"
+      },
+      {
+        "label": "Rozchod kol přední",
+        "value": "1555 mm"
+      },
+      {
+        "label": "Rozchod kol zadní",
+        "value": "1555 mm"
+      },
+      {
+        "label": "Převis přední",
+        "value": "880 mm"
+      },
+      {
+        "label": "Převis zadní",
+        "value": "745 mm"
+      },
+      {
+        "label": "Přední nájezdový úhel",
+        "value": "17,5°"
+      },
+      {
+        "label": "Zadní nájezdový úhel",
+        "value": "27,5°"
+      },
+      {
+        "label": "Přechodový úhel",
+        "value": "17°"
+      },
+      {
+        "label": "Minimální světlá výška",
+        "value": "178 mm"
+      },
+      {
+        "label": "Poloměr otáčení",
+        "value": "5,3 m"
+      },
+      {
+        "label": "Objem zavazadlového prostoru (dle standardu VDA)",
+        "value": "423 l"
+      },
+      {
+        "label": "Celková hmotnost (2WD 6MT)",
+        "value": "1800 kg"
+      },
+      {
+        "label": "Celková hmotnost (2WD 6AT)",
+        "value": "1820 kg"
+      },
+      {
+        "label": "Celková hmotnost (AWD 6MT)",
+        "value": "1890 kg"
+      },
+      {
+        "label": "Celková hmotnost (AWD 6AT)",
+        "value": "1920 kg"
+      },
+      {
+        "label": "Provozní hmotnost (2WD 6MT)",
+        "value": "1300 kg"
+      },
+      {
+        "label": "Provozní hmotnost (2WD 6AT)",
+        "value": "1318 kg"
+      },
+      {
+        "label": "Provozní hmotnost (AWD 6MT)",
+        "value": "1390 kg"
+      },
+      {
+        "label": "Provozní hmotnost (AWD 6AT)",
+        "value": "1417 kg"
+      },
+      {
+        "label": "Celková hmotnost přívěsu brzděný",
+        "value": "1000 kg"
+      },
+      {
+        "label": "Celková hmotnost přívěsu nebrzděný",
+        "value": "500 kg"
+      },
+      {
+        "label": "Tovární záruka",
+        "value": "5 let / 100 000 km"
+      },
+      {
+        "label": "Velikost kol (standard)",
+        "value": "16'' (205/65 R16)"
+      },
+      {
+        "label": "Velikost kol (volitelné)",
+        "value": "18'' (215/50 R18)"
+      }
+    ],
+    "status": "published",
+    "model": 2,
+    "version": null,
+    "pricelist_colors": {
+      "exterior": [
+        {
+          "name": "GRAND bílá",
+          "code": "WAA",
+          "type": "základní",
+          "pricing_per_trim": {
+            "style": 0
+          }
+        },
+        {
+          "name": "SPACE černá",
+          "code": "LAK",
+          "type": "metalická",
+          "pricing_per_trim": {
+            "style": 12900
+          }
+        },
+        {
+          "name": "IRON kovová",
+          "code": "ADE",
+          "type": "metalická",
+          "pricing_per_trim": {
+            "style": 12900
+          }
+        },
+        {
+          "name": "LATTE béžová",
+          "code": "EBL",
+          "type": "metalická",
+          "pricing_per_trim": {
+            "style": 12900
+          }
+        },
+        {
+          "name": "DANDY modrá",
+          "code": "BAS",
+          "type": "metalická",
+          "pricing_per_trim": {
+            "style": 12900
+          }
+        }
+      ],
+      "interior": [
+        {
+          "name": "Světle šedá",
+          "code": "EBG",
+          "material": "textil",
+          "pricing_per_trim": {
+            "style": 0
+          }
+        },
+        {
+          "name": "Černá",
+          "code": "LBH",
+          "material": "textil",
+          "pricing_per_trim": {
+            "style": 0
+          }
+        }
+      ]
+    },
+    "pricelist_colors_exterior": [
+      {
+        "name": "GRAND bílá",
+        "code": "WAA",
+        "type": "základní",
+        "pricing_per_trim": [
+          {
+            "trim_slug": "style",
+            "price": 0
+          }
+        ]
+      },
+      {
+        "name": "SPACE černá",
+        "code": "LAK",
+        "type": "metalická",
+        "pricing_per_trim": [
+          {
+            "trim_slug": "style",
+            "price": 12900
+          }
+        ]
+      },
+      {
+        "name": "IRON kovová",
+        "code": "ADE",
+        "type": "metalická",
+        "pricing_per_trim": [
+          {
+            "trim_slug": "style",
+            "price": 12900
+          }
+        ]
+      },
+      {
+        "name": "LATTE béžová",
+        "code": "EBL",
+        "type": "metalická",
+        "pricing_per_trim": [
+          {
+            "trim_slug": "style",
+            "price": 12900
+          }
+        ]
+      },
+      {
+        "name": "DANDY modrá",
+        "code": "BAS",
+        "type": "metalická",
+        "pricing_per_trim": [
+          {
+            "trim_slug": "style",
+            "price": 12900
+          }
+        ]
+      }
+    ],
+    "pricelist_colors_interior": [
+      {
+        "name": "Světle šedá",
+        "code": "EBG",
+        "material": "textil",
+        "pricing_per_trim": [
+          {
+            "trim_slug": "style",
+            "price": 0
+          }
+        ]
+      },
+      {
+        "name": "Černá",
+        "code": "LBH",
+        "material": "textil",
+        "pricing_per_trim": [
+          {
+            "trim_slug": "style",
+            "price": 0
+          }
+        ]
+      }
+    ],
+    "trim_levels": [
+      54
+    ],
+    "option_packages": [
+      59,
+      60
+    ]
+  },
+  {
+    "id": 25,
+    "year": 2026,
+    "technical_data": [
+      {
+        "label": "Motor",
+        "value": "Benzín 1.5 GDI Turbo"
+      },
+      {
+        "label": "Výkon",
+        "value": "120 kW / 163 k při 5 000–5 500 ot./min"
+      },
+      {
+        "label": "Maximální točivý moment",
+        "value": "280 Nm při 1 500–4 000 ot./min"
+      },
+      {
+        "label": "Zdvihový objem",
+        "value": "1 497 cm3"
+      },
+      {
+        "label": "Vrtání × Zdvih",
+        "value": "76 × 88 mm"
+      },
+      {
+        "label": "Kompresní poměr",
+        "value": "9,5 : 1"
+      },
+      {
+        "label": "Počet a uspořádání válců",
+        "value": "4 v řadě"
+      },
+      {
+        "label": "Palivo",
+        "value": "Benzín"
+      },
+      {
+        "label": "Emisní norma",
+        "value": "Euro 6e"
+      },
+      {
+        "label": "Převodovka",
+        "value": "6MT nebo 6AT (Aisin)"
+      },
+      {
+        "label": "Pohon",
+        "value": "2WD (FWD) nebo 4WD"
+      },
+      {
+        "label": "Maximální rychlost",
+        "value": "191 km/h (2WD 6MT) / 193 km/h (2WD 6AT) / 191 km/h (4WD 6MT) / 193 km/h (4WD 6AT)"
+      },
+      {
+        "label": "Kombinovaná spotřeba",
+        "value": "7,65 l/100 km (2WD 6MT) / 7,95 l/100 km (2WD 6AT) / 8,08 l/100 km (4WD 6MT) / 8,61 l/100 km (4WD 6AT)"
+      },
+      {
+        "label": "Kombinované emise CO2",
+        "value": "175 g/km (2WD 6MT) / 182 g/km (2WD 6AT) / 185 g/km (4WD 6MT) / 197 g/km (4WD 6AT)"
+      },
+      {
+        "label": "Vnější délka",
+        "value": "4 450 mm"
+      },
+      {
+        "label": "Vnější šířka",
+        "value": "1 870 mm"
+      },
+      {
+        "label": "Vnější výška",
+        "value": "1 620 mm (1 629 mm se střešními ližinami)"
+      },
+      {
+        "label": "Rozvor",
+        "value": "2 675 mm"
+      },
+      {
+        "label": "Rozchod kol přední",
+        "value": "1 590 mm"
+      },
+      {
+        "label": "Rozchod kol zadní",
+        "value": "1 610 mm"
+      },
+      {
+        "label": "Převis přední",
+        "value": "910 mm"
+      },
+      {
+        "label": "Převis zadní",
+        "value": "865 mm"
+      },
+      {
+        "label": "Minimální světlá výška",
+        "value": "182 mm"
+      },
+      {
+        "label": "Přední/zadní nájezdový úhel",
+        "value": "18 / 24,5°"
+      },
+      {
+        "label": "Přechodový úhel",
+        "value": "15,9°"
+      },
+      {
+        "label": "Poloměr otáčení",
+        "value": "5,35 m"
+      },
+      {
+        "label": "Objem zavazadlového prostoru (VDA 213)",
+        "value": "551 / 407 l (s rezervním kolem)"
+      },
+      {
+        "label": "Celková hmotnost",
+        "value": "2 010 kg (2WD 6MT) / 2 040 kg (2WD 6AT) / 2 100 kg (4WD 6MT) / 2 130 kg (4WD 6AT)"
+      },
+      {
+        "label": "Provozní hmotnost",
+        "value": "1 405 kg (2WD 6MT) / 1 435 kg (2WD 6AT) / 1 495 kg (4WD 6MT) / 1 525 kg (4WD 6AT)"
+      },
+      {
+        "label": "Celková hmotnost přívěsu brzděný",
+        "value": "1 500 kg (pro AT s možností navýšení na 2 000 kg)"
+      },
+      {
+        "label": "Celková hmotnost přívěsu nebrzděný",
+        "value": "750 kg (6MT) / 500 kg (6AT)"
+      },
+      {
+        "label": "Objem palivové nádrže",
+        "value": "50 l"
+      },
+      {
+        "label": "Tovární záruka",
+        "value": "5 let / 100 000 km"
+      }
+    ],
+    "status": "published",
+    "model": 1,
+    "version": null,
+    "pricelist_colors": {
+      "exterior": [
+        {
+          "name": "GRAND bílá",
+          "code": "WAA",
+          "type": "základní",
+          "pricing_per_trim": {
+            "style": 0,
+            "style_plus": 0,
+            "elegant": 0,
+            "premium": 0
+          }
+        },
+        {
+          "name": "SPACE černá",
+          "code": "LAK",
+          "type": "metalická",
+          "pricing_per_trim": {
+            "style": 12900,
+            "style_plus": 12900,
+            "elegant": 12900,
+            "premium": 12900
+          }
+        },
+        {
+          "name": "LATTE béžová",
+          "code": "EBL",
+          "type": "metalická",
+          "pricing_per_trim": {
+            "style": 12900,
+            "style_plus": 12900,
+            "elegant": 12900,
+            "premium": 12900
+          }
+        },
+        {
+          "name": "IRON kovová",
+          "code": "ADE",
+          "type": "metalická",
+          "pricing_per_trim": {
+            "style": 12900,
+            "style_plus": 12900,
+            "elegant": 12900,
+            "premium": 12900
+          }
+        },
+        {
+          "name": "DANDY modrá",
+          "code": "BAS",
+          "type": "metalická",
+          "pricing_per_trim": {
+            "style": 12900,
+            "style_plus": 12900,
+            "elegant": 12900,
+            "premium": 12900
+          }
+        }
+      ],
+      "interior": [
+        {
+          "name": "Béžová",
+          "code": "EBG",
+          "material": "textil / syntetická kůže / pravá kůže",
+          "pricing_per_trim": {
+            "style": 0,
+            "style_plus": 0,
+            "elegant": 0,
+            "premium": 0
+          }
+        },
+        {
+          "name": "Černá",
+          "code": "LBH",
+          "material": "textil / syntetická kůže / pravá kůže",
+          "pricing_per_trim": {
+            "style": 0,
+            "style_plus": 0,
+            "elegant": 0,
+            "premium": 0
+          }
+        }
+      ]
+    },
+    "pricelist_colors_exterior": [
+      {
+        "name": "GRAND bílá",
+        "code": "WAA",
+        "type": "základní",
+        "pricing_per_trim": [
+          {
+            "trim_slug": "style",
+            "price": 0
+          },
+          {
+            "trim_slug": "style_plus",
+            "price": 0
+          },
+          {
+            "trim_slug": "elegant",
+            "price": 0
+          },
+          {
+            "trim_slug": "premium",
+            "price": 0
+          }
+        ]
+      },
+      {
+        "name": "SPACE černá",
+        "code": "LAK",
+        "type": "metalická",
+        "pricing_per_trim": [
+          {
+            "trim_slug": "style",
+            "price": 12900
+          },
+          {
+            "trim_slug": "style_plus",
+            "price": 12900
+          },
+          {
+            "trim_slug": "elegant",
+            "price": 12900
+          },
+          {
+            "trim_slug": "premium",
+            "price": 12900
+          }
+        ]
+      },
+      {
+        "name": "LATTE béžová",
+        "code": "EBL",
+        "type": "metalická",
+        "pricing_per_trim": [
+          {
+            "trim_slug": "style",
+            "price": 12900
+          },
+          {
+            "trim_slug": "style_plus",
+            "price": 12900
+          },
+          {
+            "trim_slug": "elegant",
+            "price": 12900
+          },
+          {
+            "trim_slug": "premium",
+            "price": 12900
+          }
+        ]
+      },
+      {
+        "name": "IRON kovová",
+        "code": "ADE",
+        "type": "metalická",
+        "pricing_per_trim": [
+          {
+            "trim_slug": "style",
+            "price": 12900
+          },
+          {
+            "trim_slug": "style_plus",
+            "price": 12900
+          },
+          {
+            "trim_slug": "elegant",
+            "price": 12900
+          },
+          {
+            "trim_slug": "premium",
+            "price": 12900
+          }
+        ]
+      },
+      {
+        "name": "DANDY modrá",
+        "code": "BAS",
+        "type": "metalická",
+        "pricing_per_trim": [
+          {
+            "trim_slug": "style",
+            "price": 12900
+          },
+          {
+            "trim_slug": "style_plus",
+            "price": 12900
+          },
+          {
+            "trim_slug": "elegant",
+            "price": 12900
+          },
+          {
+            "trim_slug": "premium",
+            "price": 12900
+          }
+        ]
+      }
+    ],
+    "pricelist_colors_interior": [
+      {
+        "name": "Béžová",
+        "code": "EBG",
+        "material": "textil / syntetická kůže / pravá kůže",
+        "pricing_per_trim": [
+          {
+            "trim_slug": "style",
+            "price": 0
+          },
+          {
+            "trim_slug": "style_plus",
+            "price": 0
+          },
+          {
+            "trim_slug": "elegant",
+            "price": 0
+          },
+          {
+            "trim_slug": "premium",
+            "price": 0
+          }
+        ]
+      },
+      {
+        "name": "Černá",
+        "code": "LBH",
+        "material": "textil / syntetická kůže / pravá kůže",
+        "pricing_per_trim": [
+          {
+            "trim_slug": "style",
+            "price": 0
+          },
+          {
+            "trim_slug": "style_plus",
+            "price": 0
+          },
+          {
+            "trim_slug": "elegant",
+            "price": 0
+          },
+          {
+            "trim_slug": "premium",
+            "price": 0
+          }
+        ]
+      }
+    ],
+    "trim_levels": [
+      55,
+      56,
+      57,
+      58
+    ],
+    "option_packages": [
+      61,
+      62,
+      63,
+      64
+    ]
+  },
+  {
+    "id": 26,
+    "year": 2026,
+    "technical_data": [
+      {
+        "label": "Motor benzín",
+        "value": "1.5 GDI Turbo"
+      },
+      {
+        "label": "Zdvihový objem – benzín (cc)",
+        "value": "1 497"
+      },
+      {
+        "label": "Emisní norma",
+        "value": "Euro 6e-bis"
+      },
+      {
+        "label": "Vnější délka (mm)",
+        "value": "4 705"
+      },
+      {
+        "label": "Vnější šířka (mm)",
+        "value": "1 890"
+      },
+      {
+        "label": "Vnější výška (mm)",
+        "value": "1 710 (1 720 se střešními ližinami)"
+      },
+      {
+        "label": "Rozvor (mm)",
+        "value": "2 680"
+      },
+      {
+        "label": "Rozchod kol – přední (mm)",
+        "value": "1 610"
+      },
+      {
+        "label": "Rozchod kol – zadní (mm)",
+        "value": "1 630"
+      },
+      {
+        "label": "Převis přední (mm)",
+        "value": "930 (benzín) / 935 (hybrid)"
+      },
+      {
+        "label": "Převis zadní (mm)",
+        "value": "1 090"
+      },
+      {
+        "label": "Minimální světlá výška (mm)",
+        "value": "195 (benzín) / 180 (hybrid)"
+      },
+      {
+        "label": "Poloměr otáčení (m)",
+        "value": "5,42"
+      },
+      {
+        "label": "Objem zavazadlového prostoru – benzín (l, VDA 213)",
+        "value": "839 / 703 (s rezervním kolem)"
+      },
+      {
+        "label": "Palivo benzín",
+        "value": "Benzin"
+      },
+      {
+        "label": "Objem palivové nádrže – benzín (l)",
+        "value": "50"
+      },
+      {
+        "label": "Vrtání x zdvih – benzín (mm)",
+        "value": "76 x 82,5"
+      },
+      {
+        "label": "Kompresní poměr – benzín",
+        "value": "9,5 : 1"
+      },
+      {
+        "label": "Počet a uspořádání válců – benzín",
+        "value": "4 v Řadě"
+      },
+      {
+        "label": "Maximální výkon – benzín (kW/ot.)",
+        "value": "120/5 000~5 500"
+      },
+      {
+        "label": "Maximální výkon – benzín (k/ot.)",
+        "value": "163/5 000~5 500"
+      },
+      {
+        "label": "Maximální točivý moment – benzín (Nm/ot.)",
+        "value": "280/1 500~4 000"
+      },
+      {
+        "label": "Maximální rychlost – benzín 2WD 6MT (km/h)",
+        "value": "194"
+      },
+      {
+        "label": "Maximální rychlost – benzín 2WD 6AT / 4WD 6AT (km/h)",
+        "value": "191"
+      },
+      {
+        "label": "Spotřeba kombinovaná – benzín 2WD 6MT (l/100 km)",
+        "value": "7,937"
+      },
+      {
+        "label": "Spotřeba kombinovaná – benzín 2WD 6AT (l/100 km)",
+        "value": "8,511"
+      },
+      {
+        "label": "Spotřeba kombinovaná – benzín 4WD 6AT (l/100 km)",
+        "value": "9,080"
+      },
+      {
+        "label": "Kombinované emise CO2 – benzín 2WD 6MT (g/km)",
+        "value": "181"
+      },
+      {
+        "label": "Kombinované emise CO2 – benzín 2WD 6AT (g/km)",
+        "value": "194"
+      },
+      {
+        "label": "Kombinované emise CO2 – benzín 4WD 6AT (g/km)",
+        "value": "207"
+      },
+      {
+        "label": "Celková hmotnost – benzín 2WD 6MT (kg)",
+        "value": "2 050"
+      },
+      {
+        "label": "Celková hmotnost – benzín 2WD 6AT (kg)",
+        "value": "2 080"
+      },
+      {
+        "label": "Celková hmotnost – benzín 4WD 6AT (kg)",
+        "value": "2 170"
+      },
+      {
+        "label": "Provozní hmotnost – benzín 2WD 6MT (kg)",
+        "value": "1 498"
+      },
+      {
+        "label": "Provozní hmotnost – benzín 2WD 6AT (kg)",
+        "value": "1 528"
+      },
+      {
+        "label": "Provozní hmotnost – benzín 4WD 6AT (kg)",
+        "value": "1 618"
+      },
+      {
+        "label": "Celková hmotnost přívěsu brzděný – benzín (kg)",
+        "value": "1 500 (pro AT s možností navýšení na 2 000*)"
+      },
+      {
+        "label": "Celková hmotnost přívěsu nebrzděný – benzín 2WD (kg)",
+        "value": "750"
+      },
+      {
+        "label": "Celková hmotnost přívěsu nebrzděný – benzín 4WD (kg)",
+        "value": "500"
+      }
+    ],
+    "status": "published",
+    "model": 3,
+    "version": null,
+    "pricelist_colors": {
+      "exterior": [
+        {
+          "name": "GRAND bílá",
+          "code": "WAA",
+          "type": "základní",
+          "pricing_per_trim": {
+            "club": 0,
+            "style": 0,
+            "premium": 0
+          }
+        },
+        {
+          "name": "IRON kovová",
+          "code": "ADE",
+          "type": "metalická",
+          "pricing_per_trim": {
+            "club": 14900,
+            "style": 14900,
+            "premium": 14900
+          }
+        },
+        {
+          "name": "SPACE černá",
+          "code": "LAK",
+          "type": "metalická",
+          "pricing_per_trim": {
+            "club": 14900,
+            "style": 14900,
+            "premium": 14900
+          }
+        },
+        {
+          "name": "LATTE béžová",
+          "code": "EBL",
+          "type": "metalická",
+          "pricing_per_trim": {
+            "club": 14900,
+            "style": 14900,
+            "premium": 14900
+          }
+        },
+        {
+          "name": "DANDY modrá",
+          "code": "BAS",
+          "type": "metalická",
+          "pricing_per_trim": {
+            "club": 14900,
+            "style": 14900,
+            "premium": 14900
+          }
+        },
+        {
+          "name": "FOREST zelená",
+          "code": "GAO",
+          "type": "metalická",
+          "pricing_per_trim": {
+            "club": 14900,
+            "style": 14900,
+            "premium": 14900
+          }
+        },
+        {
+          "name": "GRAND bílá s černou střechou",
+          "code": "2WA (E22B)",
+          "type": "dvoutónová",
+          "pricing_per_trim": {
+            "club": 10000,
+            "style": 10000,
+            "premium": 10000
+          }
+        },
+        {
+          "name": "IRON kovová s černou střechou",
+          "code": "2DE (E22B)",
+          "type": "dvoutónová",
+          "pricing_per_trim": {
+            "club": 24900,
+            "style": 24900,
+            "premium": 24900
+          }
+        },
+        {
+          "name": "LATTE béžová s černou střechou",
+          "code": "2BL (E22B)",
+          "type": "dvoutónová",
+          "pricing_per_trim": {
+            "club": 24900,
+            "style": 24900,
+            "premium": 24900
+          }
+        },
+        {
+          "name": "FOREST zelená s černou střechou",
+          "code": "2GO (E22B)",
+          "type": "dvoutónová",
+          "pricing_per_trim": {
+            "club": 24900,
+            "style": 24900,
+            "premium": 24900
+          }
+        }
+      ],
+      "interior": [
+        {
+          "name": "Dvoutónový šedý textil (k dispozici pouze s automatickou převodovkou nebo pro Hybrid)",
+          "code": "ADF",
+          "material": "textil",
+          "pricing_per_trim": {
+            "club": 0,
+            "style": 0,
+            "premium": 0
+          }
+        },
+        {
+          "name": "Černý textil",
+          "code": "LBH",
+          "material": "textil",
+          "pricing_per_trim": {
+            "club": 0,
+            "style": 0,
+            "premium": 0
+          }
+        },
+        {
+          "name": "Dvoutónová šedá syntetická kůže (k dispozici pouze s automatickou převodovkou)",
+          "code": "ADFT",
+          "material": "syntetická kůže",
+          "pricing_per_trim": {
+            "style": 5900
+          }
+        },
+        {
+          "name": "Černá syntetická kůže",
+          "code": "LBHT",
+          "material": "syntetická kůže",
+          "pricing_per_trim": {
+            "style": 5900
+          }
+        },
+        {
+          "name": "Dvoutónová šedá kůže",
+          "code": "ADFL",
+          "material": "pravá kůže",
+          "pricing_per_trim": {
+            "premium": 0
+          }
+        },
+        {
+          "name": "Černá kůže",
+          "code": "LBHL",
+          "material": "pravá kůže",
+          "pricing_per_trim": {
+            "premium": 0
+          }
+        }
+      ]
+    },
+    "pricelist_colors_exterior": [
+      {
+        "name": "GRAND bílá",
+        "code": "WAA",
+        "type": "základní",
+        "pricing_per_trim": [
+          {
+            "trim_slug": "club",
+            "price": 0
+          },
+          {
+            "trim_slug": "style",
+            "price": 0
+          },
+          {
+            "trim_slug": "premium",
+            "price": 0
+          }
+        ]
+      },
+      {
+        "name": "IRON kovová",
+        "code": "ADE",
+        "type": "metalická",
+        "pricing_per_trim": [
+          {
+            "trim_slug": "club",
+            "price": 14900
+          },
+          {
+            "trim_slug": "style",
+            "price": 14900
+          },
+          {
+            "trim_slug": "premium",
+            "price": 14900
+          }
+        ]
+      },
+      {
+        "name": "SPACE černá",
+        "code": "LAK",
+        "type": "metalická",
+        "pricing_per_trim": [
+          {
+            "trim_slug": "club",
+            "price": 14900
+          },
+          {
+            "trim_slug": "style",
+            "price": 14900
+          },
+          {
+            "trim_slug": "premium",
+            "price": 14900
+          }
+        ]
+      },
+      {
+        "name": "LATTE béžová",
+        "code": "EBL",
+        "type": "metalická",
+        "pricing_per_trim": [
+          {
+            "trim_slug": "club",
+            "price": 14900
+          },
+          {
+            "trim_slug": "style",
+            "price": 14900
+          },
+          {
+            "trim_slug": "premium",
+            "price": 14900
+          }
+        ]
+      },
+      {
+        "name": "DANDY modrá",
+        "code": "BAS",
+        "type": "metalická",
+        "pricing_per_trim": [
+          {
+            "trim_slug": "club",
+            "price": 14900
+          },
+          {
+            "trim_slug": "style",
+            "price": 14900
+          },
+          {
+            "trim_slug": "premium",
+            "price": 14900
+          }
+        ]
+      },
+      {
+        "name": "FOREST zelená",
+        "code": "GAO",
+        "type": "metalická",
+        "pricing_per_trim": [
+          {
+            "trim_slug": "club",
+            "price": 14900
+          },
+          {
+            "trim_slug": "style",
+            "price": 14900
+          },
+          {
+            "trim_slug": "premium",
+            "price": 14900
+          }
+        ]
+      },
+      {
+        "name": "GRAND bílá s černou střechou",
+        "code": "2WA (E22B)",
+        "type": "dvoutónová",
+        "pricing_per_trim": [
+          {
+            "trim_slug": "club",
+            "price": 10000
+          },
+          {
+            "trim_slug": "style",
+            "price": 10000
+          },
+          {
+            "trim_slug": "premium",
+            "price": 10000
+          }
+        ]
+      },
+      {
+        "name": "IRON kovová s černou střechou",
+        "code": "2DE (E22B)",
+        "type": "dvoutónová",
+        "pricing_per_trim": [
+          {
+            "trim_slug": "club",
+            "price": 24900
+          },
+          {
+            "trim_slug": "style",
+            "price": 24900
+          },
+          {
+            "trim_slug": "premium",
+            "price": 24900
+          }
+        ]
+      },
+      {
+        "name": "LATTE béžová s černou střechou",
+        "code": "2BL (E22B)",
+        "type": "dvoutónová",
+        "pricing_per_trim": [
+          {
+            "trim_slug": "club",
+            "price": 24900
+          },
+          {
+            "trim_slug": "style",
+            "price": 24900
+          },
+          {
+            "trim_slug": "premium",
+            "price": 24900
+          }
+        ]
+      },
+      {
+        "name": "FOREST zelená s černou střechou",
+        "code": "2GO (E22B)",
+        "type": "dvoutónová",
+        "pricing_per_trim": [
+          {
+            "trim_slug": "club",
+            "price": 24900
+          },
+          {
+            "trim_slug": "style",
+            "price": 24900
+          },
+          {
+            "trim_slug": "premium",
+            "price": 24900
+          }
+        ]
+      }
+    ],
+    "pricelist_colors_interior": [
+      {
+        "name": "Dvoutónový šedý textil (k dispozici pouze s automatickou převodovkou nebo pro Hybrid)",
+        "code": "ADF",
+        "material": "textil",
+        "pricing_per_trim": [
+          {
+            "trim_slug": "club",
+            "price": 0
+          },
+          {
+            "trim_slug": "style",
+            "price": 0
+          },
+          {
+            "trim_slug": "premium",
+            "price": 0
+          }
+        ]
+      },
+      {
+        "name": "Černý textil",
+        "code": "LBH",
+        "material": "textil",
+        "pricing_per_trim": [
+          {
+            "trim_slug": "club",
+            "price": 0
+          },
+          {
+            "trim_slug": "style",
+            "price": 0
+          },
+          {
+            "trim_slug": "premium",
+            "price": 0
+          }
+        ]
+      },
+      {
+        "name": "Dvoutónová šedá syntetická kůže (k dispozici pouze s automatickou převodovkou)",
+        "code": "ADFT",
+        "material": "syntetická kůže",
+        "pricing_per_trim": [
+          {
+            "trim_slug": "style",
+            "price": 5900
+          }
+        ]
+      },
+      {
+        "name": "Černá syntetická kůže",
+        "code": "LBHT",
+        "material": "syntetická kůže",
+        "pricing_per_trim": [
+          {
+            "trim_slug": "style",
+            "price": 5900
+          }
+        ]
+      },
+      {
+        "name": "Dvoutónová šedá kůže",
+        "code": "ADFL",
+        "material": "pravá kůže",
+        "pricing_per_trim": [
+          {
+            "trim_slug": "premium",
+            "price": 0
+          }
+        ]
+      },
+      {
+        "name": "Černá kůže",
+        "code": "LBHL",
+        "material": "pravá kůže",
+        "pricing_per_trim": [
+          {
+            "trim_slug": "premium",
+            "price": 0
+          }
+        ]
+      }
+    ],
+    "trim_levels": [
+      59,
+      60,
+      61
+    ],
+    "option_packages": [
+      65,
+      66,
+      67
+    ]
+  },
+  {
+    "id": 27,
+    "year": 2026,
+    "technical_data": [
+      {
+        "label": "Motor (benzín)",
+        "value": "1.5 GDI Turbo Hybrid"
+      },
+      {
+        "label": "Druh pohonu",
+        "value": "2WD (FWD)"
+      },
+      {
+        "label": "Převodovka",
+        "value": "automatická hybridní převodovka e-DHT"
+      },
+      {
+        "label": "Emisní norma",
+        "value": "Euro 6e-bis"
+      },
+      {
+        "label": "Elektrický motor – maximální výkon (kW)",
+        "value": "130"
+      },
+      {
+        "label": "Elektrický motor – maximální výkon (k)",
+        "value": "176,8"
+      },
+      {
+        "label": "Elektrický motor – maximální točivý moment (Nm)",
+        "value": "300"
+      },
+      {
+        "label": "Elektrický motor – maximální točivý moment (kg.m)",
+        "value": "30,6"
+      },
+      {
+        "label": "Spalovací motor – maximální výkon (kW/ot.)",
+        "value": "110/5 500"
+      },
+      {
+        "label": "Spalovací motor – maximální výkon (k/ot.)",
+        "value": "149,5/5 500"
+      },
+      {
+        "label": "Spalovací motor – maximální točivý moment (Nm/ot.)",
+        "value": "220/2 400~4 200"
+      },
+      {
+        "label": "Spalovací motor – maximální točivý moment (kg.m/ot.)",
+        "value": "22,4/2 400~4 200"
+      },
+      {
+        "label": "Kombinovaný výkon",
+        "value": "204 k / 300 Nm"
+      },
+      {
+        "label": "Maximální rychlost (km/h)",
+        "value": "180"
+      },
+      {
+        "label": "Zdvihový objem (cm3)",
+        "value": "1 498"
+      },
+      {
+        "label": "Vrtání x zdvih (mm)",
+        "value": "72 × 92"
+      },
+      {
+        "label": "Kompresní poměr",
+        "value": "14 : 1"
+      },
+      {
+        "label": "Počet a uspořádání válců",
+        "value": "4 v řadě"
+      },
+      {
+        "label": "Palivo",
+        "value": "Benzín"
+      },
+      {
+        "label": "Objem palivové nádrže (l)",
+        "value": "50"
+      },
+      {
+        "label": "Vnější délka (mm)",
+        "value": "4 705"
+      },
+      {
+        "label": "Vnější šířka (mm)",
+        "value": "1 890"
+      },
+      {
+        "label": "Vnější výška (mm)",
+        "value": "1 710 (1 720 se střešními ližinami)"
+      },
+      {
+        "label": "Rozvor (mm)",
+        "value": "2 680"
+      },
+      {
+        "label": "Rozchod kol přední (mm)",
+        "value": "1 610"
+      },
+      {
+        "label": "Rozchod kol zadní (mm)",
+        "value": "1 630"
+      },
+      {
+        "label": "Převis přední (mm)",
+        "value": "935"
+      },
+      {
+        "label": "Převis zadní (mm)",
+        "value": "1 090"
+      },
+      {
+        "label": "Minimální světlá výška (mm)",
+        "value": "180"
+      },
+      {
+        "label": "Poloměr otáčení (m)",
+        "value": "5,42"
+      },
+      {
+        "label": "Objem zavazadlového prostoru (VDA 213) (l)",
+        "value": "839/703 (s rezervním kolem)"
+      },
+      {
+        "label": "Celková hmotnost (kg)",
+        "value": "2 250"
+      },
+      {
+        "label": "Provozní hmotnost (kg)",
+        "value": "1 670"
+      },
+      {
+        "label": "Celková hmotnost přívěsu brzděný (kg)",
+        "value": "1 300"
+      },
+      {
+        "label": "Celková hmotnost přívěsu nebrzděný (kg)",
+        "value": "500"
+      },
+      {
+        "label": "Kombinované emise CO2 – 17'' kola (g/km)",
+        "value": "136,6"
+      },
+      {
+        "label": "Kombinované emise CO2 – 18'' kola (g/km)",
+        "value": "132,8"
+      },
+      {
+        "label": "Kombinované emise CO2 – 20'' kola (g/km)",
+        "value": "139,2"
+      },
+      {
+        "label": "Kombinovaná spotřeba – 17'' kola (l/100km)",
+        "value": "6,023"
+      },
+      {
+        "label": "Kombinovaná spotřeba – 18'' kola (l/100km)",
+        "value": "5,856"
+      },
+      {
+        "label": "Kombinovaná spotřeba – 20'' kola (l/100km)",
+        "value": "6,128"
+      },
+      {
+        "label": "Fáze 1 (nízké zatížení) – 17'' (l/100km)",
+        "value": "6,436"
+      },
+      {
+        "label": "Fáze 1 (nízké zatížení) – 18'' (l/100km)",
+        "value": "5,809"
+      },
+      {
+        "label": "Fáze 1 (nízké zatížení) – 20'' (l/100km)",
+        "value": "6,441"
+      },
+      {
+        "label": "Fáze 2 (střední zatížení) – 17'' (l/100km)",
+        "value": "3,869"
+      },
+      {
+        "label": "Fáze 2 (střední zatížení) – 18'' (l/100km)",
+        "value": "3,784"
+      },
+      {
+        "label": "Fáze 2 (střední zatížení) – 20'' (l/100km)",
+        "value": "4,443"
+      },
+      {
+        "label": "Fáze 3 (vysoké zatížení) – 17'' (l/100km)",
+        "value": "5,309"
+      },
+      {
+        "label": "Fáze 3 (vysoké zatížení) – 18'' (l/100km)",
+        "value": "5,307"
+      },
+      {
+        "label": "Fáze 3 (vysoké zatížení) – 20'' (l/100km)",
+        "value": "5,372"
+      },
+      {
+        "label": "Fáze 4 (extra vysoké zatížení) – 17'' (l/100km)",
+        "value": "7,734"
+      },
+      {
+        "label": "Fáze 4 (extra vysoké zatížení) – 18'' (l/100km)",
+        "value": "7,544"
+      },
+      {
+        "label": "Fáze 4 (extra vysoké zatížení) – 20'' (l/100km)",
+        "value": "7,639"
+      },
+      {
+        "label": "Metodika testování",
+        "value": "(WLTP) Worldwide Harmonized Light Vehicle Test Procedure"
+      },
+      {
+        "label": "Tovární záruka",
+        "value": "5 let / 100 000 km"
+      },
+      {
+        "label": "Garance na baterii",
+        "value": "8 let / 160 000 km (pokud kapacita klesne pod 70 %)"
+      }
+    ],
+    "status": "published",
+    "model": 4,
+    "version": null,
+    "pricelist_colors": {
+      "exterior": [
+        {
+          "name": "GRAND bílá",
+          "code": "WAA",
+          "type": "základní",
+          "pricing_per_trim": {
+            "club": 0,
+            "style": 0,
+            "premium": 0
+          }
+        },
+        {
+          "name": "IRON kovová",
+          "code": "ADE",
+          "type": "metalická",
+          "pricing_per_trim": {
+            "club": 14900,
+            "style": 14900,
+            "premium": 14900
+          }
+        },
+        {
+          "name": "SPACE černá",
+          "code": "LAK",
+          "type": "metalická",
+          "pricing_per_trim": {
+            "club": 14900,
+            "style": 14900,
+            "premium": 14900
+          }
+        },
+        {
+          "name": "LATTE béžová",
+          "code": "EBL",
+          "type": "metalická",
+          "pricing_per_trim": {
+            "club": 14900,
+            "style": 14900,
+            "premium": 14900
+          }
+        },
+        {
+          "name": "DANDY modrá",
+          "code": "BAS",
+          "type": "metalická",
+          "pricing_per_trim": {
+            "club": 14900,
+            "style": 14900,
+            "premium": 14900
+          }
+        },
+        {
+          "name": "FOREST zelená",
+          "code": "GAO",
+          "type": "metalická",
+          "pricing_per_trim": {
+            "club": 14900,
+            "style": 14900,
+            "premium": 14900
+          }
+        },
+        {
+          "name": "GRAND bílá s černou střechou",
+          "code": "2WA (E22B)",
+          "type": "dvoutónová",
+          "pricing_per_trim": {
+            "club": 10000,
+            "style": 10000,
+            "premium": 10000
+          }
+        },
+        {
+          "name": "IRON kovová s černou střechou",
+          "code": "2DE (E22B)",
+          "type": "dvoutónová",
+          "pricing_per_trim": {
+            "club": 24900,
+            "style": 24900,
+            "premium": 24900
+          }
+        },
+        {
+          "name": "LATTE béžová s černou střechou",
+          "code": "2BL (E22B)",
+          "type": "dvoutónová",
+          "pricing_per_trim": {
+            "club": 24900,
+            "style": 24900,
+            "premium": 24900
+          }
+        },
+        {
+          "name": "FOREST zelená s černou střechou",
+          "code": "2GO (E22B)",
+          "type": "dvoutónová",
+          "pricing_per_trim": {
+            "club": 24900,
+            "style": 24900,
+            "premium": 24900
+          }
+        }
+      ],
+      "interior": [
+        {
+          "name": "Dvoutónový šedý textil (k dispozici pouze s automatickou převodovkou nebo pro Hybrid)",
+          "code": "ADF",
+          "material": "textil",
+          "pricing_per_trim": {
+            "club": 0,
+            "style": 0
+          }
+        },
+        {
+          "name": "Černý textil",
+          "code": "LBH",
+          "material": "textil",
+          "pricing_per_trim": {
+            "club": 0,
+            "style": 0
+          }
+        },
+        {
+          "name": "Dvoutónová šedá syntetická kůže (k dispozici pouze s automatickou převodovkou)",
+          "code": "ADFT",
+          "material": "syntetická kůže",
+          "pricing_per_trim": {
+            "style": 5900
+          }
+        },
+        {
+          "name": "Černá syntetická kůže",
+          "code": "LBHT",
+          "material": "syntetická kůže",
+          "pricing_per_trim": {
+            "style": 5900
+          }
+        },
+        {
+          "name": "Dvoutónová šedá kůže",
+          "code": "ADFL",
+          "material": "pravá kůže",
+          "pricing_per_trim": {
+            "premium": 0
+          }
+        },
+        {
+          "name": "Černá kůže",
+          "code": "LBHL",
+          "material": "pravá kůže",
+          "pricing_per_trim": {
+            "premium": 0
+          }
+        }
+      ]
+    },
+    "pricelist_colors_exterior": [
+      {
+        "name": "GRAND bílá",
+        "code": "WAA",
+        "type": "základní",
+        "pricing_per_trim": [
+          {
+            "trim_slug": "club",
+            "price": 0
+          },
+          {
+            "trim_slug": "style",
+            "price": 0
+          },
+          {
+            "trim_slug": "premium",
+            "price": 0
+          }
+        ]
+      },
+      {
+        "name": "IRON kovová",
+        "code": "ADE",
+        "type": "metalická",
+        "pricing_per_trim": [
+          {
+            "trim_slug": "club",
+            "price": 14900
+          },
+          {
+            "trim_slug": "style",
+            "price": 14900
+          },
+          {
+            "trim_slug": "premium",
+            "price": 14900
+          }
+        ]
+      },
+      {
+        "name": "SPACE černá",
+        "code": "LAK",
+        "type": "metalická",
+        "pricing_per_trim": [
+          {
+            "trim_slug": "club",
+            "price": 14900
+          },
+          {
+            "trim_slug": "style",
+            "price": 14900
+          },
+          {
+            "trim_slug": "premium",
+            "price": 14900
+          }
+        ]
+      },
+      {
+        "name": "LATTE béžová",
+        "code": "EBL",
+        "type": "metalická",
+        "pricing_per_trim": [
+          {
+            "trim_slug": "club",
+            "price": 14900
+          },
+          {
+            "trim_slug": "style",
+            "price": 14900
+          },
+          {
+            "trim_slug": "premium",
+            "price": 14900
+          }
+        ]
+      },
+      {
+        "name": "DANDY modrá",
+        "code": "BAS",
+        "type": "metalická",
+        "pricing_per_trim": [
+          {
+            "trim_slug": "club",
+            "price": 14900
+          },
+          {
+            "trim_slug": "style",
+            "price": 14900
+          },
+          {
+            "trim_slug": "premium",
+            "price": 14900
+          }
+        ]
+      },
+      {
+        "name": "FOREST zelená",
+        "code": "GAO",
+        "type": "metalická",
+        "pricing_per_trim": [
+          {
+            "trim_slug": "club",
+            "price": 14900
+          },
+          {
+            "trim_slug": "style",
+            "price": 14900
+          },
+          {
+            "trim_slug": "premium",
+            "price": 14900
+          }
+        ]
+      },
+      {
+        "name": "GRAND bílá s černou střechou",
+        "code": "2WA (E22B)",
+        "type": "dvoutónová",
+        "pricing_per_trim": [
+          {
+            "trim_slug": "club",
+            "price": 10000
+          },
+          {
+            "trim_slug": "style",
+            "price": 10000
+          },
+          {
+            "trim_slug": "premium",
+            "price": 10000
+          }
+        ]
+      },
+      {
+        "name": "IRON kovová s černou střechou",
+        "code": "2DE (E22B)",
+        "type": "dvoutónová",
+        "pricing_per_trim": [
+          {
+            "trim_slug": "club",
+            "price": 24900
+          },
+          {
+            "trim_slug": "style",
+            "price": 24900
+          },
+          {
+            "trim_slug": "premium",
+            "price": 24900
+          }
+        ]
+      },
+      {
+        "name": "LATTE béžová s černou střechou",
+        "code": "2BL (E22B)",
+        "type": "dvoutónová",
+        "pricing_per_trim": [
+          {
+            "trim_slug": "club",
+            "price": 24900
+          },
+          {
+            "trim_slug": "style",
+            "price": 24900
+          },
+          {
+            "trim_slug": "premium",
+            "price": 24900
+          }
+        ]
+      },
+      {
+        "name": "FOREST zelená s černou střechou",
+        "code": "2GO (E22B)",
+        "type": "dvoutónová",
+        "pricing_per_trim": [
+          {
+            "trim_slug": "club",
+            "price": 24900
+          },
+          {
+            "trim_slug": "style",
+            "price": 24900
+          },
+          {
+            "trim_slug": "premium",
+            "price": 24900
+          }
+        ]
+      }
+    ],
+    "pricelist_colors_interior": [
+      {
+        "name": "Dvoutónový šedý textil (k dispozici pouze s automatickou převodovkou nebo pro Hybrid)",
+        "code": "ADF",
+        "material": "textil",
+        "pricing_per_trim": [
+          {
+            "trim_slug": "club",
+            "price": 0
+          },
+          {
+            "trim_slug": "style",
+            "price": 0
+          }
+        ]
+      },
+      {
+        "name": "Černý textil",
+        "code": "LBH",
+        "material": "textil",
+        "pricing_per_trim": [
+          {
+            "trim_slug": "club",
+            "price": 0
+          },
+          {
+            "trim_slug": "style",
+            "price": 0
+          }
+        ]
+      },
+      {
+        "name": "Dvoutónová šedá syntetická kůže (k dispozici pouze s automatickou převodovkou)",
+        "code": "ADFT",
+        "material": "syntetická kůže",
+        "pricing_per_trim": [
+          {
+            "trim_slug": "style",
+            "price": 5900
+          }
+        ]
+      },
+      {
+        "name": "Černá syntetická kůže",
+        "code": "LBHT",
+        "material": "syntetická kůže",
+        "pricing_per_trim": [
+          {
+            "trim_slug": "style",
+            "price": 5900
+          }
+        ]
+      },
+      {
+        "name": "Dvoutónová šedá kůže",
+        "code": "ADFL",
+        "material": "pravá kůže",
+        "pricing_per_trim": [
+          {
+            "trim_slug": "premium",
+            "price": 0
+          }
+        ]
+      },
+      {
+        "name": "Černá kůže",
+        "code": "LBHL",
+        "material": "pravá kůže",
+        "pricing_per_trim": [
+          {
+            "trim_slug": "premium",
+            "price": 0
+          }
+        ]
+      }
+    ],
+    "trim_levels": [
+      62,
+      63,
+      64
+    ],
+    "option_packages": [
+      68,
+      69,
+      70
+    ]
+  },
+  {
+    "id": 28,
+    "year": 2026,
+    "technical_data": [
+      {
+        "label": "Druh pohonu",
+        "value": "FWD"
+      },
+      {
+        "label": "Převodovka",
+        "value": "Redukční převodovka"
+      },
+      {
+        "label": "Elektromotor",
+        "value": "Synchronní motory s permanentními magnety"
+      },
+      {
+        "label": "Maximální výkon (kW)",
+        "value": "152,2"
+      },
+      {
+        "label": "Maximální výkon (k)",
+        "value": "207"
+      },
+      {
+        "label": "Maximální točivý moment (Nm)",
+        "value": "339"
+      },
+      {
+        "label": "Maximální točivý moment (kg.m)",
+        "value": "34,6"
+      },
+      {
+        "label": "Zrychlení z 0 na 100 km/h (s)",
+        "value": "8,11"
+      },
+      {
+        "label": "Maximální rychlost (km/h)",
+        "value": "175"
+      },
+      {
+        "label": "Typ baterie",
+        "value": "Lithium-železo-fosfátová LFP (LifeP04)"
+      },
+      {
+        "label": "Standardní nabíjecí doba (0–100%)",
+        "value": "Trojfázové: 30h (IC-CPD, 2kW) 9h (11kW)"
+      },
+      {
+        "label": "Rychlonabíjení (10–80%)",
+        "value": "300kW: 37 min / 100kW: 42 min"
+      },
+      {
+        "label": "Palubní nabíječka (kW)",
+        "value": "10,5"
+      },
+      {
+        "label": "Kapacita baterie (kWh)",
+        "value": "80,6"
+      },
+      {
+        "label": "Napětí (V)",
+        "value": "390,4"
+      },
+      {
+        "label": "Spotřeba elektrické energie (Wh/km)",
+        "value": "135,5 (město) / 186,5 (kombinovaná)"
+      },
+      {
+        "label": "Dojezd kombinovaný (km)",
+        "value": "462"
+      },
+      {
+        "label": "Dojezd město (km)",
+        "value": "635"
+      },
+      {
+        "label": "Vnější délka (mm)",
+        "value": "4 715"
+      },
+      {
+        "label": "Vnější šířka (mm)",
+        "value": "1 890"
+      },
+      {
+        "label": "Vnější výška (mm)",
+        "value": "1 715 (1 725 se střešními ližinami)"
+      },
+      {
+        "label": "Rozvor (mm)",
+        "value": "2 680"
+      },
+      {
+        "label": "Rozchod kol přední (mm)",
+        "value": "1 620"
+      },
+      {
+        "label": "Rozchod kol zadní (mm)",
+        "value": "1 640"
+      },
+      {
+        "label": "Převis přední (mm)",
+        "value": "930"
+      },
+      {
+        "label": "Převis zadní (mm)",
+        "value": "1 105"
+      },
+      {
+        "label": "Přední nájezdový úhel (°)",
+        "value": "18,3"
+      },
+      {
+        "label": "Zadní nájezdový úhel (°)",
+        "value": "20,8"
+      },
+      {
+        "label": "Přechodový úhel (°)",
+        "value": "15,3"
+      },
+      {
+        "label": "Minimální světlá výška (mm)",
+        "value": "169"
+      },
+      {
+        "label": "Poloměr otáčení (m)",
+        "value": "5,42"
+      },
+      {
+        "label": "Velikost zavazadlového prostoru (l)",
+        "value": "839"
+      },
+      {
+        "label": "Celková hmotnost (kg)",
+        "value": "2 410"
+      },
+      {
+        "label": "Provozní hmotnost (kg)",
+        "value": "1 915"
+      },
+      {
+        "label": "Tažná hmotnost brzděná (kg)",
+        "value": "1 500"
+      },
+      {
+        "label": "Tažná hmotnost nebrzděná (kg)",
+        "value": "500"
+      }
+    ],
+    "status": "published",
+    "model": 5,
+    "version": null,
+    "pricelist_colors": {
+      "exterior": [
+        {
+          "name": "GRAND bílá",
+          "code": "WAA",
+          "type": "základní",
+          "pricing_per_trim": {
+            "style": 0,
+            "premium": 0
+          }
+        },
+        {
+          "name": "SPACE černá",
+          "code": "LAK",
+          "type": "metalická",
+          "pricing_per_trim": {
+            "style": 14900,
+            "premium": 14900
+          }
+        },
+        {
+          "name": "DANDY modrá",
+          "code": "BAS",
+          "type": "metalická",
+          "pricing_per_trim": {
+            "style": 14900,
+            "premium": 14900
+          }
+        },
+        {
+          "name": "IRON kovová",
+          "code": "ADE",
+          "type": "metalická",
+          "pricing_per_trim": {
+            "style": 14900,
+            "premium": 14900
+          }
+        },
+        {
+          "name": "LATTE béžová",
+          "code": "EBL",
+          "type": "metalická",
+          "pricing_per_trim": {
+            "style": 14900,
+            "premium": 14900
+          }
+        },
+        {
+          "name": "FOREST zelená",
+          "code": "GAO",
+          "type": "metalická",
+          "pricing_per_trim": {
+            "style": 14900,
+            "premium": 14900
+          }
+        },
+        {
+          "name": "GRAND bílá s černou střechou",
+          "code": "2WA",
+          "type": "dvoutónová",
+          "pricing_per_trim": {
+            "style": 0,
+            "premium": 10000
+          }
+        },
+        {
+          "name": "IRON kovová s černou střechou",
+          "code": "2DE",
+          "type": "dvoutónová",
+          "pricing_per_trim": {
+            "style": 0,
+            "premium": 24900
+          }
+        },
+        {
+          "name": "LATTE béžová s černou střechou",
+          "code": "2BL",
+          "type": "dvoutónová",
+          "pricing_per_trim": {
+            "style": 0,
+            "premium": 24900
+          }
+        },
+        {
+          "name": "FOREST zelená s černou střechou",
+          "code": "2GO",
+          "type": "dvoutónová",
+          "pricing_per_trim": {
+            "style": 0,
+            "premium": 24900
+          }
+        }
+      ],
+      "interior": [
+        {
+          "name": "Černý textil",
+          "code": "LBH",
+          "material": "textil",
+          "pricing_per_trim": {
+            "style": 0
+          }
+        },
+        {
+          "name": "Dvoutónový šedý textil",
+          "code": "ADF",
+          "material": "textil",
+          "pricing_per_trim": {
+            "style": 0
+          }
+        },
+        {
+          "name": "Černá syntetická kůže",
+          "code": "LBHT",
+          "material": "syntetická kůže",
+          "pricing_per_trim": {
+            "premium": 0
+          }
+        },
+        {
+          "name": "Dvoutónová šedá syntetická kůže",
+          "code": "ADFT (E27)",
+          "material": "syntetická kůže",
+          "pricing_per_trim": {
+            "premium": 0
+          }
+        },
+        {
+          "name": "Černá kůže (dostupné pouze v kombinaci s PREMIUM+ paketem)",
+          "code": "LBHL (E04)",
+          "material": "pravá kůže",
+          "pricing_per_trim": {
+            "premium": 14900
+          }
+        },
+        {
+          "name": "Dvoutónová šedá kůže (dostupné pouze v kombinaci s PREMIUM+ paketem)",
+          "code": "ADFL (E23)",
+          "material": "pravá kůže",
+          "pricing_per_trim": {
+            "premium": 14900
+          }
+        }
+      ]
+    },
+    "pricelist_colors_exterior": [
+      {
+        "name": "GRAND bílá",
+        "code": "WAA",
+        "type": "základní",
+        "pricing_per_trim": [
+          {
+            "trim_slug": "style",
+            "price": 0
+          },
+          {
+            "trim_slug": "premium",
+            "price": 0
+          }
+        ]
+      },
+      {
+        "name": "SPACE černá",
+        "code": "LAK",
+        "type": "metalická",
+        "pricing_per_trim": [
+          {
+            "trim_slug": "style",
+            "price": 14900
+          },
+          {
+            "trim_slug": "premium",
+            "price": 14900
+          }
+        ]
+      },
+      {
+        "name": "DANDY modrá",
+        "code": "BAS",
+        "type": "metalická",
+        "pricing_per_trim": [
+          {
+            "trim_slug": "style",
+            "price": 14900
+          },
+          {
+            "trim_slug": "premium",
+            "price": 14900
+          }
+        ]
+      },
+      {
+        "name": "IRON kovová",
+        "code": "ADE",
+        "type": "metalická",
+        "pricing_per_trim": [
+          {
+            "trim_slug": "style",
+            "price": 14900
+          },
+          {
+            "trim_slug": "premium",
+            "price": 14900
+          }
+        ]
+      },
+      {
+        "name": "LATTE béžová",
+        "code": "EBL",
+        "type": "metalická",
+        "pricing_per_trim": [
+          {
+            "trim_slug": "style",
+            "price": 14900
+          },
+          {
+            "trim_slug": "premium",
+            "price": 14900
+          }
+        ]
+      },
+      {
+        "name": "FOREST zelená",
+        "code": "GAO",
+        "type": "metalická",
+        "pricing_per_trim": [
+          {
+            "trim_slug": "style",
+            "price": 14900
+          },
+          {
+            "trim_slug": "premium",
+            "price": 14900
+          }
+        ]
+      },
+      {
+        "name": "GRAND bílá s černou střechou",
+        "code": "2WA",
+        "type": "dvoutónová",
+        "pricing_per_trim": [
+          {
+            "trim_slug": "style",
+            "price": 0
+          },
+          {
+            "trim_slug": "premium",
+            "price": 10000
+          }
+        ]
+      },
+      {
+        "name": "IRON kovová s černou střechou",
+        "code": "2DE",
+        "type": "dvoutónová",
+        "pricing_per_trim": [
+          {
+            "trim_slug": "style",
+            "price": 0
+          },
+          {
+            "trim_slug": "premium",
+            "price": 24900
+          }
+        ]
+      },
+      {
+        "name": "LATTE béžová s černou střechou",
+        "code": "2BL",
+        "type": "dvoutónová",
+        "pricing_per_trim": [
+          {
+            "trim_slug": "style",
+            "price": 0
+          },
+          {
+            "trim_slug": "premium",
+            "price": 24900
+          }
+        ]
+      },
+      {
+        "name": "FOREST zelená s černou střechou",
+        "code": "2GO",
+        "type": "dvoutónová",
+        "pricing_per_trim": [
+          {
+            "trim_slug": "style",
+            "price": 0
+          },
+          {
+            "trim_slug": "premium",
+            "price": 24900
+          }
+        ]
+      }
+    ],
+    "pricelist_colors_interior": [
+      {
+        "name": "Černý textil",
+        "code": "LBH",
+        "material": "textil",
+        "pricing_per_trim": [
+          {
+            "trim_slug": "style",
+            "price": 0
+          }
+        ]
+      },
+      {
+        "name": "Dvoutónový šedý textil",
+        "code": "ADF",
+        "material": "textil",
+        "pricing_per_trim": [
+          {
+            "trim_slug": "style",
+            "price": 0
+          }
+        ]
+      },
+      {
+        "name": "Černá syntetická kůže",
+        "code": "LBHT",
+        "material": "syntetická kůže",
+        "pricing_per_trim": [
+          {
+            "trim_slug": "premium",
+            "price": 0
+          }
+        ]
+      },
+      {
+        "name": "Dvoutónová šedá syntetická kůže",
+        "code": "ADFT (E27)",
+        "material": "syntetická kůže",
+        "pricing_per_trim": [
+          {
+            "trim_slug": "premium",
+            "price": 0
+          }
+        ]
+      },
+      {
+        "name": "Černá kůže (dostupné pouze v kombinaci s PREMIUM+ paketem)",
+        "code": "LBHL (E04)",
+        "material": "pravá kůže",
+        "pricing_per_trim": [
+          {
+            "trim_slug": "premium",
+            "price": 14900
+          }
+        ]
+      },
+      {
+        "name": "Dvoutónová šedá kůže (dostupné pouze v kombinaci s PREMIUM+ paketem)",
+        "code": "ADFL (E23)",
+        "material": "pravá kůže",
+        "pricing_per_trim": [
+          {
+            "trim_slug": "premium",
+            "price": 14900
+          }
+        ]
+      }
+    ],
+    "trim_levels": [
+      65,
+      66
+    ],
+    "option_packages": [
+      71,
+      72
+    ]
+  },
+  {
+    "id": 29,
+    "year": 2026,
+    "technical_data": [
+      {
+        "label": "Motor",
+        "value": "BENZÍN 1.5 GDI TURBO"
+      },
+      {
+        "label": "Druh pohonu",
+        "value": "FWD/AWD"
+      },
+      {
+        "label": "Převodovka",
+        "value": "6stupňová automatická převodovka AISIN"
+      },
+      {
+        "label": "Emisní norma",
+        "value": "Euro 6e"
+      },
+      {
+        "label": "Vnější délka (mm)",
+        "value": "4 740"
+      },
+      {
+        "label": "Vnější šířka (mm)",
+        "value": "1 910"
+      },
+      {
+        "label": "Vnější výška (mm)",
+        "value": "1 655 (1 670 se střešními ližinami)"
+      },
+      {
+        "label": "Rozvor (mm)",
+        "value": "2 680"
+      },
+      {
+        "label": "Rozchod kol – přední (mm)",
+        "value": "1 635"
+      },
+      {
+        "label": "Rozchod kol – zadní (mm)",
+        "value": "1 655"
+      },
+      {
+        "label": "Převis přední (mm)",
+        "value": "915"
+      },
+      {
+        "label": "Převis zadní (mm)",
+        "value": "1 145"
+      },
+      {
+        "label": "Minimální světlá výška (mm)",
+        "value": "206"
+      },
+      {
+        "label": "Poloměr otáčení (m)",
+        "value": "5,43"
+      },
+      {
+        "label": "Objem zavazadlového prostoru (l)",
+        "value": "668 (při sklopení druhé řady 1 568)"
+      },
+      {
+        "label": "FWD – Celková hmotnost (kg)",
+        "value": "2 080"
+      },
+      {
+        "label": "AWD – Celková hmotnost (kg)",
+        "value": "2 170"
+      },
+      {
+        "label": "FWD – Provozní hmotnost (kg)",
+        "value": "1 580"
+      },
+      {
+        "label": "AWD – Provozní hmotnost (kg)",
+        "value": "1 670"
+      },
+      {
+        "label": "Celková hmotnost přívěsu brzděný (kg)",
+        "value": "1 500"
+      },
+      {
+        "label": "Celková hmotnost přívěsu nebrzděný (kg)",
+        "value": "500"
+      },
+      {
+        "label": "Palivo",
+        "value": "Benzín"
+      },
+      {
+        "label": "Objem palivové nádrže (l)",
+        "value": "50"
+      },
+      {
+        "label": "Zdvihový objem (cm3)",
+        "value": "1 497"
+      },
+      {
+        "label": "Vrtání × Zdvih (mm)",
+        "value": "76 × 82,5"
+      },
+      {
+        "label": "Kompresní poměr",
+        "value": "9,5 : 1"
+      },
+      {
+        "label": "Počet a uspořádání válců",
+        "value": "4 v řadě"
+      },
+      {
+        "label": "Maximální výkon (kW/ot.)",
+        "value": "120/5 000~5 500"
+      },
+      {
+        "label": "Maximální výkon (k/ot.)",
+        "value": "163/5 000~5 500"
+      },
+      {
+        "label": "Maximální točivý moment (Nm/ot.)",
+        "value": "280/1 500~4 000"
+      },
+      {
+        "label": "Maximální rychlost (km/h)",
+        "value": "191"
+      },
+      {
+        "label": "Benzín FWD – Kombinované emise CO2 (g/km)",
+        "value": "193,60"
+      },
+      {
+        "label": "Benzín AWD – Kombinované emise CO2 (g/km)",
+        "value": "205,00"
+      },
+      {
+        "label": "Benzín FWD – Kombinovaná spotřeba (l/100km)",
+        "value": "8,525"
+      },
+      {
+        "label": "Benzín AWD – Kombinovaná spotřeba (l/100km)",
+        "value": "9,027"
+      },
+      {
+        "label": "Benzín FWD – Fáze 1 nízké zatížení (l/100km)",
+        "value": "11,117"
+      },
+      {
+        "label": "Benzín AWD – Fáze 1 nízké zatížení (l/100km)",
+        "value": "11,612"
+      },
+      {
+        "label": "Benzín FWD – Fáze 2 střední zatížení (l/100km)",
+        "value": "8,287"
+      },
+      {
+        "label": "Benzín AWD – Fáze 2 střední zatížení (l/100km)",
+        "value": "8,860"
+      },
+      {
+        "label": "Benzín FWD – Fáze 3 vysoké zatížení (l/100km)",
+        "value": "7,261"
+      },
+      {
+        "label": "Benzín AWD – Fáze 3 vysoké zatížení (l/100km)",
+        "value": "7,768"
+      },
+      {
+        "label": "Benzín FWD – Fáze 4 extra vysoké zatížení (l/100km)",
+        "value": "8,787"
+      },
+      {
+        "label": "Benzín AWD – Fáze 4 extra vysoké zatížení (l/100km)",
+        "value": "9,246"
+      }
+    ],
+    "status": "published",
+    "model": 6,
+    "version": null,
+    "pricelist_colors": {
+      "exterior": [
+        {
+          "name": "GRAND bílá",
+          "code": "WAA",
+          "type": "základní",
+          "pricing_per_trim": {
+            "style": 0,
+            "premium": 0
+          }
+        },
+        {
+          "name": "COPPER měděná (pouze ze skladových zásob)",
+          "code": "OBE",
+          "type": "metalická",
+          "pricing_per_trim": {
+            "style": 14900,
+            "premium": 14900
+          }
+        },
+        {
+          "name": "IRON kovová",
+          "code": "ADE",
+          "type": "metalická",
+          "pricing_per_trim": {
+            "style": 14900,
+            "premium": 14900
+          }
+        },
+        {
+          "name": "SPACE černá",
+          "code": "LAK",
+          "type": "metalická",
+          "pricing_per_trim": {
+            "style": 14900,
+            "premium": 14900
+          }
+        },
+        {
+          "name": "LATTE béžová",
+          "code": "EBL",
+          "type": "metalická",
+          "pricing_per_trim": {
+            "style": 14900,
+            "premium": 14900
+          }
+        },
+        {
+          "name": "DANDY modrá",
+          "code": "BAS",
+          "type": "metalická",
+          "pricing_per_trim": {
+            "style": 14900,
+            "premium": 14900
+          }
+        },
+        {
+          "name": "FOREST zelená",
+          "code": "GAO",
+          "type": "metalická",
+          "pricing_per_trim": {
+            "style": 14900,
+            "premium": 14900
+          }
+        },
+        {
+          "name": "GRAND bílá s černou střechou",
+          "code": "2WA (E22)",
+          "type": "dvoutónová",
+          "pricing_per_trim": {
+            "style": 10000,
+            "premium": 10000
+          }
+        },
+        {
+          "name": "COPPER měděná s černou střechou (pouze ze skladových zásob)",
+          "code": "2OE (E22)",
+          "type": "dvoutónová",
+          "pricing_per_trim": {
+            "style": 24900,
+            "premium": 24900
+          }
+        },
+        {
+          "name": "IRON kovová s černou střechou",
+          "code": "2DE (E22)",
+          "type": "dvoutónová",
+          "pricing_per_trim": {
+            "style": 24900,
+            "premium": 24900
+          }
+        },
+        {
+          "name": "LATTE béžová s černou střechou",
+          "code": "2BL (E22)",
+          "type": "dvoutónová",
+          "pricing_per_trim": {
+            "style": 24900,
+            "premium": 24900
+          }
+        },
+        {
+          "name": "FOREST zelená s černou střechou",
+          "code": "2GO (E22)",
+          "type": "dvoutónová",
+          "pricing_per_trim": {
+            "style": 24900,
+            "premium": 24900
+          }
+        }
+      ],
+      "interior": [
+        {
+          "name": "Černá kůže",
+          "code": "LDB",
+          "material": "syntetická kůže",
+          "pricing_per_trim": {
+            "style": 0,
+            "premium": 0
+          }
+        },
+        {
+          "name": "Dvoutónová kůže béžová",
+          "code": "EBO (E75)",
+          "material": "kombinace syntetické kůže a textilu",
+          "pricing_per_trim": {
+            "style": 9900,
+            "premium": 9900
+          }
+        },
+        {
+          "name": "Černá kůže s červeným semišem (k dispozici pouze pro benzínovou verzi)",
+          "code": "LCX (E76)",
+          "material": "syntetická kůže",
+          "pricing_per_trim": {
+            "style": 9900,
+            "premium": 9900
+          }
+        },
+        {
+          "name": "Černá kůže s černým semišem (k dispozici pouze pro hybridní verzi)",
+          "code": "LDE (E80)",
+          "material": "syntetická kůže",
+          "pricing_per_trim": {
+            "style": 9900,
+            "premium": 9900
+          }
+        }
+      ]
+    },
+    "pricelist_colors_exterior": [
+      {
+        "name": "GRAND bílá",
+        "code": "WAA",
+        "type": "základní",
+        "pricing_per_trim": [
+          {
+            "trim_slug": "style",
+            "price": 0
+          },
+          {
+            "trim_slug": "premium",
+            "price": 0
+          }
+        ]
+      },
+      {
+        "name": "COPPER měděná (pouze ze skladových zásob)",
+        "code": "OBE",
+        "type": "metalická",
+        "pricing_per_trim": [
+          {
+            "trim_slug": "style",
+            "price": 14900
+          },
+          {
+            "trim_slug": "premium",
+            "price": 14900
+          }
+        ]
+      },
+      {
+        "name": "IRON kovová",
+        "code": "ADE",
+        "type": "metalická",
+        "pricing_per_trim": [
+          {
+            "trim_slug": "style",
+            "price": 14900
+          },
+          {
+            "trim_slug": "premium",
+            "price": 14900
+          }
+        ]
+      },
+      {
+        "name": "SPACE černá",
+        "code": "LAK",
+        "type": "metalická",
+        "pricing_per_trim": [
+          {
+            "trim_slug": "style",
+            "price": 14900
+          },
+          {
+            "trim_slug": "premium",
+            "price": 14900
+          }
+        ]
+      },
+      {
+        "name": "LATTE béžová",
+        "code": "EBL",
+        "type": "metalická",
+        "pricing_per_trim": [
+          {
+            "trim_slug": "style",
+            "price": 14900
+          },
+          {
+            "trim_slug": "premium",
+            "price": 14900
+          }
+        ]
+      },
+      {
+        "name": "DANDY modrá",
+        "code": "BAS",
+        "type": "metalická",
+        "pricing_per_trim": [
+          {
+            "trim_slug": "style",
+            "price": 14900
+          },
+          {
+            "trim_slug": "premium",
+            "price": 14900
+          }
+        ]
+      },
+      {
+        "name": "FOREST zelená",
+        "code": "GAO",
+        "type": "metalická",
+        "pricing_per_trim": [
+          {
+            "trim_slug": "style",
+            "price": 14900
+          },
+          {
+            "trim_slug": "premium",
+            "price": 14900
+          }
+        ]
+      },
+      {
+        "name": "GRAND bílá s černou střechou",
+        "code": "2WA (E22)",
+        "type": "dvoutónová",
+        "pricing_per_trim": [
+          {
+            "trim_slug": "style",
+            "price": 10000
+          },
+          {
+            "trim_slug": "premium",
+            "price": 10000
+          }
+        ]
+      },
+      {
+        "name": "COPPER měděná s černou střechou (pouze ze skladových zásob)",
+        "code": "2OE (E22)",
+        "type": "dvoutónová",
+        "pricing_per_trim": [
+          {
+            "trim_slug": "style",
+            "price": 24900
+          },
+          {
+            "trim_slug": "premium",
+            "price": 24900
+          }
+        ]
+      },
+      {
+        "name": "IRON kovová s černou střechou",
+        "code": "2DE (E22)",
+        "type": "dvoutónová",
+        "pricing_per_trim": [
+          {
+            "trim_slug": "style",
+            "price": 24900
+          },
+          {
+            "trim_slug": "premium",
+            "price": 24900
+          }
+        ]
+      },
+      {
+        "name": "LATTE béžová s černou střechou",
+        "code": "2BL (E22)",
+        "type": "dvoutónová",
+        "pricing_per_trim": [
+          {
+            "trim_slug": "style",
+            "price": 24900
+          },
+          {
+            "trim_slug": "premium",
+            "price": 24900
+          }
+        ]
+      },
+      {
+        "name": "FOREST zelená s černou střechou",
+        "code": "2GO (E22)",
+        "type": "dvoutónová",
+        "pricing_per_trim": [
+          {
+            "trim_slug": "style",
+            "price": 24900
+          },
+          {
+            "trim_slug": "premium",
+            "price": 24900
+          }
+        ]
+      }
+    ],
+    "pricelist_colors_interior": [
+      {
+        "name": "Černá kůže",
+        "code": "LDB",
+        "material": "syntetická kůže",
+        "pricing_per_trim": [
+          {
+            "trim_slug": "style",
+            "price": 0
+          },
+          {
+            "trim_slug": "premium",
+            "price": 0
+          }
+        ]
+      },
+      {
+        "name": "Dvoutónová kůže béžová",
+        "code": "EBO (E75)",
+        "material": "kombinace syntetické kůže a textilu",
+        "pricing_per_trim": [
+          {
+            "trim_slug": "style",
+            "price": 9900
+          },
+          {
+            "trim_slug": "premium",
+            "price": 9900
+          }
+        ]
+      },
+      {
+        "name": "Černá kůže s červeným semišem (k dispozici pouze pro benzínovou verzi)",
+        "code": "LCX (E76)",
+        "material": "syntetická kůže",
+        "pricing_per_trim": [
+          {
+            "trim_slug": "style",
+            "price": 9900
+          },
+          {
+            "trim_slug": "premium",
+            "price": 9900
+          }
+        ]
+      },
+      {
+        "name": "Černá kůže s černým semišem (k dispozici pouze pro hybridní verzi)",
+        "code": "LDE (E80)",
+        "material": "syntetická kůže",
+        "pricing_per_trim": [
+          {
+            "trim_slug": "style",
+            "price": 9900
+          },
+          {
+            "trim_slug": "premium",
+            "price": 9900
+          }
+        ]
+      }
+    ],
+    "trim_levels": [
+      67,
+      68
+    ],
+    "option_packages": []
+  },
+  {
+    "id": 30,
+    "year": 2026,
+    "technical_data": [
+      {
+        "label": "Motor",
+        "value": "1.5 GDI Turbo Hybrid"
+      },
+      {
+        "label": "Druh pohonu",
+        "value": "FWD"
+      },
+      {
+        "label": "Převodovka",
+        "value": "automatická hybridní převodovka e-DHT"
+      },
+      {
+        "label": "Emisní norma",
+        "value": "Euro 6e-bis"
+      },
+      {
+        "label": "Vnější délka (mm)",
+        "value": "4 740"
+      },
+      {
+        "label": "Vnější šířka (mm)",
+        "value": "1 910"
+      },
+      {
+        "label": "Vnější výška (mm)",
+        "value": "1 670 (1 680 se střešními ližinami)"
+      },
+      {
+        "label": "Rozvor (mm)",
+        "value": "2 680"
+      },
+      {
+        "label": "Rozchod kol přední (mm)",
+        "value": "1 635"
+      },
+      {
+        "label": "Rozchod kol zadní (mm)",
+        "value": "1 655"
+      },
+      {
+        "label": "Převis přední (mm)",
+        "value": "915"
+      },
+      {
+        "label": "Převis zadní (mm)",
+        "value": "1 145"
+      },
+      {
+        "label": "Minimální světlá výška (mm)",
+        "value": "193"
+      },
+      {
+        "label": "Poloměr otáčení (m)",
+        "value": "5,43"
+      },
+      {
+        "label": "Objem zavazadlového prostoru (l)",
+        "value": "668 (při sklopení druhé řady 1 568)"
+      },
+      {
+        "label": "Celková hmotnost (kg)",
+        "value": "2 290"
+      },
+      {
+        "label": "Provozní hmotnost (kg)",
+        "value": "1 725"
+      },
+      {
+        "label": "Celková hmotnost přívěsu brzděný (kg)",
+        "value": "1 300"
+      },
+      {
+        "label": "Celková hmotnost přívěsu nebrzděný (kg)",
+        "value": "500"
+      },
+      {
+        "label": "Palivo",
+        "value": "Benzín"
+      },
+      {
+        "label": "Objem palivové nádrže (l)",
+        "value": "50"
+      },
+      {
+        "label": "Zdvihový objem (cm3)",
+        "value": "1 498"
+      },
+      {
+        "label": "Vrtání × Zdvih (mm)",
+        "value": "72 × 92"
+      },
+      {
+        "label": "Kompresní poměr",
+        "value": "14 : 1"
+      },
+      {
+        "label": "Počet a uspořádání válců",
+        "value": "4 v řadě"
+      },
+      {
+        "label": "Elektrický motor – maximální výkon (kW)",
+        "value": "130"
+      },
+      {
+        "label": "Elektrický motor – maximální výkon (k)",
+        "value": "176,8"
+      },
+      {
+        "label": "Elektrický motor – maximální točivý moment (Nm)",
+        "value": "300"
+      },
+      {
+        "label": "Elektrický motor – maximální točivý moment (kg.m)",
+        "value": "30,6"
+      },
+      {
+        "label": "Maximální výkon (kW/ot.)",
+        "value": "110/5 500"
+      },
+      {
+        "label": "Maximální výkon (k/ot.)",
+        "value": "149,5/5 500"
+      },
+      {
+        "label": "Maximální točivý moment (Nm/ot.)",
+        "value": "220/2 400~4 200"
+      },
+      {
+        "label": "Maximální točivý moment (km.m/ot.)",
+        "value": "22,4/2 400~4 200"
+      },
+      {
+        "label": "Maximální rychlost (km/h)",
+        "value": "174,5"
+      },
+      {
+        "label": "Maximální kombinovaný výkon (kW)",
+        "value": "150"
+      },
+      {
+        "label": "Maximální kombinovaný výkon (k)",
+        "value": "204"
+      },
+      {
+        "label": "Kombinované emise CO2 (g/km)",
+        "value": "134"
+      },
+      {
+        "label": "Spotřeba kombinovaná (l/100km)",
+        "value": "5,910"
+      },
+      {
+        "label": "Spotřeba fáze 1 - nízké zatížení (l/100km)",
+        "value": "6,054"
+      },
+      {
+        "label": "Spotřeba fáze 2 - střední zatížení (l/100km)",
+        "value": "3,734"
+      },
+      {
+        "label": "Spotřeba fáze 3 - vysoké zatížení (l/100km)",
+        "value": "5,361"
+      },
+      {
+        "label": "Spotřeba fáze 4 - extra vysoké zatížení (l/100km)",
+        "value": "7,587"
+      },
+      {
+        "label": "Metodika testování",
+        "value": "(WLTP) Worldwide Harmonised Light Vehicle Test Procedure"
+      }
+    ],
+    "status": "published",
+    "model": 7,
+    "version": null,
+    "pricelist_colors": {
+      "exterior": [
+        {
+          "name": "GRAND bílá",
+          "code": "WAA",
+          "type": "základní",
+          "pricing_per_trim": {
+            "style": 0,
+            "premium": 0
+          }
+        },
+        {
+          "name": "COPPER měděná (pouze ze skladových zásob)",
+          "code": "OBE",
+          "type": "metalická",
+          "pricing_per_trim": {
+            "style": 14900,
+            "premium": 14900
+          }
+        },
+        {
+          "name": "IRON kovová",
+          "code": "ADE",
+          "type": "metalická",
+          "pricing_per_trim": {
+            "style": 14900,
+            "premium": 14900
+          }
+        },
+        {
+          "name": "SPACE černá",
+          "code": "LAK",
+          "type": "metalická",
+          "pricing_per_trim": {
+            "style": 14900,
+            "premium": 14900
+          }
+        },
+        {
+          "name": "LATTE béžová",
+          "code": "EBL",
+          "type": "metalická",
+          "pricing_per_trim": {
+            "style": 14900,
+            "premium": 14900
+          }
+        },
+        {
+          "name": "DANDY modrá",
+          "code": "BAS",
+          "type": "metalická",
+          "pricing_per_trim": {
+            "style": 14900,
+            "premium": 14900
+          }
+        },
+        {
+          "name": "FOREST zelená",
+          "code": "GAO",
+          "type": "metalická",
+          "pricing_per_trim": {
+            "style": 14900,
+            "premium": 14900
+          }
+        },
+        {
+          "name": "GRAND bílá s černou střechou",
+          "code": "2WA (E22)",
+          "type": "dvoutónová",
+          "pricing_per_trim": {
+            "style": 10000,
+            "premium": 10000
+          }
+        },
+        {
+          "name": "COPPER měděná s černou střechou (pouze ze skladových zásob)",
+          "code": "2OE (E22)",
+          "type": "dvoutónová",
+          "pricing_per_trim": {
+            "style": 24900,
+            "premium": 24900
+          }
+        },
+        {
+          "name": "IRON kovová s černou střechou",
+          "code": "2DE (E22)",
+          "type": "dvoutónová",
+          "pricing_per_trim": {
+            "style": 24900,
+            "premium": 24900
+          }
+        },
+        {
+          "name": "LATTE béžová s černou střechou",
+          "code": "2BL (E22)",
+          "type": "dvoutónová",
+          "pricing_per_trim": {
+            "style": 24900,
+            "premium": 24900
+          }
+        },
+        {
+          "name": "FOREST zelená s černou střechou",
+          "code": "2GO (E22)",
+          "type": "dvoutónová",
+          "pricing_per_trim": {
+            "style": 24900,
+            "premium": 24900
+          }
+        }
+      ],
+      "interior": [
+        {
+          "name": "Černá kůže",
+          "code": "LDB",
+          "material": "syntetická kůže",
+          "pricing_per_trim": {
+            "style": 0,
+            "premium": 0
+          }
+        },
+        {
+          "name": "Dvoutónová kůže béžová",
+          "code": "EBO (E75)",
+          "material": "kombinace syntetické kůže a textilu",
+          "pricing_per_trim": {
+            "style": 9900,
+            "premium": 9900
+          }
+        },
+        {
+          "name": "Černá kůže s červeným semišem (k dispozici pouze pro benzínovou verzi)",
+          "code": "LCX (E76)",
+          "material": "syntetická kůže",
+          "pricing_per_trim": {
+            "style": 9900,
+            "premium": 9900
+          }
+        },
+        {
+          "name": "Černá kůže s černým semišem (k dispozici pouze pro hybridní verzi)",
+          "code": "LDE (E80)",
+          "material": "syntetická kůže",
+          "pricing_per_trim": {
+            "style": 9900,
+            "premium": 9900
+          }
+        }
+      ]
+    },
+    "pricelist_colors_exterior": [
+      {
+        "name": "GRAND bílá",
+        "code": "WAA",
+        "type": "základní",
+        "pricing_per_trim": [
+          {
+            "trim_slug": "style",
+            "price": 0
+          },
+          {
+            "trim_slug": "premium",
+            "price": 0
+          }
+        ]
+      },
+      {
+        "name": "COPPER měděná (pouze ze skladových zásob)",
+        "code": "OBE",
+        "type": "metalická",
+        "pricing_per_trim": [
+          {
+            "trim_slug": "style",
+            "price": 14900
+          },
+          {
+            "trim_slug": "premium",
+            "price": 14900
+          }
+        ]
+      },
+      {
+        "name": "IRON kovová",
+        "code": "ADE",
+        "type": "metalická",
+        "pricing_per_trim": [
+          {
+            "trim_slug": "style",
+            "price": 14900
+          },
+          {
+            "trim_slug": "premium",
+            "price": 14900
+          }
+        ]
+      },
+      {
+        "name": "SPACE černá",
+        "code": "LAK",
+        "type": "metalická",
+        "pricing_per_trim": [
+          {
+            "trim_slug": "style",
+            "price": 14900
+          },
+          {
+            "trim_slug": "premium",
+            "price": 14900
+          }
+        ]
+      },
+      {
+        "name": "LATTE béžová",
+        "code": "EBL",
+        "type": "metalická",
+        "pricing_per_trim": [
+          {
+            "trim_slug": "style",
+            "price": 14900
+          },
+          {
+            "trim_slug": "premium",
+            "price": 14900
+          }
+        ]
+      },
+      {
+        "name": "DANDY modrá",
+        "code": "BAS",
+        "type": "metalická",
+        "pricing_per_trim": [
+          {
+            "trim_slug": "style",
+            "price": 14900
+          },
+          {
+            "trim_slug": "premium",
+            "price": 14900
+          }
+        ]
+      },
+      {
+        "name": "FOREST zelená",
+        "code": "GAO",
+        "type": "metalická",
+        "pricing_per_trim": [
+          {
+            "trim_slug": "style",
+            "price": 14900
+          },
+          {
+            "trim_slug": "premium",
+            "price": 14900
+          }
+        ]
+      },
+      {
+        "name": "GRAND bílá s černou střechou",
+        "code": "2WA (E22)",
+        "type": "dvoutónová",
+        "pricing_per_trim": [
+          {
+            "trim_slug": "style",
+            "price": 10000
+          },
+          {
+            "trim_slug": "premium",
+            "price": 10000
+          }
+        ]
+      },
+      {
+        "name": "COPPER měděná s černou střechou (pouze ze skladových zásob)",
+        "code": "2OE (E22)",
+        "type": "dvoutónová",
+        "pricing_per_trim": [
+          {
+            "trim_slug": "style",
+            "price": 24900
+          },
+          {
+            "trim_slug": "premium",
+            "price": 24900
+          }
+        ]
+      },
+      {
+        "name": "IRON kovová s černou střechou",
+        "code": "2DE (E22)",
+        "type": "dvoutónová",
+        "pricing_per_trim": [
+          {
+            "trim_slug": "style",
+            "price": 24900
+          },
+          {
+            "trim_slug": "premium",
+            "price": 24900
+          }
+        ]
+      },
+      {
+        "name": "LATTE béžová s černou střechou",
+        "code": "2BL (E22)",
+        "type": "dvoutónová",
+        "pricing_per_trim": [
+          {
+            "trim_slug": "style",
+            "price": 24900
+          },
+          {
+            "trim_slug": "premium",
+            "price": 24900
+          }
+        ]
+      },
+      {
+        "name": "FOREST zelená s černou střechou",
+        "code": "2GO (E22)",
+        "type": "dvoutónová",
+        "pricing_per_trim": [
+          {
+            "trim_slug": "style",
+            "price": 24900
+          },
+          {
+            "trim_slug": "premium",
+            "price": 24900
+          }
+        ]
+      }
+    ],
+    "pricelist_colors_interior": [
+      {
+        "name": "Černá kůže",
+        "code": "LDB",
+        "material": "syntetická kůže",
+        "pricing_per_trim": [
+          {
+            "trim_slug": "style",
+            "price": 0
+          },
+          {
+            "trim_slug": "premium",
+            "price": 0
+          }
+        ]
+      },
+      {
+        "name": "Dvoutónová kůže béžová",
+        "code": "EBO (E75)",
+        "material": "kombinace syntetické kůže a textilu",
+        "pricing_per_trim": [
+          {
+            "trim_slug": "style",
+            "price": 9900
+          },
+          {
+            "trim_slug": "premium",
+            "price": 9900
+          }
+        ]
+      },
+      {
+        "name": "Černá kůže s červeným semišem (k dispozici pouze pro benzínovou verzi)",
+        "code": "LCX (E76)",
+        "material": "syntetická kůže",
+        "pricing_per_trim": [
+          {
+            "trim_slug": "style",
+            "price": 9900
+          },
+          {
+            "trim_slug": "premium",
+            "price": 9900
+          }
+        ]
+      },
+      {
+        "name": "Černá kůže s černým semišem (k dispozici pouze pro hybridní verzi)",
+        "code": "LDE (E80)",
+        "material": "syntetická kůže",
+        "pricing_per_trim": [
+          {
+            "trim_slug": "style",
+            "price": 9900
+          },
+          {
+            "trim_slug": "premium",
+            "price": 9900
+          }
+        ]
+      }
+    ],
+    "trim_levels": [
+      69,
+      70
+    ],
+    "option_packages": []
+  },
+  {
+    "id": 31,
+    "year": 2026,
+    "technical_data": [
+      {
+        "label": "Motorizace",
+        "value": "Rexton G4 2.2 e-XDI 202 k / 441 Nm diesel"
+      },
+      {
+        "label": "Převodovka",
+        "value": "8-stupňová automatická (8AT) Shift-by-wire"
+      },
+      {
+        "label": "Emisní norma",
+        "value": "Euro 6e"
+      },
+      {
+        "label": "Palivo",
+        "value": "Diesel"
+      },
+      {
+        "label": "Zdvihový objem",
+        "value": "2 157 cm3"
+      },
+      {
+        "label": "Vrtání x Zdvih",
+        "value": "86,2 x 92,4 mm"
+      },
+      {
+        "label": "Kompresní poměr",
+        "value": "15,5:1"
+      },
+      {
+        "label": "Počet a uspořádání válců",
+        "value": "4 v řadě"
+      },
+      {
+        "label": "Maximální výkon",
+        "value": "148,6 kW / 202 k při 3 800 ot./min"
+      },
+      {
+        "label": "Maximální točivý moment",
+        "value": "441 Nm / 45 kg.m při 1 600 – 2 600 ot./min"
+      },
+      {
+        "label": "Maximální rychlost",
+        "value": "184 km/h"
+      },
+      {
+        "label": "Kombinovaná spotřeba (2WD 5-místná)",
+        "value": "7,669 l/100 km"
+      },
+      {
+        "label": "Kombinovaná spotřeba (4WD 5-místná)",
+        "value": "8,241 l/100 km"
+      },
+      {
+        "label": "Kombinovaná spotřeba (2WD 7-místná)",
+        "value": "7,822 l/100 km"
+      },
+      {
+        "label": "Kombinovaná spotřeba (4WD 7-místná)",
+        "value": "8,355 l/100 km"
+      },
+      {
+        "label": "Kombinované emise CO2 (2WD 5-místná)",
+        "value": "201 g/km"
+      },
+      {
+        "label": "Kombinované emise CO2 (4WD 5-místná)",
+        "value": "216 g/km"
+      },
+      {
+        "label": "Kombinované emise CO2 (2WD 7-místná)",
+        "value": "205 g/km"
+      },
+      {
+        "label": "Kombinované emise CO2 (4WD 7-místná)",
+        "value": "219 g/km"
+      },
+      {
+        "label": "Vnější délka",
+        "value": "4 850 mm"
+      },
+      {
+        "label": "Vnější šířka",
+        "value": "1 960 mm"
+      },
+      {
+        "label": "Vnější výška",
+        "value": "1 825 mm (se střešními ližinami, bez antény)"
+      },
+      {
+        "label": "Rozvor",
+        "value": "2 865 mm"
+      },
+      {
+        "label": "Rozchod kol přední",
+        "value": "1 640 mm"
+      },
+      {
+        "label": "Rozchod kol zadní",
+        "value": "1 640 mm"
+      },
+      {
+        "label": "Převis přední",
+        "value": "895 mm"
+      },
+      {
+        "label": "Převis zadní",
+        "value": "1 090 mm"
+      },
+      {
+        "label": "Minimální světlá výška",
+        "value": "224 mm (10-ti prvková zadní náprava Multilink s nezávislým zavěšením) / 203 mm (5-ti prvková zadní náprava)"
+      },
+      {
+        "label": "Poloměr otáčení",
+        "value": "5,5 m"
+      },
+      {
+        "label": "Celková hmotnost (2WD 5-místná)",
+        "value": "2 670 kg"
+      },
+      {
+        "label": "Celková hmotnost (4WD 5-místná)",
+        "value": "2 800 kg"
+      },
+      {
+        "label": "Celková hmotnost (2WD 7-místná)",
+        "value": "2 820 kg"
+      },
+      {
+        "label": "Celková hmotnost (4WD 7-místná)",
+        "value": "2 950 kg"
+      },
+      {
+        "label": "Provozní hmotnost (2WD 5-místná)",
+        "value": "1 960 kg"
+      },
+      {
+        "label": "Provozní hmotnost (4WD 5-místná)",
+        "value": "2 070 kg"
+      },
+      {
+        "label": "Provozní hmotnost (2WD 7-místná)",
+        "value": "1 980 kg"
+      },
+      {
+        "label": "Provozní hmotnost (4WD 7-místná)",
+        "value": "2 105 kg"
+      },
+      {
+        "label": "Celková hmotnost přívěsu brzděný",
+        "value": "2 700 kg pro 2WD, 3 500 kg pro 4WD"
+      },
+      {
+        "label": "Celková hmotnost přívěsu nebrzděný",
+        "value": "750 kg"
+      },
+      {
+        "label": "Objem palivové nádrže",
+        "value": "70 l"
+      },
+      {
+        "label": "Objem zavazadlového prostoru 5-místná (základní)",
+        "value": "1 051 l"
+      },
+      {
+        "label": "Objem zavazadlového prostoru 5-místná (2. řada složená 40%)",
+        "value": "1 376 l"
+      },
+      {
+        "label": "Objem zavazadlového prostoru 5-místná (2. řada složená 60%)",
+        "value": "1 652 l"
+      },
+      {
+        "label": "Objem zavazadlového prostoru 5-místná (2. řada složená 100%)",
+        "value": "1 977 l"
+      },
+      {
+        "label": "Objem zavazadlového prostoru 7-místná (základní)",
+        "value": "240 l"
+      },
+      {
+        "label": "Tovární záruka",
+        "value": "5 let / 150 000 km"
+      }
+    ],
+    "status": "published",
+    "model": 8,
+    "version": null,
+    "pricelist_colors": {
+      "exterior": [
+        {
+          "name": "GRAND bílá",
+          "code": "WAA",
+          "type": "základní",
+          "pricing_per_trim": {
+            "club_2wd": 0,
+            "clever_4wd": 0,
+            "premium_4wd": 0
+          }
+        },
+        {
+          "name": "PEARL bílá (dostupné pouze ze skladových zásob)",
+          "code": "WAK",
+          "type": "metalická",
+          "pricing_per_trim": {
+            "club_2wd": 0,
+            "clever_4wd": 0,
+            "premium_4wd": 22900
+          }
+        },
+        {
+          "name": "SPACE černá",
+          "code": "LAK",
+          "type": "metalická",
+          "pricing_per_trim": {
+            "club_2wd": 20900,
+            "clever_4wd": 20900,
+            "premium_4wd": 20900
+          }
+        },
+        {
+          "name": "ELEMENTAL šedá (dostupné pouze ze skladových zásob)",
+          "code": "ACY",
+          "type": "metalická",
+          "pricing_per_trim": {
+            "club_2wd": 20900,
+            "clever_4wd": 20900,
+            "premium_4wd": 20900
+          }
+        },
+        {
+          "name": "ATLANTIC modrá (dostupné pouze ze skladových zásob)",
+          "code": "BAU",
+          "type": "metalická",
+          "pricing_per_trim": {
+            "club_2wd": 20900,
+            "clever_4wd": 20900,
+            "premium_4wd": 20900
+          }
+        },
+        {
+          "name": "MARBLE grafitová",
+          "code": "ACM",
+          "type": "metalická",
+          "pricing_per_trim": {
+            "club_2wd": 20900,
+            "clever_4wd": 20900,
+            "premium_4wd": 20900
+          }
+        }
+      ],
+      "interior": [
+        {
+          "name": "Světlý interiér",
+          "code": "EBJ",
+          "material": "textil",
+          "pricing_per_trim": {
+            "club_2wd": 0,
+            "clever_4wd": 0,
+            "premium_4wd": 0
+          }
+        },
+        {
+          "name": "Černý interiér",
+          "code": "LBN",
+          "material": "textil",
+          "pricing_per_trim": {
+            "club_2wd": 0,
+            "clever_4wd": 0,
+            "premium_4wd": 0
+          }
+        },
+        {
+          "name": "Světlý interiér",
+          "code": "EBJL",
+          "material": "pravá kůže",
+          "pricing_per_trim": {
+            "clever_4wd": 0
+          }
+        },
+        {
+          "name": "Černý interiér",
+          "code": "LBNL",
+          "material": "pravá kůže",
+          "pricing_per_trim": {
+            "clever_4wd": 0
+          }
+        },
+        {
+          "name": "Světlý interiér",
+          "code": "EBJQL",
+          "material": "prošívaná kůže",
+          "pricing_per_trim": {
+            "premium_4wd": 0
+          }
+        },
+        {
+          "name": "Černý interiér",
+          "code": "LBNQL",
+          "material": "prošívaná kůže",
+          "pricing_per_trim": {
+            "premium_4wd": 0
+          }
+        }
+      ]
+    },
+    "pricelist_colors_exterior": [
+      {
+        "name": "GRAND bílá",
+        "code": "WAA",
+        "type": "základní",
+        "pricing_per_trim": [
+          {
+            "trim_slug": "club_2wd",
+            "price": "standard"
+          },
+          {
+            "trim_slug": "clever_4wd",
+            "price": "standard"
+          },
+          {
+            "trim_slug": "premium_4wd",
+            "price": "standard"
+          }
+        ]
+      },
+      {
+        "name": "PEARL bílá (dostupné pouze ze skladových zásob)",
+        "code": "WAK",
+        "type": "metalická",
+        "pricing_per_trim": [
+          {
+            "trim_slug": "club_2wd",
+            "price": "unavailable"
+          },
+          {
+            "trim_slug": "clever_4wd",
+            "price": "unavailable"
+          },
+          {
+            "trim_slug": "premium_4wd",
+            "price": 22900
+          }
+        ]
+      },
+      {
+        "name": "SPACE černá",
+        "code": "LAK",
+        "type": "metalická",
+        "pricing_per_trim": [
+          {
+            "trim_slug": "club_2wd",
+            "price": 20900
+          },
+          {
+            "trim_slug": "clever_4wd",
+            "price": 20900
+          },
+          {
+            "trim_slug": "premium_4wd",
+            "price": 20900
+          }
+        ]
+      },
+      {
+        "name": "ELEMENTAL šedá (dostupné pouze ze skladových zásob)",
+        "code": "ACY",
+        "type": "metalická",
+        "pricing_per_trim": [
+          {
+            "trim_slug": "club_2wd",
+            "price": 20900
+          },
+          {
+            "trim_slug": "clever_4wd",
+            "price": 20900
+          },
+          {
+            "trim_slug": "premium_4wd",
+            "price": 20900
+          }
+        ]
+      },
+      {
+        "name": "ATLANTIC modrá (dostupné pouze ze skladových zásob)",
+        "code": "BAU",
+        "type": "metalická",
+        "pricing_per_trim": [
+          {
+            "trim_slug": "club_2wd",
+            "price": 20900
+          },
+          {
+            "trim_slug": "clever_4wd",
+            "price": 20900
+          },
+          {
+            "trim_slug": "premium_4wd",
+            "price": 20900
+          }
+        ]
+      },
+      {
+        "name": "MARBLE grafitová",
+        "code": "ACM",
+        "type": "metalická",
+        "pricing_per_trim": [
+          {
+            "trim_slug": "club_2wd",
+            "price": 20900
+          },
+          {
+            "trim_slug": "clever_4wd",
+            "price": 20900
+          },
+          {
+            "trim_slug": "premium_4wd",
+            "price": 20900
+          }
+        ]
+      }
+    ],
+    "pricelist_colors_interior": [
+      {
+        "name": "Světlý interiér",
+        "code": "EBJ",
+        "material": "textil",
+        "pricing_per_trim": [
+          {
+            "trim_slug": "club_2wd",
+            "price": "standard"
+          },
+          {
+            "trim_slug": "clever_4wd",
+            "price": "unavailable"
+          },
+          {
+            "trim_slug": "premium_4wd",
+            "price": "unavailable"
+          }
+        ]
+      },
+      {
+        "name": "Černý interiér",
+        "code": "LBN",
+        "material": "textil",
+        "pricing_per_trim": [
+          {
+            "trim_slug": "club_2wd",
+            "price": "standard"
+          },
+          {
+            "trim_slug": "clever_4wd",
+            "price": "unavailable"
+          },
+          {
+            "trim_slug": "premium_4wd",
+            "price": "unavailable"
+          }
+        ]
+      },
+      {
+        "name": "Světlý interiér",
+        "code": "EBJL",
+        "material": "pravá kůže",
+        "pricing_per_trim": [
+          {
+            "trim_slug": "clever_4wd",
+            "price": "standard"
+          },
+          {
+            "trim_slug": "club_2wd",
+            "price": "unavailable"
+          },
+          {
+            "trim_slug": "premium_4wd",
+            "price": "unavailable"
+          }
+        ]
+      },
+      {
+        "name": "Černý interiér",
+        "code": "LBNL",
+        "material": "pravá kůže",
+        "pricing_per_trim": [
+          {
+            "trim_slug": "clever_4wd",
+            "price": "standard"
+          },
+          {
+            "trim_slug": "club_2wd",
+            "price": "unavailable"
+          },
+          {
+            "trim_slug": "premium_4wd",
+            "price": "unavailable"
+          }
+        ]
+      },
+      {
+        "name": "Světlý interiér",
+        "code": "EBJQL",
+        "material": "prošívaná kůže",
+        "pricing_per_trim": [
+          {
+            "trim_slug": "premium_4wd",
+            "price": "standard"
+          },
+          {
+            "trim_slug": "club_2wd",
+            "price": "unavailable"
+          },
+          {
+            "trim_slug": "clever_4wd",
+            "price": "unavailable"
+          }
+        ]
+      },
+      {
+        "name": "Černý interiér",
+        "code": "LBNQL",
+        "material": "prošívaná kůže",
+        "pricing_per_trim": [
+          {
+            "trim_slug": "premium_4wd",
+            "price": "standard"
+          },
+          {
+            "trim_slug": "club_2wd",
+            "price": "unavailable"
+          },
+          {
+            "trim_slug": "clever_4wd",
+            "price": "unavailable"
+          }
+        ]
+      }
+    ],
+    "trim_levels": [
+      71,
+      72,
+      73
+    ],
+    "option_packages": [
+      73,
+      74,
+      75,
+      76,
+      77
+    ]
+  },
+  {
+    "id": 32,
+    "year": 2026,
+    "technical_data": [
+      {
+        "label": "Motor",
+        "value": "2.2 e-XDI"
+      },
+      {
+        "label": "Emisní norma",
+        "value": "EURO 6e"
+      },
+      {
+        "label": "Druh pohonu",
+        "value": "4WD (pohon všech kol)"
+      },
+      {
+        "label": "Převodovka",
+        "value": "6MT / 6AT"
+      },
+      {
+        "label": "Palivo",
+        "value": "Diesel"
+      },
+      {
+        "label": "Zdvihový objem",
+        "value": "2157 cc"
+      },
+      {
+        "label": "Vrtání x zdvih",
+        "value": "86,2 x 92,4 mm"
+      },
+      {
+        "label": "Kompresní poměr",
+        "value": "15,5 : 1"
+      },
+      {
+        "label": "Počet a uspořádání válců",
+        "value": "4 v řadě"
+      },
+      {
+        "label": "Maximální výkon",
+        "value": "148,6 kW / 202 k při 3800 min-1"
+      },
+      {
+        "label": "Maximální točivý moment",
+        "value": "400 Nm / 1400–2800 (6MT), 441 Nm / 1600–2600 (6AT)"
+      },
+      {
+        "label": "Maximální rychlost",
+        "value": "177 km/h (6MT) / 172 km/h (6AT)"
+      },
+      {
+        "label": "Objem palivové nádrže",
+        "value": "75 L"
+      },
+      {
+        "label": "Vnější délka",
+        "value": "5405 mm (5415 mm s mřížkou chladiče Premium)"
+      },
+      {
+        "label": "Vnější šířka",
+        "value": "1950 mm"
+      },
+      {
+        "label": "Vnější výška",
+        "value": "1855 mm (tyčová anténa), 1885 mm (anténa ve tvaru žraločí ploutve)"
+      },
+      {
+        "label": "Rozvor",
+        "value": "3210 mm"
+      },
+      {
+        "label": "Rozchod kol přední",
+        "value": "1640 mm (235/70R17)"
+      },
+      {
+        "label": "Rozchod kol zadní",
+        "value": "1640 mm (235/70R17)"
+      },
+      {
+        "label": "Převis přední",
+        "value": "890 mm (900 mm s mřížkou chladiče Premium)"
+      },
+      {
+        "label": "Převis zadní",
+        "value": "1305 mm"
+      },
+      {
+        "label": "Minimální světlá výška",
+        "value": "220 mm (mezi osami)"
+      },
+      {
+        "label": "Poloměr otáčení",
+        "value": "6,09 m"
+      },
+      {
+        "label": "Délka nákladového prostoru",
+        "value": "1610 mm"
+      },
+      {
+        "label": "Šířka nákladového prostoru",
+        "value": "1570 mm"
+      },
+      {
+        "label": "Hloubka nákladového prostoru",
+        "value": "570 mm"
+      },
+      {
+        "label": "Celková hmotnost",
+        "value": "3260 kg (listové pružiny), 2990 kg (5-ti prvková náprava)"
+      },
+      {
+        "label": "Provozní hmotnost (s listovými pružinami)",
+        "value": "2175–2246 kg (6MT) / 2185–2256 kg (6AT)"
+      },
+      {
+        "label": "Provozní hmotnost (s 5-ti prvkovou nápravou)",
+        "value": "2110–2195 kg (6MT) / 2120–2205 kg (6AT)"
+      },
+      {
+        "label": "Celková hmotnost přívěsu brzděný (listové pružiny)",
+        "value": "2600 kg (6MT) / 3500 kg (6AT)"
+      },
+      {
+        "label": "Celková hmotnost přívěsu brzděný (5-prvková náprava)",
+        "value": "2600 kg (6MT) / 3500 kg (6AT)"
+      },
+      {
+        "label": "Celková hmotnost přívěsu nebrzděný",
+        "value": "750 kg"
+      },
+      {
+        "label": "Kombinované emise CO2 (5-prvková zadní náprava, 6MT)",
+        "value": "226 g/km"
+      },
+      {
+        "label": "Kombinované emise CO2 (5-prvková zadní náprava, 6AT)",
+        "value": "243 g/km"
+      },
+      {
+        "label": "Kombinovaná spotřeba (5-prvková zadní náprava, 6MT)",
+        "value": "8,627 L/100 km"
+      },
+      {
+        "label": "Kombinovaná spotřeba (5-prvková zadní náprava, 6AT)",
+        "value": "9,271 L/100 km"
+      },
+      {
+        "label": "Kombinované emise CO2 (zadní tuhá náprava s listovými pružinami, 6MT)",
+        "value": "233 g/km"
+      },
+      {
+        "label": "Kombinované emise CO2 (zadní tuhá náprava s listovými pružinami, 6AT)",
+        "value": "246 g/km"
+      },
+      {
+        "label": "Kombinovaná spotřeba (zadní tuhá náprava s listovými pružinami, 6MT)",
+        "value": "8,897 L/100 km"
+      },
+      {
+        "label": "Kombinovaná spotřeba (zadní tuhá náprava s listovými pružinami, 6AT)",
+        "value": "9,384 L/100 km"
+      }
+    ],
+    "status": "published",
+    "model": 9,
+    "version": null,
+    "pricelist_colors": null,
+    "pricelist_colors_exterior": [
+      {
+        "name": "GRAND bílá",
+        "code": "WAA",
+        "type": "základní",
+        "pricing_per_trim": [
+          {
+            "trim_slug": "style_4wd",
+            "price": 0
+          },
+          {
+            "trim_slug": "premium_4wd",
+            "price": 0
+          }
+        ]
+      },
+      {
+        "name": "PEARL bílá (není možné kombinovat s BLACK paketem)",
+        "code": "WAK - E24",
+        "type": "metalická",
+        "pricing_per_trim": [
+          {
+            "trim_slug": "style_4wd",
+            "price": "unavailable"
+          },
+          {
+            "trim_slug": "premium_4wd",
+            "price": 21175
+          }
+        ]
+      },
+      {
+        "name": "SPACE černá",
+        "code": "LAK",
+        "type": "metalická",
+        "pricing_per_trim": [
+          {
+            "trim_slug": "style_4wd",
+            "price": 19360
+          },
+          {
+            "trim_slug": "premium_4wd",
+            "price": 19360
+          }
+        ]
+      },
+      {
+        "name": "AMAZONIA zelená",
+        "code": "GAM",
+        "type": "metalická",
+        "pricing_per_trim": [
+          {
+            "trim_slug": "style_4wd",
+            "price": 19360
+          },
+          {
+            "trim_slug": "premium_4wd",
+            "price": 19360
+          }
+        ]
+      },
+      {
+        "name": "SAND béžová",
+        "code": "EBK",
+        "type": "metalická",
+        "pricing_per_trim": [
+          {
+            "trim_slug": "style_4wd",
+            "price": 19360
+          },
+          {
+            "trim_slug": "premium_4wd",
+            "price": 19360
+          }
+        ]
+      },
+      {
+        "name": "INDIAN červená (není možné kombinovat s BLACK paketem)",
+        "code": "RAJ",
+        "type": "metalická",
+        "pricing_per_trim": [
+          {
+            "trim_slug": "style_4wd",
+            "price": 19360
+          },
+          {
+            "trim_slug": "premium_4wd",
+            "price": 19360
+          }
+        ]
+      },
+      {
+        "name": "MARBLE grafitová",
+        "code": "ACM",
+        "type": "metalická",
+        "pricing_per_trim": [
+          {
+            "trim_slug": "style_4wd",
+            "price": 19360
+          },
+          {
+            "trim_slug": "premium_4wd",
+            "price": 19360
+          }
+        ]
+      }
+    ],
+    "pricelist_colors_interior": [
+      {
+        "name": "Černý interiér, černé stropní čalounění (textil)",
+        "code": "LBT1",
+        "material": "textil",
+        "pricing_per_trim": [
+          {
+            "trim_slug": "style_4wd",
+            "price": "standard"
+          },
+          {
+            "trim_slug": "premium_4wd",
+            "price": "unavailable"
+          }
+        ]
+      },
+      {
+        "name": "Černý interiér, černé stropní čalounění (kůže)",
+        "code": "LBT2",
+        "material": "pravá kůže",
+        "pricing_per_trim": [
+          {
+            "trim_slug": "style_4wd",
+            "price": "unavailable"
+          },
+          {
+            "trim_slug": "premium_4wd",
+            "price": "standard"
+          }
+        ]
+      }
+    ],
+    "trim_levels": [
+      74,
+      75
+    ],
+    "option_packages": [
+      78,
+      79,
+      80
+    ]
+  }
+]

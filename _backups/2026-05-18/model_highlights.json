@@ -1,0 +1,1402 @@
+[
+  {
+    "id": 13,
+    "sort": 1,
+    "photo": "d78765a9-f666-49ea-a302-0a89600faf78",
+    "title": "Pohon všech kol",
+    "subtitle": "Systém v reálném čase sleduje stav vozidla a jízdní podmínky. Podle potřeby automaticky optimalizuje rozdělení hnací síly mezi kola, čímž podporuje efektivní, stabilní a bezpečnější jízdu.",
+    "model": 3,
+    "eyebrow": "Aktivní AWD",
+    "category": "technologie"
+  },
+  {
+    "id": 1,
+    "sort": 1,
+    "photo": "3e7a7751-906b-4e66-92d8-10f8ffaf7395",
+    "title": "Systém START - STOP",
+    "subtitle": "Automaticky vypne motor při zastavení vozidla, například na semaforu, a pomáhá tak snižovat spotřebu paliva omezením zbytečného volnoběhu. Funkci lze zapnout nebo vypnout.",
+    "model": 2,
+    "eyebrow": "Jezděte úsporně",
+    "category": "technologie"
+  },
+  {
+    "id": 9,
+    "sort": 1,
+    "photo": null,
+    "title": "LFP baterie 42 kWh CATL",
+    "subtitle": "Dojezd 195 km WLTP, 265 km město.",
+    "model": 18,
+    "eyebrow": null,
+    "category": "technologie"
+  },
+  {
+    "id": 105,
+    "sort": 1,
+    "photo": "d5085bfc-55b0-4d12-a304-55d7f9d6f2f0",
+    "title": "4rohová ochrana BSD",
+    "subtitle": "Čtyři radary umístěné v přední a zadní části vozu aktivně sledují okolí vozidla. Pomáhají rozpoznat rizikové situace a podporují bezpečnější jízdu i předcházení nehodám.",
+    "model": 5,
+    "eyebrow": "Bezpečí ze všech stran",
+    "category": "bezpecnost"
+  },
+  {
+    "id": 157,
+    "sort": 1,
+    "photo": "0a7770a0-5e44-4c9d-a68a-af40516de760",
+    "title": "Part-time 4WD s řazením za jízdy",
+    "subtitle": "Za běžných podmínek vůz využívá pohon dvou kol. Jakmile je potřeba vyšší trakce, například na mokré nebo zasněžené silnici, lze využít režim 4H. Pro náročnější terén je k dispozici také redukovaný režim 4L.",
+    "model": 9,
+    "eyebrow": "Volitelný pohon všech kol",
+    "category": "technologie"
+  },
+  {
+    "id": 45,
+    "sort": 1,
+    "photo": "75d4aa42-ca7d-4140-aa68-c2bf0698eea0",
+    "title": "Promyšlené detaily",
+    "subtitle": "JAECOO7 není jen o prvním dojmu. Je o trvalém zážitku, který vychází z každého přesně navrženého detailu. Od výrazné masky chladiče až po designově čisté zadní svítilny – každý centimetr karoserie působí jako celek, který vás zaujme, ale neunaví.",
+    "model": 15,
+    "eyebrow": null,
+    "category": "technologie"
+  },
+  {
+    "id": 41,
+    "sort": 1,
+    "photo": "544e619d-80d5-4e88-a056-9fdaa86732d2",
+    "title": "Harmonie prostoru",
+    "subtitle": "Interiér vozu Jaecoo5 je navržen tak, aby působil dospěleji, než byste od kompaktního SUV očekávali. Čisté horizontální linie palubní desky, měkčené materiály a pečlivě sladěné barevné kombinace vytvářejí prostředí, které je zároveň moderní a pohodlné.",
+    "model": 14,
+    "eyebrow": null,
+    "category": "technologie"
+  },
+  {
+    "id": 61,
+    "sort": 1,
+    "photo": "f57ff5de-6e8d-42d3-a9b5-b940df39e831",
+    "title": "Hybridní elegance",
+    "subtitle": "OMODA5 SHS-H je prvním hybridním modelem značky navrženým v duchu filozofie Art in Motion. Charakteristická diamantová maska chladiče, integrovaná do výrazné přední masky, dodává vozu futuristický vzhled.",
+    "model": 11,
+    "eyebrow": null,
+    "category": "technologie"
+  },
+  {
+    "id": 53,
+    "sort": 1,
+    "photo": "3a461fa1-8f4e-4bc4-a955-7e823a34b466",
+    "title": "Anatomie těla",
+    "subtitle": "Ergonomická sedadla v modelu OMODA5 představují vrchol inženýrství a luxusu. Každý detail sedadel byl pečlivě navržen tak, aby poskytoval optimální podporu těla, minimalizoval únavu a zároveň přispíval k dynamickému zážitku z jízdy. ",
+    "model": 10,
+    "eyebrow": null,
+    "category": "technologie"
+  },
+  {
+    "id": 49,
+    "sort": 1,
+    "photo": "f6c5f005-252d-4740-8a31-2f64379db159",
+    "title": "Tichý komfort",
+    "subtitle": "Zcela rovná podlaha ve středové části zadních sedadel přispívá k pocitu většího prostoru a pohodlí pro cestující. Použití dvouvrstvého zvukově izolačního skla a důkladné odhlučnění interiéru navíc výrazně zvyšují celkový akustický komfort a zajišťují klid",
+    "model": 16,
+    "eyebrow": null,
+    "category": "technologie"
+  },
+  {
+    "id": 117,
+    "sort": 1,
+    "photo": "a5ddc9df-a220-40bf-b7da-0a0f2b459e19",
+    "title": "Jízda podle situace",
+    "subtitle": "Režimy NORMAL, SPORT a WINTER přizpůsobují chování vozu aktuálním podmínkám i stylu jízdy. Pomáhají optimalizovat jízdní projev pro běžné cestování, dynamičtější jízdu i zimní podmínky.",
+    "model": 6,
+    "eyebrow": "Jízdní režimy",
+    "category": "technologie"
+  },
+  {
+    "id": 93,
+    "sort": 1,
+    "photo": "85429106-4a97-435b-84f7-d39173a5e033",
+    "title": "Až 94 % jízdy ve městě v elektrickém režimu",
+    "subtitle": "Sériově-paralelní hybridní systém se dvěma elektromotory a převodovkou e-DHT kombinuje elektrickou jízdu s průběžným dobíjením. Díky tomu nabízí plynulý výkon, nižší spotřebu a efektivní provoz zejména ve městě.",
+    "model": 4,
+    "eyebrow": "Dual Tech Hybrid systém",
+    "category": "technologie"
+  },
+  {
+    "id": 145,
+    "sort": 1,
+    "photo": "40067f2d-317b-456d-be3c-5bf79f05c282",
+    "title": "Pevná rámová konstrukce",
+    "subtitle": "Na rozdíl od samonosné karoserie jsou motor a zavěšení kol uloženy na pevném ocelovém rámu. Toto řešení přispívá k vyšší odolnosti při nárazu a zároveň pomáhá lépe omezovat hluk a vibrace z okolí vozu.",
+    "model": 8,
+    "eyebrow": "Čtyřvrstvý rám",
+    "category": "bezpecnost"
+  },
+  {
+    "id": 65,
+    "sort": 1,
+    "photo": "462db361-ab74-4b5d-81dc-519912f2675a",
+    "title": "Pokročilý hybridní pohon",
+    "subtitle": "Jeho sofistikovaný superhybridní systém dosahuje výkonu 537 koní a umožňuje akceleraci z 0 na 100 km/h za pouhých 4,9 sekundy, přičemž pohon všech kol zajišťuje optimální trakci, stabilitu a bezpečnost i v náročných jízdních podmínkách.",
+    "model": 13,
+    "eyebrow": null,
+    "category": "technologie"
+  },
+  {
+    "id": 57,
+    "sort": 1,
+    "photo": "f9fbd1a1-1dac-4e31-a7bc-3219090ac8f1",
+    "title": "Vyzařuje budoucnost",
+    "subtitle": "OMODA5 EV zosobňuje futuristickou vizi moderní elektromobility. Dominantní maska vozu není pouze designovým prvkem – je projevem sebevědomé identity. Bezemisní pohon si žádá novou estetiku, a OMODA5 EV ji interpretuje s odvahou i elegancí. ",
+    "model": 12,
+    "eyebrow": null,
+    "category": "technologie"
+  },
+  {
+    "id": 5,
+    "sort": 1,
+    "photo": "1c9b335d-bdce-4b45-b248-6438fe47be9f",
+    "title": "Aktivní AWD",
+    "subtitle": "Systém aktivně sleduje jízdní podmínky a podle potřeby optimalizuje rozdělení výkonu mezi jednotlivá kola. Pomáhá tak zajistit efektivní, stabilní a bezpečnější jízdu.",
+    "model": 1,
+    "eyebrow": "Pohon všech kol",
+    "category": "technologie"
+  },
+  {
+    "id": 6,
+    "sort": 2,
+    "photo": "cc2e1e0c-73e1-422f-ae14-c6e24bf4ea90",
+    "title": "Pádla řazení pod volantem",
+    "subtitle": "Pádla pod volantem umožňují rychlé manuální řazení nahoru i dolů, takže může řidič pružněji reagovat na aktuální jízdní situaci.",
+    "model": 1,
+    "eyebrow": "Sportovnější ovládání",
+    "category": "technologie"
+  },
+  {
+    "id": 54,
+    "sort": 2,
+    "photo": "d991fe63-edd8-4249-97fd-646f40918094",
+    "title": "Dynamické křivky",
+    "subtitle": "Elegantní, proudící linie nejsou pouze estetickým prvkem – představují technologicky vyspělý design, který optimalizuje aerodynamiku a zároveň evokuje pocit nepřetržitého pohybu.",
+    "model": 10,
+    "eyebrow": null,
+    "category": "technologie"
+  },
+  {
+    "id": 46,
+    "sort": 2,
+    "photo": "e330606c-d231-4d6d-b46b-15dc3a1475bd",
+    "title": "Nová generace",
+    "subtitle": "Interiér modelu JAECOO7 je do detailu promyšlený a dokonale vyvážený. Spojuje klasické stylistické prvky s nejmodernějšími technologiemi a kombinuje praktické funkce typické pro SUV s prvky luxusu. ",
+    "model": 15,
+    "eyebrow": null,
+    "category": "technologie"
+  },
+  {
+    "id": 62,
+    "sort": 2,
+    "photo": "cfa08e7e-8890-4641-8b2e-e2921128b8a7",
+    "title": "Diamond Matrix",
+    "subtitle": "Přední mřížka představuje srdce designové filozofie vozu, kde se preciznost setkává s inovací. Kromě své vizuální přitažlivosti je mřížka navržena tak, aby optimalizovala proudění vzduchu, čímž přispívá k lepší aerodynamice a účinnosti celého vozu. ",
+    "model": 11,
+    "eyebrow": null,
+    "category": "technologie"
+  },
+  {
+    "id": 58,
+    "sort": 2,
+    "photo": "e64167f6-534c-435a-8261-051b311e4c5c",
+    "title": "V novém světle",
+    "subtitle": "Unikátní zadní LED světla ve tvaru kříže dodávají vozu výrazný vizuální podpis, který si nelze splést – působí moderně, sebevědomě a naprosto originálně. Jejich tvar inspirovaný „X“ motivem není jen designovým prvkem, ale také funkčním řešením.",
+    "model": 12,
+    "eyebrow": null,
+    "category": "technologie"
+  },
+  {
+    "id": 2,
+    "sort": 2,
+    "photo": "08b1b441-9e7a-45ad-b7e5-af1e518e61c6",
+    "title": "Benzinový turbomotor 1.5 GDI",
+    "subtitle": "Motor s maximálním výkonem 163 koní při 5 000–5 500 ot./min a točivým momentem 28,6 kgf.m při 1 500–4 000 ot./min nabízí živý jízdní projev i v nízkých rychlostech.",
+    "model": 2,
+    "eyebrow": "Dynamická jízda",
+    "category": "technologie"
+  },
+  {
+    "id": 42,
+    "sort": 2,
+    "photo": "b1e1f060-4a23-469e-b02f-d3019b44837f",
+    "title": "Chytrá konektivita",
+    "subtitle": "Dominantou interiéru je 13,2\" dotykový displej multimediálního systému doplněný 8,9\" digitálním přístrojovým štítem. Bezdrátové Android Auto™ a Apple CarPlay™, Bluetooth, DAB rádio a audio Sony™ promění každou cestu v dokonalý zážitek.",
+    "model": 14,
+    "eyebrow": null,
+    "category": "technologie"
+  },
+  {
+    "id": 158,
+    "sort": 2,
+    "photo": "d41423a9-c2a7-49d5-be98-316e9d92a68e",
+    "title": "Síla tam, kde je potřeba",
+    "subtitle": "Systém přibrzďuje kola bez trakce a přenáší hnací sílu na kola s lepší přilnavostí. Pomáhá tak zvládat náročnější terénní situace, například přejezdy nerovností nebo výjezdy mimo zpevněné cesty.",
+    "model": 9,
+    "eyebrow": "Uzávěrka diferenciálu",
+    "category": "technologie"
+  },
+  {
+    "id": 10,
+    "sort": 2,
+    "photo": null,
+    "title": "Nákladový prostor 6 m³",
+    "subtitle": "2 800 × 1 600 mm, krychlový tvar.",
+    "model": 18,
+    "eyebrow": null,
+    "category": "technologie"
+  },
+  {
+    "id": 118,
+    "sort": 2,
+    "photo": "95d05cd5-6ca5-4128-9b72-4e9a0a79a249",
+    "title": "Systém START STOP",
+    "subtitle": "Při zastavení vozidla, například na semaforu, systém automaticky vypne motor a pomáhá tak snížit zbytečnou spotřebu paliva při volnoběhu. Funkci lze podle potřeby vypnout.",
+    "model": 6,
+    "eyebrow": "Úspornější provoz",
+    "category": "technologie"
+  },
+  {
+    "id": 50,
+    "sort": 2,
+    "photo": "c20e686d-9bc4-41fb-8b55-b21d3c20b61f",
+    "title": "Interaktivní centrum",
+    "subtitle": "Vůz JAECOO7 SHS je vybaven inteligentními technologiemi, které zajišťují intuitivní ovládání a rychlou reakci na podněty řidiče. Dominantou palubní desky je 14,8\" infotainment displej s ostrým obrazem a citlivým dotykovým ovládáním, který zpříjemňuje každ",
+    "model": 16,
+    "eyebrow": null,
+    "category": "technologie"
+  },
+  {
+    "id": 106,
+    "sort": 2,
+    "photo": "e58d7b05-8e8d-405e-84a6-8541d189c5a7",
+    "title": "Automatická změna jízdního pruhu ALC",
+    "subtitle": "Navigačně podporovaný systém ALC dokáže na dálnici automaticky pomoci se změnou jízdního pruhu. Po aktivaci směrovky vůz asistuje s natočením řízení do zvoleného směru.",
+    "model": 5,
+    "eyebrow": "ADAS bezpečnostní systém",
+    "category": "bezpecnost"
+  },
+  {
+    "id": 146,
+    "sort": 2,
+    "photo": "0daff4ba-bb2d-4b0f-850e-f3460f1aec56",
+    "title": "81,7 % vysokopevnostní oceli",
+    "subtitle": "Zesílená konstrukce karoserie z vysokopevnostní oceli zvyšuje tuhost vozu, pevnost celé struktury a úroveň ochrany posádky — zejména v oblasti kabiny.",
+    "model": 8,
+    "eyebrow": "Důraz na bezpečnost",
+    "category": "bezpecnost"
+  },
+  {
+    "id": 94,
+    "sort": 2,
+    "photo": "82d3c3f5-accd-4dc7-b6f3-d1f705fc8eaf",
+    "title": "Delší dojezd v elektrickém režimu",
+    "subtitle": "Vysokonapěťová baterie s kapacitou 1,83 kWh je navržena s důrazem na účinnost a správné rozložení hmotnosti. Pomáhá prodloužit jízdu v elektrickém režimu a zlepšuje celkovou efektivitu hybridního pohonu.",
+    "model": 4,
+    "eyebrow": "Optimalizovaná hybridní baterie",
+    "category": "technologie"
+  },
+  {
+    "id": 14,
+    "sort": 2,
+    "photo": "ed0d37be-8578-4824-9c65-5fef82029c9a",
+    "title": "Shift by Wire",
+    "subtitle": "Ověřená 6stupňová automatická převodovka AISIN nabízí spolehlivé a plynulé řazení. Moderní ovladač Shift by Wire zároveň umožňuje snadné a intuitivní ovládání převodovky pomocí přepínače.",
+    "model": 3,
+    "eyebrow": "Moderní ovládání převodovky",
+    "category": "technologie"
+  },
+  {
+    "id": 66,
+    "sort": 2,
+    "photo": "41618f14-be23-4f53-8cc0-933e6ee6f59c",
+    "title": "Hybridní převodovka DHT",
+    "subtitle": "Technologie převodovky DHT zajišťuje maximálně efektivní přenos výkonu na kola a přináší špičkovou účinnost v každé jízdní situaci.  Tento moderní systém inteligentně a plynule přepíná mezi elektrickým a benzínovým pohonem.",
+    "model": 13,
+    "eyebrow": null,
+    "category": "technologie"
+  },
+  {
+    "id": 43,
+    "sort": 3,
+    "photo": "337a293b-de55-4fc3-aec3-5b59753b7d74",
+    "title": "Elegantní dynamika",
+    "subtitle": "Z boku zaujmou dvoubarevná 18\" litá kola a vyvážené proporce, které jasně ukazují, že Jaecoo5 nehraje jen na efekt – design jde ruku v ruce s funkčností. Zatmavená zadní okna, dynamický zadní spoiler a integrované střešní ližiny dodávají vozu sport nádech",
+    "model": 14,
+    "eyebrow": null,
+    "category": "technologie"
+  },
+  {
+    "id": 119,
+    "sort": 3,
+    "photo": "91510eb3-5129-4581-a73d-9c9041ce5179",
+    "title": "Pohon všech kol",
+    "subtitle": "Systém průběžně sleduje aktuální jízdní podmínky a podle potřeby optimalizuje rozdělení výkonu mezi jednotlivá kola. Pomáhá tak zajistit efektivní, stabilní a bezpečnější jízdu.",
+    "model": 6,
+    "eyebrow": "Aktivní AWD",
+    "category": "technologie"
+  },
+  {
+    "id": 51,
+    "sort": 3,
+    "photo": "85865b23-7793-432f-b701-54e51094af7d",
+    "title": "Komfortní prostor",
+    "subtitle": "Interiér modelu JAECOO7 SHS spojuje moderní minimalismus s prvky luxusu a nabízí klidné, komfortní prostředí pro řidiče i spolucestující. Stylově zpracovaná kabina působí vzdušně a přehledně, zatímco prostorný interiér doplňuje panoramatická střecha, kter",
+    "model": 16,
+    "eyebrow": null,
+    "category": "technologie"
+  },
+  {
+    "id": 47,
+    "sort": 3,
+    "photo": "9005ba3f-4623-471e-8350-6b3064fcb627",
+    "title": "Digitální elegance",
+    "subtitle": "14.8\" LED displej vozu JAECOO 7 nabízí elegantní a moderní rozhraní, které posouvá váš jízdní zážitek na vyšší úroveň. Díky ostrému obrazu a rychlé odezvě dotykového ovládání máte všechny funkce přehledně a intuitivně na dosah ruky.",
+    "model": 15,
+    "eyebrow": null,
+    "category": "technologie"
+  },
+  {
+    "id": 67,
+    "sort": 3,
+    "photo": "0ac40507-b00f-4828-bbb7-9e31573b705c",
+    "title": "Pohon všech kol I-AWD",
+    "subtitle": "Vozidlo samo přepíná mezi pohonem zadních a všech kol. Točivý moment se rozděluje od 0 do 90 % na přední a od 10 do 100 % na zadní nápravu. Díky tomu si zachovává skvělou ovladatelnost i výkon na sněhu, písku či jiných náročných površích.",
+    "model": 13,
+    "eyebrow": null,
+    "category": "technologie"
+  },
+  {
+    "id": 59,
+    "sort": 3,
+    "photo": "e412cdb1-4790-4837-a1b9-a8a2975cfd8e",
+    "title": "Inteligentní pohodlí",
+    "subtitle": "Interiér vozu OMODA5 EV je navržen s maximálním důrazem na pohodlí a intuitivní ovládání. Moderní technologie se zde přirozeně snoubí s uživatelsky přívětivým rozhraním, které zpříjemňuje každou chvíli strávenou za volantem.",
+    "model": 12,
+    "eyebrow": null,
+    "category": "technologie"
+  },
+  {
+    "id": 63,
+    "sort": 3,
+    "photo": "07f40a61-9148-49fa-a4cf-5bd3334def02",
+    "title": "Oáza komfortu",
+    "subtitle": "nteriér modelu OMODA5 kombinuje inovativní technologie s prvotřídním komfortem. Každý detail, od vybraných materiálů po ergonomická sedadla, byl pečlivě promyšlen, aby zajistil maximální pohodlí a uživatelskou přívětivost.",
+    "model": 11,
+    "eyebrow": null,
+    "category": "technologie"
+  },
+  {
+    "id": 55,
+    "sort": 3,
+    "photo": "5c00d308-852d-4ad4-b56c-793ddb10bf2d",
+    "title": "Umění v pohybu",
+    "subtitle": "Sofistikovaný design exteriéru, podtržený dynamickými liniemi, unikátní světelnou signaturou a charakteristickou maskou chladiče, působí sebevědomě a současně kultivovaně. OMODA5 zaujme na první pohled – a nezůstane jen u něj.",
+    "model": 10,
+    "eyebrow": null,
+    "category": "technologie"
+  },
+  {
+    "id": 3,
+    "sort": 3,
+    "photo": "3c6c1796-5755-4299-a12b-d59e7c995138",
+    "title": "6stupňová automatická převodovka",
+    "subtitle": "Třetí generace 6stupňové převodovky Aisin, používaná i ve vozech světových značek, nabízí ověřenou odolnost a stabilní řazení.",
+    "model": 2,
+    "eyebrow": "Rychlá a plynulá odezva",
+    "category": "technologie"
+  },
+  {
+    "id": 159,
+    "sort": 3,
+    "photo": "ed3c8bfa-dfbe-4da7-84ca-91f0c3d09851",
+    "title": "Silný zátah pro každý den",
+    "subtitle": "Naftový motor 2.2 l udržuje vysoký točivý moment v nejčastěji využívaném rozsahu otáček 1 600 až 2 600 ot./min. Díky tomu nabízí jistý zátah při běžné jízdě, vyšším zatížení i jízdě v terénu.",
+    "model": 9,
+    "eyebrow": "2.2litrový dieselový motor",
+    "category": "technologie"
+  },
+  {
+    "id": 7,
+    "sort": 3,
+    "photo": "6f8e3436-5df0-41a3-bb3d-bab201a19383",
+    "title": "Jízdní režimy",
+    "subtitle": "Volbou režimu NORMAL, SPORT nebo WINTER se chování vozu přizpůsobí aktuálním podmínkám. Systém optimalizuje odezvu řízení a podvozku pro pohodlnější, dynamičtější nebo jistější jízdu.",
+    "model": 1,
+    "eyebrow": "Jízda podle situace",
+    "category": "technologie"
+  },
+  {
+    "id": 11,
+    "sort": 3,
+    "photo": null,
+    "title": "Zadní křídlové dveře 270°",
+    "subtitle": "Otevírání v poměru 2:3, maximální flexibilita.",
+    "model": 18,
+    "eyebrow": null,
+    "category": "technologie"
+  },
+  {
+    "id": 15,
+    "sort": 3,
+    "photo": "6e28ab57-d84f-48f1-833a-650742d92c98",
+    "title": "Jízda podle situace",
+    "subtitle": "Režimy NORMAL, SPORT a WINTER přizpůsobují chování vozu aktuálním podmínkám i stylu jízdy. Pomáhají optimalizovat jízdní projev pro běžné cestování, dynamičtější jízdu i zimní podmínky.",
+    "model": 3,
+    "eyebrow": "Jízdní režimy",
+    "category": "technologie"
+  },
+  {
+    "id": 147,
+    "sort": 3,
+    "photo": "69458fd1-ab5a-4028-8b6e-d3d4cfa844dc",
+    "title": "9 airbagů",
+    "subtitle": "Vůz je vybaven celkem 9 airbagy: čelními airbagy řidiče a spolujezdce, kolenním airbagem řidiče, bočními airbagy vpředu i vzadu a hlavovými airbagy pro ochranu cestujících.",
+    "model": 8,
+    "eyebrow": "Bezpečí pro celou posádku",
+    "category": "bezpecnost"
+  },
+  {
+    "id": 95,
+    "sort": 3,
+    "photo": "caf1f0c4-310e-4477-9c05-c4b071cdf369",
+    "title": "Hybridně optimalizované odhlučnění NVH",
+    "subtitle": "Speciální zvukově izolační materiály v motorovém prostoru, krytech a podbězích kol pomáhají snižovat hluk od vozovky i rezonanci pneumatik. Výsledkem je tišší a komfortnější jízda.",
+    "model": 4,
+    "eyebrow": "Tichý a kultivovaný provoz",
+    "category": "technologie"
+  },
+  {
+    "id": 107,
+    "sort": 3,
+    "photo": "bc9103ee-fddf-4129-a739-29f004f2517e",
+    "title": "Adaptivní tempomat ACC & SSA",
+    "subtitle": "Systém pomáhá udržovat bezpečný odstup od vozidla vpředu podle nastavené rychlosti. Podporuje plynulou jízdu při zrychlování, zpomalování, zastavení i opětovném rozjezdu.",
+    "model": 5,
+    "eyebrow": "Chytrý asistent ",
+    "category": "bezpecnost"
+  },
+  {
+    "id": 148,
+    "sort": 4,
+    "photo": "5da78ba7-5b8f-4c68-b49c-ebdeed20bd08",
+    "title": "Jistější řízení při tažení",
+    "subtitle": "Při tažení přívěsu nebo karavanu systém TSA pomáhá stabilizovat vůz při bočním rozkývání způsobeném nerovnostmi, větrem nebo horšími jízdními podmínkami.",
+    "model": 8,
+    "eyebrow": "Stabilizace přívěsu TSA",
+    "category": "bezpecnost"
+  },
+  {
+    "id": 64,
+    "sort": 4,
+    "photo": "3e36c4a5-ccc2-47a5-b369-67781a914fdf",
+    "title": "Duální obrazovka",
+    "subtitle": "Model OMODA5 je vybaven duální obrazovkou o celkové velikosti 24,6 palce, která spojuje dva vysoce kvalitní displeje do jednoho plynulého panelu. Toto řešení podtrhuje futuristický design interiéru, a zároveň poskytuje maximální přehlednost a komfort.",
+    "model": 11,
+    "eyebrow": null,
+    "category": "technologie"
+  },
+  {
+    "id": 120,
+    "sort": 4,
+    "photo": "814f3dc9-6258-42cd-ad2e-885ac5b659b0",
+    "title": "Moderní ovládání převodovky",
+    "subtitle": "Ověřená 6stupňová automatická převodovka AISIN nabízí spolehlivé a plynulé řazení. Moderní ovladač Shift by Wire umožňuje snadné a intuitivní ovládání převodovky pomocí přepínače.",
+    "model": 6,
+    "eyebrow": "Shift by Wire",
+    "category": "technologie"
+  },
+  {
+    "id": 16,
+    "sort": 4,
+    "photo": "4778073a-5f7f-4340-90e6-183c9cd05753",
+    "title": "Apple CarPlay & Android Auto",
+    "subtitle": "Apple CarPlay a Android Auto umožňují pohodlně propojit váš chytrý telefon s multimediálním systémem vozu. Díky tomu můžete na displeji používat navigaci, hudbu, hovory i vybrané aplikace bezpečněji a přehledněji během jízdy.",
+    "model": 3,
+    "eyebrow": "Chytré propojení",
+    "category": "technologie"
+  },
+  {
+    "id": 108,
+    "sort": 4,
+    "photo": "a286ecca-b9ae-4c07-8416-2e08fba8d3fa",
+    "title": "Top konstrukce s důrazem na bezpečnost",
+    "subtitle": "Karoserie využívá 34 % vysokopevnostní a 47 % ultravysokopevnostní oceli zpracované technologií Hot Press Forming. Díky tomu dosahuje vysoké tuhosti a přispívá k maximální ochraně posádky.",
+    "model": 5,
+    "eyebrow": "81 % vysokopevnostní oceli",
+    "category": "bezpecnost"
+  },
+  {
+    "id": 60,
+    "sort": 4,
+    "photo": "73ad4d85-cd99-465a-af76-4903c337d714",
+    "title": "Neuvěřitelný prostor",
+    "subtitle": "Jakmile vstoupíte do interiéru modelu OMODA5 EV, ocitnete se v prostoru, který vás okamžitě vtáhne. Vše je navrženo tak, abyste si každou cestu vychutnali s pocitem naprostého pohodlí a s jistotou, že vaše bezpečí je vždy na prvním místě.",
+    "model": 12,
+    "eyebrow": null,
+    "category": "technologie"
+  },
+  {
+    "id": 52,
+    "sort": 4,
+    "photo": "9c1450fc-1847-414d-b280-72e256eae574",
+    "title": "Hybridní síla",
+    "subtitle": "Plug-in hybridní sytém inteligentně upravuje provoz motoru a generátoru na základě faktorů, jako je rychlost, nabití baterie a teplota, čímž je dosaženo ultra dlouhého dojezdu až 1 200 km a extrémně nízké spotřeby paliva 1,2 l/100 km dle WLTP. Baterie o k",
+    "model": 16,
+    "eyebrow": null,
+    "category": "technologie"
+  },
+  {
+    "id": 8,
+    "sort": 4,
+    "photo": "294db1ef-3ceb-4d6d-838c-dab5b0504f78",
+    "title": "Systém START STOP",
+    "subtitle": "Při zastavení vozidla, například na semaforu, systém automaticky vypne motor a pomáhá tak snížit zbytečnou spotřebu paliva při volnoběhu. Funkci lze podle potřeby vypnout.",
+    "model": 1,
+    "eyebrow": "Úspornější provoz",
+    "category": "technologie"
+  },
+  {
+    "id": 96,
+    "sort": 4,
+    "photo": "54669682-fd56-4c0b-a612-3aaec90fdd4a",
+    "title": "Dobíjení během jízdy",
+    "subtitle": "Rekuperační brzdový systém pomáhá při zpomalování získávat energii zpět a dobíjet baterii. Intenzitu rekuperace lze nastavit ve třech úrovních pomocí pádel pod volantem.",
+    "model": 4,
+    "eyebrow": "Rekuperační brzdění",
+    "category": "technologie"
+  },
+  {
+    "id": 160,
+    "sort": 4,
+    "photo": "5013b6ea-13cf-4226-b3ab-2d18fb73963d",
+    "title": "Vyšší nosnost až 700 kg",
+    "subtitle": "Zadní odpružení s listovými pružinami je navrženo s důrazem na převoz těžšího nákladu a jízdu mimo zpevněné cesty. Pevnější nastavení podporuje stabilitu vozu i při vyšším zatížení.",
+    "model": 9,
+    "eyebrow": "Zadní odpružení listovými pružinami",
+    "category": "technologie"
+  },
+  {
+    "id": 68,
+    "sort": 4,
+    "photo": "641c4a1c-4335-4c10-a47e-be815c0d62ff",
+    "title": "Elektrický dojezd až 145 km",
+    "subtitle": "Omoda9 SHS je vybavena baterií o kapacitě přes 34 kWh, která zajišťuje dojezd až 145 km v čistě elektrickém režimu. Díky rychlonabíjení s výkonem až 70 kW lze energii doplnit v krátkém čase. Má i technologii V2L.",
+    "model": 13,
+    "eyebrow": null,
+    "category": "technologie"
+  },
+  {
+    "id": 48,
+    "sort": 4,
+    "photo": "70623193-a020-468a-a1f6-3e3b5bcba2fe",
+    "title": "Stylová praktičnost",
+    "subtitle": "Zažijte pohodlí nejmodernější technologie díky 50W bezdrátovému nabíjení, které udržuje vaše zařízení vždy připravená – rychle, spolehlivě a bez zbytečných kabelů. Stačí odložit telefon na určené místo a nabíjení se spustí automaticky. ",
+    "model": 15,
+    "eyebrow": null,
+    "category": "technologie"
+  },
+  {
+    "id": 12,
+    "sort": 4,
+    "photo": null,
+    "title": "Rychlonabíjení 50 min (20 – 80 %)",
+    "subtitle": "Bluetooth, volič jízdních režimů, rekuperace L1/L2/L3.",
+    "model": 18,
+    "eyebrow": null,
+    "category": "technologie"
+  },
+  {
+    "id": 56,
+    "sort": 4,
+    "photo": "cc5feb50-cbab-4484-9517-6ab6d68dbd10",
+    "title": "Oáza komfortu",
+    "subtitle": "Interiér modelu OMODA5 kombinuje inovativní technologie s prvotřídním komfortem. Každý detail, od vybraných materiálů po ergonomická sedadla, byl pečlivě promyšlen, aby zajistil maximální pohodlí a uživatelskou přívětivost.",
+    "model": 10,
+    "eyebrow": null,
+    "category": "technologie"
+  },
+  {
+    "id": 44,
+    "sort": 4,
+    "photo": "df1f77ee-8d10-4963-ad63-e1e925e5e2a5",
+    "title": "Stylová praktičnost",
+    "subtitle": "Praktičnost Jaecoo5 drží krok s jeho atraktivním designem. Zadní sedadla dělená v poměru 60:40 umožňují flexibilně kombinovat převoz pasažérů a nákladu. Standardní objem prostoru kufru 480 litrů lze po sklopení zadních sedadel zvětšit až na 1 280 litrů.  ",
+    "model": 14,
+    "eyebrow": null,
+    "category": "technologie"
+  },
+  {
+    "id": 4,
+    "sort": 4,
+    "photo": "4d710981-bd62-4686-9910-08507992201b",
+    "title": "Systém jízdních režimů",
+    "subtitle": "Zajišťuje optimální jízdní vlastnosti podle zvoleného režimu NORMAL / SPORT / WINTER propojením řízení a podvozku.",
+    "model": 2,
+    "eyebrow": "Jistota za každého počasí",
+    "category": "technologie"
+  },
+  {
+    "id": 77,
+    "sort": 5,
+    "photo": "287a1398-c4a3-4dde-bc38-501bb127cd73",
+    "title": "Adaptivní tempomat ACC & SSA",
+    "subtitle": "Systém pomáhá udržovat bezpečný odstup od vozidla vpředu podle nastavené rychlosti. Podporuje plynulou jízdu při zrychlování, zpomalování, zastavení i opětovném rozjezdu.",
+    "model": 1,
+    "eyebrow": "Chytrý asistent",
+    "category": "bezpecnost"
+  },
+  {
+    "id": 109,
+    "sort": 5,
+    "photo": "40431f04-2ef0-4d13-85ed-c25d68d91274",
+    "title": "LFP Blade baterie",
+    "subtitle": "Moderní lithium-železo-fosfátová baterie LFP s kapacitou 73,4 kWh je navržena s důrazem na bezpečnost elektromobilu. Díky technologii cell-to-pack nabízí vysokou odolnost při nárazu, efektivní nabíjení a dlouhou životnost.",
+    "model": 5,
+    "eyebrow": "Bezpečná a odolná baterie",
+    "category": "technologie"
+  },
+  {
+    "id": 69,
+    "sort": 5,
+    "photo": "9dca45f0-75dd-4936-8271-353fae7f662f",
+    "title": "Autonomní nouzové brzdění AEB",
+    "subtitle": "Systém AEB upozorní řidiče na riziko čelní kolize během jízdy a v případě potřeby automaticky aktivuje brzdy, aby pomohl zabránit nehodě nebo zmírnil její následky.",
+    "model": 2,
+    "eyebrow": "ADAS System",
+    "category": "bezpecnost"
+  },
+  {
+    "id": 85,
+    "sort": 5,
+    "photo": "f002de86-248a-4d2f-b2b0-a829b6008296",
+    "title": "3D 360° kamerový systém",
+    "subtitle": "Čtyři vnější kamery pomáhají sledovat okolí vozu při parkování i pomalé jízdě. Řidiči poskytují přehledný pohled na prostor za vozem, po stranách i v blízkosti kol.",
+    "model": 3,
+    "eyebrow": "Lepší přehled kolem vozu",
+    "category": "komfort"
+  },
+  {
+    "id": 149,
+    "sort": 5,
+    "photo": "a2328817-73a0-4ab4-9ec3-3775868201a8",
+    "title": "3D 360° kamerový systém",
+    "subtitle": "Čtyři vnější kamery pomáhají sledovat okolí vozu při parkování i pomalé jízdě. Řidiči poskytují přehledný pohled na prostor za vozem, po stranách i v blízkosti kol.",
+    "model": 8,
+    "eyebrow": "Lepší přehled kolem",
+    "category": "komfort"
+  },
+  {
+    "id": 97,
+    "sort": 5,
+    "photo": "f002de86-248a-4d2f-b2b0-a829b6008296",
+    "title": "3D 360° kamerový systém",
+    "subtitle": "Čtyři vnější kamery pomáhají sledovat okolí vozu při parkování i pomalé jízdě. Řidiči poskytují přehledný pohled na prostor za vozem, po stranách i v blízkosti kol.",
+    "model": 4,
+    "eyebrow": "Lepší přehled kolem vozu",
+    "category": "komfort"
+  },
+  {
+    "id": 133,
+    "sort": 5,
+    "photo": "f2a470e4-ff9e-42d1-a6e5-83ab6bd42b34",
+    "title": "Chytré elektrické víko kufru",
+    "subtitle": "Díky senzoru pro bezdotykové otevření můžete zavazadlový prostor otevřít jednoduchým pohybem nohy pod zadním nárazníkem. Praktické řešení ve chvíli, kdy máte plné ruce nákupu, zavazadel nebo sportovní výbavy.",
+    "model": 7,
+    "eyebrow": "Stačí pohyb nohou",
+    "category": "komfort"
+  },
+  {
+    "id": 121,
+    "sort": 5,
+    "photo": "f2a470e4-ff9e-42d1-a6e5-83ab6bd42b34",
+    "title": "Chytré elektrické víko kufru",
+    "subtitle": "Díky senzoru pro bezdotykové otevření můžete zavazadlový prostor otevřít jednoduchým pohybem nohy pod zadním nárazníkem. Praktické řešení ve chvíli, kdy máte plné ruce nákupu, zavazadel nebo sportovní výbavy.",
+    "model": 6,
+    "eyebrow": "Stačí pohyb nohou",
+    "category": "komfort"
+  },
+  {
+    "id": 161,
+    "sort": 5,
+    "photo": "041bbcea-e7b2-416a-b5e6-962abac89c38",
+    "title": "Komfortnější jízda s nákladem do 500 kg",
+    "subtitle": "Na rozdíl od tvrdšího odpružení běžných užitkových vozů pětiprvkové zavěšení lépe rozkládá rázy od vozovky. Pomáhá tak vyvážit komfort jízdy, stabilitu a praktičnost při každodenním používání.",
+    "model": 9,
+    "eyebrow": "Pětiprvkové zadní zavěšení ",
+    "category": "komfort"
+  },
+  {
+    "id": 86,
+    "sort": 6,
+    "photo": "2977aae1-8d0b-4da9-9619-f7e15091361d",
+    "title": "Elektricky nastavitelné sedadlo řidiče",
+    "subtitle": "Elektricky nastavitelné sedadlo v 8 směrech včetně 2směrné bederní opěrky umožňuje pohodlné nastavení podle potřeb řidiče a zpříjemňuje každodenní i delší cestování.",
+    "model": 3,
+    "eyebrow": "Komfort při každé jízdě",
+    "category": "komfort"
+  },
+  {
+    "id": 78,
+    "sort": 6,
+    "photo": "09044dda-17c0-462a-94fb-831922f6787c",
+    "title": "74 % vysokopevnostní oceli",
+    "subtitle": "Karoserie využívá 28 % vysokopevnostní a 46 % ultravysokopevnostní oceli zpracované technologií Hot Press Forming. Díky tomu dosahuje vysoké tuhosti a přispívá k lepší ochraně posádky.",
+    "model": 1,
+    "eyebrow": "Špičková konstrukce ",
+    "category": "bezpecnost"
+  },
+  {
+    "id": 134,
+    "sort": 6,
+    "photo": "5f4c8b21-a118-4dc6-9278-4d065b4d4a32",
+    "title": "Panoramatické střešní okno",
+    "subtitle": "Panoramatické střešní okno s výklopným a posuvným mechanismem přináší do kabiny více světla, lepší odvětrání a příjemnější pocit otevřeného prostoru.",
+    "model": 7,
+    "eyebrow": "Vzdušnější interiér",
+    "category": "komfort"
+  },
+  {
+    "id": 70,
+    "sort": 6,
+    "photo": "b5eecdc4-4a4c-47c0-8eb3-f7f22adbfe3e",
+    "title": "Konstrukce s důrazem na bezpečnost",
+    "subtitle": "Karoserie využívá 79 % vysokopevnostní oceli a 40 % ultravysokopevnostní oceli zpracované technologií Hot Press Forming. Díky tomu dosahuje vysoké tuhosti a pomáhá lépe chránit posádku.",
+    "model": 2,
+    "eyebrow": "79 % vysokopevnostní oceli",
+    "category": "bezpecnost"
+  },
+  {
+    "id": 110,
+    "sort": 6,
+    "photo": "6bec772d-f889-493b-96c8-4975cab67f7b",
+    "title": "Systém řízení vysokonapěťové baterie",
+    "subtitle": "Pokročilý systém správy baterie pomáhá udržovat optimální výkon i při nižších teplotách. Aktivně připravuje baterii už od 8 °C a zároveň pomáhá chránit její životnost. Na baterii se vztahuje záruka 10 let nebo 1 000 000 km.",
+    "model": 5,
+    "eyebrow": "Optimální výkon baterie",
+    "category": "technologie"
+  },
+  {
+    "id": 162,
+    "sort": 6,
+    "photo": "f9ae7e46-5621-4552-a00e-24f840c663a0",
+    "title": "3D 360° kamerový systém",
+    "subtitle": "Systém využívá čtyři vnější kamery a vytváří 3D pohled na okolí vozu. Pomáhá tak řidiči lépe se orientovat při parkování, manévrování v úzkých ulicích nebo jízdě v omezeném prostoru.",
+    "model": 9,
+    "eyebrow": "Lepší přehled kolem vozu",
+    "category": "komfort"
+  },
+  {
+    "id": 150,
+    "sort": 6,
+    "photo": "6cec87e0-c58d-43bc-91a3-8aa2cfa7c7e8",
+    "title": "Elektricky nastavitelná přední sedadla",
+    "subtitle": "Sedadlo řidiče nabízí elektrické nastavení v 8 směrech včetně 2směrné bederní opěrky. Sedadlo spolujezdce je nastavitelné elektricky v 6 směrech, takže posádce poskytuje pohodlí i na delších cestách.",
+    "model": 8,
+    "eyebrow": "Komfort při každé jízdě",
+    "category": "komfort"
+  },
+  {
+    "id": 98,
+    "sort": 6,
+    "photo": "2977aae1-8d0b-4da9-9619-f7e15091361d",
+    "title": "Elektricky nastavitelné sedadlo řidiče",
+    "subtitle": "Elektricky nastavitelné sedadlo v 8 směrech včetně 2směrné bederní opěrky umožňuje pohodlné nastavení podle potřeb řidiče a zpříjemňuje každodenní i delší cestování.",
+    "model": 4,
+    "eyebrow": "Komfort při každé jízdě",
+    "category": "komfort"
+  },
+  {
+    "id": 122,
+    "sort": 6,
+    "photo": "bb74291b-0277-4eda-8bf2-94db89f1d315",
+    "title": "3D 360° kamerový systém",
+    "subtitle": "Čtyři vnější kamery pomáhají sledovat okolí vozu při parkování i pomalé jízdě. Řidiči poskytují přehledný pohled na prostor za vozem, po stranách i v blízkosti kol.",
+    "model": 6,
+    "eyebrow": "Lepší přehled kolem vozu",
+    "category": "komfort"
+  },
+  {
+    "id": 135,
+    "sort": 7,
+    "photo": "6242fe02-5f3c-4270-a9f0-038f582986b7",
+    "title": "Elektricky nastavitelné přední sedadlo",
+    "subtitle": "Elektricky nastavitelné sedadlo v 8 směrech včetně 2směrné bederní opěrky umožňuje pohodlné nastavení podle potřeb řidiče a zpříjemňuje každodenní i delší cestování.",
+    "model": 7,
+    "eyebrow": "Komfort při každé jízdě",
+    "category": "komfort"
+  },
+  {
+    "id": 87,
+    "sort": 7,
+    "photo": "7d4ff28d-fad7-4c0d-91f8-5d6a58408733",
+    "title": "Variabilní uspořádání sedadel",
+    "subtitle": "Díky variabilnímu uspořádání sedadel nabízí vůz zavazadlový prostor až 1 662 litrů. Snadno tak zvládne rodinné cestování, sportovní výbavu i outdoorová dobrodružství.",
+    "model": 3,
+    "eyebrow": "Velkorysý zavazadlový prostor",
+    "category": "komfort"
+  },
+  {
+    "id": 111,
+    "sort": 7,
+    "photo": "f7dd6b86-edce-452d-bc0a-1009ce532c6a",
+    "title": "Silný elektrický pohon",
+    "subtitle": "Elektrický pohonný systém kombinuje motor o výkonu 152,2 kW s reduktorem pro rozdělení točivého momentu. Výsledkem je plynulý, tichý a zároveň výrazně dynamický jízdní projev.",
+    "model": 5,
+    "eyebrow": "EV pohonný systém",
+    "category": "technologie"
+  },
+  {
+    "id": 79,
+    "sort": 7,
+    "photo": "0bff6279-3a2a-441e-bc38-e3fe54b32425",
+    "title": "7 airbagů",
+    "subtitle": "Vůz je vybaven 7 airbagy: čelními airbagy pro řidiče a spolujezdce, kolenním airbagem řidiče, bočními airbagy v první řadě a hlavovými airbagy pro cestující ve druhé řadě.",
+    "model": 1,
+    "eyebrow": "Bezpečí pro všechny",
+    "category": "bezpecnost"
+  },
+  {
+    "id": 123,
+    "sort": 7,
+    "photo": "6242fe02-5f3c-4270-a9f0-038f582986b7",
+    "title": "Elektricky nastavitelné přední sedadlo",
+    "subtitle": "Elektricky nastavitelné sedadlo v 8 směrech včetně 2směrné bederní opěrky umožňuje pohodlné nastavení podle potřeb řidiče a zpříjemňuje každodenní i delší cestování.",
+    "model": 6,
+    "eyebrow": "Komfort při každé jízdě",
+    "category": "komfort"
+  },
+  {
+    "id": 152,
+    "sort": 7,
+    "photo": "92a8da65-41a7-4920-934e-56ba0f515304",
+    "title": "Velkorysý zavazadlový prostor",
+    "subtitle": "Zavazadlový prostor je navržen tak, aby zvládl i náročnější výbavu. Čtyři golfové bagy lze pohodlně uložit napříč bez nutnosti sklápět sedadla ve druhé řadě.",
+    "model": 8,
+    "eyebrow": "Variabilní uspořádání sedadel",
+    "category": "komfort"
+  },
+  {
+    "id": 71,
+    "sort": 7,
+    "photo": "5eaab4f0-89bd-4fed-b18a-07857465fbd4",
+    "title": "Stabilita za všech podmínek",
+    "subtitle": "Systém ESC pomáhá předcházet nehodám tím, že udržuje stabilitu vozu v různých jízdních situacích a pomáhá řidiči zachovat kontrolu nad vozidlem.",
+    "model": 2,
+    "eyebrow": "Elektronická stabilizace ESC",
+    "category": "bezpecnost"
+  },
+  {
+    "id": 163,
+    "sort": 7,
+    "photo": "ac064ceb-b1be-432b-9ba1-6c1af099704a",
+    "title": "Elektricky nastavitelná přední sedadla",
+    "subtitle": "Sedadlo řidiče nabízí elektrické nastavení v 8 směrech včetně 2směrné bederní opěrky. Sedadlo spolujezdce je nastavitelné elektricky v 6 směrech, což přispívá k pohodlnější jízdě pro celou posádku.",
+    "model": 9,
+    "eyebrow": "Komfort při každé jízdě",
+    "category": "komfort"
+  },
+  {
+    "id": 99,
+    "sort": 7,
+    "photo": "7d4ff28d-fad7-4c0d-91f8-5d6a58408733",
+    "title": "Variabilní uspořádání sedadel",
+    "subtitle": "Díky variabilnímu uspořádání sedadel nabízí vůz zavazadlový prostor až 1 662 litrů. Snadno tak zvládne rodinné cestování, sportovní výbavu i outdoorová dobrodružství.",
+    "model": 4,
+    "eyebrow": "Velkorysý zavazadlový prostor",
+    "category": "komfort"
+  },
+  {
+    "id": 151,
+    "sort": 8,
+    "photo": "6a3bfb9d-f116-4be2-9312-87c00e9590a1",
+    "title": "Komfort, konektivita a praktičnost pro každý den",
+    "subtitle": "Vůz nabízí širokou paletu komfortních a praktických prvků — od chytrého elektrického víka kufru, vyhřívaných a odvětrávaných sedadel až po Apple CarPlay, Android Auto, bezdrátové nabíjení nebo USB-C konektory vpředu i vzadu.",
+    "model": 8,
+    "eyebrow": "Další prvky výbavy",
+    "category": "komfort"
+  },
+  {
+    "id": 72,
+    "sort": 8,
+    "photo": "f6cddb53-b1e2-49c6-8e9e-208f9986655b",
+    "title": "Další bezpečnostní prvky",
+    "subtitle": "Vůz nabízí další bezpečnostní a asistenční funkce, které pomáhají chránit posádku, zvyšují jistotu za volantem a podporují řidiče při každodenním provozu.",
+    "model": 2,
+    "eyebrow": "Asistenční systémy pro klidnější jízdu",
+    "category": "bezpecnost"
+  },
+  {
+    "id": 80,
+    "sort": 8,
+    "photo": "d4e635de-93fd-47fe-9ff1-56cb9c6a866e",
+    "title": "Multi Collision Brake MCB",
+    "subtitle": "V případě nehody systém MCB automaticky aktivuje nouzové brzdění, pokud řidič nemůže vozidlo dočasně ovládat. Pomáhá tak snížit riziko následné kolize.",
+    "model": 1,
+    "eyebrow": "Ochrana i po nárazu",
+    "category": "bezpecnost"
+  },
+  {
+    "id": 88,
+    "sort": 8,
+    "photo": "198039ea-3655-4b28-b72b-dd54bbbad08d",
+    "title": "Dvouzónová automatická klimatizace",
+    "subtitle": "Dvouzónová klimatizace s mikrofiltrací, automatickým odmlžováním a funkcí dosoušení pomáhá udržovat v kabině čistší vzduch a příjemné prostředí za každého počasí.",
+    "model": 3,
+    "eyebrow": "Příjemné klima",
+    "category": "komfort"
+  },
+  {
+    "id": 100,
+    "sort": 8,
+    "photo": "198039ea-3655-4b28-b72b-dd54bbbad08d",
+    "title": "Dvouzónová automatická klimatizace",
+    "subtitle": "Dvouzónová klimatizace s mikrofiltrací, automatickým odmlžováním a funkcí dosoušení pomáhá udržovat v kabině čistší vzduch a příjemné prostředí za každého počasí.",
+    "model": 4,
+    "eyebrow": "Příjemné klima",
+    "category": "komfort"
+  },
+  {
+    "id": 112,
+    "sort": 8,
+    "photo": "3ba5bcc4-31ae-4415-bb2d-6aabd2697ff6",
+    "title": "Dojezd až 462 km na jedno nabití",
+    "subtitle": "Vůz nabízí maximální dojezd až 462 km podle metodiky WLTP. Při použití domácí nebo přenosné nabíječky lze přes AVN systém nastavit začátek i konec nabíjení. U domácí wallboxové nebo rychlonabíječky lze navíc nastavit cílovou úroveň nabití.",
+    "model": 5,
+    "eyebrow": "Dojezd a chytré nabíjení",
+    "category": "technologie"
+  },
+  {
+    "id": 124,
+    "sort": 8,
+    "photo": "37623093-5066-42a8-9fce-ee6a74589503",
+    "title": "Dvouzónová automatická klimatizace",
+    "subtitle": "Dvouzónová klimatizace s mikrofiltrací a automatickým odmlžováním pomáhá udržovat v kabině čistší vzduch a příjemné prostředí za každého počasí.",
+    "model": 6,
+    "eyebrow": "Příjemné klima",
+    "category": "komfort"
+  },
+  {
+    "id": 136,
+    "sort": 8,
+    "photo": "8a6ba528-ecb6-401c-b34f-81453df96c94",
+    "title": "Velkorysý zavazadlový prostor",
+    "subtitle": "Díky variabilnímu uspořádání sedadel nabízí vůz zavazadlový prostor až 1 568 litrů. Snadno tak zvládne rodinné cestování, sportovní výbavu i outdoorová dobrodružství.",
+    "model": 7,
+    "eyebrow": "Variabilní uspořádání sedadel",
+    "category": "komfort"
+  },
+  {
+    "id": 164,
+    "sort": 8,
+    "photo": "e874e9e9-c5e1-4e33-93b0-2121dc58940e",
+    "title": "Komfort, konektivita a praktičnost",
+    "subtitle": "Vůz nabízí řadu praktických a komfortních prvků — od Apple CarPlay a Android Auto přes USB-C konektory, zadní výdechy klimatizace a LED osvětlení až po vyhřívaná a odvětrávaná přední sedadla nebo vyhřívaný volant.",
+    "model": 9,
+    "eyebrow": "Další prvky výbavy",
+    "category": "technologie"
+  },
+  {
+    "id": 81,
+    "sort": 9,
+    "photo": "0377a2de-0610-4d97-a5a7-9aae81e85b0d",
+    "title": "Chytré elektrické 5 dveře",
+    "subtitle": "Pokud máte u sebe chytrý klíč a zastavíte se přibližně na tři sekundy za vozidlem, víko zavazadlového prostoru se automaticky otevře. Výšku otevření lze navíc nastavit podle potřeby.",
+    "model": 1,
+    "eyebrow": "Automatické otevírání a zavírání",
+    "category": "komfort"
+  },
+  {
+    "id": 153,
+    "sort": 9,
+    "photo": "20c1d6d9-5fea-49e2-8eed-981987d728f6",
+    "title": "Síla tam, kde je potřeba",
+    "subtitle": "Systém přibrzďuje kola bez trakce a přenáší hnací sílu na kola s lepší přilnavostí. Díky tomu pomáhá zvládat náročnější terénní situace, například přejezdy nerovností nebo výjezdy mimo zpevněné cesty.",
+    "model": 8,
+    "eyebrow": "Uzávěrka diferenciálu",
+    "category": "technologie"
+  },
+  {
+    "id": 89,
+    "sort": 9,
+    "photo": "e45dbc11-8e24-49c0-beae-ceac879711d6",
+    "title": "8 airbagů",
+    "subtitle": "Vůz je vybaven 8 airbagy včetně středového airbagu mezi předními sedadly. Ten pomáhá chránit cestující v první řadě při bočním nárazu.",
+    "model": 3,
+    "eyebrow": "Ještě vyšší ochrana",
+    "category": "bezpecnost"
+  },
+  {
+    "id": 101,
+    "sort": 9,
+    "photo": "e45dbc11-8e24-49c0-beae-ceac879711d6",
+    "title": "8 airbagů",
+    "subtitle": "Vůz je vybaven 8 airbagy včetně středového airbagu mezi předními sedadly. Ten pomáhá chránit cestující v první řadě při bočním nárazu.",
+    "model": 4,
+    "eyebrow": "Ještě vyšší ochrana",
+    "category": "bezpecnost"
+  },
+  {
+    "id": 165,
+    "sort": 9,
+    "photo": "e1cb1ffe-feec-4d33-a07f-d476898e7ea9",
+    "title": "Pevná rámová konstrukce",
+    "subtitle": "Na rozdíl od samonosné karoserie jsou motor a zavěšení kol uloženy na pevném ocelovém rámu. Toto řešení přispívá k vyšší odolnosti při nárazu a zároveň pomáhá lépe omezovat hluk a vibrace z okolí vozu.",
+    "model": 9,
+    "eyebrow": "Čtyřvrstvý rám",
+    "category": "bezpecnost"
+  },
+  {
+    "id": 113,
+    "sort": 9,
+    "photo": "a250c551-d147-4b49-b9f3-7b5322eefaf7",
+    "title": "Vehicle to Load (V2L)",
+    "subtitle": "Funkce V2L umožňuje napájet externí spotřebiče přímo z vozu výkonem až 3,5 kW. Praktické řešení pro kempování, výlety i práci v terénu — energii lze využívat až do předem nastavené minimální kapacity baterie v rozmezí 20–70 %.",
+    "model": 5,
+    "eyebrow": "Outdoor s výhodami ",
+    "category": "komfort"
+  },
+  {
+    "id": 137,
+    "sort": 9,
+    "photo": "814b9667-0f16-4fab-b8c2-31a84b5c45ff",
+    "title": "8 airbagů",
+    "subtitle": "Vůz je vybaven 8 airbagy včetně středového airbagu mezi předními sedadly. Ten pomáhá chránit cestující v první řadě při bočním nárazu.",
+    "model": 7,
+    "eyebrow": "Rozšířená ochrana posádky",
+    "category": "bezpecnost"
+  },
+  {
+    "id": 125,
+    "sort": 9,
+    "photo": "814b9667-0f16-4fab-b8c2-31a84b5c45ff",
+    "title": "8 airbagů",
+    "subtitle": "Vůz je vybaven 8 airbagy včetně středového airbagu mezi předními sedadly. Ten pomáhá chránit cestující v první řadě při bočním nárazu.",
+    "model": 6,
+    "eyebrow": "Rozšířená ochrana posádky",
+    "category": "bezpecnost"
+  },
+  {
+    "id": 73,
+    "sort": 9,
+    "photo": "f941ecc1-847d-46dd-87a3-1487d6b3105c",
+    "title": "Elektricky nastavitelná přední sedadla",
+    "subtitle": "Sedadlo řidiče nabízí elektrické nastavení v 8 směrech včetně 2směrné bederní opěrky. Sedadlo spolujezdce je nastavitelné elektricky v 6 směrech, takže posádce poskytuje pohodlí i na delších cestách.",
+    "model": 2,
+    "eyebrow": "Komfort při každé jízdě",
+    "category": "komfort"
+  },
+  {
+    "id": 126,
+    "sort": 10,
+    "photo": "02aca0a4-ae9a-48fd-98d8-89cabadb1c1a",
+    "title": "Stabilita za všech podmínek",
+    "subtitle": "Systém ESC pomáhá předcházet nehodám tím, že podporuje stabilitu vozu v různých jízdních situacích a pomáhá řidiči udržet kontrolu nad vozidlem.",
+    "model": 6,
+    "eyebrow": "Elektronická stabilizace ESC",
+    "category": "bezpecnost"
+  },
+  {
+    "id": 114,
+    "sort": 10,
+    "photo": "4cea667a-bebe-472c-b24f-b15f15e98770",
+    "title": "3D 360° kamerový systém",
+    "subtitle": "Čtyři vnější kamery pomáhají sledovat okolí vozu při parkování i pomalé jízdě. Řidiči poskytují přehledný pohled na prostor za vozem, po stranách i v blízkosti kol.",
+    "model": 5,
+    "eyebrow": "Lepší přehled kolem vozu",
+    "category": "komfort"
+  },
+  {
+    "id": 166,
+    "sort": 10,
+    "photo": "c1b449b0-a0af-437f-8173-95a493520984",
+    "title": "Konstrukce s důrazem na bezpečnost",
+    "subtitle": "Zesílená konstrukce karoserie z vysokopevnostní oceli zvyšuje tuhost vozu, pevnost celé struktury a úroveň ochrany posádky — zejména v oblasti kabiny.",
+    "model": 9,
+    "eyebrow": "79,2 % vysokopevnostní oceli",
+    "category": "bezpecnost"
+  },
+  {
+    "id": 138,
+    "sort": 10,
+    "photo": "02aca0a4-ae9a-48fd-98d8-89cabadb1c1a",
+    "title": "Stabilita za všech podmínek",
+    "subtitle": "Systém ESC pomáhá předcházet nehodám tím, že podporuje stabilitu vozu v různých jízdních situacích a pomáhá řidiči udržet kontrolu nad vozidlem.",
+    "model": 7,
+    "eyebrow": "Elektronická stabilizace ESC",
+    "category": "bezpecnost"
+  },
+  {
+    "id": 102,
+    "sort": 10,
+    "photo": "1e298433-148b-4b94-853d-ce7c9ffe2a3a",
+    "title": "Autonomní nouzové brzdění AEB",
+    "subtitle": "Systém AEB upozorní řidiče na riziko čelní kolize a v případě potřeby automaticky aktivuje brzdy, aby pomohl zabránit nehodě nebo zmírnit její následky.",
+    "model": 4,
+    "eyebrow": "ADAS bezpečnostní systém",
+    "category": "bezpecnost"
+  },
+  {
+    "id": 90,
+    "sort": 10,
+    "photo": "1e298433-148b-4b94-853d-ce7c9ffe2a3a",
+    "title": "Autonomní nouzové brzdění AEB",
+    "subtitle": "Systém AEB upozorní řidiče na riziko čelní kolize a v případě potřeby automaticky aktivuje brzdy, aby pomohl zabránit nehodě nebo zmírnit její následky.",
+    "model": 3,
+    "eyebrow": "ADAS bezpečnostní systém",
+    "category": "bezpecnost"
+  },
+  {
+    "id": 154,
+    "sort": 10,
+    "photo": "cff05681-f911-42da-a8e8-bc45e032595a",
+    "title": "Silný zátah pro každý den",
+    "subtitle": "Naftový motor 2.2 l udržuje vysoký točivý moment v nejčastěji využívaném rozsahu otáček 1 600 až 2 600 ot./min. Díky tomu nabízí jistý zátah a silný výkon při běžné jízdě i při vyšším zatížení.",
+    "model": 8,
+    "eyebrow": "2.2litrový dieselový motor",
+    "category": "technologie"
+  },
+  {
+    "id": 82,
+    "sort": 10,
+    "photo": "eea3bcad-67e0-4b99-964a-408f3c0750eb",
+    "title": "Elektricky nastavitelná přední sedadla",
+    "subtitle": "Sedadlo řidiče nabízí elektrické nastavení v 8 směrech včetně 2směrné bederní opěrky. Sedadlo spolujezdce je nastavitelné elektricky v 6 směrech, takže posádce poskytuje pohodlí i na delších cestách.",
+    "model": 1,
+    "eyebrow": "Komfort při každé jízdě",
+    "category": "komfort"
+  },
+  {
+    "id": 74,
+    "sort": 10,
+    "photo": "b0b71d99-e81b-416e-a0a1-57cf6da6cad0",
+    "title": "Chytře využitý zavazadlový prostor",
+    "subtitle": "Praktickou přepážku Magic Tray lze podle potřeby snadno vyjmout nebo nainstalovat. Umožňuje uložit různé předměty pod rovnou ložnou plochu a efektivněji tak využít zavazadlový prostor.",
+    "model": 2,
+    "eyebrow": "Magic Tray",
+    "category": "komfort"
+  },
+  {
+    "id": 167,
+    "sort": 11,
+    "photo": "7e4194c0-1333-4544-a6eb-3e8c130b1e74",
+    "title": "Bezpečí pro všechny na palubě",
+    "subtitle": "Vůz je vybaven 6 airbagy: čelními airbagy pro řidiče a spolujezdce, bočními airbagy pro první řadu a hlavovými airbagy pro ochranu cestujících.",
+    "model": 9,
+    "eyebrow": "6 airbagů",
+    "category": "bezpecnost"
+  },
+  {
+    "id": 83,
+    "sort": 11,
+    "photo": "e3f05e59-1155-4e50-aebc-fe31af8a2bb6",
+    "title": "Magic Tray",
+    "subtitle": "Praktickou přepážku Magic Tray lze podle potřeby snadno vyjmout nebo nainstalovat. Umožňuje uložit různé předměty pod rovnou ložnou plochu a efektivněji tak využít zavazadlový prostor.",
+    "model": 1,
+    "eyebrow": "Chytře využitý kufr",
+    "category": "komfort"
+  },
+  {
+    "id": 115,
+    "sort": 11,
+    "photo": "4bcdb335-b4e1-4a74-8b0c-bdc671f776e9",
+    "title": "Pet-friendly režim ",
+    "subtitle": "Když potřebujete na chvíli opustit vůz a nemůžete vzít domácího mazlíčka s sebou, režim klimatizace pomůže udržet v kabině bezpečnou a příjemnou teplotu. Vůz přitom můžete zamknout a interiér zůstane temperovaný.",
+    "model": 5,
+    "eyebrow": "Komfortní režim pro mazlíčky",
+    "category": "komfort"
+  },
+  {
+    "id": 91,
+    "sort": 11,
+    "photo": "07b87a8d-19e5-41ac-89c1-9403211123af",
+    "title": "Elektronická stabilizace ESC",
+    "subtitle": "Systém ESC pomáhá předcházet nehodám tím, že podporuje stabilitu vozu v různých jízdních situacích a pomáhá řidiči udržet kontrolu nad vozidlem.",
+    "model": 3,
+    "eyebrow": "Stabilita za všech podmínek",
+    "category": "bezpecnost"
+  },
+  {
+    "id": 155,
+    "sort": 11,
+    "photo": "af0ba7a4-cda9-4c37-bc05-57d91a96da0f",
+    "title": "Zadní víceprvkové zavěšení",
+    "subtitle": "Podvozek pomáhá udržet maximální trakci i na nepravidelném povrchu. Zadní víceprvkové zavěšení rozkládá rázy od vozovky přes několik ramen a přispívá ke stabilnímu a komfortnímu jízdnímu projevu.",
+    "model": 8,
+    "eyebrow": "Stabilita i na nerovném povrchu",
+    "category": "technologie"
+  },
+  {
+    "id": 75,
+    "sort": 11,
+    "photo": "e8d4b558-2fe5-4fe9-91b6-34351c7157bf",
+    "title": "Dvouzónová automatická klimatizace",
+    "subtitle": "Řidič i spolujezdec si mohou nastavit teplotu nezávisle podle svých preferencí. Mikrofiltr klimatizace zároveň pomáhá udržovat v interiéru čistší a příjemnější vzduch.",
+    "model": 2,
+    "eyebrow": "Příjemné klima v interiéru",
+    "category": "komfort"
+  },
+  {
+    "id": 127,
+    "sort": 11,
+    "photo": "44b662b9-9a7c-4465-b6bc-b740d3296865",
+    "title": "Chytrý asistent",
+    "subtitle": "Systém pomáhá udržovat bezpečný odstup od vozidla vpředu podle nastavené rychlosti. Podporuje plynulou jízdu při zrychlování, zpomalování, zastavení i opětovném rozjezdu.",
+    "model": 6,
+    "eyebrow": "Adaptivní tempomat ACC & SSA",
+    "category": "bezpecnost"
+  },
+  {
+    "id": 139,
+    "sort": 11,
+    "photo": "44b662b9-9a7c-4465-b6bc-b740d3296865",
+    "title": "Chytrý asistent",
+    "subtitle": "Systém pomáhá udržovat bezpečný odstup od vozidla vpředu podle nastavené rychlosti. Podporuje plynulou jízdu při zrychlování, zpomalování, zastavení i opětovném rozjezdu.",
+    "model": 7,
+    "eyebrow": "Adaptivní tempomat ACC & SSA",
+    "category": "bezpecnost"
+  },
+  {
+    "id": 103,
+    "sort": 11,
+    "photo": "07b87a8d-19e5-41ac-89c1-9403211123af",
+    "title": "Elektronická stabilizace ESC",
+    "subtitle": "Systém ESC pomáhá předcházet nehodám tím, že podporuje stabilitu vozu v různých jízdních situacích a pomáhá řidiči udržet kontrolu nad vozidlem.",
+    "model": 4,
+    "eyebrow": "Stabilita za všech podmínek",
+    "category": "bezpecnost"
+  },
+  {
+    "id": 168,
+    "sort": 12,
+    "photo": "6540102a-1af1-4805-ae03-8729ad509587",
+    "title": "Chytrý asistent ",
+    "subtitle": "Systém pomáhá udržovat bezpečný odstup od vozidla vpředu podle nastavené rychlosti. Podporuje plynulou jízdu při zrychlování, zpomalování, zastavení i opětovném rozjezdu.",
+    "model": 9,
+    "eyebrow": "Adaptivní tempomat ACC & SSA",
+    "category": "technologie"
+  },
+  {
+    "id": 92,
+    "sort": 12,
+    "photo": "57b332ad-95d1-4161-afb0-ac362826ad2f",
+    "title": "Asistenční systémy pro jistější jízdu",
+    "subtitle": "Další bezpečnostní a asistenční funkce pomáhají chránit posádku, podporují řidiče v každodenním provozu a zvyšují pocit jistoty za volantem.",
+    "model": 3,
+    "eyebrow": "Další bezpečnostní prvky",
+    "category": "bezpecnost"
+  },
+  {
+    "id": 128,
+    "sort": 12,
+    "photo": "bb45fec7-a870-4219-b767-053435a948d9",
+    "title": "ADAS bezpečnostní systém",
+    "subtitle": "Systém AEB upozorní řidiče na riziko čelní kolize a v případě potřeby automaticky aktivuje brzdy, aby pomohl zabránit nehodě nebo zmírnit její následky.",
+    "model": 6,
+    "eyebrow": "Autonomní nouzové brzdění AEB",
+    "category": "bezpecnost"
+  },
+  {
+    "id": 84,
+    "sort": 12,
+    "photo": "c5357f6d-9ceb-44ba-8ce8-d50a44ec4b86",
+    "title": "Výsuvná přihrádka před spolujezdcem",
+    "subtitle": "Prostorná výsuvná přihrádka s plochým dnem umožňuje bezpečné uložení různých předmětů včetně tabletu. Díky přehlednému řešení máte vše důležité pohodlně po ruce.",
+    "model": 1,
+    "eyebrow": "Praktické úložné řešení",
+    "category": "komfort"
+  },
+  {
+    "id": 104,
+    "sort": 12,
+    "photo": "57b332ad-95d1-4161-afb0-ac362826ad2f",
+    "title": "Asistenční systémy pro jistější jízdu",
+    "subtitle": "Další bezpečnostní a asistenční funkce pomáhají chránit posádku, podporují řidiče v každodenním provozu a zvyšují pocit jistoty za volantem.",
+    "model": 4,
+    "eyebrow": "Další bezpečnostní prvky",
+    "category": "bezpecnost"
+  },
+  {
+    "id": 116,
+    "sort": 12,
+    "photo": "a58d9c43-442e-4fe4-8ec0-701692c8d514",
+    "title": "Elektricky nastavitelné přední sedadlo",
+    "subtitle": "Elektricky nastavitelné sedadlo v 8 směrech včetně 2směrné bederní opěrky umožňuje pohodlné nastavení podle potřeb řidiče a zpříjemňuje každodenní i delší cestování.",
+    "model": 5,
+    "eyebrow": "Komfort při každé jízdě",
+    "category": "komfort"
+  },
+  {
+    "id": 156,
+    "sort": 12,
+    "photo": "42f108e7-2455-4cc3-8f67-a956824ccad1",
+    "title": "Jistý jízdní projev",
+    "subtitle": "Pohon zadních kol, známý i z prémiových sedanů, přispívá ke stabilnímu chování v zatáčkách a pohodlnější jízdě. Vůz tak působí jistě a vyváženě při každodenním cestování i delších trasách.",
+    "model": 8,
+    "eyebrow": "Pohon zadních kol RWD",
+    "category": "technologie"
+  },
+  {
+    "id": 140,
+    "sort": 12,
+    "photo": "bb45fec7-a870-4219-b767-053435a948d9",
+    "title": "ADAS bezpečnostní systém",
+    "subtitle": "Systém AEB upozorní řidiče na riziko čelní kolize a v případě potřeby automaticky aktivuje brzdy, aby pomohl zabránit nehodě nebo zmírnit její následky.",
+    "model": 7,
+    "eyebrow": "Autonomní nouzové brzdění AEB",
+    "category": "bezpecnost"
+  },
+  {
+    "id": 76,
+    "sort": 12,
+    "photo": "45c5fdb9-c94d-4e3f-8049-016d59ee6bcc",
+    "title": "Apple CarPlay & Android Auto",
+    "subtitle": "Propojte svůj smartphone s multimediálním systémem vozu a mějte oblíbené aplikace, navigaci, hudbu i hovory pohodlně na dosah přímo na obrazovce vozu.",
+    "model": 2,
+    "eyebrow": "Chytré propojení ",
+    "category": "komfort"
+  },
+  {
+    "id": 141,
+    "sort": 13,
+    "photo": "941286b4-624a-4089-9ffc-e1cb2393d23f",
+    "title": "Efektivní jízda v elektrickém režimu",
+    "subtitle": "Hybridní systém se dvěma elektromotory a převodovkou e-DHT umožňuje současně dobíjet baterii a využívat elektrickou jízdu. Díky tomu nabízí lepší efektivitu, plynulý výkon a úspornější provoz.",
+    "model": 7,
+    "eyebrow": "Dual-Tech Hybrid systém",
+    "category": "technologie"
+  },
+  {
+    "id": 142,
+    "sort": 14,
+    "photo": "8ea230e3-8985-4e0f-b5e9-f5925c741c03",
+    "title": "Delší podpora elektrické jízdy",
+    "subtitle": "Vysokonapěťová baterie s kapacitou 1,83 kWh je optimalizovaná pro nízkou spotřebu a správné rozložení hmotnosti. Pomáhá prodloužit jízdu v elektrickém režimu a zlepšuje celkovou účinnost hybridního pohonu.",
+    "model": 7,
+    "eyebrow": "Optimalizovaná hybridní baterie",
+    "category": "technologie"
+  },
+  {
+    "id": 143,
+    "sort": 15,
+    "photo": "e13c35fa-7f49-4cda-8cb2-5e5a2d68548f",
+    "title": "Spolehlivá elektrická podpora",
+    "subtitle": "Integrovaný systém správy baterie BMS omezuje samovybíjení pomocí režimu spánku. LFP baterie zároveň nabízí dlouhou životnost a stabilní účinnost při každodenním používání.",
+    "model": 7,
+    "eyebrow": "Nízkonapěťová LFP baterie",
+    "category": "technologie"
+  },
+  {
+    "id": 144,
+    "sort": 16,
+    "photo": "8382537a-dacd-4ea4-bf02-c32b8958527b",
+    "title": "Vyšší komfort a stabilita",
+    "subtitle": "Vylepšené tlumiče pomáhají zvyšovat jízdní komfort i stabilitu vozu. Lépe reagují na různé povrchy a přispívají k jistějšímu a příjemnějšímu jízdnímu projevu.",
+    "model": 7,
+    "eyebrow": "Smart Frequency Damper",
+    "category": "technologie"
+  }
+]

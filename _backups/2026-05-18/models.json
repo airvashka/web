@@ -1,0 +1,1764 @@
+[
+  {
+    "id": 17,
+    "slug": "farizon-sv",
+    "name": "Farizon SuperVan",
+    "tagline": "Největší prostor ve třídě",
+    "description": "Elektrická dodávka SV (SuperVan) — největší prostor ve své třídě zajišťuje plynulou a bezstarostnou jízdu.\n\nModerní elektrický pohon pro firmy, které chtějí kombinovat ekonomický provoz s ekologickým přístupem k mobilitě.",
+    "body_type": "van",
+    "fuel_type": "ev",
+    "price_from": null,
+    "hero_image": null,
+    "status": "published",
+    "sort": 1,
+    "brand": 3,
+    "sub_brand": null,
+    "youtube_video_ids": null,
+    "hero_stats": [
+      {
+        "label": "Záruka",
+        "value": "7 let / 150 000 km"
+      }
+    ],
+    "promo_active": false,
+    "promo_label": null,
+    "promo_discount_amount": null,
+    "promo_valid_to": null,
+    "promo_description": null,
+    "highlights_panel": [
+      {
+        "icon_kind": "range",
+        "big": "Elektrický",
+        "lab": "Nulové emise",
+        "note": "Pro firmy s ohledem na životní prostředí."
+      },
+      {
+        "icon_kind": "charge",
+        "big": "DC nabíjení",
+        "lab": "Rychle do akce",
+        "note": "Krátká přestávka — a zase v provozu."
+      },
+      {
+        "icon_kind": "tow",
+        "big": "Velký nákladový prostor",
+        "lab": "Užitkový",
+        "note": "Optimalizovaný pro logistiku v městě."
+      }
+    ],
+    "variant_badge_kind": "EVX",
+    "hero_image_card": null,
+    "hero_video": null,
+    "gallery": [],
+    "color_interior": [],
+    "documents": [],
+    "model_years": [
+      17
+    ],
+    "highlights": [],
+    "color_exterior": []
+  },
+  {
+    "id": 10,
+    "slug": "omoda-5",
+    "name": "Omoda 5",
+    "tagline": "Inteligentní design pro ty, kteří chtějí víc",
+    "description": "OMODA5 ztělesňuje harmonii mezi moderním luxusem, technologickou vyspělostí a smyslem pro detail. Navržen pro ty, kteří nehledají kompromisy, ale požadují to nejlepší v každém směru. Vstupte do nové éry – s elegancí, výkonem a vizí budoucnosti.",
+    "body_type": "suv",
+    "fuel_type": "petrol",
+    "price_from": 579000,
+    "hero_image": "5c00d308-852d-4ad4-b56c-793ddb10bf2d",
+    "status": "published",
+    "sort": 2,
+    "brand": 2,
+    "sub_brand": 1,
+    "youtube_video_ids": null,
+    "hero_stats": [
+      {
+        "label": "Výkon",
+        "value": "108 kW"
+      },
+      {
+        "label": "Točivý moment",
+        "value": "275 Nm"
+      },
+      {
+        "label": "Spotřeba (komb.)",
+        "value": "7,0 l/100 km"
+      },
+      {
+        "label": "Záruka",
+        "value": "7 let / 150 000 km"
+      }
+    ],
+    "promo_active": false,
+    "promo_label": null,
+    "promo_discount_amount": null,
+    "promo_valid_to": null,
+    "promo_description": null,
+    "highlights_panel": [
+      {
+        "icon_kind": "transmission",
+        "big": "DCT 7st",
+        "lab": "Automat",
+        "note": "Plynulé řazení s rychlou odezvou."
+      },
+      {
+        "icon_kind": "fuel",
+        "big": "1.6 Turbo",
+        "lab": "Benzín",
+        "note": "Moderní turbo s dobrou dynamikou a nízkou spotřebou."
+      },
+      {
+        "icon_kind": "awd",
+        "big": "2WD",
+        "lab": "Pohon předních",
+        "note": "Lehčí konstrukce — nižší cena, nižší náklady."
+      }
+    ],
+    "variant_badge_kind": "ICE",
+    "hero_image_card": null,
+    "hero_video": null,
+    "gallery": [
+      102,
+      103,
+      104,
+      105,
+      106,
+      107
+    ],
+    "color_interior": [
+      27
+    ],
+    "documents": [
+      20
+    ],
+    "model_years": [
+      10
+    ],
+    "highlights": [
+      53,
+      54,
+      55,
+      56
+    ],
+    "color_exterior": [
+      79,
+      80,
+      81,
+      82,
+      83,
+      84
+    ]
+  },
+  {
+    "id": 2,
+    "slug": "tivoli",
+    "name": "Tivoli",
+    "tagline": "Inspirace pro každý den",
+    "description": "Tivoli je kompaktní městské SUV s osobitým charizmatem a designem, který se nebojí být vidět. Charakteristické červené prvky v přední masce, výrazná LED světla a 18\" diamantově řezaná kola dávají vozu sebevědomý vzhled vhodný stejně tak do města jako za jeho hranice.\n\nPod kapotou pracuje 1,5litrový benzínový motor GDI-Turbo s výkonem 163 k a točivým momentem až 280 Nm dostupným už od 1 500 ot./min. Vybírat můžete mezi 6st. manuální nebo 6st. automatickou převodovkou AISIN se třemi jízdními režimy (Normal / Sport / Winter). Pohon je možný i ve verzi AWD s uzamykatelnou redukcí.\n\nKaroserie je z 79 % vyrobena z vysokopevnostní oceli, ve výbavě je 7 airbagů a kompletní balík asistenčních systémů (FVSA, SDA, TSR, DAW, HBA). Zavazadlový prostor 423 l (až 1 115 l po sklopení) zvládne nákupy i víkendový výlet.",
+    "body_type": "suv",
+    "fuel_type": "petrol",
+    "price_from": 459900,
+    "hero_image": "360b8d82-34ed-477c-b95e-92169f904f23",
+    "status": "published",
+    "sort": 3,
+    "brand": 1,
+    "sub_brand": null,
+    "youtube_video_ids": null,
+    "hero_stats": [
+      {
+        "label": "Výkon",
+        "value": "163 k"
+      },
+      {
+        "label": "Točivý moment",
+        "value": "280 Nm"
+      },
+      {
+        "label": "Záruka",
+        "value": "5 let / 100 000 km"
+      }
+    ],
+    "promo_active": true,
+    "promo_label": "VÝPRODEJ SKLADU",
+    "promo_discount_amount": 50000,
+    "promo_valid_to": null,
+    "promo_description": "CENOVÉ ZVÝHODNENÍ VE VÝŠI 50 000 Kč. Cenové zvýhodnění platí na vybraná skladová vozidla. Akce trvá do 31. 5. 2026 nebo do vyprodání zásob.",
+    "highlights_panel": [
+      {
+        "icon_kind": "fuel",
+        "big": "1.5 Turbo",
+        "lab": "Benzín",
+        "note": "Svižný benzínový motor pro každý den."
+      },
+      {
+        "icon_kind": "transmission",
+        "big": "Manuál / AT",
+        "lab": "Na výběr",
+        "note": "Manuální i automatická převodovka v ceníku."
+      },
+      {
+        "icon_kind": "awd",
+        "big": "FWD/AWD",
+        "lab": "Na výběr",
+        "note": "Podle Vašich preferencí"
+      }
+    ],
+    "variant_badge_kind": "ICE",
+    "hero_image_card": "14947649-fad8-4bc1-bbea-19d42b6a6743",
+    "hero_video": "dc31fa9f-91ff-4005-be0e-1546cababed3",
+    "gallery": [
+      26,
+      27,
+      28,
+      29,
+      30,
+      31,
+      32
+    ],
+    "color_interior": [
+      31,
+      32
+    ],
+    "documents": [
+      1,
+      2,
+      12
+    ],
+    "model_years": [
+      1,
+      24
+    ],
+    "highlights": [
+      1,
+      2,
+      3,
+      4,
+      69,
+      70,
+      71,
+      72,
+      73,
+      74,
+      75,
+      76
+    ],
+    "color_exterior": [
+      102,
+      103,
+      104,
+      105,
+      106
+    ]
+  },
+  {
+    "id": 1,
+    "slug": "korando",
+    "name": "Korando",
+    "tagline": "Moderní SUV pro dnešní dobu",
+    "description": "Korando si jde sebevědomě svou vlastní cestou. Je výstižným představitelem moderních hodnot a chytrých řešení — opravdové SUV, které vytváří jedinečnou rovnováhu mezi praktičností a pohodlím. Robustní vzhled, LED osvětlení a Black Paket s černými koly mu dodávají charakter, který je vidět z každého úhlu.\n\nInteriér Korando je vyroben z prvotřídních materiálů a vybavený nejmodernější technologií: 10,25\" digitální přístrojová deska, 9\" HD navigace, Android Auto a Apple CarPlay, ambientní osvětlení ve 34 barvách a elektricky nastavitelná přední sedadla. Zavazadlový prostor 551 l a inteligentní elektrické páté dveře zvládnou jak denní rutinu, tak víkendové dobrodružství.\n\nPod kapotou je 1,5litrový benzínový turbo motor (163 k / 280 Nm) s 6st. manuální nebo 6st. automatickou převodovkou AISIN. AWD verze utáhne brzděný přívěs až 1 500 kg. 74 % karoserie tvoří vysokopevnostní ocel a Korando má 5 hvězdiček Euro NCAP (test 2019) — jeden z mála údajů, který brožura zmiňuje konkrétně.",
+    "body_type": "suv",
+    "fuel_type": "petrol",
+    "price_from": 549900,
+    "hero_image": "5d09b21a-cb43-491a-aa7c-2e91072b2a70",
+    "status": "published",
+    "sort": 4,
+    "brand": 1,
+    "sub_brand": null,
+    "youtube_video_ids": [
+      "LeS98suOVFk",
+      "WFVdVrx29dI"
+    ],
+    "hero_stats": [
+      {
+        "label": "Výkon",
+        "value": "163 k"
+      },
+      {
+        "label": "Točivý moment",
+        "value": "280 Nm"
+      },
+      {
+        "label": "Záruka",
+        "value": "5 let / 100 000 km"
+      }
+    ],
+    "promo_active": true,
+    "promo_label": "JARNÍ VÝPRODEJ SKLADU",
+    "promo_discount_amount": 70000,
+    "promo_valid_to": null,
+    "promo_description": "Jarní výprodej skladů KGM přináší Korando se slevou 70 000 Kč!\n\nKORANDO STYLE+, skvěle vybavený vůz, je nyní ještě dostupnější. Připravili jsme pro vás limitovanou akční nabídku modelu KORANDO STYLE+ s bohatou výbavou ZDARMA v hodnotě 30 000 Kč.  \n\n- Signalizace vzdálenosti při parkování - i vpředu\n- Dvouzónová automatická klimatizace\n- Vyhřívaný volant \n- Bezdrátové nabíjení (15 W)\n- Textilní koberce\n- Pevná podlaha zavazadlového prostoru\n- 220V elektrická zásuvka umístěná na středové konzoli\n- Skla se zvýšeným tónováním “PRIVACY GLASS”, včetně solární a hlukové ochrany (skla v zadních bočních dveřích a ve dveřích zavazadlového prostoru)\n- Střešní ližiny (stříbrná barva) ",
+    "highlights_panel": [
+      {
+        "icon_kind": "awd",
+        "big": "4×4 i 2WD",
+        "lab": "Na výběr",
+        "note": "Pohon všech kol pro klid v jakémkoli počasí."
+      },
+      {
+        "icon_kind": "transmission",
+        "big": "6st AT",
+        "lab": "Automat Aisin",
+        "note": "Plynulé a vyzkoušené řazení."
+      },
+      {
+        "icon_kind": "tow",
+        "big": "1 500 kg",
+        "lab": "Brzděný přívěs",
+        "note": "Vhodný pro karavan i menší přívěs."
+      }
+    ],
+    "variant_badge_kind": "ICE",
+    "hero_image_card": null,
+    "hero_video": null,
+    "gallery": [
+      34,
+      35,
+      37,
+      38,
+      140,
+      141,
+      142,
+      143,
+      144,
+      145,
+      146,
+      147,
+      148,
+      149,
+      150,
+      151,
+      152,
+      153,
+      154,
+      155,
+      156,
+      157,
+      158,
+      159
+    ],
+    "color_interior": [
+      33,
+      34,
+      35
+    ],
+    "documents": [
+      3,
+      21,
+      22,
+      23
+    ],
+    "model_years": [
+      2,
+      25
+    ],
+    "highlights": [
+      5,
+      6,
+      7,
+      8,
+      77,
+      78,
+      79,
+      80,
+      81,
+      82,
+      83,
+      84
+    ],
+    "color_exterior": [
+      132,
+      133,
+      134,
+      135,
+      136,
+      137,
+      138,
+      139,
+      140,
+      141
+    ]
+  },
+  {
+    "id": 11,
+    "slug": "omoda-5-shs-h",
+    "name": "Omoda 5 SHS-H",
+    "tagline": "Síla hybridu",
+    "description": "OMODA5 SHS-H přináší moderní hybridní pohon navržený pro skutečný provoz – plynulý, úsporný a příjemně svižný. Je to vůz pro řidiče, kteří chtějí stylové SUV s technologií, jež umí výrazně snížit spotřebu a zároveň zachovat jednoduchost používání bez změny návyků.",
+    "body_type": "suv",
+    "fuel_type": "hybrid",
+    "price_from": 629000,
+    "hero_image": "f57ff5de-6e8d-42d3-a9b5-b940df39e831",
+    "status": "published",
+    "sort": 5,
+    "brand": 2,
+    "sub_brand": 1,
+    "youtube_video_ids": null,
+    "hero_stats": [
+      {
+        "label": "Celkový výkon ",
+        "value": "165 kW"
+      },
+      {
+        "label": "Točivý moment",
+        "value": "215 Nm"
+      },
+      {
+        "label": "Spotřeba (komb.)",
+        "value": "5,3 l/100 km"
+      },
+      {
+        "label": "Záruka",
+        "value": "7 let / 150 000 km"
+      }
+    ],
+    "promo_active": false,
+    "promo_label": null,
+    "promo_discount_amount": null,
+    "promo_valid_to": null,
+    "promo_description": null,
+    "highlights_panel": [
+      {
+        "icon_kind": "selfcharge",
+        "big": "Hybrid",
+        "lab": "Bez nabíjení",
+        "note": "Baterii doplní motor a rekuperace."
+      },
+      {
+        "icon_kind": "fuel",
+        "big": "Nízká spotřeba",
+        "lab": "Úspora paliva",
+        "note": "Hybrid v městském provozu šetří nejvíc."
+      },
+      {
+        "icon_kind": "range",
+        "big": "Dlouhé trasy",
+        "lab": "Dojezd na nádrž",
+        "note": "Dlouhá auta bez nutnosti nabíjet."
+      }
+    ],
+    "variant_badge_kind": "HEV",
+    "hero_image_card": null,
+    "hero_video": null,
+    "gallery": [
+      115,
+      116,
+      117,
+      118,
+      119,
+      120
+    ],
+    "color_interior": [
+      29
+    ],
+    "documents": [
+      19
+    ],
+    "model_years": [
+      11
+    ],
+    "highlights": [
+      61,
+      62,
+      63,
+      64
+    ],
+    "color_exterior": [
+      91,
+      92,
+      93,
+      94,
+      95,
+      96
+    ]
+  },
+  {
+    "id": 18,
+    "slug": "farizon-v6e",
+    "name": "Farizon V6E",
+    "tagline": "Revoluce v městském podnikání. Elektricky",
+    "description": "Farizon V6E je čistě elektrické lehké užitkové vozidlo (LCV) navržené pro městské podnikání. Synchronní motor s permanentními magnety o jmenovitém výkonu 50 kW (max. 100 kW) je doplněn LFP baterií CATL s kapacitou 42 kWh — kombinovaný dojezd dle WLTP je 195 km, městský dojezd až 265 km. Rychlonabíjení 20 → 80 % zvládne za 50 minut.\n\nNákladový prostor 6 m³ ve tvaru krychle (2 800 × 1 600 × 1 320 mm) je až o 10 % větší než u běžných vozidel stejného segmentu. Zadní křídlové dveře s otevíráním v poměru 2:3 a možností otevírání do úhlu 270° se přizpůsobí jakékoli logistické potřebě. Nabíjecí platforma ve výšce 540 mm nad zemí usnadňuje nakládku.\n\nRámová konstrukce vozidla odolá tlaku až 7,5 tuny na střeše a má ocelovou podlahu s nosností 1,5 tuny. Užitečné zatížení vozu je o 260 kg vyšší než u vozů stejné kategorie. V6E prošlo přes 5 800 testy a 1 milion kilometrů zkušebních jízd. Kompletní balík ESC, ABS, EBD, TCS, HBB, HBA, HHC, HDC plus rekuperační brzdění L1/L2/L3.",
+    "body_type": "van",
+    "fuel_type": "ev",
+    "price_from": null,
+    "hero_image": "4587635b-d865-4914-8c76-678c6faffe36",
+    "status": "published",
+    "sort": 6,
+    "brand": 3,
+    "sub_brand": null,
+    "youtube_video_ids": null,
+    "hero_stats": [
+      {
+        "label": "Dojezd WLTP",
+        "value": "195 km"
+      },
+      {
+        "label": "Výkon",
+        "value": "50 kW"
+      },
+      {
+        "label": "Záruka",
+        "value": "7 let / 150 000 km"
+      }
+    ],
+    "promo_active": false,
+    "promo_label": null,
+    "promo_discount_amount": null,
+    "promo_valid_to": null,
+    "promo_description": null,
+    "highlights_panel": [
+      {
+        "icon_kind": "range",
+        "big": "Elektrický",
+        "lab": "Nulové emise",
+        "note": "Pro firmy s ohledem na životní prostředí."
+      },
+      {
+        "icon_kind": "charge",
+        "big": "DC nabíjení",
+        "lab": "Rychle do akce",
+        "note": "Krátká přestávka — a zase v provozu."
+      },
+      {
+        "icon_kind": "tow",
+        "big": "Velký nákladový prostor",
+        "lab": "Užitkový",
+        "note": "Optimalizovaný pro logistiku v městě."
+      }
+    ],
+    "variant_badge_kind": "EVX",
+    "hero_image_card": null,
+    "hero_video": null,
+    "gallery": [
+      81,
+      82,
+      83
+    ],
+    "color_interior": [
+      6
+    ],
+    "documents": [
+      4
+    ],
+    "model_years": [
+      18
+    ],
+    "highlights": [
+      9,
+      10,
+      11,
+      12
+    ],
+    "color_exterior": [
+      11
+    ]
+  },
+  {
+    "id": 3,
+    "slug": "torres",
+    "name": "Torres",
+    "tagline": "Dobrodružství s moderním SUV",
+    "description": "Torres byl od základu navržen pro vaše další dobrodružství. Jeho jméno odkazuje na národní park Torres del Paine v Chile — krajinu třpytivých jezer, hlubokých údolí a rozeklaných pohoří s ledovci. Tento robustní, odvážný a sebevědomý SUV nese ostře řezané světlomety, full LED přední i zadní svítilny a nápaditý kryt zadních dveří inspirovaný rezervním kolem klasických off-roadů.\n\nInteriér překvapí prostorností a moderním pojetím. Cestujícím nabízí tři barvy interiéru (černý, dvoutónový šedý a hnědý), ambientní osvětlení ve 32 barvách a 12,3\" navigační systém s HD couvací kamerou a 360° AVM kamerou. Sedadla 2. řady jsou dělená 40:60 a sklopná až o 32,5° pro relaxaci na delších cestách.\n\nPohánět ho bude 1,5litrový GDI Turbo motor (163 k / 280 Nm) s AISIN 6st. automatickou převodovkou. AWD verze s tažnou schopností 1 500 kg z něj dělá ideálního parťáka pro tažení karavanu i loďky. 78 % karoserie je z vysokopevnostní oceli, výbava obsahuje 8 airbagů a kompletní balík ADAS.",
+    "body_type": "suv",
+    "fuel_type": "petrol",
+    "price_from": 649900,
+    "hero_image": "dc803e9c-7beb-4c03-b989-4895f98dd268",
+    "status": "published",
+    "sort": 7,
+    "brand": 1,
+    "sub_brand": null,
+    "youtube_video_ids": null,
+    "hero_stats": [
+      {
+        "label": "Výkon",
+        "value": "163 k"
+      },
+      {
+        "label": "Točivý moment",
+        "value": "280 Nm"
+      },
+      {
+        "label": "Záruka",
+        "value": "5 let / 100 000 km"
+      }
+    ],
+    "promo_active": false,
+    "promo_label": null,
+    "promo_discount_amount": null,
+    "promo_valid_to": null,
+    "promo_description": null,
+    "highlights_panel": [
+      {
+        "icon_kind": "awd",
+        "big": "4×4 i 2WD",
+        "lab": "Na výběr",
+        "note": "Pohon předních i všech kol — podle ceny a potřeby."
+      },
+      {
+        "icon_kind": "tow",
+        "big": "2 200 kg",
+        "lab": "Brzděný přívěs",
+        "note": "Stačí na karavan i větší přívěs."
+      },
+      {
+        "icon_kind": "transmission",
+        "big": "6st AT",
+        "lab": "Automatická převodovka",
+        "note": "Plynulá a vyzkoušená Aisin v každé ceně."
+      }
+    ],
+    "variant_badge_kind": "ICE",
+    "hero_image_card": null,
+    "hero_video": "8632d5f6-916f-449f-928f-b8611b2bf0a8",
+    "gallery": [
+      39,
+      40,
+      41,
+      42,
+      43,
+      44,
+      127,
+      128,
+      129,
+      130,
+      131,
+      132,
+      133,
+      134,
+      135,
+      136,
+      137,
+      138,
+      139
+    ],
+    "color_interior": [
+      36,
+      37,
+      38
+    ],
+    "documents": [
+      5,
+      13
+    ],
+    "model_years": [
+      26
+    ],
+    "highlights": [
+      13,
+      14,
+      15,
+      16,
+      85,
+      86,
+      87,
+      88,
+      89,
+      90,
+      91,
+      92
+    ],
+    "color_exterior": [
+      142,
+      143,
+      144,
+      145,
+      146,
+      147,
+      148,
+      149,
+      150,
+      151
+    ]
+  },
+  {
+    "id": 12,
+    "slug": "omoda-5-ev",
+    "name": "Omoda 5 EV",
+    "tagline": "Síla inovace, energie budoucnosti",
+    "description": "OMODA5 EV představuje revoluci v oblasti elektromobility – spojuje špičkový design, inteligentní technologie a ekologickou efektivitu do jediného, dokonale vyladěného celku. Tento moderní elektromobil je navržen pro řidiče, kteří hledají nejen dynamický výkon a dlouhý dojezd, ale také nejnovější digitální technologie a maximální komfort. S futuristickou siluetou, pokročilými asistenčními systémy a chytrými funkcemi pro snadné ovládání přináší OMODA5 EV nový standard pro každodenní jízdu i dlouhé cesty. Díky nulovým emisím a energeticky úspornému pohonu nabízí ekologickou alternativu bez kompromisů v oblasti výkonu a stylu.",
+    "body_type": "suv",
+    "fuel_type": "ev",
+    "price_from": 749000,
+    "hero_image": "f9fbd1a1-1dac-4e31-a7bc-3219090ac8f1",
+    "status": "published",
+    "sort": 8,
+    "brand": 2,
+    "sub_brand": 1,
+    "youtube_video_ids": null,
+    "hero_stats": [
+      {
+        "label": "Výkon a kapacita baterie",
+        "value": "150 kW / 61 kWh"
+      },
+      {
+        "label": "Dojezd dle WLTP",
+        "value": "402 km"
+      },
+      {
+        "label": "Spotřeba",
+        "value": "16,9 kWh/100 km"
+      },
+      {
+        "label": "Záruka",
+        "value": "7 let / 150 000 km"
+      }
+    ],
+    "promo_active": false,
+    "promo_label": null,
+    "promo_discount_amount": null,
+    "promo_valid_to": null,
+    "promo_description": null,
+    "highlights_panel": [
+      {
+        "icon_kind": "range",
+        "big": "Plně elektrický",
+        "lab": "Dojezd WLTP",
+        "note": "Bez emisí, bez kompromisů na dojezdu."
+      },
+      {
+        "icon_kind": "charge",
+        "big": "DC rychlonabíjení",
+        "lab": "Nabití na cestě",
+        "note": "Krátká pauza a jedete dál."
+      },
+      {
+        "icon_kind": "heatpump",
+        "big": "Tepelná pumpa",
+        "lab": "V základní ceně",
+        "note": "V zimě úsporné vytápění bez ztráty dojezdu."
+      }
+    ],
+    "variant_badge_kind": "EVX",
+    "hero_image_card": null,
+    "hero_video": null,
+    "gallery": [
+      108,
+      109,
+      110,
+      111,
+      112,
+      113,
+      114
+    ],
+    "color_interior": [
+      28
+    ],
+    "documents": [
+      18
+    ],
+    "model_years": [
+      12
+    ],
+    "highlights": [
+      57,
+      58,
+      59,
+      60
+    ],
+    "color_exterior": [
+      85,
+      86,
+      87,
+      88,
+      89,
+      90
+    ]
+  },
+  {
+    "id": 13,
+    "slug": "omoda-9-shs",
+    "name": "Omoda 9 SHS",
+    "tagline": "Nová úroveň luxusu a výkonu",
+    "description": "OMODA9 je symbolem inovace, elegance a dynamiky. Prémiové materiály, pokročilé technologie a unikátní design vytvářejí vůz, který posouvá hranice komfortu i výkonu. Vstupte do světa, kde se snoubí moderní styl s nejnovějšími trendy automobilového průmyslu.",
+    "body_type": "suv",
+    "fuel_type": "phev",
+    "price_from": 1199000,
+    "hero_image": "28bfeb82-39c2-45f4-b8f4-ba30ccb8052e",
+    "status": "published",
+    "sort": 9,
+    "brand": 2,
+    "sub_brand": 1,
+    "youtube_video_ids": [
+      "piG8UO24WUk",
+      "gX2N9cgFEt8",
+      "ujM_LiQSNic",
+      "favIIgudjKo",
+      "XEjT-sqCxZw"
+    ],
+    "hero_stats": [
+      {
+        "label": "Zrychlení 0–100 km/h",
+        "value": "4,9 s"
+      },
+      {
+        "label": "Točivý moment",
+        "value": "700 Nm"
+      },
+      {
+        "label": "Kombinovaný dojezd",
+        "value": "1 100 km"
+      },
+      {
+        "label": "Celkový výkon ",
+        "value": "395 kW"
+      }
+    ],
+    "promo_active": false,
+    "promo_label": null,
+    "promo_discount_amount": null,
+    "promo_valid_to": null,
+    "promo_description": null,
+    "highlights_panel": [
+      {
+        "icon_kind": "selfcharge",
+        "big": "Plug-in hybrid",
+        "lab": "Nabíjení i tankování",
+        "note": "Krátké trasy elektricky, dlouhé bez kompromisů."
+      },
+      {
+        "icon_kind": "range",
+        "big": "Velký dojezd",
+        "lab": "Hybrid + nádrž",
+        "note": "Bezstarostná dálnice i město."
+      },
+      {
+        "icon_kind": "fuel",
+        "big": "Nízká spotřeba",
+        "lab": "Úspora paliva",
+        "note": "Energetická efektivita prémiové třídy."
+      }
+    ],
+    "variant_badge_kind": "HEV",
+    "hero_image_card": null,
+    "hero_video": null,
+    "gallery": [
+      121,
+      122,
+      123,
+      124,
+      125,
+      126
+    ],
+    "color_interior": [
+      30,
+      44
+    ],
+    "documents": [
+      17
+    ],
+    "model_years": [
+      22
+    ],
+    "highlights": [
+      65,
+      66,
+      67,
+      68
+    ],
+    "color_exterior": [
+      97,
+      98,
+      99,
+      100,
+      101
+    ]
+  },
+  {
+    "id": 4,
+    "slug": "torres-hev",
+    "name": "Torres HEV",
+    "tagline": "Torres bourá hranice — nyní s pokročilým hybridem",
+    "description": "Torres Hybrid přebírá vše, co milujete na klasickém Torresu — robustní design, ostře řezané světlomety, šestiúhelníkový design zadní části inspirovaný klasickými kryty rezervního kola — a přidává to nejdůležitější: Dual-Tech Hybrid systém s plně elektrickým pohonem do 72 km/h ve městě.\n\nPokročilý hybridní pohon nabízí kombinovaný výkon 150 kW / 204 k a 300 Nm točivého momentu. Převodovka e-DHT automaticky volí jeden z devíti hybridních režimů podle stylu jízdy, regenerativní brzdění dobíjí baterii a vy si užíváte plynulou jízdu bez nutnosti se starat o nabíjení. Stačí natankovat benzín.\n\nBlack Paket s 20\" černými koly, červenými třmeny brzd a černými kryty podvozku vytváří elegantní, sebevědomou alternativu k klasické variantě. Uvnitř vás čeká panoramatické střešní okno, panoramatický displej s grafickou platformou Athena 2.0, 78 % HSS oceli a 8 airbagů. Brodění do hloubky 300 mm a tažná stabilita Trailer Stability Assist přidávají všestrannost na off-road i pro tažení.",
+    "body_type": "suv",
+    "fuel_type": "hybrid",
+    "price_from": 755700,
+    "hero_image": "4747a9fc-81ab-42a7-9608-3a98c42985e8",
+    "status": "published",
+    "sort": 10,
+    "brand": 1,
+    "sub_brand": null,
+    "youtube_video_ids": null,
+    "hero_stats": [
+      {
+        "label": "Systémový výkon",
+        "value": "150 kW"
+      },
+      {
+        "label": "Záruka",
+        "value": "5 let / 100 000 km"
+      }
+    ],
+    "promo_active": false,
+    "promo_label": null,
+    "promo_discount_amount": null,
+    "promo_valid_to": null,
+    "promo_description": null,
+    "highlights_panel": [
+      {
+        "icon_kind": "selfcharge",
+        "big": "Bez nabíjení",
+        "lab": "Self-charging hybrid",
+        "note": "Jen tankujete — baterii dobíjí motor a brzdy."
+      },
+      {
+        "icon_kind": "range",
+        "big": "1 100 km",
+        "lab": "Dojezd na nádrž",
+        "note": "Praha–Mnichov a zpět bez tankování."
+      },
+      {
+        "icon_kind": "fuel",
+        "big": "5,3 l",
+        "lab": "Spotřeba komb.",
+        "note": "Nižší náklady než u 1.5 benzína."
+      }
+    ],
+    "variant_badge_kind": "HEV",
+    "hero_image_card": "9c0af505-3e67-400d-9045-596b7f0cc2c9",
+    "hero_video": "e930a050-4430-4984-b993-bae668ee43ff",
+    "gallery": [
+      45,
+      46,
+      47,
+      48,
+      49,
+      50,
+      51
+    ],
+    "color_interior": [
+      10,
+      11,
+      12
+    ],
+    "documents": [
+      6,
+      24
+    ],
+    "model_years": [
+      27
+    ],
+    "highlights": [
+      93,
+      94,
+      95,
+      96,
+      97,
+      98,
+      99,
+      100,
+      101,
+      102,
+      103,
+      104
+    ],
+    "color_exterior": [
+      152,
+      153,
+      154,
+      155,
+      156,
+      157,
+      158,
+      159,
+      160,
+      161
+    ]
+  },
+  {
+    "id": 14,
+    "slug": "jaecoo-5",
+    "name": "Jaecoo 5",
+    "tagline": "Kompaktní SUV pro každý den",
+    "description": "JAECOO5 přináší do světa kompaktních SUV svěží energii, sebevědomý design a technologie, které jste dosud znali spíše z vyšších tříd. Robustní silueta, výrazná příď a důraz na funkční detaily jasně ukazují, že tohle auto se cítí stejně jistě v úzkých ulicích města jako na rozbité okresce či polní cestě.",
+    "body_type": "suv",
+    "fuel_type": "petrol",
+    "price_from": 629000,
+    "hero_image": "44d012ca-30bd-4555-82f3-88ea6968e828",
+    "status": "published",
+    "sort": 11,
+    "brand": 2,
+    "sub_brand": 2,
+    "youtube_video_ids": null,
+    "hero_stats": [
+      {
+        "label": "Výkon",
+        "value": "108 kW"
+      },
+      {
+        "label": "Spotřeba (komb.)",
+        "value": "7.0 l/100 km"
+      },
+      {
+        "label": "Záruka",
+        "value": "7 let / 150 000 km"
+      },
+      {
+        "label": " Automatická převodovka",
+        "value": "7 DCT"
+      }
+    ],
+    "promo_active": false,
+    "promo_label": null,
+    "promo_discount_amount": null,
+    "promo_valid_to": null,
+    "promo_description": null,
+    "highlights_panel": [
+      {
+        "icon_kind": "fuel",
+        "big": "Spalovací motor",
+        "lab": "Benzín / Diesel",
+        "note": "Klasický pohon s tisíci kilometry zkušeností."
+      },
+      {
+        "icon_kind": "transmission",
+        "big": "Automat",
+        "lab": "Plynulé řazení",
+        "note": "Komfortní jízda v každé situaci."
+      },
+      {
+        "icon_kind": "awd",
+        "big": "Stabilita",
+        "lab": "Bezpečné chování",
+        "note": "Důvěryhodné chování na silnici."
+      }
+    ],
+    "variant_badge_kind": "ICE",
+    "hero_image_card": null,
+    "hero_video": null,
+    "gallery": [
+      84,
+      85,
+      86,
+      87,
+      88,
+      89
+    ],
+    "color_interior": [
+      24,
+      43
+    ],
+    "documents": [
+      15
+    ],
+    "model_years": [
+      14
+    ],
+    "highlights": [
+      41,
+      42,
+      43,
+      44
+    ],
+    "color_exterior": [
+      60,
+      61,
+      62,
+      63,
+      64,
+      65,
+      66
+    ]
+  },
+  {
+    "id": 5,
+    "slug": "torres-evx",
+    "name": "Torres EVX",
+    "tagline": "Elektrické SUV z Koreje, postavené pro dobrodružství",
+    "description": "Torres EVX přebírá robustní DNA klasického Torresu a přidává čistě elektrický pohon s dojezdem až 462 km dle WLTP. Designově se odlišuje aerodynamickou čelní maskou, designovými LED světly denního svícení horizontálně protkávajícími celou přední část, full LED zadními kombinovanými svítilnami a 20\" \"Diamond-Cut\" alu koly.\n\nPod kapotou pracuje výkonný elektromotor s 152,2 kW (206,9 k) a 339 Nm točivého momentu. Lithium-železo fosfátová (LFP) baterie o kapacitě 80,6 kWh využívá technologii nové generace \"cell-to-pack\", která integruje hranaté lamelové články přímo do bateriového bloku — větší energetická účinnost a bezpečnost. Rychlonabíjení 10 – 80 % zvládne za cca 28 minut, AC nabíječka 11 kW dobije 0 – 100 % za 9 hodin.\n\nInteriér nabízí 12,3\" digitální přístrojový panel, 12,3\" infotainment displej, elektricky nastavitelná sedadla v 8 směrech, ventilaci i vyhřívání předních i zadních sedadel, 360° kameru a dvoutónový šedý nebo černý interiér. Zavazadlový prostor 839 l (až 1 662 l) je nejlepší ve své třídě a navíc obsahuje dvojité dno. 81 % HSS oceli v karoserii.",
+    "body_type": "suv",
+    "fuel_type": "ev",
+    "price_from": 879900,
+    "hero_image": "28db533b-05b8-4aba-bb61-965cef45cf9d",
+    "status": "published",
+    "sort": 12,
+    "brand": 1,
+    "sub_brand": null,
+    "youtube_video_ids": null,
+    "hero_stats": [
+      {
+        "label": "Dojezd WLTP",
+        "value": "462 km"
+      },
+      {
+        "label": "Výkon",
+        "value": "152,2 kW"
+      },
+      {
+        "label": "Záruka",
+        "value": "7 let / 150 000 km"
+      }
+    ],
+    "promo_active": false,
+    "promo_label": null,
+    "promo_discount_amount": null,
+    "promo_valid_to": null,
+    "promo_description": null,
+    "highlights_panel": [
+      {
+        "icon_kind": "range",
+        "big": "462 km",
+        "lab": "Dojezd WLTP",
+        "note": "Klidně až na hory — a zpět na jedno nabití."
+      },
+      {
+        "icon_kind": "charge",
+        "big": "38 min",
+        "lab": "Nabití 10 → 80 %",
+        "note": "Stačí na kávu — a jedete dál."
+      },
+      {
+        "icon_kind": "heatpump",
+        "big": "Tepelná pumpa",
+        "lab": "V základní ceně",
+        "note": "V zimě nepoznáte. Žádný extra příplatek."
+      }
+    ],
+    "variant_badge_kind": "EVX",
+    "hero_image_card": null,
+    "hero_video": "ee7f7bcc-ab40-48f1-875f-9f7ce1d9aea4",
+    "gallery": [
+      52,
+      53,
+      54,
+      55,
+      56,
+      57
+    ],
+    "color_interior": [
+      13,
+      14
+    ],
+    "documents": [
+      7,
+      25
+    ],
+    "model_years": [
+      5,
+      28
+    ],
+    "highlights": [
+      105,
+      106,
+      107,
+      108,
+      109,
+      110,
+      111,
+      112,
+      113,
+      114,
+      115,
+      116
+    ],
+    "color_exterior": [
+      162,
+      163,
+      164,
+      165,
+      166,
+      167,
+      168,
+      169,
+      170,
+      171
+    ]
+  },
+  {
+    "id": 6,
+    "slug": "actyon",
+    "name": "Actyon",
+    "tagline": "Nový horizont vašeho stylu",
+    "description": "Actyon je městské SUV-kupé, které ztělesňuje designovou identitu KGM \"Powered By Toughness\". Inspirován prvky korejské vlajky (Geon, Gon, Gam, Ri) a souhvězdím Velkého vozu, nese rozpoznatelný KGM design světel, sportovní střešní linii, odvážné charakterové linie a elegantně zakřivenou záď. Vysoká linie oken, výrazné podběhy kol a tvarovaná kapota umocňují jeho atraktivitu.\n\nInteriér je váš bezpečný přístav na kolech: 12,3\" panoramatický displej s novou grafickou platformou Athena 2.0, krystalový volič \"Shift-by-Wire\", plovoucí středová konzola, ambientní osvětlení s červeným prošíváním a panoramatické střešní okno. Zavazadlový prostor 668 l (až 1 568 l po sklopení) je nejvyšší ve své třídě SUV-kupé.\n\nPod kapotou pracuje 1,5 GDI Turbo benzín s 163 k a 280 Nm, převodovka 6st. AT a volitelný pohon všech kol z legendární rodiny KGM 4×4. Karoserie z 78 % HSS oceli, 8 airbagů (vč. centrálního) a kompletní ADAS balík vč. 3D 360° kamery, IACC a AEB.",
+    "body_type": "suv",
+    "fuel_type": "petrol",
+    "price_from": 859900,
+    "hero_image": "ed3efb05-fea1-4362-8066-adee555c34c2",
+    "status": "published",
+    "sort": 13,
+    "brand": 1,
+    "sub_brand": null,
+    "youtube_video_ids": null,
+    "hero_stats": [
+      {
+        "label": "Výkon",
+        "value": "120 kW"
+      },
+      {
+        "label": "Točivý moment",
+        "value": "280 Nm"
+      },
+      {
+        "label": "Záruka",
+        "value": "5 let / 100 000 km"
+      }
+    ],
+    "promo_active": false,
+    "promo_label": null,
+    "promo_discount_amount": null,
+    "promo_valid_to": null,
+    "promo_description": null,
+    "highlights_panel": [
+      {
+        "icon_kind": "transmission",
+        "big": "6st AT",
+        "lab": "Automat",
+        "note": "Plynulá Aisin převodovka — vyzkoušená kombinace."
+      },
+      {
+        "icon_kind": "awd",
+        "big": "4×4 i 2WD",
+        "lab": "Na výběr",
+        "note": "Pohon všech kol pro náročnější jízdu."
+      },
+      {
+        "icon_kind": "fuel",
+        "big": "1.5 Turbo",
+        "lab": "Benzín",
+        "note": "Moderní turbo s rozumnou spotřebou."
+      }
+    ],
+    "variant_badge_kind": "ICE",
+    "hero_image_card": "94aba54a-8da7-4448-84fa-dfa0d730c62e",
+    "hero_video": "4fe68070-d342-43e1-a1e0-33116ccfcdb1",
+    "gallery": [
+      58,
+      59,
+      60,
+      61,
+      62,
+      63
+    ],
+    "color_interior": [
+      15,
+      16,
+      17
+    ],
+    "documents": [
+      8,
+      26
+    ],
+    "model_years": [
+      6,
+      29
+    ],
+    "highlights": [
+      117,
+      118,
+      119,
+      120,
+      121,
+      122,
+      123,
+      124,
+      125,
+      126,
+      127,
+      128
+    ],
+    "color_exterior": [
+      172,
+      173,
+      174,
+      175,
+      176,
+      177,
+      178,
+      179,
+      180,
+      181
+    ]
+  },
+  {
+    "id": 15,
+    "slug": "jaecoo-7",
+    "name": "Jaecoo 7",
+    "tagline": "Styl města, duše dobrodruha",
+    "description": "JAECOO7 představuje definici inteligentního SUV. Spojuje progresivní design s výjimečným komfortem, terénními schopnostmi a technologiemi, které posouvají každou cestu na novou úroveň. Vůz je navržen pro moderní objevitele, kteří chtějí spojit každodenní praktičnost s autentickým zážitkem z jízdy.",
+    "body_type": "suv",
+    "fuel_type": "petrol",
+    "price_from": 759000,
+    "hero_image": "b88b8854-04e2-4a20-aa82-ef978599f89b",
+    "status": "published",
+    "sort": 14,
+    "brand": 2,
+    "sub_brand": 2,
+    "youtube_video_ids": null,
+    "hero_stats": [
+      {
+        "label": "Výkon",
+        "value": "108 kW"
+      },
+      {
+        "label": "Spotřeba (komb.)",
+        "value": "8.0 l/100 km"
+      },
+      {
+        "label": "Záruka",
+        "value": "7 let / 150 000 km"
+      },
+      {
+        "label": "Poháněná náprava",
+        "value": "AWD"
+      }
+    ],
+    "promo_active": false,
+    "promo_label": null,
+    "promo_discount_amount": null,
+    "promo_valid_to": null,
+    "promo_description": null,
+    "highlights_panel": [
+      {
+        "icon_kind": "awd",
+        "big": "4×4 dostupné",
+        "lab": "AWD na výběr",
+        "note": "Pohon všech kol pro jistotu v každém ročním období."
+      },
+      {
+        "icon_kind": "transmission",
+        "big": "DCT 7st",
+        "lab": "Automat",
+        "note": "Moderní převodovka s rychlým řazením."
+      },
+      {
+        "icon_kind": "fuel",
+        "big": "1.6 Turbo",
+        "lab": "Benzín",
+        "note": "Dynamický motor s rozumnou spotřebou."
+      }
+    ],
+    "variant_badge_kind": "ICE",
+    "hero_image_card": null,
+    "hero_video": null,
+    "gallery": [
+      90,
+      91,
+      92,
+      93,
+      94,
+      95
+    ],
+    "color_interior": [
+      25
+    ],
+    "documents": [
+      14
+    ],
+    "model_years": [
+      15
+    ],
+    "highlights": [
+      45,
+      46,
+      47,
+      48
+    ],
+    "color_exterior": [
+      67,
+      68,
+      69,
+      70,
+      71,
+      72
+    ]
+  },
+  {
+    "id": 16,
+    "slug": "jaecoo-7-shs",
+    "name": "Jaecoo 7 SHS",
+    "tagline": "Plug-in hybrid pro moderní cestovatele",
+    "description": "JAECOO7 SHS výrazně posouvá koncept inteligentního SUV díky plug-in hybridní technologii. Tento model spojuje moderní a odvážný design s maximálním komfortem, špičkovými terénními schopnostmi a pokročilými technologiemi, přičemž zároveň přináší ekologičtější provoz a nižší spotřebu. Je navržen pro náročné řidiče, kteří hledají harmonii mezi každodenní praktičností, dynamickým jízdním projevem a odpovědným přístupem k mobilitě. JAECOO7 SHS je ideálním společníkem pro ty, kteří chtějí objevovat svět s respektem, ale bez kompromisů ve výkonu.",
+    "body_type": "suv",
+    "fuel_type": "phev",
+    "price_from": 929000,
+    "hero_image": "b1a5471a-fc08-432e-bfa8-e668c1c08c91",
+    "status": "published",
+    "sort": 15,
+    "brand": 2,
+    "sub_brand": 2,
+    "youtube_video_ids": null,
+    "hero_stats": [
+      {
+        "label": "Celkový výkon",
+        "value": "205 kW"
+      },
+      {
+        "label": "Kombinovaný dojezd",
+        "value": "1 200 km"
+      },
+      {
+        "label": "Spotřeba (komb.)",
+        "value": "2.4 l/100 km"
+      },
+      {
+        "label": "Záruka",
+        "value": "7 let / 150 000 km"
+      }
+    ],
+    "promo_active": false,
+    "promo_label": null,
+    "promo_discount_amount": null,
+    "promo_valid_to": null,
+    "promo_description": null,
+    "highlights_panel": [
+      {
+        "icon_kind": "selfcharge",
+        "big": "Hybrid",
+        "lab": "Bez nabíjení",
+        "note": "Baterii doplní motor a rekuperace — žádné kabely."
+      },
+      {
+        "icon_kind": "fuel",
+        "big": "Nízká spotřeba",
+        "lab": "Úspora paliva",
+        "note": "Hybridní pohon výrazně šetří v městě."
+      },
+      {
+        "icon_kind": "range",
+        "big": "Velký dojezd",
+        "lab": "Na jednu nádrž",
+        "note": "Bez kompromisů na delších trasách."
+      }
+    ],
+    "variant_badge_kind": "HEV",
+    "hero_image_card": null,
+    "hero_video": null,
+    "gallery": [
+      96,
+      97,
+      98,
+      99,
+      100,
+      101
+    ],
+    "color_interior": [
+      41,
+      42
+    ],
+    "documents": [
+      16
+    ],
+    "model_years": [
+      16
+    ],
+    "highlights": [
+      49,
+      50,
+      51,
+      52
+    ],
+    "color_exterior": [
+      73,
+      74,
+      75,
+      76,
+      120,
+      121
+    ]
+  },
+  {
+    "id": 7,
+    "slug": "actyon-hev",
+    "name": "Actyon HEV",
+    "tagline": "Ideální pro život ve městě — nyní hybridně",
+    "description": "Actyon Hybrid přebírá design a komfort základního Actyonu a přidává Dual-Tech Hybrid systém pro vyšší úspornost paliva a tišší jízdu ve městě. Plně elektrický pohon je k dispozici až do 72 km/h, čímž přináší plynulejší a ekologičtější zážitek z jízdy. Stačí natankovat — žádné zapojování do zásuvky.\n\nPohonná jednotka kombinuje benzínový motor s elektromotorem a převodovkou e-DHT, která automaticky volí jeden z 9 hybridních režimů. Kombinovaný výkon 150 kW / 204 k, regenerativní brzdový systém dobíjí baterii při zpomalování. Designově je odlišen od spalovací verze decentně — především vnitřním Hybrid emblémem a černými semišovými prvky v interiéru.\n\nVše ostatní zůstává jako u základního Actyonu: 12,3\" Athena 2.0 displej, 8 airbagů, 78 % HSS oceli, panoramatické střešní okno, ventilovaná i vyhřívaná sedadla, 668 l zavazadelník a kompletní ADAS balík vč. IACC, AEB a 3D 360° kamery.",
+    "body_type": "suv",
+    "fuel_type": "hybrid",
+    "price_from": 919900,
+    "hero_image": "6a33d03e-fce5-407c-b265-34a71cda35c6",
+    "status": "published",
+    "sort": 16,
+    "brand": 1,
+    "sub_brand": null,
+    "youtube_video_ids": null,
+    "hero_stats": [
+      {
+        "label": "Systémový výkon",
+        "value": "150 kW"
+      },
+      {
+        "label": "Záruka",
+        "value": "5 let / 100 000 km"
+      }
+    ],
+    "promo_active": false,
+    "promo_label": null,
+    "promo_discount_amount": null,
+    "promo_valid_to": null,
+    "promo_description": null,
+    "highlights_panel": [
+      {
+        "icon_kind": "selfcharge",
+        "big": "Plný hybrid",
+        "lab": "Self-charging",
+        "note": "Žádné nabíjecí kabely — baterii doplníte sami."
+      },
+      {
+        "icon_kind": "fuel",
+        "big": "Nízká spotřeba",
+        "lab": "Úspora paliva",
+        "note": "Hybridní pohon šetří v městě i na dálnici."
+      },
+      {
+        "icon_kind": "range",
+        "big": "Velký dojezd",
+        "lab": "Na jednu nádrž",
+        "note": "Dlouhé trasy bez plánování zastávek."
+      }
+    ],
+    "variant_badge_kind": "HEV",
+    "hero_image_card": "28028739-36ad-4c7d-95c3-2dbdb69392a8",
+    "hero_video": "3de4f700-3806-49ce-8a03-5d9d412c846b",
+    "gallery": [
+      64,
+      65,
+      66,
+      67,
+      68,
+      69
+    ],
+    "color_interior": [
+      51,
+      52,
+      53
+    ],
+    "documents": [
+      9,
+      27
+    ],
+    "model_years": [
+      7,
+      30
+    ],
+    "highlights": [
+      133,
+      134,
+      135,
+      136,
+      137,
+      138,
+      139,
+      140,
+      141,
+      142,
+      143,
+      144
+    ],
+    "color_exterior": [
+      182,
+      183,
+      184,
+      185,
+      186,
+      187,
+      188,
+      189,
+      190,
+      191
+    ]
+  },
+  {
+    "id": 8,
+    "slug": "rexton",
+    "name": "Rexton",
+    "tagline": "Luxus, elegance a jedinečné off-road schopnosti",
+    "description": "Rexton je vlajková loď značky KGM — luxusní velké SUV s opravdovým rámovým podvozkem a schopnostmi off-roadu. Výrazná chromová maska s diagonálním vzorem pevného řetězu, full LED světlomety s dynamickými směrovými LED světly, 20\" alu kola a horizontálně prodloužená zadní svítilna mu dávají sebevědomou, prémiovou přítomnost.\n\nInteriér v prémiových materiálech nabízí 12,3\" digitální přístrojovou desku, 12,3\" infotainment s Apple CarPlay a Android Auto, dvouzónovou plně automatickou klimatizaci, elektricky nastavitelná a ventilovaná sedadla s pamětí a vyhřívání v první i druhé řadě. K dispozici je 5-místná i 7-místná konfigurace, zavazadlový prostor až 1 977 l (5-místná verze, sklopená sedadla).\n\nPohon zajišťuje 2,2 l e-XDi diesel 202 k / 441 Nm s 8st. automatickou převodovkou se systémem Shift-by-Wire. Přepínatelný 4WD a uzávěrka diferenciálu zvládnou těžký terén. Čtyřvrstvý Quad-frame rám, 81,7 % HSS oceli, 9 airbagů (vč. kolenního a postranních zadních) a kompletní ADAS balík.",
+    "body_type": "suv",
+    "fuel_type": "diesel",
+    "price_from": 899900,
+    "hero_image": "ece10cbf-2870-4eaf-ac76-e7ba85d7049a",
+    "status": "published",
+    "sort": 17,
+    "brand": 1,
+    "sub_brand": null,
+    "youtube_video_ids": null,
+    "hero_stats": [
+      {
+        "label": "Výkon",
+        "value": "202 k"
+      },
+      {
+        "label": "Točivý moment",
+        "value": "441 Nm"
+      },
+      {
+        "label": "Záruka",
+        "value": "5 let / 100 000 km"
+      }
+    ],
+    "promo_active": false,
+    "promo_label": null,
+    "promo_discount_amount": null,
+    "promo_valid_to": null,
+    "promo_description": null,
+    "highlights_panel": [
+      {
+        "icon_kind": "awd",
+        "big": "4×4",
+        "lab": "Pohon všech kol",
+        "note": "Skutečný off-road s nízkým převodem."
+      },
+      {
+        "icon_kind": "tow",
+        "big": "3 500 kg",
+        "lab": "Brzděný přívěs",
+        "note": "Nejvyšší trakční schopnost v třídě."
+      },
+      {
+        "icon_kind": "transmission",
+        "big": "8st AT",
+        "lab": "Automat Mercedes",
+        "note": "Robustní převodovka pro náročné použití."
+      }
+    ],
+    "variant_badge_kind": "ICE",
+    "hero_image_card": null,
+    "hero_video": "57f596f5-3431-408f-aeef-83fd5f2a3aea",
+    "gallery": [
+      70,
+      71,
+      72,
+      73,
+      74,
+      75
+    ],
+    "color_interior": [
+      21,
+      22
+    ],
+    "documents": [
+      10,
+      28
+    ],
+    "model_years": [
+      8,
+      31
+    ],
+    "highlights": [
+      145,
+      146,
+      147,
+      148,
+      149,
+      150,
+      152,
+      151,
+      153,
+      154,
+      155,
+      156
+    ],
+    "color_exterior": [
+      192,
+      193,
+      194,
+      195,
+      196,
+      197,
+      198
+    ]
+  },
+  {
+    "id": 9,
+    "slug": "musso-grand",
+    "name": "Musso Grand",
+    "tagline": "Robustní pick-up s prémiovým zpracováním",
+    "description": "Musso Grand je opravdový pick-up postavený na žebřinovém rámu — kombinace tradičních proporcí, off-roadových schopností a moderního prémiového zpracování. Maska chladiče Premium, full LED světlomety, LED přední mlhovky a do stran protažená světla mu dávají sebevědomý vzhled, který funguje stejně tak ve městě jako na stavbě.\n\nPohonem je 2,2 l e-XDi diesel s 202 k a 441 Nm točivého momentu (s manuální převodovkou max. 400 Nm). 6st. automatická AISIN převodovka a přepínatelný pohon všech kol 4×4 zajišťují bezpečnou jízdu v jakýchkoli podmínkách. Tažná schopnost a velkorysý nákladový prostor 1 262 l (dle VDA) s rozměry 1 610 × 1 570 × 570 mm dělají z Musso Grand spolehlivého parťáka pro práci i zábavu.\n\nUvnitř kabiny se cítíte jako v prémiovém voze: redesignovaná palubní deska s 12,3\" Smart Audio displejem vystupujícím nad desku, 12,3\" Full HD přístrojový panel, 360° kamera (AMS), ventilovaná a vyhřívaná sedadla, dvouzónová klimatizace a ambientní osvětlení. Quad Frame čtyřvrstvý podvozek, 6 airbagů a kompletní balík ADAS (AEBS, FCW, SDA, BSA, HBA).",
+    "body_type": "pickup",
+    "fuel_type": "diesel",
+    "price_from": 785290,
+    "hero_image": "84d40916-34c0-4d3f-9c4e-7e14202e7401",
+    "status": "published",
+    "sort": 18,
+    "brand": 1,
+    "sub_brand": null,
+    "youtube_video_ids": null,
+    "hero_stats": [
+      {
+        "label": "Výkon",
+        "value": "202 k"
+      },
+      {
+        "label": "Točivý moment",
+        "value": "441 Nm"
+      },
+      {
+        "label": "Záruka",
+        "value": "5 let / 100 000 km"
+      }
+    ],
+    "promo_active": false,
+    "promo_label": null,
+    "promo_discount_amount": null,
+    "promo_valid_to": null,
+    "promo_description": null,
+    "highlights_panel": [
+      {
+        "icon_kind": "tow",
+        "big": "3 500 kg",
+        "lab": "Brzděný přívěs",
+        "note": "Top tahačské schopnosti v segmentu."
+      },
+      {
+        "icon_kind": "awd",
+        "big": "4×4",
+        "lab": "Pohon všech kol",
+        "note": "Plnohodnotný off-road s redukcí."
+      },
+      {
+        "icon_kind": "fuel",
+        "big": "2.2 Diesel",
+        "lab": "Vznětový motor",
+        "note": "Dlouhé trasy s rezervou točivého momentu."
+      }
+    ],
+    "variant_badge_kind": "ICE",
+    "hero_image_card": null,
+    "hero_video": "e359680f-69ff-461f-b443-e95a75fe98ba",
+    "gallery": [
+      76,
+      77,
+      78,
+      79,
+      80
+    ],
+    "color_interior": [
+      23
+    ],
+    "documents": [
+      11,
+      29
+    ],
+    "model_years": [
+      9,
+      32
+    ],
+    "highlights": [
+      157,
+      158,
+      159,
+      160,
+      161,
+      162,
+      163,
+      164,
+      165,
+      166,
+      167,
+      168
+    ],
+    "color_exterior": [
+      199,
+      200,
+      201,
+      202,
+      203,
+      204,
+      205,
+      206,
+      207,
+      208,
+      209,
+      210
+    ]
+  }
+]

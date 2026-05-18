@@ -1,0 +1,26 @@
+[
+  {
+    "id": 1,
+    "slug": "omoda",
+    "name": "OMODA",
+    "primary_color": "#0F1B2E",
+    "logo": null,
+    "description": "Městská elegance a technologie pro mladou generaci.",
+    "instagram_url": "https://www.instagram.com/omoda_cz",
+    "facebook_url": "https://www.facebook.com/omodacz",
+    "sort": 1,
+    "brand": 2
+  },
+  {
+    "id": 2,
+    "slug": "jaecoo",
+    "name": "JAECOO",
+    "primary_color": "#1F3D2F",
+    "logo": null,
+    "description": "Styl pro město, schopnosti pro dobrodružství.",
+    "instagram_url": "https://www.instagram.com/jaecoo_cz",
+    "facebook_url": "https://www.facebook.com/jaecoocz",
+    "sort": 2,
+    "brand": 2
+  }
+]

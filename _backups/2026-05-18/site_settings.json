@@ -1,0 +1,41 @@
+{
+  "id": 1,
+  "homepage_hero_image": "aef89661-3b22-4557-b9dc-3ae5ef045d28",
+  "homepage_hero_title": "Tři značky.\nJeden servis.\nJsme SFR Motor.",
+  "homepage_hero_subtitle": "Autorizovaný prodej a servis vozů KGM, OMODA & JAECOO a FARIZON a specializovaný servis Dacia a Renault.",
+  "homepage_hero_cta_label": "Prohlédnout skladovky",
+  "homepage_hero_cta_url": "/sklad",
+  "homepage_hero_cta_secondary_label": "Objednat servis",
+  "homepage_hero_cta_secondary_url": "/servis",
+  "homepage_youtube_video_ids": [
+    "piG8UO24WUk",
+    "eSfJXjNV8Mg",
+    "SybpHjEJP1s",
+    "S9tdBpkwX_4"
+  ],
+  "instagram_url": "https://www.instagram.com/sfrmotor/",
+  "youtube_channel_url": "https://www.youtube.com/@sfrmotor",
+  "stock_highlights": [
+    {
+      "icon": "shield",
+      "title": "Záruka výrobce",
+      "subtitle": "Plná tovární záruka 5–7 let dle modelu, kompletní servisní historie."
+    },
+    {
+      "icon": "swap",
+      "title": "Výkup vašeho vozu",
+      "subtitle": "Protiúčtem zaplatíte jen rozdíl. Online ocenění do hodiny."
+    },
+    {
+      "icon": "wallet",
+      "title": "Financování a pojištění",
+      "subtitle": "Zařídíme leasing, úvěr i pojištění na míru. Vy si jen vyzvednete klíče."
+    },
+    {
+      "icon": "badge",
+      "title": "Autorizovaný prodejce",
+      "subtitle": "KGM · OMODA & JAECOO · FARIZON. Originální díly a servis ve vlastní dílně."
+    }
+  ],
+  "favicon": "27a574cd-44e6-4b26-ba70-bb34902c9234"
+}
