@@ -188,6 +188,7 @@ async function processPdf({ filePath, brand, modelSlug, modelName, tag, title })
         model_slug: modelSlug || null,
         tag,
         content: c.content,
+        content_normalized: c.content.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase(),
         chunk_index: i + 1,
         total_chunks: chunks.length,
         page_number: c.page_number,
