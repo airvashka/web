@@ -25,8 +25,10 @@ const brands = await directusGet<Brand>('brands', {
 });
 
 // Skladové vozy (4 nejnovější)
+// Načteme větší pool (16) a client-side z něj náhodně vybereme 4
+// → každý F5 = jiná auta pro variabilitu UX
 const stockVehicles = await directusGet<any>('stock_vehicles', {
-  limit: 4,
+  limit: 16,
   sort: ['-listed_at'],
   fields: [
     'id', 'condition', 'availability', 'km', 'list_price', 'promo_price',
@@ -244,7 +246,7 @@ const articles = articlesRaw.map((a) => {
       {stockVehicles.length === 0 ? (
         <div class="sklad-empty">Skladovka se právě plní — koukněte se za chvíli, nebo nám zavolejte +420 771 235 458.</div>
       ) : (
-        <div class="skladovka-grid">
+        <div class="skladovka-grid" data-stock-shuffle data-visible-count="4">
           {stockVehicles.map((v: any) => {
             const isNew = v.condition === 'new';
             const isHighlighted = v.highlighted;
@@ -255,12 +257,12 @@ const articles = articlesRaw.map((a) => {
               && (!v.model.promo_valid_to || String(v.model.promo_valid_to) >= today);
             const modelPromoLabel = (v.model?.promo_label ?? '').toString().trim();
             const modelPromoDiscount = Number(v.model?.promo_discount_amount ?? 0) || 0;
-            const pillLabel = modelPromoActive && modelPromoLabel
-              ? modelPromoLabel
-              : isHighlighted
-                ? (customLabel || 'Novinka')
-                : isNew ? 'Nové' : 'Skladem';
-            const pillClass = (modelPromoActive || isHighlighted || isNew) ? ' is-new' : '';
+            // Pill: POUZE pro Akci / Highlight. Stav (Nové/Ojeté) je v specs chips dole.
+            let pillLabel = '';
+            if (modelPromoActive && modelPromoLabel) pillLabel = modelPromoLabel;
+            else if (isHighlighted && customLabel) pillLabel = customLabel;
+            else if (isHighlighted) pillLabel = 'Novinka';
+
             const photoId = v.photos?.[0]?.directus_files_id;
             const trim = v.trim_level_snapshot?.name ?? '';
             const modelName = v.model?.name ?? 'Vůz';
@@ -268,13 +270,14 @@ const articles = articlesRaw.map((a) => {
             const carYear = v.model_year?.year ?? '';
             const conditionLabel = v.condition === 'new' ? 'Nové' : v.condition === 'demo' ? 'Předváděcí' : 'Ojeté';
             const fuelLabel = v.trim_level_snapshot?.fuel_label ?? '';
-            // Cena s ohledem na model promo
+            const transmissionLabel = v.transmission === 'manual' ? 'Manuál' : v.transmission === 'automatic' ? 'Automat' : '';
+            // Cena s ohledem na model promo (jen u nových vozů)
             const baseList = v.list_price;
             let price = v.promo_price ?? baseList;
             let priceBefore: number | null = null;
             if (v.promo_price && baseList && v.promo_price < baseList) {
               priceBefore = baseList;
-            } else if (modelPromoActive && modelPromoDiscount > 0 && baseList) {
+            } else if (modelPromoActive && modelPromoDiscount > 0 && baseList && isNew) {
               price = baseList - modelPromoDiscount;
               priceBefore = baseList;
             }
@@ -282,18 +285,26 @@ const articles = articlesRaw.map((a) => {
               <a class="scard" href={`/sklad/${buildStockSlug(v, v.brand, v.model, v.trim_level ?? { name: trim })}`}>
                 <div class="pic">
                   {photoId && <DirectusImage src={photoId} alt={`${brandName} ${modelName}`} aspectRatio="4/3" />}
+                  {pillLabel && <span class="pill">{pillLabel}</span>}
                 </div>
                 <div class="body">
-                  <span class={`pill${pillClass}`}>{pillLabel}</span>
                   <div class="nm">{brandName} {modelName}</div>
-                  <div class="var">{trim}</div>
-                  <div class="meta">
+                  {trim && <div class="var">{trim}</div>}
+                  <div class="specs">
                     {fuelLabel && <span>{fuelLabel}</span>}
-                    {carYear && <span class="dot">{carYear}</span>}
-                    <span class="dot">{fmtKm(v.km)}</span>
-                    <span class="dot">{conditionLabel}</span>
+                    {carYear && <span>{carYear}</span>}
+                    <span>{conditionLabel}</span>
+                    {transmissionLabel && <span>{transmissionLabel}</span>}
                   </div>
-                  <div class="price">{fmtPrice(price)}</div>
+                  <div class="foot">
+                    <span class="km">{fmtKm(v.km)}</span>
+                    <div class="price">
+                      {priceBefore && (
+                        <span class="price-before">{fmtPrice(priceBefore)}</span>
+                      )}
+                      <span>{fmtPrice(price)}</span>
+                    </div>
+                  </div>
                 </div>
               </a>
             );
@@ -401,4 +412,20 @@ const articles = articlesRaw.map((a) => {
       </div>
     </section>
   )}
+
+  <script>
+    /* === Skladovka shuffle ===
+       Z poolu 16 vozů zamícháme DOM order při loadu → každý F5 = jiná 4 auta.
+       Fisher-Yates shuffle. CSS skrývá vše od 5. karty dál. */
+    (() => {
+      const grid = document.querySelector('[data-stock-shuffle]');
+      if (!grid) return;
+      const cards = Array.from(grid.children);
+      for (let i = cards.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [cards[i], cards[j]] = [cards[j], cards[i]];
+      }
+      cards.forEach((c) => grid.appendChild(c));
+    })();
+  </script>
 </BaseLayout>

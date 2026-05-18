@@ -150,17 +150,20 @@ const fmtKm = (n?: number | null) => (n === 0 || !n ? '0 km' : `${n.toLocaleStri
                 const modelPromoLabel = ((v.model as any)?.promo_label ?? '').toString().trim();
                 const modelPromoDiscount = Number((v.model as any)?.promo_discount_amount ?? 0) || 0;
 
-                const pillLabel = modelPromoActive && modelPromoLabel
-                  ? modelPromoLabel
-                  : isHighlighted
-                    ? (customLabel || 'Novinka')
-                    : isNew ? 'Nové' : 'Skladem';
-                const pillClass = (modelPromoActive || isHighlighted || isNew) ? ' is-new' : '';
+                // Pill: POUZE pro reálný důvod (Akce nebo Highlight s vlastním labelem).
+                // "Skladem"/"Nové" se nezobrazuje — všechny vozy zde jsou skladem,
+                // stav (Nové/Předváděcí/Ojeté) je v info chips dole.
+                let pillLabel = '';
+                if (modelPromoActive && modelPromoLabel) pillLabel = modelPromoLabel;
+                else if (isHighlighted && customLabel) pillLabel = customLabel;
+                else if (isHighlighted) pillLabel = 'Novinka';
+
                 const photoId = firstPhoto(v);
                 const trimName = v.trim_level?.name ?? (v.trim_level_snapshot as any)?.name ?? '';
                 const carYear = v.model_year?.year ?? '';
                 const conditionLabel = conditionLabels[v.condition ?? ''] ?? '';
                 const fuelLabel = fuelLabels[v.model?.fuel_type ?? ''] ?? '';
+                const transmissionLabel = v.transmission === 'manual' ? 'Manuál' : v.transmission === 'automatic' ? 'Automat' : '';
                 // Cena: stock.promo > model promo (jen u nových vozů) > list
                 const baseList = v.list_price;
                 let displayPrice = v.promo_price ?? baseList;
@@ -183,22 +186,25 @@ const fmtKm = (n?: number | null) => (n === 0 || !n ? '0 km' : `${n.toLocaleStri
                   >
                     <div class="pic">
                       {photoId && <DirectusImage src={photoId} alt={`${v.brand?.name ?? ''} ${v.model?.name ?? ''}`} aspectRatio="4/3" />}
+                      {pillLabel && <span class="pill">{pillLabel}</span>}
                     </div>
                     <div class="body">
-                      <span class={`pill${pillClass}`}>{pillLabel}</span>
                       <div class="nm">{v.brand?.name ?? ''} {v.model?.name ?? ''}</div>
-                      <div class="var">{trimName}</div>
-                      <div class="meta">
+                      {trimName && <div class="var">{trimName}</div>}
+                      <div class="specs">
                         {fuelLabel && <span>{fuelLabel}</span>}
-                        {carYear && <span class="dot">{carYear}</span>}
-                        <span class="dot">{fmtKm(v.km)}</span>
-                        {conditionLabel && <span class="dot">{conditionLabel}</span>}
+                        {carYear && <span>{carYear}</span>}
+                        {conditionLabel && <span>{conditionLabel}</span>}
+                        {transmissionLabel && <span>{transmissionLabel}</span>}
                       </div>
-                      <div class="price">
-                        {fmtPrice(displayPrice)}
-                        {priceBefore && (
-                          <span class="price-before">{fmtPrice(priceBefore)}</span>
-                        )}
+                      <div class="foot">
+                        <span class="km">{fmtKm(v.km)}</span>
+                        <div class="price">
+                          {priceBefore && (
+                            <span class="price-before">{fmtPrice(priceBefore)}</span>
+                          )}
+                          <span>{fmtPrice(displayPrice)}</span>
+                        </div>
                       </div>
                     </div>
                   </a>

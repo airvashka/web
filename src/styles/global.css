@@ -3507,12 +3507,18 @@ button.thumb-more {
   grid-template-columns: repeat(4, 1fr);
   gap: 18px;
 }
+/* Shuffle pool — render 16, default zobrazí jen prvních 4. Client JS pak
+   zamíchá DOM order tak že každý F5 vidí jinou náhodnou čtyřku. */
+.skladovka-grid[data-stock-shuffle] > .scard:nth-child(n+5) {
+  display: none;
+}
 .scard {
-  background: var(--bg-cream);
+  background: #fff;
   border-radius: var(--radius-lg);
   overflow: hidden;
   display: flex; flex-direction: column;
   transition: transform .2s, box-shadow .2s;
+  border: 1px solid var(--line);
 }
 .scard:hover { transform: translateY(-3px); box-shadow: 0 14px 30px -16px rgba(0,0,0,0.18); }
 .scard .pic {
@@ -3522,61 +3528,83 @@ button.thumb-more {
   overflow: hidden;
 }
 .scard .pic img { width: 100%; height: 100%; object-fit: cover; display: block; }
-.scard .body {
-  background: #fff;
-  padding: 22px 22px 24px;
-  display: flex; flex-direction: column;
-  flex: 1;
-}
+/* Pill jako overlay přes foto — zobrazí se POUZE pro promo/highlight (ne pro 'Skladem'/'Nové',
+   to je v .specs jako chip Stav). */
 .scard .pill {
+  position: absolute;
+  top: 12px;
+  left: 12px;
   display: inline-flex;
   font-family: var(--font-display);
   font-weight: 600;
   font-size: 11px;
-  letter-spacing: 0.14em;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
-  background: var(--ink);
+  background: var(--accent);
   color: #fff;
   padding: 6px 10px;
   border-radius: 5px;
-  align-self: flex-start;
-  margin-bottom: 14px;
+  box-shadow: 0 4px 12px -4px rgba(0,0,0,0.25);
 }
-.scard .pill.is-new { background: var(--accent); }
+.scard .body {
+  padding: 18px 20px 20px;
+  display: flex; flex-direction: column;
+  flex: 1;
+  gap: 14px;
+}
 .scard .nm {
   font-family: var(--font-display);
   font-weight: 600;
-  font-size: 19px;
+  font-size: 20px;
   letter-spacing: -0.01em;
-  margin-bottom: 5px;
+  line-height: 1.2;
 }
 .scard .var {
   font-size: 13.5px;
   color: var(--text-muted);
-  margin-bottom: 18px;
+  margin-top: -10px;
 }
-.scard .meta {
-  font-family: var(--font-display);
-  font-size: 12px;
-  color: var(--text-muted);
+/* Info chips — palivo, rok, stav, převodovka. Jen to co máme. */
+.scard .specs {
+  display: flex; flex-wrap: wrap; gap: 6px;
+}
+.scard .specs span {
+  font-size: 11.5px;
   letter-spacing: 0.02em;
-  padding: 14px 0;
-  border-top: 1px solid var(--line);
-  display: flex; gap: 12px; flex-wrap: wrap;
+  color: var(--text);
+  background: var(--bg-cream);
+  padding: 4px 9px;
+  border-radius: 4px;
+  white-space: nowrap;
 }
-.scard .meta .dot::before { content: "·"; margin-right: 12px; opacity: 0.5; }
+/* Footer řádek — km vlevo, cena vpravo */
+.scard .foot {
+  display: flex; align-items: flex-end; justify-content: space-between;
+  gap: 12px;
+  padding-top: 14px;
+  margin-top: auto;
+  border-top: 1px solid var(--line);
+}
+.scard .km {
+  font-family: var(--font-display);
+  font-size: 12.5px;
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+  padding-bottom: 2px;
+}
 .scard .price {
   font-family: var(--font-display);
   font-weight: 700;
   font-size: 22px;
   letter-spacing: -0.02em;
   color: var(--accent);
-  margin-top: 8px;
   font-variant-numeric: tabular-nums;
   display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap;
+  text-align: right;
+  justify-content: flex-end;
 }
 .scard .price-before {
-  font-size: 13px;
+  font-size: 12.5px;
   font-weight: 500;
   color: var(--text-muted);
   text-decoration: line-through;
