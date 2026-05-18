@@ -33,7 +33,7 @@ const DIRECTUS_URL = import.meta.env.PUBLIC_DIRECTUS_URL || import.meta.env.DIRE
 async function fetchModelContext(slug: string) {
   const models = await directusGet<any>('models', {
     filter: { slug: { _eq: slug } },
-    fields: ['*', 'brand.name', 'brand.slug'],
+    fields: ['*', 'brand.name', 'brand.slug', 'brand.id'],
     limit: 1,
   });
   const model = models[0];
@@ -69,7 +69,43 @@ async function fetchModelContext(slug: string) {
     fields: ['id', 'condition', 'list_price', 'promo_price', 'km', 'color_name', 'trim_level_snapshot'],
   });
 
-  return { model, latestYear, trims, packages, stock };
+  // ── ROZŠÍŘENÝ KONTEXT ──
+  // Ostatní modely téže značky (alternativy)
+  const siblingModels = model.brand?.id
+    ? await directusGet<any>('models', {
+        filter: {
+          brand: { _eq: model.brand.id },
+          status: { _eq: 'published' },
+          id: { _neq: model.id },
+        },
+        fields: ['id', 'name', 'slug', 'tagline', 'fuel_type', 'body_type', 'price_from', 'promo_active', 'promo_label', 'promo_discount_amount'],
+        sort: ['sort'],
+      })
+    : [];
+
+  // Všechny brandy které dealer prodává (přehled)
+  const allBrands = await directusGet<any>('brands', {
+    filter: { status: { _eq: 'published' } },
+    fields: ['id', 'name', 'slug', 'tagline'],
+    sort: ['sort'],
+  });
+
+  // Sklad počty napříč brandy (pro general "kolik máte vozů")
+  const allStock = await directusGet<any>('stock_vehicles', {
+    filter: { status: { _eq: 'published' } },
+    fields: ['id', 'condition', 'brand.name', 'model.name'],
+  });
+
+  // Zaměstnanci — sales + service + parts + management
+  const employees = await directusGet<any>('employees', {
+    sort: ['sort', 'full_name'],
+    fields: ['id', 'full_name', 'role', 'department', 'email', 'phone'],
+  });
+
+  return {
+    model, latestYear, trims, packages, stock,
+    siblingModels, allBrands, allStock, employees,
+  };
 }
 
 /* ──────────── SYSTEM PROMPT ──────────── */
@@ -80,8 +116,49 @@ function fmtPrice(n: number | null | undefined): string {
 }
 
 function buildSystemPrompt(ctx: NonNullable<Awaited<ReturnType<typeof fetchModelContext>>>): string {
-  const { model, latestYear, trims, packages, stock } = ctx;
+  const { model, latestYear, trims, packages, stock, siblingModels, allBrands, allStock, employees } = ctx;
   const brand = model.brand?.name ?? '';
+
+  // ── Sibling models (alternativy v rámci značky) ──
+  const siblingsBlock = siblingModels.length
+    ? siblingModels.map((m: any) => {
+        const promo = m.promo_active && m.promo_label
+          ? ` 🔥 AKCE: ${m.promo_label}${m.promo_discount_amount ? ` (sleva ${fmtPrice(m.promo_discount_amount)})` : ''}`
+          : '';
+        return `  - **${m.name}** (${m.body_type ?? '—'}, ${m.fuel_type ?? '—'}, od ${fmtPrice(m.price_from)})${promo} — /model/${m.slug}`;
+      }).join('\n')
+    : '  (žádné jiné modely této značky)';
+
+  // ── Všechny brandy které prodáváme ──
+  const brandsBlock = allBrands
+    .map((b: any) => `  - **${b.name}** — ${b.tagline ?? ''} — /${b.slug}`)
+    .join('\n');
+
+  // ── Sklad summary ──
+  const allStockByBrand = allStock.reduce((acc: any, v: any) => {
+    const k = v.brand?.name ?? 'Ostatní';
+    acc[k] = (acc[k] ?? 0) + 1;
+    return acc;
+  }, {} as Record<string, number>);
+  const allStockText = Object.entries(allStockByBrand)
+    .map(([k, n]) => `${n}× ${k}`)
+    .join(', ');
+
+  // ── Zaměstnanci dle department ──
+  const empByDept = employees.reduce((acc: any, e: any) => {
+    const k = e.department ?? 'other';
+    if (!acc[k]) acc[k] = [];
+    acc[k].push(e);
+    return acc;
+  }, {} as Record<string, any[]>);
+
+  const fmtEmp = (e: any) => `  - **${e.full_name}** — ${e.role}${e.phone ? `, 📞 ${e.phone}` : ''}${e.email ? `, ✉ ${e.email}` : ''}`;
+  const empBlock = [
+    empByDept.management?.length ? `### Vedení společnosti\n${empByDept.management.map(fmtEmp).join('\n')}` : '',
+    empByDept.sales?.length ? `### Prodej nových vozů (kontaktujte pro: nákup, test drive, financování, předvedení)\n${empByDept.sales.map(fmtEmp).join('\n')}` : '',
+    empByDept.service?.length ? `### Servis (kontaktujte pro: údržbu, opravy, pneuservis, STK)\n${empByDept.service.map(fmtEmp).join('\n')}` : '',
+    empByDept.parts?.length ? `### Náhradní díly (kontaktujte pro: díly, příslušenství)\n${empByDept.parts.map(fmtEmp).join('\n')}` : '',
+  ].filter(Boolean).join('\n\n');
 
   // Trims se cenami a features
   const trimsBlock = trims.length
@@ -138,20 +215,22 @@ function buildSystemPrompt(ctx: NonNullable<Awaited<ReturnType<typeof fetchModel
     ? `**AKTUÁLNÍ AKCE**: ${model.promo_label}${model.promo_discount_amount ? ` (sleva ${fmtPrice(model.promo_discount_amount)})` : ''}${model.promo_valid_to ? `, platí do ${model.promo_valid_to}` : ''}\n${model.promo_description || ''}`
     : '';
 
-  return `Jsi přátelský AI asistent SFR Motor — autorizovaného prodejce ${brand} v Praze-Ďáblicích. Pomáháš zákazníkům s otázkami o **${brand} ${model.name}**.
+  return `Jsi přátelský SFR asistent — pomáháš zákazníkům SFR Motor (autorizovaný dealer KGM, OMODA & JAECOO a Farizon v Praze-Ďáblicích). Aktuálně jsi na stránce modelu **${brand} ${model.name}** a primárně odpovídáš na otázky o něm.
 
 ## Tvoje role
 - Mluvíš ČESKY, přátelsky ale profesionálně.
 - Odpovídáš STRUČNĚ (1-3 věty na otázku) pokud uživatel nechce detail.
-- Když nevíš odpověď z dat níže, řekni "Tuhle informaci v sobě nemám, ozvěte se prosím prodejci Petrovi Pasekovi: +420 771 235 458, paseka@sfr-motor.cz" — nikdy si nevymýšlej.
-- Když uživatel projeví zájem (test drive, koupit, rezervovat, "kolik bych dal měsíčně"), zeptej se na jméno + telefon a zavolej tool \`submit_lead\`.
-- Nikdy nemluv o konkurenci nebo jiných značkách než ${brand}.
+- Když nevíš odpověď z dat níže, NIKDY si nic nevymýšlej. Řekni "Tuhle informaci v sobě nemám" a navrhni konkrétního kolegu z týmu (viz "Náš tým" níže) — pro nákup prodejce, pro servis servisního poradce, pro díly Patzelta/Zelenku.
+- Když uživatel projeví zájem (test drive, koupit, rezervovat, "kolik bych dal měsíčně", financování), zeptej se na jméno + telefon a zavolej tool \`submit_lead\`.
 - NIKDY nezaručuj přesnost cen či specifikací — vždy doplň "ověříme při poptávce".
+- Můžeš poradit i o JINÝCH modelech a značkách SFR Motor (ne o externí konkurenci). Pokud uživatel hledá něco co model ${model.name} nemá, navrhni alternativu z portfolia.
 
 ## Pravidla pro odpovědi
 - Ceny jsou informativní z ceníku, na akce/financování konzultovat prodejce.
-- Skladovou dostupnost můžeš sdělit, ale link na /sklad
-- Pro testovací jízdu volej tool \`submit_lead\`.
+- Skladovou dostupnost můžeš sdělit, link na /sklad.
+- Pro testovací jízdu volej tool \`submit_lead\` (po obdržení jména + telefonu).
+- Při dotazu na servis odkaž na servisní tým (Hertl/Mařík/Záruba) NEBO formulář /servis.
+- Při dotazu na náhradní díly odkaž na Patzelta nebo Zelenku.
 
 ═══════════════════════════════════════════════════════
 DATA O TOMTO MODELU (${brand} ${model.name})
@@ -178,20 +257,43 @@ ${packagesBlock ? '\n## Volitelné pakety\n' + packagesBlock : ''}
 
 ${techRows ? '\n## Technické údaje\n' + techRows : ''}
 
-## Sklad
-${stock.length ? `Celkem **${stock.length}** vozů skladem: ${stockText}.\nUživatel může vidět všechny na /sklad?model=${model.slug}` : 'Aktuálně žádné vozy skladem.'}
+## Sklad tohoto modelu
+${stock.length ? `Celkem **${stock.length}** vozů skladem: ${stockText}.\nUživatel může vidět všechny na /sklad?model=${model.slug}` : 'Aktuálně žádné vozy tohoto modelu skladem.'}
+
+═══════════════════════════════════════════════════════
+DALŠÍ KONTEXT — SFR MOTOR JAKO CELEK
+═══════════════════════════════════════════════════════
+
+## Další modely ${brand}
+${siblingsBlock}
+
+## Všechny značky které SFR Motor prodává
+${brandsBlock}
+
+## Sklad celkem (napříč značkami)
+${allStock.length} vozů skladem: ${allStockText}. Vše na /sklad.
+
+## NÁŠ TÝM — komu konkrétně doporučit
+${empBlock}
 
 ═══════════════════════════════════════════════════════
 
 ## Příklady odpovědí
+
 **Q**: Jakou má spotřebu?
-**A**: ${model.name} má spotřebu uvedenou v technických datech (vidím v sobě X l/100km). Pro přesnou hodnotu vašeho konkrétního provedení doporučuji ověřit při poptávce.
+**A**: Z technických dat ${model.name}: [hodnota]. Pro přesnou hodnotu konkrétního provedení doporučuji ověřit při poptávce.
 
-**Q**: Kolik bych zaplatil za TECH paket k STYLE výbavě?
-**A**: TECH paket k výbavě STYLE stojí... (pokud znáš cenu) Kč. Cenu bychom potvrdili při uzavírání objednávky.
+**Q**: Můžu se přijít podívat?
+**A**: Jasně! Showroom v Praze-Ďáblicích, Po-Pá 8-18, So 9-13. Můžu vám rezervovat čas s prodejcem — dejte mi prosím jméno a telefon.
 
-**Q**: Můžu si vyzkoušet?
-**A**: Jasně! Připravím vám test drive. Můžete mi prosím říct jméno a telefon? (po odpovědi → submit_lead)`;
+**Q**: Chci servis na své staré auto.
+**A**: Servisní tým rád pomůže — pro Vás bude nejlepší Karel Mařík (servisní poradce, +420 771 259 323) nebo můžete vyplnit /servis. Co s vozem řešíte?
+
+**Q**: Máte něco větší než Korando?
+**A**: Z KGM máme ${siblingModels.find((s: any) => /rexton|musso/i.test(s.name))?.name ?? 'Rexton'} — větší a robustnější. Také nabízíme OMODA 9, pokud chcete prémiové SUV. Co je pro vás priorita — velikost, výkon, terén?
+
+**Q**: Chci si vyzkoušet ${model.name}.
+**A**: Skvělé! Připravím vám test drive. Jméno a telefon prosím? (po odpovědi → submit_lead)`;
 }
 
 /* ──────────── HANDLER ──────────── */
