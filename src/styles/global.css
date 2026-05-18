@@ -36,8 +36,11 @@
 
 * { box-sizing: border-box; }
 html, body { margin: 0; padding: 0; }
-html { -webkit-text-size-adjust: 100%; overflow-x: hidden; }
-body { overflow-x: hidden; min-width: 0; }
+/* Pozor: overflow-x: hidden by zlomil position: sticky (nav by se nedal scrollovat headroom-style).
+   `clip` je modernější varianta — taky zabrání horizontálnímu scrollu, ale neestablishuje
+   scroll container, takže sticky funguje. (95%+ browser support.) */
+html { -webkit-text-size-adjust: 100%; overflow-x: clip; }
+body { overflow-x: clip; min-width: 0; }
 /* Globální image reset — zabrání tomu, aby fotky vystupovaly za viewport */
 img, svg, video, iframe { max-width: 100%; height: auto; display: block; }
 /* Tap target friendly buttons na mobilu */
