@@ -102,13 +102,14 @@ const optionPackages = latestYear
     })
   : [];
 
-// Skladové vozy tohoto modelu
+// Skladové vozy tohoto modelu (pool pro shuffle — 5 viditelných z 16)
 const stockOfModel = await directusGet<any>('stock_vehicles', {
   filter: { model: { _eq: rawModel.id }, status: { _eq: 'published' }, availability: { _in: ['in_stock', 'on_the_way'] } },
   sort: ['-listed_at'],
-  limit: 3,
+  limit: 16,
   fields: [
     'id', 'condition', 'km', 'list_price', 'promo_price', 'trim_level_snapshot',
+    'highlighted', 'highlight_label', 'transmission',
     'photos.directus_files_id', 'model_year.year', 'color_code', 'color_category',
     'trim_level.name',
   ],
@@ -980,33 +981,69 @@ if (promoActive && promoDescription) {
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
           </a>
         </div>
-        <div class="cars">
+        <div class="skladovka-grid" data-stock-shuffle data-visible-count="5">
           {stockOfModel.map((v: any) => {
             const photoId = v.photos?.[0]?.directus_files_id;
             const trim = v.trim_level_snapshot?.name ?? '';
             const carYear = v.model_year?.year ?? '';
-            const meta = `${(v.km ?? 0).toLocaleString('cs-CZ')} km · ${carYear}`;
-            const price = v.promo_price ?? v.list_price;
+            const isNew = v.condition === 'new';
+            const isHl = v.highlighted;
+            const customLabel = (v.highlight_label ?? '').toString().trim();
+            const conditionLabel = v.condition === 'new' ? 'Nové' : v.condition === 'demo' ? 'Předváděcí' : 'Ojeté';
+            const fuelType = rawModel.fuel_type ?? '';
+            const fuelLabelMap: Record<string, string> = { petrol: 'Benzín', diesel: 'Diesel', hybrid: 'Hybrid', phev: 'PHEV', ev: 'Elektro' };
+            const fuelLabel = fuelLabelMap[fuelType] ?? '';
+            const transmissionLabel = v.transmission === 'manual' ? 'Manuál' : v.transmission === 'automatic' ? 'Automat' : '';
+            // Pill: Akce/Highlight only
+            let pillLabel = '';
+            if (isHl && customLabel) pillLabel = customLabel;
+            else if (isHl) pillLabel = 'Novinka';
+            // Cena
+            const baseList = v.list_price;
+            let price = v.promo_price ?? baseList;
+            let priceBefore: number | null = null;
+            if (v.promo_price && baseList && v.promo_price < baseList) priceBefore = baseList;
+            const fmtPrice = (n?: number | null) => (n ? `${n.toLocaleString('cs-CZ')} Kč` : '—');
+            const fmtKm = (n?: number | null) => (n === 0 || !n ? '0 km' : `${n.toLocaleString('cs-CZ')} km`);
             return (
-              <article class="car-card">
+              <a class="scard" href={`/sklad/${buildStockSlug(v, brand, rawModel, v.trim_level ?? { name: trim })}`} data-fuel={fuelType}>
                 <div class="pic">
-                  <span class="tag">Skladem</span>
                   {photoId && <DirectusImage src={photoId} alt={`${rawModel.name} ${trim}`} aspectRatio="4/3" />}
+                  {pillLabel && <span class="pill">{pillLabel}</span>}
                 </div>
-                <div class="car-body">
-                  <div class="car-name">{rawModel.name} {trim}</div>
-                  <div class="car-meta">{meta}</div>
-                  <hr />
-                  <div class="car-price">{price ? `${price.toLocaleString('cs-CZ')} Kč` : '—'}</div>
-                  <a class="btn btn-outline" style="padding: 12px 20px; font-size: 12px;" href={`/sklad/${buildStockSlug(v, brand, rawModel, v.trim_level ?? { name: trim })}`}>
-                    Detail vozu
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
-                  </a>
+                <div class="body">
+                  <div class="nm">{brand.name} {rawModel.name}</div>
+                  {trim && <div class="var">{trim}</div>}
+                  <div class="specs">
+                    {fuelLabel && <span class="fuel">{fuelLabel}</span>}
+                    {carYear && <span>{carYear}</span>}
+                    <span>{conditionLabel}</span>
+                    {transmissionLabel && <span>{transmissionLabel}</span>}
+                  </div>
+                  <div class="foot">
+                    <span class="km">{fmtKm(v.km)}</span>
+                    <div class="price">
+                      {priceBefore && <span class="price-before">{fmtPrice(priceBefore)}</span>}
+                      <span>{fmtPrice(price)}</span>
+                    </div>
+                  </div>
                 </div>
-              </article>
+              </a>
             );
           })}
         </div>
+        <script>
+          (() => {
+            const grid = document.querySelector('#skladem [data-stock-shuffle]');
+            if (!grid) return;
+            const cards = Array.from(grid.children).filter((c) => c.tagName === 'A');
+            for (let i = cards.length - 1; i > 0; i--) {
+              const j = Math.floor(Math.random() * (i + 1));
+              [cards[i], cards[j]] = [cards[j], cards[i]];
+            }
+            cards.forEach((c) => grid.appendChild(c));
+          })();
+        </script>
       </div>
     </section>
   )}

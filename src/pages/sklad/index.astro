@@ -192,7 +192,7 @@ const fmtKm = (n?: number | null) => (n === 0 || !n ? '0 km' : `${n.toLocaleStri
                       <div class="nm">{v.brand?.name ?? ''} {v.model?.name ?? ''}</div>
                       {trimName && <div class="var">{trimName}</div>}
                       <div class="specs">
-                        {fuelLabel && <span>{fuelLabel}</span>}
+                        {fuelLabel && <span class="fuel">{fuelLabel}</span>}
                         {carYear && <span>{carYear}</span>}
                         {conditionLabel && <span>{conditionLabel}</span>}
                         {transmissionLabel && <span>{transmissionLabel}</span>}

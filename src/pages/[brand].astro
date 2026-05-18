@@ -93,11 +93,11 @@ const stockCount = stockOfBrand.length;
 const stockSample = await directusGet<any>('stock_vehicles', {
   filter: { brand: { _eq: brand.id }, status: { _eq: 'published' }, availability: { _in: ['in_stock', 'on_the_way'] } },
   sort: ['-listed_at'],
-  limit: 4,
+  limit: 16,  // Pool pro shuffle — 5 viditelných z 16 → každý F5 jiná pětice.
   fields: [
     'id', 'condition', 'km', 'list_price', 'promo_price',
     'highlighted', 'highlight_label', 'trim_level_snapshot',
-    'color_code', 'color_category',
+    'color_code', 'color_category', 'transmission',
     'photos.directus_files_id',
     'model.name', 'model.slug', 'model.fuel_type',
     'model.promo_active', 'model.promo_label', 'model.promo_discount_amount', 'model.promo_valid_to',
@@ -411,7 +411,7 @@ const activeBrand = Astro.params.brand;
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
           </a>
         </div>
-        <div class="skladovka-grid">
+        <div class="skladovka-grid" data-stock-shuffle data-visible-count="5">
           {stockSample.map((v: any) => {
             const isNew = v.condition === 'new';
             const isHl = v.highlighted;
@@ -422,17 +422,21 @@ const activeBrand = Astro.params.brand;
               && (!v.model.promo_valid_to || String(v.model.promo_valid_to) >= today);
             const modelPromoLabel = (v.model?.promo_label ?? '').toString().trim();
             const modelPromoDiscount = Number(v.model?.promo_discount_amount ?? 0) || 0;
-            const pillLabel = modelPromoActive && modelPromoLabel
-              ? modelPromoLabel
-              : isHl
-                ? (customLabel || 'Novinka')
-                : isNew ? 'Nové' : 'Skladem';
-            const pillClass = (modelPromoActive || isHl || isNew) ? ' is-new' : '';
+            // Pill: POUZE pro Akce/Highlight. Stav (Nové/Ojeté) je v specs chips.
+            let pillLabel = '';
+            if (modelPromoActive && modelPromoLabel) pillLabel = modelPromoLabel;
+            else if (isHl && customLabel) pillLabel = customLabel;
+            else if (isHl) pillLabel = 'Novinka';
+
             const photoId = v.photos?.[0]?.directus_files_id;
             const trim = v.trim_level_snapshot?.name ?? '';
             const modelName = v.model?.name ?? 'Vůz';
             const carYear = v.model_year?.year ?? '';
             const conditionLabel = v.condition === 'new' ? 'Nové' : v.condition === 'demo' ? 'Předváděcí' : 'Ojeté';
+            const fuelType = v.model?.fuel_type ?? '';
+            const fuelLabelMap: Record<string, string> = { petrol: 'Benzín', diesel: 'Diesel', hybrid: 'Hybrid', phev: 'PHEV', ev: 'Elektro' };
+            const fuelLabel = fuelLabelMap[fuelType] ?? '';
+            const transmissionLabel = v.transmission === 'manual' ? 'Manuál' : v.transmission === 'automatic' ? 'Automat' : '';
             // Cena: stock.promo > model promo (jen u nových vozů) > list
             const baseList = v.list_price;
             let price = v.promo_price ?? baseList;
@@ -444,28 +448,45 @@ const activeBrand = Astro.params.brand;
               priceBefore = baseList;
             }
             return (
-              <a class="scard" href={`/sklad/${buildStockSlug(v, brand, v.model, v.trim_level ?? { name: trim })}`}>
+              <a class="scard" href={`/sklad/${buildStockSlug(v, brand, v.model, v.trim_level ?? { name: trim })}`} data-fuel={fuelType}>
                 <div class="pic">
                   {photoId && <DirectusImage src={photoId} alt={`${brand.name} ${modelName}`} aspectRatio="4/3" />}
+                  {pillLabel && <span class="pill">{pillLabel}</span>}
                 </div>
                 <div class="body">
-                  <span class={`pill${pillClass}`}>{pillLabel}</span>
                   <div class="nm">{brand.name} {modelName}</div>
-                  <div class="var">{trim}</div>
-                  <div class="meta">
+                  {trim && <div class="var">{trim}</div>}
+                  <div class="specs">
+                    {fuelLabel && <span class="fuel">{fuelLabel}</span>}
                     {carYear && <span>{carYear}</span>}
-                    <span class="dot">{fmtKm(v.km)}</span>
-                    <span class="dot">{conditionLabel}</span>
+                    <span>{conditionLabel}</span>
+                    {transmissionLabel && <span>{transmissionLabel}</span>}
                   </div>
-                  <div class="price">
-                    {fmtPrice(price)}
-                    {priceBefore && <span class="price-before">{fmtPrice(priceBefore)}</span>}
+                  <div class="foot">
+                    <span class="km">{fmtKm(v.km)}</span>
+                    <div class="price">
+                      {priceBefore && <span class="price-before">{fmtPrice(priceBefore)}</span>}
+                      <span>{fmtPrice(price)}</span>
+                    </div>
                   </div>
                 </div>
               </a>
             );
           })}
         </div>
+        <script>
+          // Shuffle pool — render 16, viditelných 5; Fisher-Yates při každém F5
+          (() => {
+            const grid = document.querySelector('.skladovka [data-stock-shuffle]') ?? document.querySelector('[data-stock-shuffle]');
+            if (!grid) return;
+            const cards = Array.from(grid.children).filter((c) => c.tagName === 'A');
+            for (let i = cards.length - 1; i > 0; i--) {
+              const j = Math.floor(Math.random() * (i + 1));
+              [cards[i], cards[j]] = [cards[j], cards[i]];
+            }
+            cards.forEach((c) => grid.appendChild(c));
+          })();
+        </script>
       </div>
     </section>
   )}

@@ -246,7 +246,7 @@ const articles = articlesRaw.map((a) => {
       {stockVehicles.length === 0 ? (
         <div class="sklad-empty">Skladovka se právě plní — koukněte se za chvíli, nebo nám zavolejte +420 771 235 458.</div>
       ) : (
-        <div class="skladovka-grid" data-stock-shuffle data-visible-count="4">
+        <div class="skladovka-grid" data-stock-shuffle data-visible-count="5">
           {stockVehicles.map((v: any) => {
             const isNew = v.condition === 'new';
             const isHighlighted = v.highlighted;
@@ -270,6 +270,7 @@ const articles = articlesRaw.map((a) => {
             const carYear = v.model_year?.year ?? '';
             const conditionLabel = v.condition === 'new' ? 'Nové' : v.condition === 'demo' ? 'Předváděcí' : 'Ojeté';
             const fuelLabel = v.trim_level_snapshot?.fuel_label ?? '';
+            const fuelType = v.model?.fuel_type ?? '';
             const transmissionLabel = v.transmission === 'manual' ? 'Manuál' : v.transmission === 'automatic' ? 'Automat' : '';
             // Cena s ohledem na model promo (jen u nových vozů)
             const baseList = v.list_price;
@@ -282,7 +283,7 @@ const articles = articlesRaw.map((a) => {
               priceBefore = baseList;
             }
             return (
-              <a class="scard" href={`/sklad/${buildStockSlug(v, v.brand, v.model, v.trim_level ?? { name: trim })}`}>
+              <a class="scard" href={`/sklad/${buildStockSlug(v, v.brand, v.model, v.trim_level ?? { name: trim })}`} data-fuel={fuelType}>
                 <div class="pic">
                   {photoId && <DirectusImage src={photoId} alt={`${brandName} ${modelName}`} aspectRatio="4/3" />}
                   {pillLabel && <span class="pill">{pillLabel}</span>}
@@ -291,7 +292,7 @@ const articles = articlesRaw.map((a) => {
                   <div class="nm">{brandName} {modelName}</div>
                   {trim && <div class="var">{trim}</div>}
                   <div class="specs">
-                    {fuelLabel && <span>{fuelLabel}</span>}
+                    {fuelLabel && <span class="fuel">{fuelLabel}</span>}
                     {carYear && <span>{carYear}</span>}
                     <span>{conditionLabel}</span>
                     {transmissionLabel && <span>{transmissionLabel}</span>}

@@ -3507,10 +3507,48 @@ button.thumb-more {
   grid-template-columns: repeat(4, 1fr);
   gap: 18px;
 }
-/* Shuffle pool — render 16, default zobrazí jen prvních 4. Client JS pak
-   zamíchá DOM order tak že každý F5 vidí jinou náhodnou čtyřku. */
-.skladovka-grid[data-stock-shuffle] > .scard:nth-child(n+5) {
+/* Homepage skladovka — 5 sloupců aby šířka karet matchovala /sklad
+   (kde má sidebar 280px → 4 cols ve zbylé šířce ≈ stejné jako 5 cols full-width). */
+.skladovka-grid[data-stock-shuffle] {
+  grid-template-columns: repeat(5, 1fr);
+}
+/* Shuffle pool — render 16, default zobrazí jen prvních 5. Client JS pak
+   zamíchá DOM order tak že každý F5 vidí jinou náhodnou pětici. */
+.skladovka-grid[data-stock-shuffle] > .scard:nth-child(n+6) {
   display: none;
+}
+@media (max-width: 1100px) {
+  .skladovka-grid[data-stock-shuffle] { grid-template-columns: repeat(3, 1fr); }
+  .skladovka-grid[data-stock-shuffle] > .scard:nth-child(n+4) { display: none; }
+}
+
+/* ===== Barevné akcenty podle typu paliva (spalovák/HEV/PHEV/EV) =====
+   Levý border + barva chip Palivo. Subtílní — neruší celkový design,
+   ale na první pohled signalizuje pohonný typ. */
+.scard[data-fuel="petrol"], .scard[data-fuel="diesel"] {
+  border-left: 3px solid #8a8580;
+}
+.scard[data-fuel="petrol"] .specs span.fuel,
+.scard[data-fuel="diesel"] .specs span.fuel {
+  background: #ece8e0; color: #5c5852;
+}
+.scard[data-fuel="hybrid"] {
+  border-left: 3px solid #6ba368;
+}
+.scard[data-fuel="hybrid"] .specs span.fuel {
+  background: #e3efdf; color: #3d6b3a;
+}
+.scard[data-fuel="phev"] {
+  border-left: 3px solid #4a9b6e;
+}
+.scard[data-fuel="phev"] .specs span.fuel {
+  background: #dcebe1; color: #2a6b48;
+}
+.scard[data-fuel="ev"] {
+  border-left: 3px solid #2d8aa8;
+}
+.scard[data-fuel="ev"] .specs span.fuel {
+  background: #d9eaf1; color: #1e5d76;
 }
 .scard {
   background: #fff;
@@ -3547,15 +3585,15 @@ button.thumb-more {
   box-shadow: 0 4px 12px -4px rgba(0,0,0,0.25);
 }
 .scard .body {
-  padding: 18px 20px 20px;
+  padding: 16px 16px 18px;
   display: flex; flex-direction: column;
   flex: 1;
-  gap: 14px;
+  gap: 12px;
 }
 .scard .nm {
   font-family: var(--font-display);
   font-weight: 600;
-  font-size: 20px;
+  font-size: 18px;
   letter-spacing: -0.01em;
   line-height: 1.2;
 }
@@ -3577,38 +3615,45 @@ button.thumb-more {
   border-radius: 4px;
   white-space: nowrap;
 }
-/* Footer řádek — km vlevo, cena vpravo */
+/* Footer řádek — km vlevo, cena vpravo. Cena má prioritu (větší font),
+   km menší šedý. Vše nowrap aby se nezalamovaly číslice. */
 .scard .foot {
   display: flex; align-items: flex-end; justify-content: space-between;
-  gap: 12px;
-  padding-top: 14px;
+  gap: 8px;
+  padding-top: 12px;
   margin-top: auto;
   border-top: 1px solid var(--line);
 }
 .scard .km {
   font-family: var(--font-display);
-  font-size: 12.5px;
+  font-size: 12px;
   color: var(--text-muted);
   font-variant-numeric: tabular-nums;
   padding-bottom: 2px;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 .scard .price {
   font-family: var(--font-display);
   font-weight: 700;
-  font-size: 22px;
+  font-size: 18px;
   letter-spacing: -0.02em;
   color: var(--accent);
   font-variant-numeric: tabular-nums;
-  display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap;
+  display: flex; flex-direction: column; align-items: flex-end;
+  gap: 2px;
   text-align: right;
-  justify-content: flex-end;
+  white-space: nowrap;
+  line-height: 1.15;
 }
+.scard .price > span:last-child { white-space: nowrap; }
 .scard .price-before {
-  font-size: 12.5px;
+  font-size: 11.5px;
   font-weight: 500;
   color: var(--text-muted);
   text-decoration: line-through;
   text-decoration-thickness: 1.4px;
+  white-space: nowrap;
 }
 
 /* Tag promo source (např. "JARNÍ AKCE") vedle savings v sklad detailu */
