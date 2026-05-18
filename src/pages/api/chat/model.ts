@@ -54,62 +54,87 @@ function extractKeywords(question) {
 }
 
 /**
+ * Z variant slugu vrátí base slug (např. "actyon-hev" → "actyon", "torres-evx" → "torres").
+ * Pokud slug nemá známý variant suffix, vrátí ho beze změny.
+ */
+function getBaseSlug(slug) {
+  if (!slug) return null;
+  return slug.replace(/-(hev|evx|ice|hybrid|electric)$/i, '');
+}
+
+/**
  * Vyhledá nejrelevantnější chunky v `knowledge_documents` pro otázku uživatele.
- * Filtruje podle brand_slug a model_slug (chunky pro tento model + univerzální).
+ * Filtruje podle brand_slug a model_slug. Když je uživatel na variantě (např. actyon-hev),
+ * hledá i chunky pro base slug (actyon) — protože brožury často pokrývají celou řadu.
  */
 async function searchKnowledgeBase(question, brandSlug, modelSlug) {
   if (!question || question.length < 5) return [];
   const keywords = extractKeywords(question);
   if (!keywords.length) return [];
 
-  // Filter: chunky které jsou buď pro tento model, nebo pro tuto značku obecně,
-  // nebo univerzální (oba slug prázdné).
+  const baseSlug = getBaseSlug(modelSlug);
+  const slugVariants = baseSlug && baseSlug !== modelSlug
+    ? [modelSlug, baseSlug]
+    : [modelSlug].filter(Boolean);
+
+  // Filter: chunky pro tento model NEBO base variantu, NEBO značku obecně, NEBO univerzální.
   const slugFilter = {
     _or: [
-      { model_slug: { _eq: modelSlug } },
+      ...slugVariants.map((s) => ({ model_slug: { _eq: s } })),
       { _and: [{ model_slug: { _empty: true } }, { brand_slug: { _eq: brandSlug } }] },
       { _and: [{ model_slug: { _empty: true } }, { brand_slug: { _empty: true } }] },
     ],
   };
 
-  // Pro každé keyword zkus najít chunky které ho obsahují. Pak skóruj dle počtu match keywords.
-  const allChunks = [];
+  // Multi-keyword search: chunky obsahující JAKÝKOLIV ze top 6 keywords.
+  // Pak score v paměti dle počtu match keywords.
+  const searchKeywords = keywords.slice(0, 6);
+  const contentFilter = {
+    _or: searchKeywords.map((k) => ({ content: { _icontains: k } })),
+  };
+
+  let chunks = [];
   try {
-    // Z důvodu omezení Directus filteru (OR nelze sloučit s array of contains efektivně),
-    // uděláme 1 fetch s _icontains na nejdůležitější keyword (první) a pak skórujeme v paměti.
-    const primary = keywords[0];
     const filter = {
       _and: [
         { status: { _eq: 'active' } },
         slugFilter,
-        { content: { _icontains: primary } },
+        contentFilter,
       ],
     };
     const res = await directusGet('knowledge_documents', {
       filter,
       fields: ['id', 'title', 'content', 'page_number', 'tag', 'source_filename'],
-      limit: 50,
+      limit: 100,
     });
-    if (Array.isArray(res)) allChunks.push(...res);
+    if (Array.isArray(res)) chunks = res;
   } catch (e) {
-    console.warn('knowledge search failed:', e?.message);
+    console.warn('[chat] knowledge search failed:', e?.message);
     return [];
   }
 
-  if (!allChunks.length) return [];
+  console.log(`[chat] RAG search: model="${modelSlug}", base="${baseSlug}", keywords=[${searchKeywords.join(', ')}] → ${chunks.length} chunks found`);
 
-  // Skórování — kolik keywords se v chunku objevuje
-  const scored = allChunks.map((c) => {
+  if (!chunks.length) return [];
+
+  // Skórování — kolik keywords se v chunku objevuje + délka match (delší = relevantnější)
+  const scored = chunks.map((c) => {
     const lc = (c.content || '').toLowerCase();
     let score = 0;
-    for (const k of keywords) {
-      if (lc.includes(k)) score++;
+    let matchedKeywords = [];
+    for (const k of searchKeywords) {
+      if (lc.includes(k)) {
+        score += k.length; // dlouhá keyword = víc bodů
+        matchedKeywords.push(k);
+      }
     }
-    return { ...c, score };
+    return { ...c, score, matchedKeywords };
   }).sort((a, b) => b.score - a.score);
 
-  // Vrať top 4 chunky které mají alespoň 2 keyword matches
-  return scored.filter((c) => c.score >= 2).slice(0, 4);
+  const topChunks = scored.slice(0, 5);
+  console.log(`[chat] top chunks: ${topChunks.map((c) => `${c.source_filename}#${c.page_number}(score=${c.score})`).join(', ')}`);
+
+  return topChunks;
 }
 
 /* ──────────── DATA FETCHERS ──────────── */

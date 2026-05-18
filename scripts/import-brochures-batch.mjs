@@ -35,16 +35,44 @@ import { join, basename, extname } from 'node:path';
 const rl = readline.createInterface({ input, output });
 const prompt = (q) => rl.question(q);
 
-let URL = '', TOKEN = '';
+let URL = '', TOKEN = '', AUTH_TIME = 0, AUTH_EMAIL = '', AUTH_PASSWORD = '';
+const TOKEN_LIFETIME_MS = 13 * 60 * 1000; // 13 min — Directus default je 15, relogujeme dřív
+
+async function login() {
+  const auth = await fetch(`${URL}/auth/login`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email: AUTH_EMAIL, password: AUTH_PASSWORD }),
+  }).then((r) => r.json());
+  if (!auth?.data?.access_token) throw new Error(`Login failed: ${JSON.stringify(auth?.errors ?? auth)}`);
+  TOKEN = auth.data.access_token;
+  AUTH_TIME = Date.now();
+}
+
+async function ensureValidToken() {
+  if (!TOKEN || Date.now() - AUTH_TIME > TOKEN_LIFETIME_MS) {
+    await login();
+  }
+}
 
 async function api(method, path, body) {
-  const opts = { method, headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${TOKEN}` } };
-  if (body) opts.body = JSON.stringify(body);
-  const r = await fetch(`${URL}${path}`, opts);
-  const t = await r.text();
-  let j; try { j = JSON.parse(t); } catch { j = t; }
-  if (!r.ok) throw new Error(`${method} ${path} → ${r.status}: ${JSON.stringify(j?.errors ?? j).slice(0, 400)}`);
-  return j;
+  await ensureValidToken();
+  const doFetch = async () => {
+    const opts = { method, headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${TOKEN}` } };
+    if (body) opts.body = JSON.stringify(body);
+    const r = await fetch(`${URL}${path}`, opts);
+    const t = await r.text();
+    let j; try { j = JSON.parse(t); } catch { j = t; }
+    return { ok: r.ok, status: r.status, json: j };
+  };
+  let res = await doFetch();
+  // Pokud server odmítl s TOKEN_EXPIRED, hned obnov token a zkus znovu
+  if (!res.ok && (res.status === 401 || JSON.stringify(res.json).includes('TOKEN_EXPIRED'))) {
+    await login();
+    res = await doFetch();
+  }
+  if (!res.ok) throw new Error(`${method} ${path} → ${res.status}: ${JSON.stringify(res.json?.errors ?? res.json).slice(0, 400)}`);
+  return res.json;
 }
 
 const ok = (m) => console.log(`  ✓  ${m}`);
@@ -192,16 +220,15 @@ async function main() {
   // Brand — pro tuto složku všechno KGM (z parametru by šlo, ale tady víme)
   const BRAND = 'kgm';
 
-  // ── Auth ──
+  // ── Auth (credentials uloženy pro auto-relogin při expiraci) ──
   URL = (await prompt('Directus URL [https://directus-production-3e67.up.railway.app]: ')).trim()
     || 'https://directus-production-3e67.up.railway.app';
-  const email = (await prompt('Email: ')).trim();
-  const password = (await prompt('Heslo: ')).trim();
+  AUTH_EMAIL = (await prompt('Email: ')).trim();
+  AUTH_PASSWORD = (await prompt('Heslo: ')).trim();
   console.log('');
 
-  const auth = await api('POST', '/auth/login', { email, password });
-  TOKEN = auth.data.access_token;
-  ok('Auth OK\n');
+  await login();
+  ok('Auth OK (auto-relogin každých 13 min)\n');
 
   // ── Walk folders ──
   let folders;
