@@ -3564,6 +3564,7 @@ html.scrolled-down .subnav {
   display: flex; flex-direction: column;
   transition: transform .2s, box-shadow .2s;
   border: 1px solid var(--line);
+  position: relative;  /* containing block pro ::before top stripe — bez tohoto se proužek zavěšuje na <body> a kreslí přes celý vrch stránky */
 }
 .scard:hover { transform: translateY(-3px); box-shadow: 0 14px 30px -16px rgba(0,0,0,0.18); }
 .scard .pic {
