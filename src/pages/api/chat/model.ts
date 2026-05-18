@@ -139,6 +139,44 @@ async function searchKnowledgeBase(question, brandSlug, modelSlug) {
 
 /* ──────────── DATA FETCHERS ──────────── */
 
+async function fetchBrandContext(brandSlug: string) {
+  const brands = await directusGet<any>('brands', {
+    filter: { slug: { _eq: brandSlug }, status: { _eq: 'published' } },
+    fields: ['*'],
+    limit: 1,
+  });
+  const brand = brands[0];
+  if (!brand) return null;
+
+  // Všechny modely této značky
+  const models = await directusGet<any>('models', {
+    filter: { brand: { _eq: brand.id }, status: { _eq: 'published' } },
+    fields: ['id', 'name', 'slug', 'tagline', 'fuel_type', 'body_type', 'price_from', 'promo_active', 'promo_label', 'promo_discount_amount', 'description'],
+    sort: ['sort'],
+  });
+
+  // Sklad této značky
+  const stock = await directusGet<any>('stock_vehicles', {
+    filter: { brand: { _eq: brand.id }, status: { _eq: 'published' } },
+    fields: ['id', 'condition', 'list_price', 'km', 'model.name', 'trim_level_snapshot'],
+  });
+
+  // Zaměstnanci
+  const employees = await directusGet<any>('employees', {
+    sort: ['sort', 'full_name'],
+    fields: ['id', 'full_name', 'role', 'department', 'email', 'phone'],
+  });
+
+  // Všechny brandy
+  const allBrands = await directusGet<any>('brands', {
+    filter: { status: { _eq: 'published' } },
+    fields: ['id', 'name', 'slug', 'tagline'],
+    sort: ['sort'],
+  });
+
+  return { mode: 'brand', brand, models, stock, employees, allBrands };
+}
+
 async function fetchModelContext(slug: string) {
   const models = await directusGet<any>('models', {
     filter: { slug: { _eq: slug } },
@@ -212,12 +250,110 @@ async function fetchModelContext(slug: string) {
   });
 
   return {
+    mode: 'model',
     model, latestYear, trims, packages, stock,
     siblingModels, allBrands, allStock, employees,
   };
 }
 
-/* ──────────── SYSTEM PROMPT ──────────── */
+/* ──────────── SYSTEM PROMPT — BRAND MODE ──────────── */
+
+function buildBrandSystemPrompt(ctx: any, knowledgeChunks: any[] = []): string {
+  const { brand, models, stock, employees, allBrands } = ctx;
+
+  const modelsBlock = models.length
+    ? models.map((m: any) => {
+        const promo = m.promo_active && m.promo_label ? ` 🔥 AKCE: ${m.promo_label}` : '';
+        return `### ${m.name} (slug: ${m.slug})
+- Tagline: ${m.tagline ?? '—'}
+- Typ: ${m.body_type ?? '—'}, palivo: ${m.fuel_type ?? '—'}
+- Cena od: ${fmtPrice(m.price_from)}${promo}
+- Popis: ${(m.description ?? '').slice(0, 200)}${(m.description ?? '').length > 200 ? '…' : ''}
+- Detail: /model/${m.slug}`;
+      }).join('\n\n')
+    : '(žádné modely)';
+
+  const stockByModel = stock.reduce((acc: any, v: any) => {
+    const k = v.model?.name ?? 'Ostatní';
+    acc[k] = (acc[k] ?? 0) + 1;
+    return acc;
+  }, {} as Record<string, number>);
+  const stockText = Object.entries(stockByModel).map(([k, n]) => `${n}× ${k}`).join(', ');
+
+  const empByDept = employees.reduce((acc: any, e: any) => {
+    const k = e.department ?? 'other';
+    if (!acc[k]) acc[k] = [];
+    acc[k].push(e);
+    return acc;
+  }, {} as Record<string, any[]>);
+  const fmtEmp = (e: any) => `  - **${e.full_name}** — ${e.role}${e.phone ? `, 📞 ${e.phone}` : ''}${e.email ? `, ✉ ${e.email}` : ''}`;
+  const empBlock = [
+    empByDept.management?.length ? `### Vedení\n${empByDept.management.map(fmtEmp).join('\n')}` : '',
+    empByDept.sales?.length ? `### Prodej (nákup, test drive, financování)\n${empByDept.sales.map(fmtEmp).join('\n')}` : '',
+    empByDept.service?.length ? `### Servis (údržba, opravy, STK)\n${empByDept.service.map(fmtEmp).join('\n')}` : '',
+    empByDept.parts?.length ? `### Náhradní díly\n${empByDept.parts.map(fmtEmp).join('\n')}` : '',
+  ].filter(Boolean).join('\n\n');
+
+  const knowledgeBlock = knowledgeChunks.length
+    ? knowledgeChunks.map((k, i) => {
+        const src = `${k.title}${k.page_number ? ` (str. ${k.page_number})` : ''}`;
+        return `### Zdroj ${i + 1}: ${src} [tag: ${k.tag ?? '—'}]\n${k.content}`;
+      }).join('\n\n---\n\n')
+    : '';
+
+  return `Jsi SFR asistent pro značku **${brand.name}** — autorizovaný dealer v Praze-Ďáblicích. Aktuálně jsi na brand stránce ${brand.name}, můžeš odpovídat na otázky o JAKÉMKOLIV modelu této značky.
+
+## DŮLEŽITÉ — POSTUP ODPOVĚDI
+
+**Když máš sekci "RELEVANTNÍ ÚRYVKY Z BROŽUR/MANUÁLŮ" níže (RAG kontext):**
+1. Pečlivě si přečti všechny úryvky — jsou ze skutečných brožur ${brand.name}.
+2. NEJDŘÍV se snaž odpovědět z těchto úryvků. Cituj zdroj (např. "Podle manuálu Torres (str. 64): ...").
+3. Pokud úryvky odpovídají jen částečně, napiš co víš + uznej omezení.
+4. AŽ když úryvky vůbec neodpovídají, řekni "v dostupné dokumentaci jsem to nenašel" a zeptej se jestli chce kontakt.
+
+## Tvoje role
+- Mluvíš ČESKY, přátelsky ale profesionálně.
+- **DRŽ SE KRÁTKO** — default 2-4 věty.
+- Nedávat kontakty automaticky — místo toho "Mám vám dát kontakt na servis?" / "Propojit s prodejcem?"
+- Když user projeví zájem o test drive/koupit, zeptej se na jméno+telefon → tool \`submit_lead\`.
+- NIKDY si nevymýšlej — když info nemáš, řekni to.
+- Emoji střídmě (max 1 na zprávu).
+
+═══════════════════════════════════════════════════════
+DATA O ZNAČCE ${brand.name.toUpperCase()}
+═══════════════════════════════════════════════════════
+
+## Základní info
+- **Značka**: ${brand.name}
+- **Tagline**: ${brand.tagline ?? '—'}
+- **Popis**: ${brand.description ?? '—'}
+
+## Modely ${brand.name}
+${modelsBlock}
+
+## Sklad ${brand.name}
+Celkem ${stock.length} vozů skladem${stockText ? `: ${stockText}` : ''}. Vše na /sklad?znacka=${brand.slug}.
+
+## NÁŠ TÝM — komu doporučit
+${empBlock}
+
+## Další značky kterým SFR Motor také prodává
+${allBrands.filter((b: any) => b.slug !== brand.slug).map((b: any) => `  - ${b.name} — /${b.slug}`).join('\n')}
+
+${knowledgeBlock ? `═══════════════════════════════════════════════════════
+RELEVANTNÍ ÚRYVKY Z BROŽUR/MANUÁLŮ (RAG) — TVŮJ PRIMÁRNÍ ZDROJ
+═══════════════════════════════════════════════════════
+
+⚠ Tyto úryvky jsou z oficiálních brožur a manuálů ${brand.name}.
+PRIMÁRNĚ čerpej z nich. Cituj zdroj.
+
+${knowledgeBlock}
+
+═══════════════════════════════════════════════════════
+` : ''}`;
+}
+
+/* ──────────── SYSTEM PROMPT — MODEL MODE ──────────── */
 
 function fmtPrice(n: number | null | undefined): string {
   if (!Number.isFinite(Number(n))) return '—';
@@ -458,27 +594,54 @@ ${knowledgeBlock}
 export const POST: APIRoute = async ({ request }) => {
   try {
     const body = await request.json();
-    const slug = String(body?.slug ?? '');
+    // Backwards compat: `slug` = model slug (model mode)
+    // Nově: `modelSlug` (model mode) NEBO `brandSlug` bez modelSlug (brand mode)
+    const modelSlug = String(body?.modelSlug ?? body?.slug ?? '').trim();
+    const brandSlug = String(body?.brandSlug ?? '').trim();
     const messages = Array.isArray(body?.messages) ? body.messages : [];
 
-    if (!slug) {
-      return new Response(JSON.stringify({ error: 'Missing slug' }), { status: 400, headers: { 'Content-Type': 'application/json' } });
+    if (!modelSlug && !brandSlug) {
+      return new Response(JSON.stringify({ error: 'Missing modelSlug or brandSlug' }), { status: 400, headers: { 'Content-Type': 'application/json' } });
     }
     if (!messages.length) {
       return new Response(JSON.stringify({ error: 'No messages' }), { status: 400, headers: { 'Content-Type': 'application/json' } });
     }
 
-    const ctx = await fetchModelContext(slug);
+    // ── Context fetch — model mode má prioritu (specifičtější) ──
+    let ctx: any = null;
+    let resolvedBrandSlug = brandSlug;
+    let resolvedModelSlug = modelSlug;
+    let mode: 'model' | 'brand' = 'model';
+
+    if (modelSlug) {
+      ctx = await fetchModelContext(modelSlug);
+      if (ctx) {
+        mode = 'model';
+        resolvedBrandSlug = ctx.model.brand?.slug ?? brandSlug;
+      }
+    }
+    if (!ctx && brandSlug) {
+      ctx = await fetchBrandContext(brandSlug);
+      if (ctx) {
+        mode = 'brand';
+        resolvedModelSlug = ''; // v brand modu žádný konkrétní model
+      }
+    }
     if (!ctx) {
-      return new Response(JSON.stringify({ error: `Model "${slug}" not found` }), { status: 404, headers: { 'Content-Type': 'application/json' } });
+      return new Response(
+        JSON.stringify({ error: `Context not found (modelSlug=${modelSlug}, brandSlug=${brandSlug})` }),
+        { status: 404, headers: { 'Content-Type': 'application/json' } },
+      );
     }
 
-    // RAG: pokud je v poslední user zprávě otázka, najdi relevantní chunky z knowledge base
+    // RAG: search v knowledge base
     const lastUserMsg = [...messages].reverse().find((m) => m.role === 'user');
     const question = lastUserMsg?.content ?? '';
-    const knowledgeChunks = await searchKnowledgeBase(question, ctx.model.brand?.slug, slug);
+    const knowledgeChunks = await searchKnowledgeBase(question, resolvedBrandSlug, resolvedModelSlug);
 
-    const systemPrompt = buildSystemPrompt(ctx, knowledgeChunks);
+    const systemPrompt = mode === 'brand'
+      ? buildBrandSystemPrompt(ctx, knowledgeChunks)
+      : buildSystemPrompt(ctx, knowledgeChunks);
 
     const anthropic = new Anthropic({ apiKey: import.meta.env.ANTHROPIC_API_KEY });
 

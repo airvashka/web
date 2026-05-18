@@ -14,21 +14,30 @@
  */
 
 interface Props {
-  modelSlug: string;
-  modelName: string;
+  brandSlug: string;
   brandName: string;
+  modelSlug?: string;  // optional — pokud chybí, jde o brand-level chat
+  modelName?: string;
 }
 
-const { modelSlug, modelName, brandName } = Astro.props;
+const { brandSlug, brandName, modelSlug = '', modelName = '' } = Astro.props;
+// Label na tlačítku: na model stránce "Zeptat se na <Model>", na brand stránce "Zeptat se na <Brand>"
+const toggleLabel = modelName ? `Zeptat se na ${modelName}` : `Zeptat se na ${brandName}`;
 ---
 
-<div class="chat-widget" data-model-slug={modelSlug} data-model-name={modelName} data-brand-name={brandName}>
+<div
+  class="chat-widget"
+  data-brand-slug={brandSlug}
+  data-brand-name={brandName}
+  data-model-slug={modelSlug}
+  data-model-name={modelName}
+>
   <!-- Toggle button (closed state) -->
   <button class="chat-toggle" type="button" aria-label="Otevřít AI asistenta" data-chat-toggle>
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
       <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
     </svg>
-    <span>Zeptat se na {modelName}</span>
+    <span>{toggleLabel}</span>
   </button>
 
   <!-- Chat panel (open state) -->
@@ -37,7 +46,7 @@ const { modelSlug, modelName, brandName } = Astro.props;
       <div class="chat-header-title">
         <span class="chat-ai-dot" aria-hidden="true"></span>
         <div>
-          <div class="chat-header-name">SFR asistent · {brandName} {modelName}</div>
+          <div class="chat-header-name">SFR Motor asistent · {brandName}{modelName ? ` ${modelName}` : ''}</div>
           <div class="chat-header-sub">Ptáte se, odpovídám</div>
         </div>
       </div>
@@ -56,7 +65,11 @@ const { modelSlug, modelName, brandName } = Astro.props;
           <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
         </span>
         <div class="chat-bubble">
-          Ahoj! Jsem SFR asistent. Můžu vám odpovědět na otázky o <strong>{brandName} {modelName}</strong> — výbavy, ceny, technická data, dostupnost skladem. Co vás zajímá?
+          {modelName ? (
+            <>Ahoj! Jsem SFR asistent. Můžu vám odpovědět na otázky o <strong>{brandName} {modelName}</strong> — výbavy, ceny, technická data, dostupnost skladem. Co vás zajímá?</>
+          ) : (
+            <>Ahoj! Jsem SFR asistent pro <strong>{brandName}</strong>. Můžu vám odpovědět na otázky o všech modelech této značky — výbavy, ceny, servis, technická data, dostupnost skladem. Co vás zajímá?</>
+          )}
         </div>
       </div>
     </div>
@@ -89,7 +102,6 @@ const { modelSlug, modelName, brandName } = Astro.props;
   // ── State ──
   const root = document.querySelector('.chat-widget') as HTMLElement | null;
   if (root) {
-    const slug = root.dataset.modelSlug!;
     const toggleBtn = root.querySelector('[data-chat-toggle]') as HTMLButtonElement;
     const closeBtn = root.querySelector('[data-chat-close]') as HTMLButtonElement;
     const panel = root.querySelector('[data-chat-panel]') as HTMLElement;
@@ -143,6 +155,11 @@ const { modelSlug, modelName, brandName } = Astro.props;
       s = s.replace(/\n/g, '<br />');
       return s;
     }
+
+    const brandSlug = root.dataset.brandSlug || '';
+    const brandName = root.dataset.brandName || '';
+    const modelSlug = root.dataset.modelSlug || '';
+    const modelName = root.dataset.modelName || '';
 
     function appendMessage(role: 'user' | 'assistant', text: string, debug: any = null) {
       const wrap = document.createElement('div');
@@ -217,7 +234,11 @@ const { modelSlug, modelName, brandName } = Astro.props;
         const r = await fetch('/api/chat/model', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ slug, messages: history }),
+          body: JSON.stringify({
+            brandSlug,
+            modelSlug,
+            messages: history,
+          }),
         });
         const j = await r.json();
         typing.remove();
@@ -405,11 +426,11 @@ const { modelSlug, modelName, brandName } = Astro.props;
     justify-content: flex-end;
   }
   .chat-bubble {
-    max-width: 78%;
-    padding: 8px 12px;
-    border-radius: 14px;
-    font-size: 13px;
-    line-height: 1.42;
+    max-width: 80%;
+    padding: 7px 11px;
+    border-radius: 13px;
+    font-size: 12.5px;
+    line-height: 1.4;
     word-wrap: break-word;
     overflow-wrap: anywhere;
   }

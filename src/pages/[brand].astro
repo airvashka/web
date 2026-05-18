@@ -4,6 +4,7 @@ import DirectusImage from '@components/DirectusImage.astro';
 import VideoStrip from '@components/VideoStrip.astro';
 import Breadcrumbs from '@components/Breadcrumbs.astro';
 import BrandLogo from '@components/BrandLogo.astro';
+import ModelChatWidget from '@components/ModelChatWidget.astro';
 import { directusGet } from '@lib/directus';
 import { buildStockSlug } from '@lib/stockSlug';
 import type { Brand, Model } from '@lib/types';
@@ -501,4 +502,9 @@ const activeBrand = Astro.params.brand;
       </div>
     </div>
   </section>
+
+  <!-- ===== AI ASISTENT (floating widget) — JEN PRO KGM brand ===== -->
+  {brand.slug === 'kgm' && (
+    <ModelChatWidget brandSlug={brand.slug} brandName={brand.name} />
+  )}
 </BaseLayout>
