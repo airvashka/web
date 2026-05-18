@@ -306,19 +306,26 @@ const articles = articlesRaw.map((a) => {
   <!-- ===== SERVIS + E-SHOP SPLIT ===== -->
   <section class="split" data-screen-label="04 Servis a E-shop">
     <div class="container split-grid">
-      <div class="split-card is-dark">
-        <div class="eyebrow">Servis pro všechny značky</div>
-        <h3>Online objednání servisu</h3>
-        <div class="svc-list">
-          {services.map((s) => (
-            <div class="svc-row">
-              <span class="svc-name">{s.nm}</span>
-              <span class="dots"></span>
-              <span class="svc-price">{s.price}</span>
-            </div>
-          ))}
+      <div class="split-card split-card--servis">
+        <div class="split-card-bg" aria-hidden="true">
+          <img src="/servis_main.jpg" alt="" loading="lazy" decoding="async" />
         </div>
-        <a class="btn btn-primary" href="/servis">Online objednání</a>
+        <div class="split-card-content">
+          <div class="split-card-top">
+            <div class="eyebrow">Servis pro všechny značky</div>
+            <h3>Online objednání servisu</h3>
+            <div class="svc-list">
+              {services.map((s) => (
+                <div class="svc-row">
+                  <span class="svc-name">{s.nm}</span>
+                  <span class="dots"></span>
+                  <span class="svc-price">{s.price}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+          <a class="btn btn-primary" href="/servis">Online objednání</a>
+        </div>
       </div>
       <div class="split-card split-card--eshop">
         <div class="split-card-bg" aria-hidden="true">

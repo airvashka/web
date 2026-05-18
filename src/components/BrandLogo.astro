@@ -31,24 +31,14 @@ const BRAND_LABELS: Record<string, string> = {
 };
 const label = BRAND_LABELS[slug] ?? slug.toUpperCase();
 
-// OMODA & JAECOO je kombinované logo — dva wordmarky s červeným dělítkem
-const isCombined = slug === 'omoda-jaecoo';
 ---
 
-{isCombined ? (
-  <span class={`brand-logo brand-logo--combined ${className} variant-${variant}`} aria-label={label} role="img" style={`height: ${height}px;`}>
-    <img src="/brand-logos/omoda.svg" alt="" class="brand-logo-img brand-logo-img--omoda" />
-    <span class="brand-logo-divider" aria-hidden="true"></span>
-    <img src="/brand-logos/jaecoo.svg" alt="" class="brand-logo-img brand-logo-img--jaecoo" />
-  </span>
-) : (
-  <img
-    src={`/brand-logos/${slug}.svg`}
-    alt={label}
-    class={`brand-logo brand-logo--single ${className} variant-${variant}`}
-    style={`height: ${height}px;`}
-  />
-)}
+<img
+  src={`/brand-logos/${slug}.svg`}
+  alt={label}
+  class={`brand-logo brand-logo--single ${className} variant-${variant}`}
+  style={`height: ${height}px;`}
+/>
 
 <style>
   .brand-logo {
@@ -60,33 +50,6 @@ const isCombined = slug === 'omoda-jaecoo';
     width: auto;
     object-fit: contain;
   }
-  .brand-logo--combined {
-    gap: 12px;
-    align-items: center;
-  }
-  .brand-logo-img {
-    height: 100%;
-    width: auto;
-    object-fit: contain;
-    display: block;
-  }
-  /* OMODA má těsnější viewBox (letters fill ~95 % výšky SVG) — zmenšit aby
-     vizuálně letter-height seděl s JAECOO (kde letters fill ~76 % výšky SVG).
-     Matematicky: OMODA height = JAECOO height × 0.76. */
-  .brand-logo-img--omoda {
-    height: 70%;
-  }
-  .brand-logo-img--jaecoo {
-    height: 92%;
-  }
-  .brand-logo-divider {
-    width: 2px;
-    height: 65%;
-    align-self: center;
-    background: rgb(209, 0, 16);
-    flex-shrink: 0;
-  }
-
   /* Tmavé (default) — logo má svojí původní barvu (černé) */
   .variant-dark {
     /* nothing — defaultní barva */
@@ -96,8 +59,4 @@ const isCombined = slug === 'omoda-jaecoo';
   .variant-light.brand-logo--single {
     filter: brightness(0) invert(1);
   }
-  .variant-light .brand-logo-img {
-    filter: brightness(0) invert(1);
-  }
-  /* Červené dělítko ponecháváme i v light variantě (charakteristický prvek brandu) */
 </style>

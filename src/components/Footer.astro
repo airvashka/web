@@ -128,19 +128,20 @@ const year = new Date().getFullYear();
   }
   .footer-brand:hover { opacity: 1; }
   /* Cap heights — IMG má width: auto, takže šířka se odvodí z height × aspect ratio.
-     Pro combined (OMODA+JAECOO) potřebujeme nižší height aby total width zůstal rozumný. */
+     OMODA & JAECOO logo je čtvercové (aspect 1.49), KGM a Farizon jsou wide
+     wordmarky — proto OMODA potřebuje vyšší height aby písmo bylo srovnatelné. */
   .footer-brand :global(.brand-logo--single) {
-    height: 26px;
-  }
-  .footer-brand :global(.brand-logo--combined) {
     height: 32px;
+  }
+  .footer-brand :global(.brand-logo[src*="omoda-jaecoo"]) {
+    height: 44px;
   }
 
   @media (max-width: 700px) {
     .footer-brands { gap: 20px; }
-    .footer-brands-row { gap: 20px; }
-    .footer-brand :global(.brand-logo--single) { height: 20px; }
-    .footer-brand :global(.brand-logo--combined) { height: 24px; }
+    .footer-brands-row { gap: 18px; }
+    .footer-brand :global(.brand-logo--single) { height: 24px; }
+    .footer-brand :global(.brand-logo[src*="omoda-jaecoo"]) { height: 32px; }
   }
 
   .footer-disclaimer {
