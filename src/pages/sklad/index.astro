@@ -62,8 +62,10 @@ const availableFuels = [...new Set(vehicles.map((v) => v.model?.fuel_type).filte
 const availableColors = [...new Set(vehicles.map((v) => v.color_category).filter(Boolean))] as string[];
 const availableConditions = [...new Set(vehicles.map((v) => v.condition).filter(Boolean))] as string[];
 
-const fmtPrice = (n?: number | null) => (n ? `${n.toLocaleString('cs-CZ')} Kč` : '—');
-const fmtKm = (n?: number | null) => (n === 0 || !n ? '0 km' : `${n.toLocaleString('cs-CZ')} km`);
+// Non-breaking space mezi číslem a jednotkou — zabrání zalomení "849 900\nKč" v úzkých kartách.
+const NBSP = String.fromCharCode(160);
+const fmtPrice = (n?: number | null) => (n ? `${n.toLocaleString('cs-CZ')} Kč` : '—');
+const fmtKm = (n?: number | null) => (n === 0 || !n ? '0 km' : `${n.toLocaleString('cs-CZ')} km`);
 ---
 
 <BaseLayout title="Skladové vozy" description="Aktuální nabídka skladových vozů KGM, OMODA & JAECOO, Farizon u SFR Motor Praha-Ďáblice.">

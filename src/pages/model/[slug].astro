@@ -252,11 +252,11 @@ if (adminHeroStats.length > 0) {
     if (bodyType) heroStats.push({ lab: 'Karoserie', val: String(bodyType).toUpperCase() });
   }
   if (rawModel.price_from) {
-    heroStats.push({ lab: 'Cena od', val: `${rawModel.price_from.toLocaleString('cs-CZ')} Kč` });
+    heroStats.push({ lab: 'Cena od', val: `${rawModel.price_from.toLocaleString('cs-CZ')} Kč` });
   }
 }
 
-const priceFrom = rawModel.price_from ? `${rawModel.price_from.toLocaleString('cs-CZ')} Kč` : '—';
+const priceFrom = rawModel.price_from ? `${rawModel.price_from.toLocaleString('cs-CZ')} Kč` : '—';
 const fuelTagClass: Record<string, string> = {
   petrol: 'benzin', diesel: 'diesel', hybrid: 'hybrid', phev: 'phev', ev: 'elektro',
 };
@@ -535,7 +535,7 @@ if (promoActive && promoDescription) {
               {promoValidTo && <span class="promo-valid"> · do {new Date(promoValidTo).toLocaleDateString('cs-CZ')}</span>}
             </div>
             <h2 class="promo-label">
-              {promoLabel || (promoDiscountAmount > 0 ? `Sleva ${promoDiscountAmount.toLocaleString('cs-CZ')} Kč` : 'Aktuální akce')}
+              {promoLabel || (promoDiscountAmount > 0 ? `Sleva ${promoDiscountAmount.toLocaleString('cs-CZ')} Kč` : 'Aktuální akce')}
             </h2>
             {promoDescriptionHtml && (
               <div class="promo-desc" set:html={promoDescriptionHtml} />
@@ -1003,8 +1003,8 @@ if (promoActive && promoDescription) {
             let price = v.promo_price ?? baseList;
             let priceBefore: number | null = null;
             if (v.promo_price && baseList && v.promo_price < baseList) priceBefore = baseList;
-            const fmtPrice = (n?: number | null) => (n ? `${n.toLocaleString('cs-CZ')} Kč` : '—');
-            const fmtKm = (n?: number | null) => (n === 0 || !n ? '0 km' : `${n.toLocaleString('cs-CZ')} km`);
+            const fmtPrice = (n?: number | null) => (n ? `${n.toLocaleString('cs-CZ')} Kč` : '—');
+            const fmtKm = (n?: number | null) => (n === 0 || !n ? '0 km' : `${n.toLocaleString('cs-CZ')} km`);
             return (
               <a class="scard" href={`/sklad/${buildStockSlug(v, brand, rawModel, v.trim_level ?? { name: trim })}`} data-fuel={fuelType}>
                 <div class="pic">
@@ -1098,7 +1098,7 @@ if (promoActive && promoDescription) {
                   <div class="model-foot">
                     <div>
                       <div class="price-lab">Cena od</div>
-                      <div class="price-val">{m.price_from ? `${m.price_from.toLocaleString('cs-CZ')} Kč` : '—'}</div>
+                      <div class="price-val">{m.price_from ? `${m.price_from.toLocaleString('cs-CZ')} Kč` : '—'}</div>
                     </div>
                     <span class="more">
                       Prozkoumat

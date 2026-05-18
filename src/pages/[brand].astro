@@ -65,7 +65,7 @@ function modelPromo(m: ModelWithSub) {
   const finalPrice = (active && discount > 0 && m.price_from) ? Number(m.price_from) - discount : Number(m.price_from ?? 0);
   return {
     active,
-    label: (m.promo_label || '').trim() || (active && discount > 0 ? `Sleva ${discount.toLocaleString('cs-CZ')} Kč` : 'Akce'),
+    label: (m.promo_label || '').trim() || (active && discount > 0 ? `Sleva ${discount.toLocaleString('cs-CZ')} Kč` : 'Akce'),
     discount,
     finalPrice,
   };
@@ -111,8 +111,8 @@ const brandVideoIds: string[] = Array.isArray((brand as any).youtube_video_ids)
   ? (brand as any).youtube_video_ids
   : [];
 
-const fmtPrice = (n?: number | null) => (n ? `${n.toLocaleString('cs-CZ')} Kč` : '—');
-const fmtKm = (n?: number | null) => (n === 0 || !n ? '0 km' : `${n.toLocaleString('cs-CZ')} km`);
+const fmtPrice = (n?: number | null) => (n ? `${n.toLocaleString('cs-CZ')} Kč` : '—');
+const fmtKm = (n?: number | null) => (n === 0 || !n ? '0 km' : `${n.toLocaleString('cs-CZ')} km`);
 
 // Ostatní brandy pro BrandStrip
 const otherBrands = await directusGet<Brand>('brands', {
@@ -290,7 +290,7 @@ const activeBrand = Astro.params.brand;
                                   <div class="price-strike">{Number(m.price_from).toLocaleString('cs-CZ')} Kč</div>
                                 </>
                               ) : (
-                                <div class="price-val">{m.price_from ? `${Number(m.price_from).toLocaleString('cs-CZ')} Kč` : '—'}</div>
+                                <div class="price-val">{m.price_from ? `${Number(m.price_from).toLocaleString('cs-CZ')} Kč` : '—'}</div>
                               )}
                             </div>
                             <span class="more">
@@ -333,7 +333,7 @@ const activeBrand = Astro.params.brand;
                               <div class="price-strike">{Number(m.price_from).toLocaleString('cs-CZ')} Kč</div>
                             </>
                           ) : (
-                            <div class="price-val">{m.price_from ? `${Number(m.price_from).toLocaleString('cs-CZ')} Kč` : '—'}</div>
+                            <div class="price-val">{m.price_from ? `${Number(m.price_from).toLocaleString('cs-CZ')} Kč` : '—'}</div>
                           )}
                         </div>
                       </div>
@@ -373,7 +373,7 @@ const activeBrand = Astro.params.brand;
                           <div class="price-strike">{Number(m.price_from).toLocaleString('cs-CZ')} Kč</div>
                         </>
                       ) : (
-                        <div class="price-val">{m.price_from ? `${Number(m.price_from).toLocaleString('cs-CZ')} Kč` : '—'}</div>
+                        <div class="price-val">{m.price_from ? `${Number(m.price_from).toLocaleString('cs-CZ')} Kč` : '—'}</div>
                       )}
                     </div>
                     <span class="more">

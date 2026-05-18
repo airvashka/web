@@ -58,8 +58,8 @@ const BRAND_DISPLAY: Record<string, { name: string; tag: string }> = {
   'farizon': { name: 'Farizon', tag: 'Elektrická logistika' },
 };
 
-const fmtPrice = (n?: number | null) => (n ? `${n.toLocaleString('cs-CZ')} Kč` : '—');
-const fmtKm = (n?: number | null) => (n === 0 || !n ? '0 km' : `${n.toLocaleString('cs-CZ')} km`);
+const fmtPrice = (n?: number | null) => (n ? `${n.toLocaleString('cs-CZ')} Kč` : '—');
+const fmtKm = (n?: number | null) => (n === 0 || !n ? '0 km' : `${n.toLocaleString('cs-CZ')} km`);
 
 // Site settings — admin editovatelná titulka
 const settingsList = await directusGet<any>('site_settings', { limit: 1, fields: ['*'] });
