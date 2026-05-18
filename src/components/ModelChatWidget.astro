@@ -509,40 +509,40 @@ const { modelSlug, modelName, brandName } = Astro.props;
   }
   .chat-send:disabled { opacity: 0.5; cursor: not-allowed; }
 
-  /* Mobile — chat panel slide-in from right (ne fullscreen) */
-  @media (max-width: 640px) {
+  /* Mobile — chat toggle ABOVE mobile bottom bar (.mbb je fixed bottom 0, h ~70px).
+     Panel zabírá celý mobilní display ale vyšší než bottom bar. */
+  @media (max-width: 768px) {
     .chat-widget {
-      bottom: 12px;
-      right: 12px;
+      bottom: calc(72px + env(safe-area-inset-bottom));
+      right: 14px;
     }
     .chat-toggle {
-      padding: 12px;
-      font-size: 0; /* skryje text, ponechá svg */
-      width: 48px;
-      height: 48px;
+      padding: 14px;
+      font-size: 0; /* skryje text */
+      width: 54px;
+      height: 54px;
       justify-content: center;
+      border-radius: 50%;
+      box-shadow: 0 8px 24px rgba(180, 118, 46, 0.45), 0 3px 10px rgba(0,0,0,0.18);
     }
-    .chat-toggle span {
-      display: none;
-    }
-    .chat-toggle svg {
-      width: 24px;
-      height: 24px;
-    }
+    .chat-toggle span { display: none; }
+    .chat-toggle svg { width: 26px; height: 26px; }
+
     .chat-panel {
-      width: calc(100vw - 24px);
+      width: calc(100vw - 20px);
       max-width: 100%;
-      height: calc(100vh - 24px);
-      max-height: calc(100vh - 24px);
-      bottom: 12px;
-      right: 12px;
+      /* Výška: od top safe-area až nad mobile bottom bar (s margin) */
+      height: calc(100vh - 72px - env(safe-area-inset-bottom) - 20px);
+      max-height: calc(100vh - 72px - env(safe-area-inset-bottom) - 20px);
+      bottom: calc(72px + env(safe-area-inset-bottom) + 10px);
+      right: 10px;
       border-radius: 16px;
-      /* slide from right místo from bottom */
-      animation: chatSlideIn .25s ease-out;
+      /* slide-in from right */
+      animation: chatSlideIn .28s cubic-bezier(0.22, 1, 0.36, 1);
     }
   }
   @keyframes chatSlideIn {
-    from { opacity: 0; transform: translateX(40px); }
+    from { opacity: 0; transform: translateX(60px); }
     to { opacity: 1; transform: translateX(0); }
   }
 </style>

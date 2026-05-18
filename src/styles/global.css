@@ -2754,7 +2754,9 @@ button.thumb-more {
 .bhero-inner {
   position: relative;
   z-index: 1;
-  padding: 90px 0;
+  /* Pouze top/bottom — horizontální padding zachovává `.container`. */
+  padding-top: 90px;
+  padding-bottom: 90px;
   width: 100%;
 }
 .bhero-eyebrow {
@@ -3204,7 +3206,9 @@ button.thumb-more {
 }
 .hhero-inner {
   position: relative; z-index: 1;
-  padding: 110px 0;
+  /* Pouze top/bottom — horizontální padding zachovává `.container { padding: 0 var(--pad) }`. */
+  padding-top: 110px;
+  padding-bottom: 110px;
   width: 100%;
 }
 .hhero-title {
@@ -4445,7 +4449,7 @@ button.thumb-more {
   .tdata-row .v { padding-top: 0; }
   .cta-banner-inner { padding: 56px 0; }
   .variants { grid-template-columns: 1fr; }
-  .bhero-inner { padding: 56px 0; }
+  .bhero-inner { padding-top: 56px; padding-bottom: 56px; }
   .why { padding: 64px 0; }
   .why-grid { grid-template-columns: 1fr; gap: 40px; }
   .why-cards { grid-template-columns: 1fr; }

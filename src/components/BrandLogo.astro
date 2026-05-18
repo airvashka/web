@@ -22,7 +22,7 @@ interface Props {
   class?: string;
 }
 
-const { slug, variant = 'dark', height = 48, class: className = '' } = Astro.props;
+const { slug, variant = 'dark', height, class: className = '' } = Astro.props;
 
 const BRAND_LABELS: Record<string, string> = {
   'kgm': 'KGM',
@@ -31,13 +31,16 @@ const BRAND_LABELS: Record<string, string> = {
 };
 const label = BRAND_LABELS[slug] ?? slug.toUpperCase();
 
+// Pouze pokud caller explicitně předá height, aplikujeme inline style.
+// Jinak nech CSS pravidla (clamp v global.css) volnou ruku.
+const heightStyle = height ? `height: ${height}px;` : '';
 ---
 
 <img
   src={`/brand-logos/${slug}.svg`}
   alt={label}
-  class={`brand-logo brand-logo--single ${className} variant-${variant}`}
-  style={`height: ${height}px;`}
+  class={`brand-logo brand-logo--single brand-logo--${slug} ${className} variant-${variant}`}
+  style={heightStyle}
 />
 
 <style>
