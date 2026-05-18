@@ -985,7 +985,7 @@ if (promoActive && promoDescription) {
         <div class="skladovka-grid" data-stock-shuffle data-visible-count="4">
           {stockOfModel.map((v: any) => {
             const photoId = v.photos?.[0]?.directus_files_id;
-            const trim = v.trim_level_snapshot?.name ?? '';
+            const trim = v.trim_level?.name ?? v.trim_level_snapshot?.name ?? '';
             const carYear = v.model_year?.year ?? '';
             const isNew = v.condition === 'new';
             const isHl = v.highlighted;
@@ -997,15 +997,27 @@ if (promoActive && promoDescription) {
             const transmissionLabel = v.transmission === 'manual' ? 'Manuál' : v.transmission === 'automatic' ? 'Automat' : '';
             const is4wd = v.drivetrain === '4wd' || v.drivetrain === 'awd';
             const conditionCls = v.condition === 'new' ? 'new' : v.condition === 'demo' ? 'demo' : 'used';
-            // Pill: Akce/Highlight only
+            // Promo akce (z rawModel)
+            const today = new Date().toISOString().slice(0, 10);
+            const modelPromoActive = !!(rawModel as any)?.promo_active
+              && (((rawModel as any)?.promo_label) || ((rawModel as any)?.promo_discount_amount))
+              && (!((rawModel as any)?.promo_valid_to) || String((rawModel as any).promo_valid_to) >= today);
+            const modelPromoLabel = ((rawModel as any)?.promo_label ?? '').toString().trim();
+            const modelPromoDiscount = Number((rawModel as any)?.promo_discount_amount ?? 0) || 0;
+            // Pill: PROMO (z modelu) nebo Highlight (z vozu)
             let pillLabel = '';
-            if (isHl && customLabel) pillLabel = customLabel;
+            if (modelPromoActive && modelPromoLabel) pillLabel = modelPromoLabel;
+            else if (isHl && customLabel) pillLabel = customLabel;
             else if (isHl) pillLabel = 'Novinka';
-            // Cena
+            // Cena: stock.promo > model promo (jen pro nové) > list
             const baseList = v.list_price;
             let price = v.promo_price ?? baseList;
             let priceBefore: number | null = null;
             if (v.promo_price && baseList && v.promo_price < baseList) priceBefore = baseList;
+            else if (modelPromoActive && modelPromoDiscount > 0 && baseList && isNew) {
+              price = baseList - modelPromoDiscount;
+              priceBefore = baseList;
+            }
             const fmtPrice = (n?: number | null) => (n ? `${n.toLocaleString('cs-CZ')} Kč` : '—');
             const fmtKm = (n?: number | null) => (n === 0 || !n ? '0 km' : `${n.toLocaleString('cs-CZ')} km`);
             return (
