@@ -434,7 +434,7 @@ const activeBrand = Astro.params.brand;
             const carYear = v.model_year?.year ?? '';
             const conditionLabel = v.condition === 'new' ? 'Nové' : v.condition === 'demo' ? 'Předváděcí' : 'Ojeté';
             const fuelType = v.model?.fuel_type ?? '';
-            const fuelLabelMap: Record<string, string> = { petrol: 'Benzín', diesel: 'Diesel', hybrid: 'Hybrid', phev: 'PHEV', ev: 'Elektro' };
+            const fuelLabelMap = { petrol: 'Benzín', diesel: 'Diesel', hybrid: 'Hybrid', phev: 'PHEV', ev: 'Elektro' };
             const fuelLabel = fuelLabelMap[fuelType] ?? '';
             const transmissionLabel = v.transmission === 'manual' ? 'Manuál' : v.transmission === 'automatic' ? 'Automat' : '';
             // Cena: stock.promo > model promo (jen u nových vozů) > list

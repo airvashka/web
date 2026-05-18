@@ -991,7 +991,7 @@ if (promoActive && promoDescription) {
             const customLabel = (v.highlight_label ?? '').toString().trim();
             const conditionLabel = v.condition === 'new' ? 'Nové' : v.condition === 'demo' ? 'Předváděcí' : 'Ojeté';
             const fuelType = rawModel.fuel_type ?? '';
-            const fuelLabelMap: Record<string, string> = { petrol: 'Benzín', diesel: 'Diesel', hybrid: 'Hybrid', phev: 'PHEV', ev: 'Elektro' };
+            const fuelLabelMap = { petrol: 'Benzín', diesel: 'Diesel', hybrid: 'Hybrid', phev: 'PHEV', ev: 'Elektro' };
             const fuelLabel = fuelLabelMap[fuelType] ?? '';
             const transmissionLabel = v.transmission === 'manual' ? 'Manuál' : v.transmission === 'automatic' ? 'Automat' : '';
             // Pill: Akce/Highlight only
