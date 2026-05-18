@@ -170,7 +170,8 @@ const toggleLabel = modelName ? `Zeptat se na ${modelName}` : `Zeptat se na ${br
       avatar.innerHTML = role === 'assistant' ? AI_AVATAR_SVG : USER_AVATAR_SVG;
 
       const bubbleWrap = document.createElement('div');
-      bubbleWrap.style.maxWidth = '82%';
+      bubbleWrap.style.maxWidth = '92%';
+      bubbleWrap.style.minWidth = '0';
       bubbleWrap.style.display = 'flex';
       bubbleWrap.style.flexDirection = 'column';
       bubbleWrap.style.gap = '4px';
@@ -426,7 +427,7 @@ const toggleLabel = modelName ? `Zeptat se na ${modelName}` : `Zeptat se na ${br
     justify-content: flex-end;
   }
   .chat-bubble {
-    max-width: 80%;
+    max-width: 100%;
     padding: 7px 11px;
     border-radius: 13px;
     font-size: 12.5px;

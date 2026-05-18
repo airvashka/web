@@ -77,14 +77,24 @@ async function searchKnowledgeBase(question, brandSlug, modelSlug) {
     ? [modelSlug, baseSlug]
     : [modelSlug].filter(Boolean);
 
-  // Filter: chunky pro tento model NEBO base variantu, NEBO značku obecně, NEBO univerzální.
-  const slugFilter = {
-    _or: [
-      ...slugVariants.map((s) => ({ model_slug: { _eq: s } })),
-      { _and: [{ model_slug: { _empty: true } }, { brand_slug: { _eq: brandSlug } }] },
-      { _and: [{ model_slug: { _empty: true } }, { brand_slug: { _empty: true } }] },
-    ],
-  };
+  // Filter podle režimu:
+  //  - Model mode (modelSlug nastaven): primárně chunky pro tento model + base variant,
+  //    fallback na brand-wide a universal.
+  //  - Brand mode (modelSlug prázdný): VŠECHNY chunky této značky + universal.
+  const slugFilter = modelSlug
+    ? {
+        _or: [
+          ...slugVariants.map((s) => ({ model_slug: { _eq: s } })),
+          { _and: [{ model_slug: { _empty: true } }, { brand_slug: { _eq: brandSlug } }] },
+          { _and: [{ model_slug: { _empty: true } }, { brand_slug: { _empty: true } }] },
+        ],
+      }
+    : {
+        _or: [
+          { brand_slug: { _eq: brandSlug } },
+          { _and: [{ model_slug: { _empty: true } }, { brand_slug: { _empty: true } }] },
+        ],
+      };
 
   // Multi-keyword search: chunky obsahující JAKÝKOLIV ze top 6 keywords.
   // Pak score v paměti dle počtu match keywords.
