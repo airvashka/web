@@ -3321,10 +3321,13 @@ button.thumb-more {
   height: clamp(36px, 4vw, 56px);
   max-width: min(280px, 70%);
 }
-/* OMODA & JAECOO logo je čtvercové, potřebuje vyšší height aby seděl s ostatními */
+/* OMODA & JAECOO logo má interní whitespace v SVG viewBoxu (tagline "by Chery Group"
+   + padding) — visual letter-height ~65% celkového height. Aby písmena vizuálně
+   sedla s KGM (které využívá ~95% výšky), kompenzujeme zvětšením. */
 .btile-name--logo .brand-logo[src*="omoda-jaecoo"] {
-  height: clamp(72px, 7.5vw, 108px);
-  max-width: min(200px, 60%);
+  height: clamp(88px, 9vw, 130px);
+  max-width: min(240px, 70%);
+  margin-left: -8px;  /* SVG interní left-padding kompenzace */
 }
 .btile-tag {
   font-family: var(--font-display);
