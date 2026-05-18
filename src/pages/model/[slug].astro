@@ -500,29 +500,41 @@ if (promoActive && promoDescription) {
     )}
   </section>
 
-  <!-- ===== SUBNAV (pořadí: Discovery → Identity → Features → Visual → Price → Action → Details) ===== -->
+  <!-- ===== SUBNAV (zkrácená: Akce → Představení → Varianty → "Co umí X" → Vizuál → Cena → Skladem → Detail) ===== -->
   <div class="subnav">
     <div class="container subnav-inner">
+      {promoActive && (<><a class="subnav-link subnav-link--accent" href="#akce">Akce</a><span class="subnav-sep">·</span></>)}
       <a class="subnav-link is-active" href="#predstaveni">Představení</a>
-      {promoActive && (<><span class="subnav-sep">·</span><a class="subnav-link subnav-link--accent" href="#akce">Akce</a></>)}
       {variantModels.length > 1 && (<><span class="subnav-sep">·</span><a class="subnav-link" href="#varianty">Varianty</a></>)}
       <span class="subnav-sep">·</span>
-      <a class="subnav-link" href="#tech-technologie">Technologie</a>
-      <span class="subnav-sep">·</span>
-      <a class="subnav-link" href="#tech-bezpecnost">Bezpečnost</a>
-      <span class="subnav-sep">·</span>
-      <a class="subnav-link" href="#tech-komfort">Komfort</a>
+      <a class="subnav-link" href="#tech-technologie">Co umí {rawModel.name}</a>
       {galleryFileIds.length > 0 && (<><span class="subnav-sep">·</span><a class="subnav-link" href="#galerie">Galerie</a></>)}
       {hasConfigurator && (<><span class="subnav-sep">·</span><a class="subnav-link" href="#barvy">Barvy</a></>)}
       <span class="subnav-sep">·</span>
-      <a class="subnav-link" href="#ceny">Ceny a výbavové stupně</a>
+      <a class="subnav-link" href="#ceny">Ceny</a>
       <span class="subnav-sep">·</span>
       <a class="subnav-link" href="#skladem">Skladem</a>
       <span class="subnav-sep">·</span>
-      <a class="subnav-link" href="#data">Technické údaje</a>
+      <a class="subnav-link" href="#data">Tech. údaje</a>
       {docsList.length > 0 && (<><span class="subnav-sep">·</span><a class="subnav-link" href="#ke-stazeni">Ke stažení</a></>)}
     </div>
   </div>
+
+  <!-- ===== MODEL SWITCHER — chips pro rychlé přepnutí na jiný model značky ===== -->
+  {otherModels.length > 0 && (
+    <div class="model-switcher">
+      <div class="container model-switcher-inner">
+        <span class="model-switcher-label">Modely {brand.name}:</span>
+        <div class="model-switcher-chips">
+          <span class="model-chip is-active">{rawModel.name}</span>
+          {otherModels.map((m: any) => (
+            <a class="model-chip" href={`/model/${m.slug}`}>{m.name}</a>
+          ))}
+          <a class="model-chip model-chip--all" href={`/${brand.slug}`}>Všechny →</a>
+        </div>
+      </div>
+    </div>
+  )}
 
   <!-- ===== AKCE BANNER ===== -->
   {promoActive && (

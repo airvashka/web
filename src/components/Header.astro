@@ -184,9 +184,10 @@ const navItems: Array<{ label: string; href: string; key: NonNullable<Props['act
 </script>
 
 <style is:global>
-  /* Smart hide-on-scroll — pouze MOBILE (<=960px).
-     Desktop má dost prostoru, klasický sticky stačí.
-     Mobile: position fixed + transform (iOS Safari friendly). */
+  /* Smart hide-on-scroll — MOBILE (fixed pozice) + DESKTOP (headroom přes sticky).
+     Mobile: position fixed + transform (iOS Safari friendly).
+     Desktop: nav je sticky a při scroll-down klesne mimo viewport přes transform,
+     na scroll-up se vrátí — JS přepíná html.scrolled-down/scrolled-up. */
   @media (max-width: 960px) {
     .nav {
       position: fixed;
@@ -207,6 +208,17 @@ const navItems: Array<{ label: string; href: string; key: NonNullable<Props['act
     }
     body {
       padding-top: 64px;
+    }
+  }
+
+  /* DESKTOP headroom — sticky + transform při scroll-down */
+  @media (min-width: 961px) {
+    html.scrolled-down .nav {
+      transform: translateY(-110%);
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+    }
+    html.scrolled-up .nav {
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
     }
   }
 
