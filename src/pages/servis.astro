@@ -130,7 +130,10 @@ const SERVIS_TEAM_BLOCKS = [
         </div>
         <input type="text" name="_hp_website" tabindex="-1" autocomplete="off" class="honeypot" />
         <TurnstileWidget />
-        <div class="fnote">Odesláním souhlasíte se zpracováním osobních údajů.</div>
+        <label class="check">
+          <input type="checkbox" required />
+          Souhlasím se zpracováním osobních údajů dle <a href="/informace/ochrana-udaju">GDPR</a>
+        </label>
         <button class="btn btn-primary" type="submit">Odeslat poptávku</button>
         <div class="lead-status" data-lead-status></div>
       </form>

@@ -37,20 +37,25 @@ export type DealerContacts = {
  * Načte aktivní prodejce + servisáky z Directus `employees`.
  * Filtruje:
  *   - department IN ('sales', 'service')
- *   - status === 'published' (pokud collection field existuje)
  *   - non-empty phone
  *
- * Cache TTL není potřeba — Astro SSR si vrátí výsledek per-request,
- * Directus má vlastní cache. Pokud by to bylo pomalé, lze přidat
- * module-level memo (cca 5-15s TTL).
+ * Module-level cache (60s TTL) — během buildu se cache sdílí napříč prerendery,
+ * takže místo 60+ calls (Header/MobileBottomBar × každá stránka) je jen 1 call.
+ * V runtime (Vercel serverless) je cache per-instance (warm starts uvidí cache).
  */
+let _cache: { data: DealerContacts; expiresAt: number } | null = null;
+const CACHE_TTL_MS = 60_000; // 60 sekund
+
 export async function getDealerContacts(): Promise<DealerContacts> {
+  const now = Date.now();
+  if (_cache && now < _cache.expiresAt) {
+    return _cache.data;
+  }
+
   try {
     const employees = await directusGet<Employee>('employees', {
       filter: {
         department: { _in: ['sales', 'service'] },
-        // status filter — pokud collection má status field, jinak Directus jen ignoruje
-        // (alternativně bez status filter pokud Directus selže na neznámém poli)
       },
       sort: ['sort', 'full_name'],
       fields: ['id', 'full_name', 'role', 'department', 'phone', 'email'],
@@ -73,11 +78,16 @@ export async function getDealerContacts(): Promise<DealerContacts> {
       else if (e.department === 'service') service.push(contact);
     }
 
-    return { sales, service };
+    const data = { sales, service };
+    _cache = { data, expiresAt: now + CACHE_TTL_MS };
+    return data;
   } catch (err) {
     // Directus padl nebo permissions — fallback na hardcoded
     console.error('[contacts] Directus fetch failed:', err);
-    return { sales: [], service: [] };
+    const empty = { sales: [], service: [] };
+    // Cache i prázdný výsledek krátce, aby každá další stránka nešla zbytečně do Directusu
+    _cache = { data: empty, expiresAt: now + 5_000 };
+    return empty;
   }
 }
 

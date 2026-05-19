@@ -152,7 +152,7 @@ const mapEmbedUrl = 'https://maps.google.com/maps?q=%C4%8Eablicka+553%2F2%2C+182
         <h2>Máte dotaz nebo poptávku?</h2>
         <p class="lead">Vyplňte krátký formulář — ozveme se do 24 hodin. Nebo zvolte konkrétního prodejce / technika výše a napište mu přímo.</p>
       </div>
-      <form class="fcard" data-lead-form data-form-type="contact">
+      <form class="fcard" data-lead-form data-form-type="contact" data-context-aware>
         <h3>Kontaktní formulář</h3>
         <div class="fgrid">
           <div class="field full">
@@ -178,7 +178,10 @@ const mapEmbedUrl = 'https://maps.google.com/maps?q=%C4%8Eablicka+553%2F2%2C+182
         </div>
         <input type="text" name="_hp_website" tabindex="-1" autocomplete="off" class="honeypot" />
         <TurnstileWidget />
-        <div class="fnote">Odesláním souhlasíte se zpracováním osobních údajů.</div>
+        <label class="check">
+          <input type="checkbox" required />
+          Souhlasím se zpracováním osobních údajů dle <a href="/informace/ochrana-udaju">GDPR</a>
+        </label>
         <button class="btn btn-primary" type="submit">Odeslat zprávu</button>
         <div class="lead-status" data-lead-status></div>
       </form>
@@ -186,7 +189,37 @@ const mapEmbedUrl = 'https://maps.google.com/maps?q=%C4%8Eablicka+553%2F2%2C+182
   </section>
 
   <script>
-        document.querySelectorAll('[data-lead-form]').forEach((form) => {
+    // Parse URL params (?form=test_drive&model=korando&brand=kgm)
+    // Pre-fill form-type + uloží kontext do dataset attributů pro payload
+    (function () {
+      const params = new URLSearchParams(window.location.search);
+      const formType = params.get('form');
+      const model = params.get('model');
+      const brand = params.get('brand');
+      const vehicle = params.get('vehicle');
+
+      const form = document.querySelector('[data-context-aware]');
+      if (!form) return;
+
+      const ALLOWED = ['contact', 'test_drive', 'service', 'stock_inquiry', 'model_inquiry'];
+      if (formType && ALLOWED.includes(formType)) form.dataset.formType = formType;
+      if (model) form.dataset.modelSlug = model;
+      if (brand) form.dataset.brandSlug = brand;
+      if (vehicle) form.dataset.vehicleVin = vehicle;
+
+      // Update form title + subject prefill (UX hint)
+      const titleEl = form.querySelector('h3');
+      const subjectInput = form.querySelector('input[name="subject"]');
+      if (formType === 'test_drive' && model) {
+        if (titleEl) titleEl.textContent = `Testovací jízda — ${model.toUpperCase()}`;
+        if (subjectInput instanceof HTMLInputElement) subjectInput.value = `Žádost o testovací jízdu (${model})`;
+      } else if (formType === 'model_inquiry' && model) {
+        if (titleEl) titleEl.textContent = `Poptávka — ${model.toUpperCase()}`;
+        if (subjectInput instanceof HTMLInputElement) subjectInput.value = `Poptávka modelu ${model}`;
+      }
+    })();
+
+    document.querySelectorAll('[data-lead-form]').forEach((form) => {
       form.addEventListener('submit', async (e) => {
         e.preventDefault();
         const statusEl = form.querySelector('[data-lead-status]');
@@ -195,14 +228,22 @@ const mapEmbedUrl = 'https://maps.google.com/maps?q=%C4%8Eablicka+553%2F2%2C+182
 
         const data = new FormData(form);
         const turnstileInput = form.querySelector('input[name="cf-turnstile-response"]');
+        const subjectVal = data.get('subject');
+        const messageVal = data.get('message');
+        // Pokud uživatel zadal téma + zprávu, spojíme je
+        const combinedMessage = subjectVal && messageVal ? subjectVal + '\n\n' + messageVal
+                              : subjectVal ? subjectVal
+                              : messageVal;
         const payload = {
           form_type: form.dataset.formType || 'contact',
           customer_name: data.get('customer_name'),
           customer_email: data.get('customer_email'),
           customer_phone: data.get('customer_phone'),
-          message: data.get('message'),
+          message: combinedMessage,
           source_page: window.location.pathname,
           source_url: window.location.href,
+          source_model_slug: form.dataset.modelSlug || undefined,
+          source_vehicle_vin: form.dataset.vehicleVin || undefined,
           _hp_website: data.get('_hp_website') || '',
           turnstile_token: turnstileInput ? turnstileInput.value : '',
         };

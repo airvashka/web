@@ -31,45 +31,7 @@ import type { Brand, Model, StockVehicle, TrimLevel, ModelYear } from '@lib/type
 // SSR: každý request = 1 Directus call (~100ms), data vždy fresh.
 export const prerender = false;
 
-// Pro SSR nepotřebujeme getStaticPaths. Zachováno (přejmenované) jen jako reference
-// pro případnou budoucí re-aktivaci statického prerenderu.
-async function _getStaticPaths_unused() {
-  const vehicles = await directusGet<any>('stock_vehicles', {
-    fields: ['id', 'brand', 'model', 'trim_level', 'color_code', 'color_category'],
-    filter: { status: { _eq: 'published' } },
-  });
-  // Načti brand/model/trim mapping najednou (build-time, omezený počet)
-  const brandIds = [...new Set(vehicles.map((v) => v.brand).filter(Boolean))];
-  const modelIds = [...new Set(vehicles.map((v) => v.model).filter(Boolean))];
-  const trimIds = [...new Set(vehicles.map((v) => v.trim_level).filter(Boolean))];
-
-  const brandMap = new Map<number, any>();
-  const modelMap = new Map<number, any>();
-  const trimMap = new Map<number, any>();
-
-  if (brandIds.length) {
-    const bs = await directusGet<any>('brands', { filter: { id: { _in: brandIds } }, fields: ['id', 'slug', 'name'] });
-    bs.forEach((b) => brandMap.set(b.id, b));
-  }
-  if (modelIds.length) {
-    const ms = await directusGet<any>('models', { filter: { id: { _in: modelIds } }, fields: ['id', 'slug', 'name'] });
-    ms.forEach((m) => modelMap.set(m.id, m));
-  }
-  if (trimIds.length) {
-    const ts = await directusGet<any>('trim_levels', { filter: { id: { _in: trimIds } }, fields: ['id', 'name'] });
-    ts.forEach((t) => trimMap.set(t.id, t));
-  }
-
-  return vehicles.map((v) => {
-    const slug = buildStockSlug(
-      v,
-      v.brand ? brandMap.get(v.brand) : null,
-      v.model ? modelMap.get(v.model) : null,
-      v.trim_level ? trimMap.get(v.trim_level) : null,
-    );
-    return { params: { id: slug } };
-  });
-}
+// (getStaticPaths smazán — viz git historie pokud potřebuješ reaktivovat static prerender)
 
 // POZN.: filename je [id].astro (legacy), ale hodnota je teď SLUG string
 // (např. "kgm-tivoli-style-bila-3"). Skutečné numerické ID parsujeme z konce.
@@ -77,6 +39,11 @@ const { id: slug } = Astro.params;
 const numericId = parseStockId(slug ?? '');
 if (Number.isNaN(numericId)) return Astro.redirect('/404');
 const id = String(numericId);
+
+// Vercel Edge cache — 60s pro CDN, stale-while-revalidate 300s.
+// User uvidí cached version okamžitě (~50ms), CDN revaliduje na pozadí.
+// Po prodeji vozu trvá max 60s než cached version exspiruje.
+Astro.response.headers.set('Cache-Control', 'public, s-maxage=60, stale-while-revalidate=300');
 
 type VehicleFull = StockVehicle & {
   photos?: Array<{ directus_files_id: string }>;

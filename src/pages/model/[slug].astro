@@ -494,7 +494,7 @@ if (promoActive && promoDescription) {
             </div>
           ))}
           <div class="mhero-spacer"></div>
-          <a class="btn btn-primary" href="/kontakt">Testovací jízda</a>
+          <a class="btn btn-primary" href={`/kontakt?form=test_drive&model=${rawModel.slug}&brand=${brand.slug}`}>Testovací jízda</a>
         </div>
       </div>
     )}
@@ -1190,11 +1190,11 @@ if (promoActive && promoDescription) {
       <h2>Připraveni na zkušební jízdu {rawModel.name}?</h2>
       <p>Rezervujte si testovací jízdu a zažijte vůz na vlastní kůži.</p>
       <div class="cta-banner-actions">
-        <a class="btn btn-primary" href="/kontakt">
+        <a class="btn btn-primary" href={`/kontakt?form=test_drive&model=${rawModel.slug}&brand=${brand.slug}`}>
           Testovací jízda
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
         </a>
-        <a class="btn btn-outline" href="/kontakt">Poptat vůz</a>
+        <a class="btn btn-outline" href={`/kontakt?form=model_inquiry&model=${rawModel.slug}&brand=${brand.slug}`}>Poptat vůz</a>
       </div>
     </div>
   </section>

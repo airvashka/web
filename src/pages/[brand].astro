@@ -391,8 +391,8 @@ const activeBrand = Astro.params.brand;
       <div class="models-banner">
         <h3>{why.bannerTitle}</h3>
         <div class="models-banner-actions">
-          <a class="btn btn-primary" href="/kontakt">Testovací jízda</a>
-          <a class="btn btn-outline" href="/kontakt">Poptat vůz</a>
+          <a class="btn btn-primary" href={`/kontakt?form=test_drive&brand=${brand.slug}`}>Testovací jízda</a>
+          <a class="btn btn-outline" href={`/kontakt?form=model_inquiry&brand=${brand.slug}`}>Poptat vůz</a>
         </div>
       </div>
     </div>

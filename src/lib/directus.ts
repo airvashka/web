@@ -224,8 +224,9 @@ async function liveFetch<T>(collection: string, opts: FetchOptions): Promise<T[]
   return doLiveFetch<T>(collection, opts);
 }
 
-async function doLiveFetch<T>(collection: string, opts: FetchOptions): Promise<T[]> {
+async function doLiveFetch<T>(collection: string, opts: FetchOptions, attempt = 1): Promise<T[]> {
   const url = `${DIRECTUS_URL}/items/${collection}${buildQuery(opts)}`;
+  const MAX_RETRIES = 2;
   try {
     const res = await fetch(url, { headers: { 'Content-Type': 'application/json' } });
     if (!res.ok) {
@@ -234,7 +235,18 @@ async function doLiveFetch<T>(collection: string, opts: FetchOptions): Promise<T
     }
     const json = await res.json();
     return json.data ?? [];
-  } catch (err) {
+  } catch (err: any) {
+    // ECONNRESET / TimeoutError / undici "terminated" → retry s exponential backoff
+    const transient = err?.cause?.code === 'ECONNRESET'
+      || err?.code === 'ECONNRESET'
+      || err?.message?.includes('terminated')
+      || err?.name === 'TimeoutError';
+    if (transient && attempt <= MAX_RETRIES) {
+      const delay = 200 * attempt; // 200ms, 400ms
+      console.warn(`[directus] transient error pro ${collection} (attempt ${attempt}/${MAX_RETRIES}), retry za ${delay}ms`);
+      await new Promise((r) => setTimeout(r, delay));
+      return doLiveFetch<T>(collection, opts, attempt + 1);
+    }
     console.error(`[directus] chyba při fetchování ${collection}:`, err);
     return [];
   }
