@@ -76,11 +76,16 @@ function formatDate(iso?: string): string {
   }
 }
 
-// Markdown → HTML
+// Markdown → HTML — sanitizujeme přes DOMPurify (XSS prevention).
+// Article body editují adminové v Directus, ale sanitizujem pro případ
+// kompromitovaného účtu / paste z neověřeného zdroje.
+import { sanitizeHtml } from '@lib/sanitize';
 marked.setOptions({ gfm: true, breaks: false });
-const bodyHtml = article.body ? marked.parse(article.body) : '';
+const rawHtml = article.body ? (marked.parse(article.body) as string) : '';
+const bodyHtml = sanitizeHtml(rawHtml);
 
-// Custom render — wrap blockquotes na .pull
+// Custom render — wrap blockquotes na .pull (po sanitizaci, jen CSS class injection,
+// bezpečné protože blockquote/ul/ol/figure jsou ve whitelist)
 const wrappedHtml = String(bodyHtml)
   .replace(/<blockquote>/g, '<blockquote class="pull">')
   .replace(/<ul>/g, '<ul class="art-list">')

@@ -139,14 +139,35 @@ const toggleLabel = modelName ? `Zeptat se na ${modelName}` : `Zeptat se na ${br
 
     const USER_AVATAR_SVG = '<svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4,22 C4,16 7.5,13 12,13 C16.5,13 20,16 20,22 Z"/></svg>';
 
+    // Bezpečnostní whitelist URL schémat — blokuje javascript:, data:, vbscript:
+    // a další URL injection vektory v markdown linkách generovaných AI.
+    function isSafeUrl(url: string): boolean {
+      const u = url.trim().toLowerCase();
+      // Relativní URL (interní) — bezpečné
+      if (u.startsWith('/') || u.startsWith('#') || u.startsWith('?')) return true;
+      // Whitelist protokolů
+      return /^(https?|mailto|tel):/i.test(u);
+    }
+
+    function escapeAttr(s: string): string {
+      // Escape pro HTML atribut hodnotu
+      return s.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+    }
+
     function markdownToHtml(text: string): string {
       let s = escapeHtml(text);
       // Markdown links — [text](url) → <a href="url">text</a>
-      // Interní (začínají /) → stejný tab, externí → nový tab
+      // SECURITY: URL se validuje proti whitelist, label se HTML-escape'uje
+      // (z escapeHtml() už je escaped, takže OK), href atribut se escape'uje navíc
       s = s.replace(/\[([^\]]+)\]\(([^)]+)\)/g, (_m, label: string, url: string) => {
+        const safe = isSafeUrl(url);
+        if (!safe) {
+          // Nepovolený URL scheme (např. javascript:) → render jako plain text
+          return `[${label}](${escapeHtml(url)})`;
+        }
         const isInternal = url.startsWith('/') || url.includes('sfr-motor');
-        const target = isInternal ? '' : ' target="_blank" rel="noopener"';
-        return `<a class="chat-link" href="${url}"${target}>${label}</a>`;
+        const target = isInternal ? '' : ' target="_blank" rel="noopener noreferrer"';
+        return `<a class="chat-link" href="${escapeAttr(url)}"${target}>${label}</a>`;
       });
       // Bold + italic
       s = s.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
