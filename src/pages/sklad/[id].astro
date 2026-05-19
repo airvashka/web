@@ -86,19 +86,53 @@ const vehiclePackages: any[] = Array.isArray((v as any).option_packages)
       .filter(Boolean)
   : [];
 
-// Souvislé entity — explicit fields aby technical_data / interior color určitě prošly
-const brands = v.brand ? await directusGet<Brand>('brands', { filter: { id: { _eq: Number(v.brand) } }, limit: 1 }) : [];
-const models = v.model ? await directusGet<any>('models', {
-  filter: { id: { _eq: Number(v.model) } },
-  limit: 1,
-  fields: ['*', 'technical_data', 'promo_active', 'promo_label', 'promo_discount_amount', 'promo_valid_to', 'promo_description'],
-}) : [];
-const trims = v.trim_level ? await directusGet<TrimLevel>('trim_levels', { filter: { id: { _eq: Number(v.trim_level) } }, limit: 1 }) : [];
-const modelYears = v.model_year ? await directusGet<any>('model_years', {
-  filter: { id: { _eq: Number(v.model_year) } },
-  limit: 1,
-  fields: ['*', 'technical_data'],
-}) : [];
+// Všech 6 navazujících queries paralelně přes Promise.all.
+// Sériově by trvaly 6×1s = 6s. Paralelně ~1s (max ze 6).
+// Celkový page load: 1× vehicle + 1× parallel batch = 2 round-tripy.
+const [brands, models, trims, modelYears, siteSettingsResult, similarResult] = await Promise.all([
+  v.brand
+    ? directusGet<Brand>('brands', { filter: { id: { _eq: Number(v.brand) } }, limit: 1 })
+    : Promise.resolve([]),
+  v.model
+    ? directusGet<any>('models', {
+        filter: { id: { _eq: Number(v.model) } },
+        limit: 1,
+        fields: ['*', 'technical_data', 'promo_active', 'promo_label', 'promo_discount_amount', 'promo_valid_to', 'promo_description'],
+      })
+    : Promise.resolve([]),
+  v.trim_level
+    ? directusGet<TrimLevel>('trim_levels', { filter: { id: { _eq: Number(v.trim_level) } }, limit: 1 })
+    : Promise.resolve([]),
+  v.model_year
+    ? directusGet<any>('model_years', {
+        filter: { id: { _eq: Number(v.model_year) } },
+        limit: 1,
+        fields: ['*', 'technical_data'],
+      })
+    : Promise.resolve([]),
+  directusGet<any>('site_settings', {
+    fields: ['stock_highlights'],
+    limit: 1,
+  }).catch(() => [] as any[]),
+  v.model
+    ? directusGet<any>('stock_vehicles', {
+        filter: {
+          id: { _neq: Number(v.id) },
+          model: { _eq: Number(v.model) },
+          status: { _eq: 'published' },
+          availability: { _in: ['in_stock', 'on_the_way'] },
+        },
+        limit: 4,
+        fields: [
+          'id', 'condition', 'km', 'list_price', 'promo_price', 'color_code', 'color_category',
+          'transmission', 'drivetrain', 'highlighted', 'highlight_label',
+          'trim_level_snapshot', 'photos.directus_files_id', 'trim_level.name',
+          'model_year.year', 'model.fuel_type', 'model.promo_active', 'model.promo_label', 'model.promo_discount_amount', 'model.promo_valid_to',
+          'brand.name', 'brand.slug', 'model.name', 'model.slug',
+        ],
+      })
+    : Promise.resolve([]),
+]);
 
 const brand = brands[0];
 const model = models[0];
@@ -242,43 +276,20 @@ const HARDCODED_HIGHLIGHTS: Highlight[] = [
   { icon: 'badge', title: 'Autorizovaný prodejce', subtitle: 'KGM · OMODA & JAECOO · FARIZON. Originální díly a servis ve vlastní dílně.' },
 ];
 
+// highlights + similar zpracovány z výsledků Promise.all nahoře (eliminace sériových calls)
 let highlights: Highlight[] = HARDCODED_HIGHLIGHTS;
-try {
-  const siteSettings = await directusGet<any>('site_settings', {
-    fields: ['stock_highlights'],
-    limit: 1,
-  });
-  const fromAdmin = siteSettings?.[0]?.stock_highlights;
-  if (Array.isArray(fromAdmin) && fromAdmin.length > 0) {
-    highlights = fromAdmin
-      .filter((h: any) => h?.title)
-      .map((h: any) => ({
-        icon: String(h.icon ?? 'star'),
-        title: String(h.title),
-        subtitle: String(h.subtitle ?? ''),
-      }));
-  }
-} catch {
-  // site_settings nebo field neexistuje — fallback je už nastavený
+const fromAdmin = siteSettingsResult?.[0]?.stock_highlights;
+if (Array.isArray(fromAdmin) && fromAdmin.length > 0) {
+  highlights = fromAdmin
+    .filter((h: any) => h?.title)
+    .map((h: any) => ({
+      icon: String(h.icon ?? 'star'),
+      title: String(h.title),
+      subtitle: String(h.subtitle ?? ''),
+    }));
 }
 
-// Similar cars (stejný model, jiné ID)
-const similar = await directusGet<any>('stock_vehicles', {
-  filter: {
-    id: { _neq: Number(v.id) },
-    model: { _eq: Number(v.model) },
-    status: { _eq: 'published' },
-    availability: { _in: ['in_stock', 'on_the_way'] },
-  },
-  limit: 4,
-  fields: [
-    'id', 'condition', 'km', 'list_price', 'promo_price', 'color_code', 'color_category',
-    'transmission', 'drivetrain', 'highlighted', 'highlight_label',
-    'trim_level_snapshot', 'photos.directus_files_id', 'trim_level.name',
-    'model_year.year', 'model.fuel_type', 'model.promo_active', 'model.promo_label', 'model.promo_discount_amount', 'model.promo_valid_to',
-    'brand.name', 'brand.slug', 'model.name', 'model.slug',
-  ],
-});
+const similar = similarResult ?? [];
 
 const conditionLabel = v.condition ? conditionLabels[v.condition] : '—';
 const availabilityLabel = v.availability ? availabilityLabels[v.availability] : '—';
