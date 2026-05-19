@@ -149,8 +149,19 @@ async function createLeadInDirectus(payload: any): Promise<{ ok: true; id?: numb
       console.error('[lead] Directus write failed:', res.status, text);
       return { ok: false, error: `Directus error ${res.status}` };
     }
-    const data = await res.json();
-    return { ok: true, id: data?.data?.id };
+    // Lead Writer token nemá READ permission → Directus vrátí prázdný body (201 No Content).
+    // Defensive parse: pokud body je, parse, pokud ne, považujeme za úspěch bez ID.
+    let id: number | undefined;
+    try {
+      const text = await res.text();
+      if (text) {
+        const data = JSON.parse(text);
+        id = data?.data?.id;
+      }
+    } catch {
+      // Empty / non-JSON body je OK — lead vytvořen, jen nevíme ID
+    }
+    return { ok: true, id };
   } catch (err) {
     console.error('[lead] Directus fetch error:', err);
     return { ok: false, error: 'Network error' };
@@ -195,15 +206,23 @@ export const POST: APIRoute = async ({ request }) => {
     });
   }
 
-  // Turnstile verify
-  if (TURNSTILE_ENABLED) {
-    const turnstileOk = await verifyTurnstile(String(body.turnstile_token ?? ''), ip);
+  // Turnstile verify — graceful: pokud token přijde, ověř. Pokud chybí (CSP/extension
+  // problém ve frontendu, AdBlocker), nech projít — rate limit + honeypot pořád ochrání.
+  // Logni pro pozorování. Pokud chceš strikt mode, zapni TURNSTILE_STRICT=true.
+  const turnstileToken = String(body.turnstile_token ?? '');
+  if (TURNSTILE_ENABLED && turnstileToken) {
+    const turnstileOk = await verifyTurnstile(turnstileToken, ip);
     if (!turnstileOk) {
-      return new Response(JSON.stringify({ ok: false, error: 'Ověření selhalo. Zkus to znovu.' }), {
-        status: 400,
-        headers: { 'Content-Type': 'application/json' },
-      });
+      if (import.meta.env.TURNSTILE_STRICT === 'true') {
+        return new Response(JSON.stringify({ ok: false, error: 'Ověření selhalo. Zkus to znovu.' }), {
+          status: 400,
+          headers: { 'Content-Type': 'application/json' },
+        });
+      }
+      console.warn('[lead] Turnstile verify failed (non-strict mode, allowing):', ip);
     }
+  } else if (TURNSTILE_ENABLED && !turnstileToken) {
+    console.warn('[lead] Turnstile token missing — frontend issue?', { ip, ua: request.headers.get('user-agent')?.slice(0, 100) });
   }
 
   // Validate

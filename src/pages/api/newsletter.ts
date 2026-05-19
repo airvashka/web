@@ -77,17 +77,29 @@ export const POST: APIRoute = async ({ request }) => {
     });
   }
 
-  // Volá Ecomail
+  // Volá Ecomail — server-side fetch bez browser headers vrací 404
+  // (Ecomail kontroluje Referer/UA jako anti-bot). Mimikujeme browser request.
   try {
     const formBody = new URLSearchParams({ email });
     const res = await fetch(ECOMAIL_URL, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+        'Referer': ECOMAIL_URL,
+        'Origin': new URL(ECOMAIL_URL).origin,
+        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+        'Accept-Language': 'cs,en;q=0.9',
+      },
       body: formBody.toString(),
+      redirect: 'follow',
     });
+    // Ecomail po úspěšném subscribe často redirectuje na thank-you stránku → res.ok bude true
+    // nebo vrátí 200/302. Pokud 404, něco s URL.
     if (!res.ok) {
-      console.error('[newsletter] Ecomail failed:', res.status);
-      return new Response(JSON.stringify({ ok: false, error: 'Něco se pokazilo. Zkus to později.' }), {
+      const text = await res.text().catch(() => '');
+      console.error('[newsletter] Ecomail failed:', res.status, text.slice(0, 200));
+      return new Response(JSON.stringify({ ok: false, error: `Newsletter služba odmítla (${res.status}). Kontaktujte nás.` }), {
         status: 502,
         headers: { 'Content-Type': 'application/json' },
       });

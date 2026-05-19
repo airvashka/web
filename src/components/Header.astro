@@ -1,5 +1,5 @@
 ---
-import { FALLBACK_SALES_PHONE, telLink } from '@lib/contacts';
+import { FALLBACK_SALES_PHONE, telLink, getDealerContacts } from '@lib/contacts';
 
 interface Props {
   active?: 'kgm' | 'omoda-jaecoo' | 'farizon' | 'sklad' | 'servis' | 'magazin' | 'kontakt';
@@ -7,10 +7,15 @@ interface Props {
 
 const { active } = Astro.props;
 
-// Dynamický prodejní telefon (z middleware Astro.locals, fallback hardcoded)
-const salesContact = (Astro.locals as any).salesContact;
-const salesPhone = salesContact?.phone ?? FALLBACK_SALES_PHONE;
-const salesPhoneLink = telLink(salesPhone);
+// Build-time fetch všech prodejců — embeddujeme jako JSON do DOM,
+// client-side JS pak randomně vybere telefon při každém načtení.
+// Důvod: Astro middleware (Astro.locals) nefunguje pro static prerendered stránky,
+// takže SSR-based rotaci jsme museli nahradit client-side.
+const contacts = await getDealerContacts();
+const salesPhonesJson = JSON.stringify(contacts.sales.map((c) => c.phone));
+// Server-side default (zobrazí se před tím než JS rotuje)
+const defaultPhone = contacts.sales[0]?.phone ?? FALLBACK_SALES_PHONE;
+const defaultPhoneLink = telLink(defaultPhone);
 
 const navItems: Array<{ label: string; href: string; key: NonNullable<Props['active']> }> = [
   { label: 'KGM', href: '/kgm', key: 'kgm' },
@@ -64,7 +69,7 @@ const navItems: Array<{ label: string; href: string; key: NonNullable<Props['act
       ))}
     </nav>
     <a class="nav-cta" href="/servis">Objednat servis</a>
-    <a class="nav-icon" href={`tel:${salesPhoneLink}`} aria-label={`Zavolat ${salesPhone}`}>
+    <a class="nav-icon" href={`tel:${defaultPhoneLink}`} aria-label="Zavolat" data-sales-phone>
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.86 19.86 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.86 19.86 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
     </a>
     <button class="nav-menu-toggle" aria-label="Otevřít menu" aria-expanded="false" data-menu-toggle>
@@ -93,9 +98,9 @@ const navItems: Array<{ label: string; href: string; key: NonNullable<Props['act
   </nav>
   <div class="mobile-drawer-cta">
     <a class="btn btn-primary" href="/servis">Objednat servis</a>
-    <a class="btn btn-outline" href={`tel:${salesPhoneLink}`}>
+    <a class="btn btn-outline" href={`tel:${defaultPhoneLink}`} data-sales-phone>
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.86 19.86 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.86 19.86 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-      {salesPhone}
+      <span data-sales-phone-text>{defaultPhone}</span>
     </a>
   </div>
   <div class="mobile-drawer-info">
@@ -111,7 +116,35 @@ const navItems: Array<{ label: string; href: string; key: NonNullable<Props['act
 </div>
 <button class="mobile-drawer-backdrop" data-menu-close aria-label="Zavřít menu" tabindex="-1"></button>
 
+<!-- Client-side phone rotation data — JSON pool prodejních telefonů z Directus.
+     JS níže random-pickne a updatne všechny data-sales-phone elementy. -->
+<script type="application/json" id="sales-phones-data" set:html={salesPhonesJson}></script>
+
 <script>
+  // ===== Sales phone rotation =====
+  (function () {
+    try {
+      const dataEl = document.getElementById('sales-phones-data');
+      if (!dataEl) return;
+      const phones = JSON.parse(dataEl.textContent || '[]');
+      if (!Array.isArray(phones) || phones.length === 0) return;
+      // Random pick
+      const phone = phones[Math.floor(Math.random() * phones.length)];
+      const telLink = phone.replace(/[^\d+]/g, '');
+      // Update všechny data-sales-phone <a> elementy
+      document.querySelectorAll('[data-sales-phone]').forEach((el) => {
+        if (el instanceof HTMLAnchorElement) el.href = 'tel:' + telLink;
+      });
+      // Update všechny data-sales-phone-text elementy
+      document.querySelectorAll('[data-sales-phone-text]').forEach((el) => {
+        el.textContent = phone;
+      });
+    } catch (err) {
+      // Fallback default zůstane — žádný break
+      console.warn('[phones] rotation failed', err);
+    }
+  })();
+
   // ===== Mobile drawer toggle =====
   (function () {
     const toggle = document.querySelector('[data-menu-toggle]');
