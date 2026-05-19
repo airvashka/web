@@ -4,7 +4,9 @@ import FuelIcon from '@components/FuelIcon.astro';
 import DirectusImage from '@components/DirectusImage.astro';
 import Breadcrumbs from '@components/Breadcrumbs.astro';
 import JsonLd from '@components/JsonLd.astro';
+import TurnstileWidget from '@components/TurnstileWidget.astro';
 import { directusGet, directusAsset } from '@lib/directus';
+import { FALLBACK_SALES_PHONE, telLink } from '@lib/contacts';
 import { getGroupedFeatures, CATEGORY_LABELS } from '@lib/features';
 import { vehicleSchema } from '@lib/schemas';
 import { buildStockSlug, parseStockId } from '@lib/stockSlug';
@@ -304,6 +306,11 @@ const similar = await directusGet<any>('stock_vehicles', {
 const conditionLabel = v.condition ? conditionLabels[v.condition] : '—';
 const availabilityLabel = v.availability ? availabilityLabels[v.availability] : '—';
 const description = (v.description ?? '').split(/\n\s*\n/).filter(Boolean);
+
+// Dynamický prodejní telefon (z middleware, fallback)
+const salesContact = (Astro.locals as any).salesContact;
+const salesPhone = salesContact?.phone ?? FALLBACK_SALES_PHONE;
+const salesPhoneLink = telLink(salesPhone);
 ---
 
 <BaseLayout title={title || 'Skladový vůz'} description={`${title} — skladový vůz u SFR Motor Praha-Ďáblice.`}>
@@ -520,7 +527,7 @@ const description = (v.description ?? '').split(/\n\s*\n/).filter(Boolean);
             </a>
             <div class="cta-row">
               <a class="btn btn-outline" href="#poptavka">Rezervovat</a>
-              <a class="btn btn-outline" href="tel:+420771235458">Zavolat +420 771 235 458</a>
+              <a class="btn btn-outline" href={`tel:${salesPhoneLink}`}>Zavolat {salesPhone}</a>
             </div>
           </div>
 
@@ -882,7 +889,7 @@ const description = (v.description ?? '').split(/\n\s*\n/).filter(Boolean);
             <div class="contact-list">
               <div class="item">
                 <span class="ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.86 19.86 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.86 19.86 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg></span>
-                <a href="tel:+420771235458">+420 771 235 458</a>
+                <a href={`tel:${salesPhoneLink}`}>{salesPhone}</a>
               </div>
               <div class="item">
                 <span class="ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 6L2 7"/></svg></span>
@@ -894,7 +901,17 @@ const description = (v.description ?? '').split(/\n\s*\n/).filter(Boolean);
               </div>
             </div>
           </div>
-          <form class="form-card" data-lead-form data-form-type="stock_inquiry" data-vehicle-id={String(v.id)} data-vehicle-label={`${title}${finalPrice ? ` — ${finalPrice.toLocaleString('cs-CZ')} Kč` : ''}`}>
+          <form
+            class="form-card"
+            data-lead-form
+            data-form-type="stock_inquiry"
+            data-vehicle-id={String(v.id)}
+            data-vehicle-vin={v.vin ?? ''}
+            data-model-id={v.model?.id ? String(v.model.id) : ''}
+            data-model-slug={v.model?.slug ?? ''}
+            data-brand-id={v.brand?.id ? String(v.brand.id) : ''}
+            data-vehicle-label={`${title}${finalPrice ? ` — ${finalPrice.toLocaleString('cs-CZ')} Kč` : ''}`}
+          >
             <div class="form-row">
               <input class="input" name="customer_name" placeholder="Jméno" required minlength="2" maxlength="200" />
               <input class="input" name="customer_phone" placeholder="Telefon" type="tel" maxlength="50" pattern="[+0-9\s\-()]+" />
@@ -902,6 +919,7 @@ const description = (v.description ?? '').split(/\n\s*\n/).filter(Boolean);
             <input class="input" name="customer_email" type="email" placeholder="E-mail" required maxlength="200" />
             <textarea class="textarea" name="message" placeholder="Zpráva (nepovinné)" maxlength="2000"></textarea>
             <input type="text" name="_hp_website" tabindex="-1" autocomplete="off" class="honeypot" />
+            <TurnstileWidget />
             <label class="check">
               <input type="checkbox" required />
               Souhlasím se zpracováním osobních údajů dle <a href="/informace/ochrana-udaju">GDPR</a>
@@ -1088,18 +1106,16 @@ const description = (v.description ?? '').split(/\n\s*\n/).filter(Boolean);
       onScroll();
     }
 
-    // Lead form submit — DIRECTUS_URL je injektováno přes define:vars nahoře
+    // Lead form submit → /api/lead (server-side endpoint)
     document.querySelectorAll('[data-lead-form]').forEach((form) => {
       form.addEventListener('submit', async (e) => {
         e.preventDefault();
         const statusEl = form.querySelector('[data-lead-status]');
-        const hp = form.querySelector('[name=_hp_website]')?.value;
-        if (hp) {
-          if (statusEl) statusEl.textContent = 'Děkujeme! Brzy se ozveme.';
-          form.reset();
-          return;
-        }
+        const submitBtn = form.querySelector('button[type=submit]');
+        if (statusEl) statusEl.textContent = 'Odesílám...';
+
         const data = new FormData(form);
+        const turnstileInput = form.querySelector('input[name="cf-turnstile-response"]');
         const payload = {
           form_type: form.dataset.formType,
           customer_name: data.get('customer_name'),
@@ -1107,20 +1123,34 @@ const description = (v.description ?? '').split(/\n\s*\n/).filter(Boolean);
           customer_phone: data.get('customer_phone'),
           message: data.get('message'),
           source_page: window.location.pathname,
+          source_url: window.location.href,
+          _hp_website: data.get('_hp_website') || '',
+          turnstile_token: turnstileInput ? turnstileInput.value : '',
         };
+        if (form.dataset.modelId) payload.source_model = Number(form.dataset.modelId);
+        if (form.dataset.modelSlug) payload.source_model_slug = form.dataset.modelSlug;
+        if (form.dataset.brandId) payload.source_brand = Number(form.dataset.brandId);
         if (form.dataset.vehicleId) payload.source_vehicle = Number(form.dataset.vehicleId);
+        if (form.dataset.vehicleVin) payload.source_vehicle_vin = form.dataset.vehicleVin;
+
         try {
-          const res = await fetch(`${DIRECTUS_URL}/items/leads`, {
+          const res = await fetch('/api/lead', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload),
           });
-          if (!res.ok) throw new Error(`HTTP ${res.status}`);
+          const result = await res.json().catch(() => ({ ok: false, error: 'Network error' }));
+          if (!res.ok || !result.ok) throw new Error(result.error || ('HTTP ' + res.status));
           if (statusEl) { statusEl.textContent = '✓ Děkujeme! Brzy se vám ozveme.'; statusEl.style.color = 'var(--ok)'; }
-          form.querySelector('button[type=submit]').disabled = true;
+          if (submitBtn) submitBtn.disabled = true;
           if (window.dataLayer) window.dataLayer.push({ event: 'generate_lead', form_name: form.dataset.formType });
         } catch (err) {
-          if (statusEl) { statusEl.textContent = 'Něco se nepodařilo. Zkuste znovu, nebo zavolejte +420 771 235 458.'; statusEl.style.color = 'var(--danger)'; }
+          if (statusEl) {
+            statusEl.textContent = err.message
+              ? '✗ ' + err.message
+              : 'Něco se nepodařilo. Zkuste znovu, nebo zavolejte +420 771 235 458.';
+            statusEl.style.color = 'var(--danger)';
+          }
         }
       });
     });

@@ -4,6 +4,7 @@ import Breadcrumbs from '@components/Breadcrumbs.astro';
 import JsonLd from '@components/JsonLd.astro';
 import GoogleReviews from '@components/GoogleReviews.astro';
 import TeamCard from '@components/TeamCard.astro';
+import TurnstileWidget from '@components/TurnstileWidget.astro';
 import { directusGet } from '@lib/directus';
 import { autoDealerSchema, autoRepairSchema } from '@lib/schemas';
 import googleReviews from '../data/google-reviews.json';
@@ -176,6 +177,7 @@ const mapEmbedUrl = 'https://maps.google.com/maps?q=%C4%8Eablicka+553%2F2%2C+182
           </div>
         </div>
         <input type="text" name="_hp_website" tabindex="-1" autocomplete="off" class="honeypot" />
+        <TurnstileWidget />
         <div class="fnote">Odesláním souhlasíte se zpracováním osobních údajů.</div>
         <button class="btn btn-primary" type="submit">Odeslat zprávu</button>
         <div class="lead-status" data-lead-status></div>
@@ -184,36 +186,44 @@ const mapEmbedUrl = 'https://maps.google.com/maps?q=%C4%8Eablicka+553%2F2%2C+182
   </section>
 
   <script>
-    const DIRECTUS_URL = import.meta.env.PUBLIC_DIRECTUS_URL;
-    document.querySelectorAll('[data-lead-form]').forEach((form) => {
+        document.querySelectorAll('[data-lead-form]').forEach((form) => {
       form.addEventListener('submit', async (e) => {
         e.preventDefault();
         const statusEl = form.querySelector('[data-lead-status]');
-        const hp = form.querySelector('[name=_hp_website]')?.value;
-        if (hp) { if (statusEl) statusEl.textContent = 'Děkujeme! Brzy se ozveme.'; form.reset(); return; }
+        const submitBtn = form.querySelector('button[type=submit]');
+        if (statusEl) statusEl.textContent = 'Odesílám...';
+
         const data = new FormData(form);
-        const subj = data.get('subject');
-        const msg = data.get('message');
+        const turnstileInput = form.querySelector('input[name="cf-turnstile-response"]');
         const payload = {
-          form_type: form.dataset.formType,
+          form_type: form.dataset.formType || 'contact',
           customer_name: data.get('customer_name'),
           customer_email: data.get('customer_email'),
           customer_phone: data.get('customer_phone'),
-          message: subj ? '[' + subj + '] ' + (msg ?? '') : msg,
+          message: data.get('message'),
           source_page: window.location.pathname,
+          source_url: window.location.href,
+          _hp_website: data.get('_hp_website') || '',
+          turnstile_token: turnstileInput ? turnstileInput.value : '',
         };
         try {
-          const res = await fetch(DIRECTUS_URL + '/items/leads', {
+          const res = await fetch('/api/lead', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload),
           });
-          if (!res.ok) throw new Error('HTTP ' + res.status);
-          if (statusEl) { statusEl.textContent = 'Děkujeme! Ozveme se do 24 hodin.'; statusEl.style.color = 'var(--ok)'; }
-          form.querySelector('button[type=submit]').disabled = true;
-          if (window.dataLayer) window.dataLayer.push({ event: 'generate_lead', form_name: form.dataset.formType });
+          const result = await res.json().catch(() => ({ ok: false, error: 'Network error' }));
+          if (!res.ok || !result.ok) throw new Error(result.error || ('HTTP ' + res.status));
+          if (statusEl) { statusEl.textContent = '✓ Děkujeme! Brzy se vám ozveme.'; statusEl.style.color = 'var(--ok)'; }
+          if (submitBtn) submitBtn.disabled = true;
+          if (window.dataLayer) window.dataLayer.push({ event: 'generate_lead', form_name: payload.form_type });
         } catch (err) {
-          if (statusEl) { statusEl.textContent = 'Něco se nepodařilo. Zkuste znovu nebo zavolejte +420 771 235 458.'; statusEl.style.color = 'var(--danger)'; }
+          if (statusEl) {
+            statusEl.textContent = err.message
+              ? '✗ ' + err.message
+              : 'Něco se nepodařilo. Zkuste znovu, nebo zavolejte +420 771 235 458.';
+            statusEl.style.color = 'var(--danger)';
+          }
         }
       });
     });

@@ -1,0 +1,35 @@
+---
+/**
+ * TurnstileWidget — Cloudflare Turnstile invisible CAPTCHA
+ *
+ * Invisible mode: žádný UI prvek se uživateli nezobrazuje. Cloudflare na
+ * pozadí vyhodnocuje riziko (browser fingerprint, behavior signals).
+ * Cca 95% legítních uživatelů projde bez challenge, 5% podezřelých
+ * dostane "I'm not a robot" interaction.
+ *
+ * Token se generuje do hidden inputu `cf-turnstile-response`, frontend
+ * ho přečte a pošle s payloadem na /api/lead.
+ *
+ * Konfigurace:
+ *  - PUBLIC_TURNSTILE_SITE_KEY = sitekey (veřejný, OK v HTML)
+ *  - TURNSTILE_SECRET = server-only verifikace v /api/lead
+ *
+ * Pokud sitekey není nastaven, komponenta nerendruje nic — backend
+ * `/api/lead` to detekuje (TURNSTILE_SECRET není nastaven) a verifikaci
+ * přeskočí. Tj. dev/lokální vývoj funguje bez Cloudflare účtu.
+ */
+const SITE_KEY = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY;
+---
+
+{SITE_KEY && (
+  <div
+    class="cf-turnstile"
+    data-sitekey={SITE_KEY}
+    data-size="invisible"
+    data-appearance="always"
+  />
+)}
+
+{SITE_KEY && (
+  <script is:inline src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+)}

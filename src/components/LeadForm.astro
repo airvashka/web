@@ -1,13 +1,18 @@
 ---
+import TurnstileWidget from '@components/TurnstileWidget.astro';
+
 interface Props {
-  formType: 'contact' | 'test_drive' | 'service' | 'stock_inquiry' | 'callback';
+  formType: 'contact' | 'test_drive' | 'service' | 'stock_inquiry' | 'model_inquiry' | 'callback';
   title?: string;
   modelId?: number;
+  modelSlug?: string;
+  brandId?: number;
   vehicleId?: number;
+  vehicleVin?: string;
   vehicleLabel?: string;
 }
 
-const { formType, title, modelId, vehicleId, vehicleLabel } = Astro.props;
+const { formType, title, modelId, modelSlug, brandId, vehicleId, vehicleVin, vehicleLabel } = Astro.props;
 
 const titles: Record<string, string> = {
   contact: 'Napište nám',
@@ -20,7 +25,16 @@ const titles: Record<string, string> = {
 const displayTitle = title ?? titles[formType] ?? 'Kontaktovat';
 ---
 
-<form class="lead-form" data-lead-form data-form-type={formType} data-model-id={modelId} data-vehicle-id={vehicleId}>
+<form
+  class="lead-form"
+  data-lead-form
+  data-form-type={formType}
+  data-model-id={modelId}
+  data-model-slug={modelSlug}
+  data-brand-id={brandId}
+  data-vehicle-id={vehicleId}
+  data-vehicle-vin={vehicleVin}
+>
   <h3 class="lead-form__title">{displayTitle}</h3>
 
   {vehicleLabel && (
@@ -52,6 +66,9 @@ const displayTitle = title ?? titles[formType] ?? 'Kontaktovat';
 
   <!-- Honeypot proti spam botům — skryté pole, lidé to nevyplní -->
   <input type="text" name="_hp_website" tabindex="-1" autocomplete="off" class="lead-form__hp" />
+
+  <!-- Cloudflare Turnstile invisible CAPTCHA — uživatel nic nevidí -->
+  <TurnstileWidget />
 
   <div class="lead-form__consent">
     <small class="text-muted">
@@ -95,22 +112,13 @@ const displayTitle = title ?? titles[formType] ?? 'Kontaktovat';
 </style>
 
 <script>
-  const DIRECTUS_URL = import.meta.env.PUBLIC_DIRECTUS_URL;
-
+  // Lead form submit → /api/lead (server-side endpoint)
+  // Honeypot, validace, rate limit a Directus zápis se dějou na serveru.
   document.querySelectorAll<HTMLFormElement>('[data-lead-form]').forEach((form) => {
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
       const statusEl = form.querySelector<HTMLDivElement>('[data-status]')!;
       const submitBtn = form.querySelector<HTMLButtonElement>('.lead-form__submit')!;
-
-      // Honeypot check — pokud bot vyplnil _hp_website, ticho zahoď
-      const hp = (form.querySelector('[name=_hp_website]') as HTMLInputElement)?.value;
-      if (hp) {
-        statusEl.textContent = 'Zpráva odeslána. Brzy se ozveme.';
-        statusEl.className = 'lead-form__status is-success';
-        form.reset();
-        return;
-      }
 
       form.classList.add('is-loading');
       statusEl.textContent = 'Odesílám...';
@@ -118,8 +126,10 @@ const displayTitle = title ?? titles[formType] ?? 'Kontaktovat';
 
       const data = new FormData(form);
       const formType = form.dataset.formType;
-      const modelId = form.dataset.modelId ? Number(form.dataset.modelId) : null;
-      const vehicleId = form.dataset.vehicleId ? Number(form.dataset.vehicleId) : null;
+
+      // Turnstile token (invisible — vyplněn automaticky pokud sitekey nastaven)
+      const turnstileInput = form.querySelector<HTMLInputElement>('input[name="cf-turnstile-response"]');
+      const turnstileToken = turnstileInput?.value ?? '';
 
       const payload: Record<string, unknown> = {
         form_type: formType,
@@ -128,17 +138,26 @@ const displayTitle = title ?? titles[formType] ?? 'Kontaktovat';
         customer_phone: data.get('customer_phone'),
         message: data.get('message'),
         source_page: window.location.pathname,
+        source_url: window.location.href,
+        _hp_website: data.get('_hp_website') ?? '',
+        turnstile_token: turnstileToken,
       };
-      if (modelId) payload.source_model = modelId;
-      if (vehicleId) payload.source_vehicle = vehicleId;
+      if (form.dataset.modelId) payload.source_model = Number(form.dataset.modelId);
+      if (form.dataset.modelSlug) payload.source_model_slug = form.dataset.modelSlug;
+      if (form.dataset.brandId) payload.source_brand = Number(form.dataset.brandId);
+      if (form.dataset.vehicleId) payload.source_vehicle = Number(form.dataset.vehicleId);
+      if (form.dataset.vehicleVin) payload.source_vehicle_vin = form.dataset.vehicleVin;
 
       try {
-        const res = await fetch(`${DIRECTUS_URL}/items/leads`, {
+        const res = await fetch('/api/lead', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload),
         });
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const result = await res.json().catch(() => ({ ok: false, error: 'Network error' }));
+        if (!res.ok || !result.ok) {
+          throw new Error(result.error || `HTTP ${res.status}`);
+        }
         statusEl.textContent = '✅ Děkujeme! Brzy se vám ozveme.';
         statusEl.className = 'lead-form__status is-success';
         form.classList.add('is-success');
@@ -154,8 +173,10 @@ const displayTitle = title ?? titles[formType] ?? 'Kontaktovat';
             source_page: window.location.pathname,
           });
         }
-      } catch (err) {
-        statusEl.textContent = '❌ Něco se nepodařilo. Zkuste to prosím znovu nebo zavolejte +420 771 235 458.';
+      } catch (err: any) {
+        statusEl.textContent = err?.message
+          ? `❌ ${err.message}`
+          : '❌ Něco se nepodařilo. Zkuste to znovu nebo zavolejte +420 771 235 458.';
         statusEl.className = 'lead-form__status is-error';
         form.classList.remove('is-loading');
         console.error('Lead form error:', err);

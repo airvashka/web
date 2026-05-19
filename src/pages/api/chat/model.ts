@@ -813,9 +813,15 @@ export const POST: APIRoute = async ({ request }) => {
               message: `[AI chat — ${brandName} ${modelName}]\n${String(input.message ?? '').slice(0, 1000)}`,
               source_page: mode === 'model' ? `/model/${resolvedModelSlug}` : `/${resolvedBrandSlug}`,
             };
+            // Server-side static token — Directus má zakázaný anonymous write.
+            // Preferujeme omezený Lead Writer token (jen leads create), fallback na admin token.
+            const directusToken = (import.meta as any).env?.DIRECTUS_LEAD_TOKEN
+              ?? (import.meta as any).env?.DIRECTUS_STATIC_TOKEN;
+            const leadHeaders: Record<string, string> = { 'Content-Type': 'application/json' };
+            if (directusToken) leadHeaders.Authorization = `Bearer ${directusToken}`;
             const r = await fetch(`${DIRECTUS_URL}/items/leads`, {
               method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
+              headers: leadHeaders,
               body: JSON.stringify(leadPayload),
             });
             if (r.ok) {

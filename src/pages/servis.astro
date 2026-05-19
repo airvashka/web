@@ -4,7 +4,9 @@ import Breadcrumbs from '@components/Breadcrumbs.astro';
 import JsonLd from '@components/JsonLd.astro';
 import GoogleReviews from '@components/GoogleReviews.astro';
 import TeamCard from '@components/TeamCard.astro';
+import TurnstileWidget from '@components/TurnstileWidget.astro';
 import { directusGet } from '@lib/directus';
+import { FALLBACK_SERVICE_PHONE, telLink } from '@lib/contacts';
 import { autoRepairSchema } from '@lib/schemas';
 import googleReviews from '../data/google-reviews.json';
 import type { Employee } from '@lib/types';
@@ -13,6 +15,11 @@ import type { Employee } from '@lib/types';
    SERVIS — 1:1 podle _design-draft/servis.jsx
    Sections: Hero · ServicesAndForm (2 col)
    ============================================================ */
+
+// Dynamický servisní telefon (z middleware, fallback)
+const serviceContact = (Astro.locals as any).serviceContact;
+const servicePhone = serviceContact?.phone ?? FALLBACK_SERVICE_PHONE;
+const servicePhoneLink = telLink(servicePhone);
 
 const SERVICES = [
   { t: 'Pravidelný servis', s: 'výměna oleje, filtry, brzdy, kapaliny' },
@@ -83,7 +90,7 @@ const SERVIS_TEAM_BLOCKS = [
           <div class="hours-row"><span class="d">Sobota</span><span class="h">9:00 – 12:00</span></div>
           <div class="hours-row"><span class="d">Neděle</span><span class="h closed">zavřeno</span></div>
           <div class="hours-foot">
-            <span>Telefon: <a href="tel:+420771259323">+420 771 259 323</a></span>
+            <span>Telefon: <a href={`tel:${servicePhoneLink}`}>{servicePhone}</a></span>
             <span>Email: <a href="mailto:servis@sfr-motor.cz">servis@sfr-motor.cz</a></span>
           </div>
         </div>
@@ -122,6 +129,7 @@ const SERVIS_TEAM_BLOCKS = [
           </div>
         </div>
         <input type="text" name="_hp_website" tabindex="-1" autocomplete="off" class="honeypot" />
+        <TurnstileWidget />
         <div class="fnote">Odesláním souhlasíte se zpracováním osobních údajů.</div>
         <button class="btn btn-primary" type="submit">Odeslat poptávku</button>
         <div class="lead-status" data-lead-status></div>
@@ -162,44 +170,44 @@ const SERVIS_TEAM_BLOCKS = [
   </section>
 
   <script>
-    const DIRECTUS_URL = import.meta.env.PUBLIC_DIRECTUS_URL;
-    document.querySelectorAll('[data-lead-form]').forEach((form) => {
+        document.querySelectorAll('[data-lead-form]').forEach((form) => {
       form.addEventListener('submit', async (e) => {
         e.preventDefault();
         const statusEl = form.querySelector('[data-lead-status]');
-        const hp = form.querySelector('[name=_hp_website]')?.value;
-        if (hp) { if (statusEl) statusEl.textContent = 'Děkujeme! Brzy se ozveme.'; form.reset(); return; }
+        const submitBtn = form.querySelector('button[type=submit]');
+        if (statusEl) statusEl.textContent = 'Odesílám...';
+
         const data = new FormData(form);
-        // Sestavit message s detaily o autu / termínu / službě
-        const parts = [];
-        const veh = data.get('vehicle');
-        const date = data.get('preferred_date');
-        const stype = data.get('service_type');
-        const msg = data.get('message');
-        if (veh) parts.push(`Vůz: ${veh}`);
-        if (stype) parts.push(`Typ úkonu: ${stype}`);
-        if (date) parts.push(`Preferovaný termín: ${date}`);
-        if (msg) parts.push(`Zpráva: ${msg}`);
+        const turnstileInput = form.querySelector('input[name="cf-turnstile-response"]');
         const payload = {
-          form_type: form.dataset.formType,
+          form_type: form.dataset.formType || 'contact',
           customer_name: data.get('customer_name'),
           customer_email: data.get('customer_email'),
           customer_phone: data.get('customer_phone'),
-          message: parts.join('\n'),
+          message: data.get('message'),
           source_page: window.location.pathname,
+          source_url: window.location.href,
+          _hp_website: data.get('_hp_website') || '',
+          turnstile_token: turnstileInput ? turnstileInput.value : '',
         };
         try {
-          const res = await fetch(`${DIRECTUS_URL}/items/leads`, {
+          const res = await fetch('/api/lead', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload),
           });
-          if (!res.ok) throw new Error(`HTTP ${res.status}`);
-          if (statusEl) { statusEl.textContent = '✓ Děkujeme! Ozveme se do 24 hodin.'; statusEl.style.color = 'var(--ok)'; }
-          form.querySelector('button[type=submit]').disabled = true;
-          if (window.dataLayer) window.dataLayer.push({ event: 'generate_lead', form_name: 'service' });
+          const result = await res.json().catch(() => ({ ok: false, error: 'Network error' }));
+          if (!res.ok || !result.ok) throw new Error(result.error || ('HTTP ' + res.status));
+          if (statusEl) { statusEl.textContent = '✓ Děkujeme! Brzy se vám ozveme.'; statusEl.style.color = 'var(--ok)'; }
+          if (submitBtn) submitBtn.disabled = true;
+          if (window.dataLayer) window.dataLayer.push({ event: 'generate_lead', form_name: payload.form_type });
         } catch (err) {
-          if (statusEl) { statusEl.textContent = 'Něco se nepodařilo. Zkuste znovu nebo zavolejte +420 771 259 323.'; statusEl.style.color = 'var(--danger)'; }
+          if (statusEl) {
+            statusEl.textContent = err.message
+              ? '✗ ' + err.message
+              : 'Něco se nepodařilo. Zkuste znovu, nebo zavolejte +420 771 235 458.';
+            statusEl.style.color = 'var(--danger)';
+          }
         }
       });
     });
