@@ -83,7 +83,7 @@ function validatePayload(body: any): { ok: true; data: any } | { ok: false; erro
 
   const message = sanitizeText(body.message, 2000);
   const formType = sanitizeText(body.form_type, 50);
-  const ALLOWED_TYPES = ['contact', 'service', 'stock_inquiry', 'model_inquiry', 'ai_chat', 'general'];
+  const ALLOWED_TYPES = ['contact', 'service', 'stock_inquiry', 'model_inquiry', 'test_drive', 'callback', 'ai_chat', 'general'];
   if (!ALLOWED_TYPES.includes(formType)) {
     return { ok: false, error: 'Neplatný typ formuláře.' };
   }

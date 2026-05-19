@@ -19,7 +19,10 @@ export const prerender = false;
 
 const ECOMAIL_LIST_ID = import.meta.env.ECOMAIL_LIST_ID ?? '4';
 const ECOMAIL_HASH = import.meta.env.ECOMAIL_HASH ?? 'f67e22c6c3dacfc9b77b6b40399abc16';
-const ECOMAIL_URL = `https://sfr.ecomailapp.cz/public/subscribe/${ECOMAIL_LIST_ID}/${ECOMAIL_HASH}`;
+const ECOMAIL_API_KEY = import.meta.env.ECOMAIL_API_KEY;
+const ECOMAIL_API_URL = `https://api2.ecomailapp.cz/lists/${ECOMAIL_LIST_ID}/subscribe`;
+// Fallback na public form (anti-bot blokuje, ale můžeme zkusit když API key chybí)
+const ECOMAIL_PUBLIC_URL = `https://sfr.ecomailapp.cz/public/subscribe/${ECOMAIL_LIST_ID}/${ECOMAIL_HASH}`;
 
 const EMAIL_RE = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
@@ -77,29 +80,70 @@ export const POST: APIRoute = async ({ request }) => {
     });
   }
 
-  // Volá Ecomail — server-side fetch bez browser headers vrací 404
-  // (Ecomail kontroluje Referer/UA jako anti-bot). Mimikujeme browser request.
+  // Preferujeme Ecomail API (s API key) — spolehlivé, oficiální.
+  // Fallback na public form pokud API key chybí (anti-bot blokuje, ale OK pro dev).
+  if (ECOMAIL_API_KEY) {
+    try {
+      const res = await fetch(ECOMAIL_API_URL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'key': ECOMAIL_API_KEY,
+        },
+        body: JSON.stringify({
+          subscriber_data: {
+            email,
+          },
+          // resubscribe: true — pokud byl odhlášen, znovu přihlásit
+          resubscribe: true,
+          // update_existing — pokud už je v listu, aktualizovat (nevracet error)
+          update_existing: true,
+        }),
+      });
+      if (!res.ok) {
+        const text = await res.text().catch(() => '');
+        console.error('[newsletter] Ecomail API failed:', res.status, text.slice(0, 200));
+        // 422 = email already subscribed (treat as success)
+        if (res.status === 422) {
+          return new Response(JSON.stringify({ ok: true, alreadySubscribed: true }), {
+            status: 200,
+            headers: { 'Content-Type': 'application/json' },
+          });
+        }
+        return new Response(JSON.stringify({ ok: false, error: `Newsletter služba odmítla (${res.status}). Kontaktujte nás.` }), {
+          status: 502,
+          headers: { 'Content-Type': 'application/json' },
+        });
+      }
+      return new Response(JSON.stringify({ ok: true }), {
+        status: 200,
+        headers: { 'Content-Type': 'application/json' },
+      });
+    } catch (err) {
+      console.error('[newsletter] Ecomail API error:', err);
+      return new Response(JSON.stringify({ ok: false, error: 'Network error.' }), {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' },
+      });
+    }
+  }
+
+  // Fallback: public form scrape (nedoporučeno, anti-bot může blokovat)
+  console.warn('[newsletter] ECOMAIL_API_KEY není nastaven, používám public form fallback');
   try {
     const formBody = new URLSearchParams({ email });
-    const res = await fetch(ECOMAIL_URL, {
+    const res = await fetch(ECOMAIL_PUBLIC_URL, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-        'Referer': ECOMAIL_URL,
-        'Origin': new URL(ECOMAIL_URL).origin,
-        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-        'Accept-Language': 'cs,en;q=0.9',
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+        'Referer': ECOMAIL_PUBLIC_URL,
       },
       body: formBody.toString(),
       redirect: 'follow',
     });
-    // Ecomail po úspěšném subscribe často redirectuje na thank-you stránku → res.ok bude true
-    // nebo vrátí 200/302. Pokud 404, něco s URL.
     if (!res.ok) {
-      const text = await res.text().catch(() => '');
-      console.error('[newsletter] Ecomail failed:', res.status, text.slice(0, 200));
-      return new Response(JSON.stringify({ ok: false, error: `Newsletter služba odmítla (${res.status}). Kontaktujte nás.` }), {
+      return new Response(JSON.stringify({ ok: false, error: `Newsletter služba odmítla (${res.status}). Nastav ECOMAIL_API_KEY ve Vercel env.` }), {
         status: 502,
         headers: { 'Content-Type': 'application/json' },
       });
@@ -109,7 +153,7 @@ export const POST: APIRoute = async ({ request }) => {
       headers: { 'Content-Type': 'application/json' },
     });
   } catch (err) {
-    console.error('[newsletter] Ecomail fetch error:', err);
+    console.error('[newsletter] fallback error:', err);
     return new Response(JSON.stringify({ ok: false, error: 'Network error.' }), {
       status: 500,
       headers: { 'Content-Type': 'application/json' },
