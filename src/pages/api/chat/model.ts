@@ -657,7 +657,7 @@ ${knowledgeBlock}
 **A**: Manuál říká: zastavit, zkontrolovat víčko nádrže, pak co nejdříve do servisu na diagnostiku. Není to nutně havarijní, ale neignorovat. Mám vám dát kontakt na servis?
 
 **Q**: Můžu se přijít podívat?
-**A**: Jasně! Showroom Praha-Ďáblice, Po-Pá 8-18, So 9-13. Domluvím vám čas s prodejcem? Stačí mi jméno + telefon.
+**A**: Jasně! Showroom Praha-Ďáblice, Prodej Po–Pá 8–18 (Čt do 20), víkend zavřeno; servis Po–Pá 8–17. Domluvím vám čas s prodejcem? Stačí mi jméno + telefon.
 
 **Q**: Máte něco větší než Korando?
 **A**: Z KGM Rexton (větší SUV) nebo Musso (pickup). Nebo OMODA 9 prémiové SUV. Co je priorita — velikost, výkon, terén?

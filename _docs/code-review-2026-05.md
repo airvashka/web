@@ -166,6 +166,8 @@ Railway fallback odstraněn ve všech 3 souborech (`admin/cenik.astro:15`, `api/
 ---
 
 ### 10) Inline `<script>window.dataLayer = …</script>` v `<head>` blokuje render
+
+**STATUS: N/A 2026-05-21** — v `BaseLayout.astro` už žádný inline `dataLayer`/GTM skript není (mezitím odstraněn), nebylo co řešit.
 **Co**: `BaseLayout.astro:85` — inline GTM placeholder bez `defer`/`async`.
 
 **Proč problém**: Jednoduchý jednořádkový skript, ale principiálně by měl být v `<body>` nebo s `defer`. Také pak `if (window.dataLayer)` checks v ostatních souborech jsou validní, ale dataLayer je deklarován v každé stránce znovu — duplicity.
@@ -197,6 +199,8 @@ Railway fallback odstraněn ve všech 3 souborech (`admin/cenik.astro:15`, `api/
 ---
 
 ### 13) Hero video bez `prefers-reduced-motion` respektu
+
+**STATUS: ✅ RESOLVED 2026-05-21** — JS hero videa kontroluje `prefers-reduced-motion`; při `reduce` se autoplay vynechá (zůstane poster). `model/[slug].astro`.
 **Co**: `model/[slug].astro:454-470` — `<video autoplay muted loop>` a JS force-play v `Header.astro`/`model[slug].astro:1249-1269`.
 
 **Proč problém**:
@@ -208,6 +212,8 @@ Railway fallback odstraněn ve všech 3 souborech (`admin/cenik.astro:15`, `api/
 ---
 
 ### 14) Sticky CTA z-index conflict s mobile nav
+
+**STATUS: ✅ RESOLVED 2026-05-21** — chat widget se skryje při otevřeném mobilním menu přes `body.drawer-open` (Header toggluje třídu, `global.css` skrývá `.chat-widget`).
 **Co**: `.sticky-cta` z-index 70 (řádek 4496 nebo blízko), `.nav` z-index 50. Na mobile je nav `position: fixed`. Když uživatel scrolluje a nav je vidět, sticky CTA jde "skrz" nav (sticky 70 > nav 50).
 
 V `global.css:4568` to vypnou `.sticky-cta { display: none }` na mobile (max-width 960). OK, ale **mobile bottom bar** (`.mbb` z-index 70 řádek 4496) i `.subnav` (z-index 45 řádek 1678) — když je drawer otevřený (`.mobile-drawer` z 200, backdrop z 190), funguje OK.
@@ -219,6 +225,8 @@ V `global.css:4568` to vypnou `.sticky-cta { display: none }` na mobile (max-wid
 ---
 
 ### 15) Subnav `top: 76px` desktopu kolize s mobile fixed nav
+
+**STATUS: ✅ RESOLVED 2026-05-21** — subnav `top` jede z proměnných `--nav-height` / `--nav-height-mobile` v `:root`.
 **Co**: `global.css:1675-1681` — `.subnav { position: sticky; top: 76px }`. Mobile media query (4576) přepíše na `top: 64px`. **Ale** mobile nav je `position: fixed`, takže subnav uvnitř sticky parent pozici se vypočítá jen vzhledem k viewportu — ne "pod nav". Když je nav scrollován pryč (transform: translateY(-100%)), subnav stále má `top: 64px` = visí pod neexistujícím navem.
 
 **Fix popisně**: Použít CSS custom property `--nav-height` a propojit JS, nebo subnav přepnout na `position: fixed` s `top: calc(64px - var(--nav-offset))` synchronizovaným s JS scroll handler.
@@ -226,6 +234,8 @@ V `global.css:4568` to vypnou `.sticky-cta { display: none }` na mobile (max-wid
 ---
 
 ### 16) CSS proměnné `--bg-card`, `--success` nedefinované
+
+**STATUS: ✅ RESOLVED 2026-05-21** — do `:root` přidány `--bg-card: #fff` a `--success: var(--ok)`.
 **Co**: `components/LeadForm.astro:71, 89, 94` — používá `var(--bg-card)` a `var(--success)`, ale v `global.css:1-35` definováno není (`--ok` existuje, ne `--success`).
 
 **Proč problém**: Fallback (bez druhého argumentu) → `background: transparent`. LeadForm vypadá rozbitě (žádné pozadí, žádný success color).
@@ -235,6 +245,8 @@ V `global.css:4568` to vypnou `.sticky-cta { display: none }` na mobile (max-wid
 ---
 
 ### 17) DirectusImage chybí `width`/`height` atributy → CLS
+
+**STATUS: ✅ RESOLVED 2026-05-21** — `DirectusImage` dopočítává `width`/`height` z `aspectRatio` (rezervace místa proti CLS, bez distorze).
 **Co**: `components/DirectusImage.astro:67-87` — žádný `width`/`height` attr na `<img>`, jen CSS `aspect-ratio` (pokud prop dodán).
 
 **Proč problém**: 
@@ -247,6 +259,8 @@ V `global.css:4568` to vypnou `.sticky-cta { display: none }` na mobile (max-wid
 ---
 
 ### 18) Body scroll lock přes `document.body.style.overflow = 'hidden'`
+
+**STATUS: ⏳ ODLOŽENO (batch B)** — vyžaduje sdílený counter-based scroll-lock modul napříč inline skripty ve 4 souborech, není to bezpečný one-liner.
 **Co**: `Header.astro:122, 131`, `sklad/[id].astro:1055, 1062`, `model/[slug].astro:1221, 1229`.
 
 **Proč problém**: 
@@ -258,6 +272,8 @@ V `global.css:4568` to vypnou `.sticky-cta { display: none }` na mobile (max-wid
 ---
 
 ### 19) Backdrop-filter chybí `-webkit-` prefix
+
+**STATUS: ✅ RESOLVED 2026-05-21** — `-webkit-backdrop-filter` doplněn na 3 chybějící místa.
 **Co**: `global.css:391` (`.gallery-counter`), `4227`, `4832` — používají `backdrop-filter: blur(...)` bez `-webkit-backdrop-filter`.
 
 **Proč problém**: Safari pre-18 vyžaduje `-webkit-` prefix. Bez něj na iOS < 18 a macOS Safari 15-16 vůbec nefunguje blur.
@@ -267,6 +283,8 @@ V `global.css:4568` to vypnou `.sticky-cta { display: none }` na mobile (max-wid
 ---
 
 ### 20) `outline: none` na inputech bez visible alternative = a11y violation
+
+**STATUS: ✅ RESOLVED 2026-05-21** — globální `:focus-visible` ring (`!important`); myš (`:focus`) beze změny.
 **Co**: `global.css:1272`, `global.css:4321`, `sklad/index.astro:417`, `admin/cenik.astro:147`, `ModelChatWidget.astro:555` — všude `outline: none` na `:focus`.
 
 **Proč problém**: Klávesnice uživatelé nevidí kam navigují. WCAG 2.2 SC 2.4.7 (Focus Visible) — porušení.
@@ -664,35 +682,3 @@ Pokud sklad naroste přes ~100 vozů, build time se zvedne (každý dostane svoj
 
 ## Recommendations — co řešit jako první (Top 5 impact × effort)
 
-| # | Issue | Impact | Effort | Why first |
-|---|---|---|---|---|
-| **1** | Lead form bypass (#1) | **Vysoký** (PR, GDPR, business) | Střední (1-2 dny) | Útok je triviální, právní rizika |
-| **2** | Broken footer links → 404 (#4) | Střední (UX, SEO) | Nízký (1 hod) | Jen vypnout linky / přidat placeholder pages |
-| **3** | Canonical URLs + trailingSlash (#5) | Vysoký (SEO long-term) | Nízký (1 hod) | BaseLayout.astro + config one-liner |
-| **4** | Marked XSS sanitization (#2, #3) | Vysoký (security) | Nízký-střední (2-4 hod) | DOMPurify install + 3 míst |
-| **5** | DirectusImage CLS (#17) | Střední (Core Web Vitals) | Nízký (1 hod) | Přidat width/height props/attrs |
-
----
-
-## Co je OK (nepatří do report, ale ujištění)
-
-- Lazy loading na images ✓
-- Eager+fetchpriority high na hero ✓
-- JSON-LD pro Vehicle/AutoDealer/Article ✓
-- Honeypot field v formech (i když serverem nevynucený) ✓
-- Astro sitemap integration ✓
-- `noindex` na /admin/cenik ✓
-- Rate limiter na AI chat (i když per-instance) ✓
-- AI lead validation (jméno + telefon format) v chat/model.ts ✓
-- Cron backup auth via CRON_SECRET ✓
-- Hero video Safari autoplay JS fix ✓
-- NBSP v fmtPrice / fmtKm ✓
-- Mobile drawer Esc handling ✓
-- env(safe-area-inset-*) respektován na bottom bar ✓
-- Image webp formát ✓
-- `prefetch` collections build-time optimalizace ✓
-- `aria-current="page"` na breadcrumb ✓
-
----
-
-*Konec reportu. Pokud máš dotazy ke konkrétním bodům, pošli číslo (např. "#13") — rád zacvičím.*

@@ -25,11 +25,10 @@ const brands = await directusGet<Brand>('brands', {
   filter: { status: { _eq: 'published' } },
 });
 
-// Skladové vozy (4 nejnovější)
-// Načteme větší pool (16) a client-side z něj náhodně vybereme 4
-// → každý F5 = jiná auta pro variabilitu UX
+// Skladové vozy — načteme CELÝ sklad (cap 100) a client-side z něj náhodně
+// vybereme 4 → každý F5 protočí všechna auta, ne jen posledních pár.
 const stockVehicles = await directusGet<any>('stock_vehicles', {
-  limit: 16,
+  limit: 100,
   sort: ['-listed_at'],
   fields: [
     'id', 'condition', 'availability', 'km', 'list_price', 'promo_price',
@@ -427,8 +426,8 @@ const articles = articlesRaw.map((a) => {
 
   <script>
     /* === Skladovka shuffle ===
-       Z poolu 16 vozů zamícháme DOM order při loadu → každý F5 = jiná 4 auta.
-       Fisher-Yates shuffle. CSS skrývá vše od 5. karty dál. */
+       Zamícháme DOM order všech načtených vozů při loadu → každý F5 = jiná 4 auta
+       z CELÉHO skladu. Fisher-Yates shuffle. CSS skrývá vše od 5. karty dál. */
     (() => {
       const grid = document.querySelector('[data-stock-shuffle]');
       if (!grid) return;
@@ -439,5 +438,4 @@ const articles = articlesRaw.map((a) => {
       }
       cards.forEach((c) => grid.appendChild(c));
     })();
-  </script>
-</BaseLayout>
+  </scr
