@@ -325,4 +325,20 @@ const mapEmbedUrl = 'https://maps.google.com/maps?q=%C4%8Eablicka+553%2F2%2C+182
       margin: 0;
       letter-spacing: -0.005em;
     }
-  
+    .team-count {
+      font-size: 13px;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    .team-grid-v2 {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 14px;
+    }
+    @media (max-width: 640px) {
+      .team-v2 { padding: 56px 0 72px; }
+      .team-grid-v2 { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 10px; }
+    }
+  </style>
+</BaseLayout>
