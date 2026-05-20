@@ -53,6 +53,7 @@ const PREFETCH_COLLECTIONS = [
   'branches',
   'employees',
   'articles',
+  'legal_pages',
   'site_settings',
   'model_color_exterior',
   'model_color_interior',
