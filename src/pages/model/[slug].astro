@@ -34,6 +34,7 @@ type ModelRaw = Model & {
   brand?: number | null;
   sub_brand?: number | null;
   hero_image?: string;
+  logo?: string;
   gallery?: Array<{ directus_files_id: string }>;
   color_exterior?: Array<any>;
   color_interior?: Array<any>;
@@ -50,6 +51,7 @@ const rawModels = await directusGet<ModelRaw>('models', {
     'variant_badge_kind',
     'hero_video',         // explicit UUID file ref (some Directus versions don't include in *)
     'hero_image_card',
+    'logo',               // model logo (wordmark) — zobrazí se v hero místo textu
     'gallery.directus_files_id',
     'color_exterior.*',
     'color_interior.*',
@@ -490,7 +492,11 @@ if (promoActive && promoDescription) {
         <span class="sep">·</span>
         <span>{badgeText}</span>
       </div>
-      <h1 class="mhero-title">{rawModel.name}</h1>
+      <h1 class="mhero-title">
+        {rawModel.logo
+          ? <img class="mhero-logo" src={directusAsset(rawModel.logo, { height: 256, format: 'webp' })} alt={rawModel.name} />
+          : rawModel.name}
+      </h1>
       <p class="mhero-tagline">{rawModel.tagline ?? ''}</p>
     </div>
     {heroStats.length > 0 && (

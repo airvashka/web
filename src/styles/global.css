@@ -1451,6 +1451,14 @@ button.thumb-more {
   margin: 0 0 20px;
   text-transform: uppercase;
 }
+/* Model logo (wordmark) místo textového názvu v hero — když models.logo nastaveno */
+.mhero-title .mhero-logo {
+  display: block;
+  height: clamp(52px, 8.5vw, 128px);
+  width: auto;
+  max-width: min(100%, 560px);
+  object-fit: contain;
+}
 .mhero-tagline {
   font-family: var(--font-display);
   font-weight: 400;
