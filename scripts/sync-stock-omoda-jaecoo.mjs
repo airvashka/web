@@ -246,7 +246,7 @@ function mapVehicle(v) {
 }
 
 async function findExisting(vin) {
-  const r = await api('GET', `/items/stock_vehicles?filter[external_source][_eq]=omoda-jaecoo&filter[external_id][_eq]=${vin}&limit=1&fields=id,external_id`);
+  const r = await api('GET', `/items/stock_vehicles?filter[external_source][_eq]=omoda-jaecoo&filter[external_id][_eq]=${vin}&limit=1&fields=id,external_id,photos`);
   return r.data?.[0] ?? null;
 }
 
@@ -285,8 +285,9 @@ async function processVehicle(v, i, total, brandId) {
     ok(`${label} created id=${id}`);
   }
 
-  // Fotky jen pro nove (vyhneme se duplikaci pri re-sync)
-  if (!existing && !NO_PHOTOS && m.gallery.length) {
+  // Fotky pro nove i pro existujici BEZ fotek (backfill), jinak skip (zadne duplikovani)
+  const existingPhotoCount = existing?.photos?.length ?? 0;
+  if (!NO_PHOTOS && m.gallery.length && (!existing || existingPhotoCount === 0)) {
     const fileIds = [];
     for (let k = 0; k < m.gallery.length; k++) {
       try { const fid = await uploadPhoto(m.gallery[k], `${m.code}-${m.vin}`, k + 1); if (fid) fileIds.push(fid); await sleep(150); }

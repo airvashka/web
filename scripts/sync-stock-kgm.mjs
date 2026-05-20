@@ -60,7 +60,9 @@ const LIMIT = parseInt(args.find((a) => a.startsWith('--limit='))?.split('=')[1]
 
 // ─── Config ───────────────────────────────────────────────
 const KGM_BASE = 'https://stock.sfrmotor.kgmcars.cz';
-const KGM_IMPORT_FOLDER_ID = 'cbb47ab0-5a42-4bf3-ba6d-7cfb1c6fd3ee'; // viz setup-file-folders.mjs output
+const PARENT_FOLDER_NAME = 'Skladové vozy';
+const KGM_FOLDER_NAME = 'Import — KGM';
+let FOLDER_ID = null; // resolved dynamicky pres ensureKgmFolder() (zadne natvrdo zadane ID)
 const REQUEST_DELAY_MS = 500; // mezi requesty na KGM
 const USER_AGENT = 'Mozilla/5.0 (compatible; sfr-motor-sync/1.0; +https://sfr-motor.cz)';
 
@@ -219,6 +221,20 @@ async function resolveCreds() {
   EMAIL = (await prompt('Email: ')).trim();
   PASSWORD = (await prompt('Heslo: ')).trim();
   await login();
+}
+
+// Najde slozku "Import — KGM" pod "Skladové vozy" (self-correcting), jinak vytvori.
+async function ensureKgmFolder() {
+  const pr = await api('GET', `/folders?filter[name][_eq]=${encodeURIComponent(PARENT_FOLDER_NAME)}&limit=1&fields=id`);
+  const parentId = pr.data?.[0]?.id ?? null;
+  if (parentId) {
+    const ch = await api('GET', `/folders?filter[parent][_eq]=${parentId}&limit=50&fields=id,name`);
+    const hit = (ch.data ?? []).find((f) => /kgm/i.test(f.name));
+    if (hit) { FOLDER_ID = hit.id; info(`Folder "${hit.name}" (${FOLDER_ID})`); return; }
+  }
+  const c = await api('POST', '/folders', parentId ? { name: KGM_FOLDER_NAME, parent: parentId } : { name: KGM_FOLDER_NAME });
+  FOLDER_ID = c.data?.id ?? null;
+  info(`Folder "${KGM_FOLDER_NAME}" vytvoren${parentId ? ` pod "${PARENT_FOLDER_NAME}"` : ''} (${FOLDER_ID})`);
 }
 
 function isTokenExpired(jsonResp) {
@@ -515,7 +531,7 @@ async function uploadPhoto(photoUrl, vehicleLabel, index, _retried = false) {
 
   // Multipart upload
   const formData = new FormData();
-  formData.append('folder', KGM_IMPORT_FOLDER_ID);
+  if (FOLDER_ID) formData.append('folder', FOLDER_ID);
   formData.append('file', new Blob([buf], { type: r.headers.get('content-type') ?? 'image/jpeg' }), filename);
 
   const upload = await fetch(`${DIRECTUS_URL}/files`, {
@@ -654,7 +670,7 @@ async function processVehicle(detailUrl, index, total) {
     console.log(`  Pohon: ${parsed.spec['Pohon']} → ${mapByPrefix(parsed.spec['Pohon'], DRIVETRAIN_MAP)}  Převod: ${parsed.spec['Převodovka']} → ${mapByPrefix(parsed.spec['Převodovka'], TRANSMISSION_MAP)}`);
     console.log(`  Fotek: ${parsed.photoUrls.length}  Pakety: ${parsed.optionalPackages.length}  Feature groups: ${Object.keys(parsed.features).length}`);
     if (existing) console.log(`  → Upsert PATCH existující id=${existing.id}`);
-    else console.log(`  → CREATE nový (status=imported)`);
+    else console.log(`  → CREATE nový (status=published)`);
     return { status: 'dry-run', externalId: parsed.externalId };
   }
 
@@ -672,11 +688,13 @@ async function processVehicle(detailUrl, index, total) {
     const payload = buildCreateFields(parsed, fkIds, trimLevelSnapshot);
     const created = await api('POST', '/items/stock_vehicles', payload);
     vehicleId = created.data?.id;
-    ok(`Created id=${vehicleId} (status=imported)`);
+    ok(`Created id=${vehicleId} (status=published)`);
   }
 
-  // Upload fotek — jen pro NOVÉ (vyhneme se duplikování při re-sync)
-  if (!existing && !NO_PHOTOS && parsed.photoUrls.length > 0) {
+  // Upload fotek — pro NOVÉ i pro existující BEZ fotek (backfill), jinak skip (žádné duplikování)
+  const existingPhotoCount = existing?.photos?.length ?? 0;
+  const needPhotos = !NO_PHOTOS && parsed.photoUrls.length > 0 && (!existing || existingPhotoCount === 0);
+  if (needPhotos) {
     console.log(`  Uploaduji ${parsed.photoUrls.length} fotek...`);
     const fileIds = [];
     for (let i = 0; i < parsed.photoUrls.length; i++) {
@@ -763,6 +781,7 @@ async function main() {
 
   await resolveCreds();
   ok('Auth OK (s auto-refresh při token expiry)');
+  if (!NO_PHOTOS) await ensureKgmFolder();
 
   // Krok 1: Listing
   const allUrls = await fetchListingUrls();
