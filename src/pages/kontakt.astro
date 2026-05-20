@@ -145,7 +145,7 @@ const mapEmbedUrl = 'https://maps.google.com/maps?q=%C4%8Eablicka+553%2F2%2C+182
     </div>
   </section>
 
-  <section class="formpanel" data-screen-label="05 Form">
+  <section class="formpanel" id="poptavka" data-screen-label="05 Form">
     <div class="container formpanel-grid">
       <div>
         <div class="section-eyebrow">Napište nám</div>
@@ -216,6 +216,15 @@ const mapEmbedUrl = 'https://maps.google.com/maps?q=%C4%8Eablicka+553%2F2%2C+182
       } else if (formType === 'model_inquiry' && model) {
         if (titleEl) titleEl.textContent = `Poptávka — ${model.toUpperCase()}`;
         if (subjectInput instanceof HTMLInputElement) subjectInput.value = `Poptávka modelu ${model}`;
+      }
+
+      // Když uživatel přišel s kontextem (z tlačítka na /model nebo /sklad),
+      // odscrolluj rovnou k formuláři místo zůstat nahoře na stránce.
+      if (formType || model || vehicle) {
+        const panel = form.closest('.formpanel');
+        if (panel) requestAnimationFrame(() =>
+          setTimeout(() => panel.scrollIntoView({ behavior: 'smooth', block: 'start' }), 80)
+        );
       }
     })();
 

@@ -24,6 +24,9 @@
   --radius-lg: 20px;
   --max: 1320px;
   --pad: 32px;
+  /* Jednotný vertikální rytmus pruhů (sekcí). Responzivní: ~64px mobil → 96px desktop.
+     Používá se napříč stránkami pro konzistentní odsazení pruhů. */
+  --section-pad: clamp(64px, 7vw, 96px);
   /* Noto Sans (universal Latin) — KGM-style consistent across web. Stejný font
      pro display i body, liší se jen weight (display = 600-700 bold, body = 400).
      POZN: Použito Noto Sans (ne Noto Sans KR) — Korean varianta nemá Latin
@@ -682,8 +685,8 @@ input, textarea, select { font: inherit; }
 }
 
 /* ===== Section heads ===== */
-.section { padding: 80px 0; }
-.section.tight { padding: 64px 0; }
+.section { padding: var(--section-pad) 0; }
+.section.tight { padding: calc(var(--section-pad) * 0.7) 0; }
 
 /* Hairline separator mezi sousedními sekcemi — vyřeší vizuální splývání
    stejně-barevných pruhů. Skip když následuje dark sekce (tam je kontrast jasný). */
@@ -1884,7 +1887,7 @@ html.scrolled-down .subnav {
 /* ===== Barvy — read-only gallery (exterior + interior) ===== */
 .config {
   background: var(--bg-cream);
-  padding: 96px 0;
+  padding: var(--section-pad) 0;
 }
 .config-head { margin-bottom: 48px; }
 
@@ -2861,7 +2864,7 @@ html.scrolled-down .subnav {
 }
 .bhero-actions .btn-outline:hover { border-color: #fff; }
 
-.why { padding: 120px 0; }
+.why { padding: var(--section-pad) 0; }
 .why-grid {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr);
@@ -2922,7 +2925,7 @@ html.scrolled-down .subnav {
 
 .models {
   background: var(--bg-cream);
-  padding: 120px 0;
+  padding: var(--section-pad) 0;
 }
 .models-head { margin-bottom: 56px; }
 .models-head .lead {
@@ -3162,7 +3165,7 @@ html.scrolled-down .subnav {
 .models-banner .btn-outline:hover { border-color: #fff; }
 
 .brand-strip {
-  padding: 72px 0;
+  padding: var(--section-pad) 0;
   border-top: 1px solid var(--line);
 }
 .brand-strip-grid {
@@ -3286,7 +3289,7 @@ html.scrolled-down .subnav {
 .hhero-counter .sep { color: rgba(255,255,255,0.4); }
 
 .brand-tiles {
-  padding: 120px 0;
+  padding: var(--section-pad) 0;
   background: #fff;
 }
 .brand-tiles-head {
@@ -3517,7 +3520,7 @@ html.scrolled-down .subnav {
 
 /* Skladovka row */
 .skladovka {
-  padding: 0 0 120px;
+  padding: var(--section-pad) 0;
   background: #fff;
 }
 .skladovka-head {
@@ -4268,7 +4271,7 @@ html.scrolled-down .subnav {
 
 .formpanel {
   background: var(--bg-cream);
-  padding: 100px 0;
+  padding: var(--section-pad) 0;
 }
 .formpanel-grid {
   display: grid;

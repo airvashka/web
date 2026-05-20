@@ -133,6 +133,8 @@ const themeClass = ['ice', 'hev', 'evx'].includes(theme) ? `theme-${theme}` : ''
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 12px;
+    /* Odstup od Představení (fotky) — i kdyz je popis kratky, boxy se nelepi na foto */
+    margin-top: clamp(40px, 5vw, 72px);
     margin-bottom: 56px;
     --theme: var(--accent, #1F6FEB);
     --theme-soft: color-mix(in srgb, var(--theme) 14%, white);
