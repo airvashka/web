@@ -12,7 +12,10 @@
     "build": "node scripts/fetch-google-reviews.mjs && astro build",
     "preview": "astro preview",
     "astro": "astro",
-    "fetch-reviews": "node scripts/fetch-google-reviews.mjs"
+    "fetch-reviews": "node scripts/fetch-google-reviews.mjs",
+    "sync:stock": "node scripts/sync-stock-kgm.mjs ; node scripts/sync-stock-omoda-jaecoo.mjs",
+    "sync:stock:kgm": "node scripts/sync-stock-kgm.mjs",
+    "sync:stock:omoda": "node scripts/sync-stock-omoda-jaecoo.mjs"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.32.1",

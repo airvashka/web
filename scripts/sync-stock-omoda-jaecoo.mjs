@@ -27,11 +27,16 @@ const args = process.argv.slice(2);
 const DRY_RUN = args.includes('--dry-run');
 const NO_PHOTOS = args.includes('--no-photos');
 const SKIP_SOLD = args.includes('--skip-sold');
+const KEEP_SOLD_PHOTOS = args.includes('--keep-sold-photos');
 const LIMIT = parseInt(args.find((a) => a.startsWith('--limit='))?.split('=')[1] ?? '0', 10);
 const LIST_MODELS = args.includes('--list-models');
 
+// Throttle pro mazani souboru z R2 (jinak Cloudflare vrati 429 a Render spadne)
+const DELETE_THROTTLE_MS = 250;
+
 const FEED_URL = 'https://omodajaecoo.app/feed/sfr-motor.json';
-const IMPORT_FOLDER_NAME = 'Import - OMODA & JAECOO';
+const PARENT_FOLDER_NAME = 'Skladové vozy';
+const IMPORT_FOLDER_NAME = 'Import — OMODA & JAECOO'; // vnorena pod PARENT_FOLDER_NAME
 const USER_AGENT = 'Mozilla/5.0 (compatible; sfr-motor-sync/1.0; +https://sfr-motor.cz)';
 
 let DIRECTUS_URL = '', TOKEN = '', EMAIL = '', PASSWORD = '', FOLDER_ID = null;
@@ -133,12 +138,36 @@ async function api(method, path, body, _retried = false) {
   return j;
 }
 
+// Prihlaseni: preferuje env (pro automaticky/cron beh), jinak interaktivni prompt.
+async function resolveCreds() {
+  const interactive = process.stdin.isTTY;
+  DIRECTUS_URL = process.env.DIRECTUS_URL
+    || (interactive ? (await prompt('Directus URL [https://sfr-motor-directus.onrender.com]: ')).trim() : '')
+    || 'https://sfr-motor-directus.onrender.com';
+  if (process.env.DIRECTUS_TOKEN) { TOKEN = process.env.DIRECTUS_TOKEN; return; }
+  if (process.env.DIRECTUS_EMAIL && process.env.DIRECTUS_PASSWORD) {
+    EMAIL = process.env.DIRECTUS_EMAIL; PASSWORD = process.env.DIRECTUS_PASSWORD; await login(); return;
+  }
+  if (!interactive) throw new Error('Neinteraktivni rezim: nastav DIRECTUS_EMAIL + DIRECTUS_PASSWORD (nebo DIRECTUS_TOKEN) v env.');
+  EMAIL = (await prompt('Admin email: ')).trim();
+  PASSWORD = (await prompt('Admin heslo: ')).trim();
+  await login();
+}
+
 async function ensureFolder() {
-  const r = await api('GET', `/folders?filter[name][_eq]=${encodeURIComponent(IMPORT_FOLDER_NAME)}&limit=1&fields=id`);
-  if (r.data?.[0]?.id) { FOLDER_ID = r.data[0].id; return; }
-  const c = await api('POST', '/folders', { name: IMPORT_FOLDER_NAME });
+  // Rodicovska slozka "Skladové vozy"
+  const pr = await api('GET', `/folders?filter[name][_eq]=${encodeURIComponent(PARENT_FOLDER_NAME)}&limit=1&fields=id`);
+  const parentId = pr.data?.[0]?.id ?? null;
+  // Self-correcting: najdi existujici podslozku obsahujici "omoda" pod tim rodicem (at nevyrabime duplikaty)
+  if (parentId) {
+    const ch = await api('GET', `/folders?filter[parent][_eq]=${parentId}&limit=50&fields=id,name`);
+    const hit = (ch.data ?? []).find((f) => /omoda/i.test(f.name));
+    if (hit) { FOLDER_ID = hit.id; info(`Folder "${hit.name}" (${FOLDER_ID})`); return; }
+  }
+  // Jinak zaloz vnorenou (pripadne top-level, pokud rodic neexistuje)
+  const c = await api('POST', '/folders', parentId ? { name: IMPORT_FOLDER_NAME, parent: parentId } : { name: IMPORT_FOLDER_NAME });
   FOLDER_ID = c.data?.id ?? null;
-  info(`Folder "${IMPORT_FOLDER_NAME}" vytvoren (${FOLDER_ID})`);
+  info(`Folder "${IMPORT_FOLDER_NAME}" vytvoren${parentId ? ` pod "${PARENT_FOLDER_NAME}"` : ''} (${FOLDER_ID})`);
 }
 
 // ─── FK cache ───
@@ -271,18 +300,44 @@ async function processVehicle(v, i, total, brandId) {
   return { status: existing ? 'updated' : 'created', vin: m.vin, id };
 }
 
+// Smaze soubory z R2/Directusu po davkach s pauzou (chrani pred 429).
+// Vraci pocet smazanych.
+async function deletePhotosThrottled(fileIds, label) {
+  let del = 0;
+  for (const fid of fileIds) {
+    if (!fid) continue;
+    try { await api('DELETE', `/files/${fid}`); del++; }
+    catch (e) { warn(`    fotka ${fid} smazani selhalo: ${e.message}`); }
+    await sleep(DELETE_THROTTLE_MS);
+  }
+  if (del) info(`    ${label}: smazano ${del} fotek z R2`);
+  return del;
+}
+
 async function markMissingAsSold(seen) {
   console.log('\nKrok 3: Sold detection...');
-  const r = await api('GET', `/items/stock_vehicles?filter[external_source][_eq]=omoda-jaecoo&filter[availability][_neq]=sold&limit=500&fields=id,external_id`);
-  let marked = 0;
+  const r = await api('GET', `/items/stock_vehicles?filter[external_source][_eq]=omoda-jaecoo&filter[availability][_neq]=sold&limit=500&fields=id,external_id,photos.directus_files_id`);
+  let marked = 0, photosDeleted = 0;
   for (const v of (r.data ?? [])) {
     if (!seen.has(String(v.external_id))) {
-      if (DRY_RUN) info(`  [DRY] sold id=${v.id} vin=${v.external_id}`);
-      else { try { await api('PATCH', `/items/stock_vehicles/${v.id}`, { availability: 'sold', sold_at: new Date().toISOString() }); info(`  sold id=${v.id}`); } catch (e) { warn(`  sold selhal id=${v.id}: ${e.message}`); } }
+      const fileIds = (v.photos ?? []).map((p) => p.directus_files_id).filter(Boolean);
+      if (DRY_RUN) { info(`  [DRY] sold id=${v.id} vin=${v.external_id}` + (fileIds.length ? ` (+ smazat ${fileIds.length} fotek)` : '')); }
+      else {
+        try {
+          await api('PATCH', `/items/stock_vehicles/${v.id}`, { availability: 'sold', sold_at: new Date().toISOString() });
+          info(`  sold id=${v.id}`);
+          // Auto zustava jako "sold", ale fotky uklidime z R2 (data pole nenabobtnava)
+          if (!KEEP_SOLD_PHOTOS && fileIds.length) {
+            await api('PATCH', `/items/stock_vehicles/${v.id}`, { photos: [] }); // odpoj M2M
+            photosDeleted += await deletePhotosThrottled(fileIds, `id=${v.id}`);
+          }
+        } catch (e) { warn(`  sold selhal id=${v.id}: ${e.message}`); }
+      }
       marked++;
     }
   }
   if (!marked) info('  Zadne chybejici vozy.');
+  else if (!DRY_RUN && !KEEP_SOLD_PHOTOS) info(`  Celkem smazano fotek: ${photosDeleted}`);
   return marked;
 }
 
@@ -291,11 +346,7 @@ async function main() {
   if (DRY_RUN) console.log('  [DRY-RUN] nic se nezapise');
   if (LIMIT) console.log(`  [LIMIT=${LIMIT}]`);
   console.log('');
-  DIRECTUS_URL = (await prompt('Directus URL [https://sfr-motor-directus.onrender.com]: ')).trim() || 'https://sfr-motor-directus.onrender.com';
-  EMAIL = (await prompt('Admin email: ')).trim();
-  PASSWORD = (await prompt('Admin heslo: ')).trim();
-  console.log('');
-  await login(); ok('Auth OK');
+  await resolveCreds(); ok('Auth OK');
   if (!DRY_RUN && !NO_PHOTOS) await ensureFolder();
 
   const brandId = await resolveBrandId('omoda-jaecoo');

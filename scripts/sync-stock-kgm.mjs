@@ -53,6 +53,9 @@ const args = process.argv.slice(2);
 const DRY_RUN = args.includes('--dry-run');
 const NO_PHOTOS = args.includes('--no-photos');
 const SKIP_SOLD = args.includes('--skip-sold');
+const KEEP_SOLD_PHOTOS = args.includes('--keep-sold-photos');
+// Throttle pro mazani souboru z R2 (jinak Cloudflare vrati 429 a Render spadne)
+const DELETE_THROTTLE_MS = 250;
 const LIMIT = parseInt(args.find((a) => a.startsWith('--limit='))?.split('=')[1] ?? '0', 10);
 
 // ─── Config ───────────────────────────────────────────────
@@ -200,6 +203,22 @@ async function login() {
   if (!r.ok) throw new Error(`Login failed ${r.status}: ${await r.text()}`);
   const j = await r.json();
   TOKEN = j.data.access_token;
+}
+
+// Prihlaseni: preferuje env (pro automaticky/cron beh), jinak interaktivni prompt.
+async function resolveCreds() {
+  const interactive = process.stdin.isTTY;
+  DIRECTUS_URL = process.env.DIRECTUS_URL
+    || (interactive ? (await prompt('Directus URL [https://sfr-motor-directus.onrender.com]: ')).trim() : '')
+    || 'https://sfr-motor-directus.onrender.com';
+  if (process.env.DIRECTUS_TOKEN) { TOKEN = process.env.DIRECTUS_TOKEN; return; }
+  if (process.env.DIRECTUS_EMAIL && process.env.DIRECTUS_PASSWORD) {
+    EMAIL = process.env.DIRECTUS_EMAIL; PASSWORD = process.env.DIRECTUS_PASSWORD; await login(); return;
+  }
+  if (!interactive) throw new Error('Neinteraktivni rezim: nastav DIRECTUS_EMAIL + DIRECTUS_PASSWORD (nebo DIRECTUS_TOKEN) v env.');
+  EMAIL = (await prompt('Email: ')).trim();
+  PASSWORD = (await prompt('Heslo: ')).trim();
+  await login();
 }
 
 function isTokenExpired(jsonResp) {
@@ -687,19 +706,38 @@ async function processVehicle(detailUrl, index, total) {
 }
 
 // ─── Sold detection ───────────────────────────────────────
+// Smaze soubory z R2/Directusu po davkach s pauzou (chrani pred 429).
+async function deletePhotosThrottled(fileIds, label) {
+  let del = 0;
+  for (const fid of fileIds) {
+    if (!fid) continue;
+    try { await api('DELETE', `/files/${fid}`); del++; }
+    catch (e) { warn(`    fotka ${fid} smazani selhalo: ${e.message}`); }
+    await sleep(DELETE_THROTTLE_MS);
+  }
+  if (del) info(`    ${label}: smazano ${del} fotek z R2`);
+  return del;
+}
+
 async function markMissingAsSold(seenIds) {
   console.log('\nKrok 4: Sold detection — vozy z Directus chybějící v KGM feedu...');
-  const r = await api('GET', `/items/stock_vehicles?filter[external_source][_eq]=kgm&filter[availability][_neq]=sold&limit=500&fields=id,external_id`);
+  const r = await api('GET', `/items/stock_vehicles?filter[external_source][_eq]=kgm&filter[availability][_neq]=sold&limit=500&fields=id,external_id,photos.directus_files_id`);
   const candidates = r.data ?? [];
-  let marked = 0;
+  let marked = 0, photosDeleted = 0;
   for (const v of candidates) {
     if (!seenIds.has(String(v.external_id))) {
+      const fileIds = (v.photos ?? []).map((p) => p.directus_files_id).filter(Boolean);
       if (DRY_RUN) {
-        info(`  [DRY] Mark sold id=${v.id} external_id=${v.external_id}`);
+        info(`  [DRY] Mark sold id=${v.id} external_id=${v.external_id}` + (fileIds.length ? ` (+ smazat ${fileIds.length} fotek)` : ''));
       } else {
         try {
           await api('PATCH', `/items/stock_vehicles/${v.id}`, { availability: 'sold', sold_at: new Date().toISOString() });
           info(`  Marked sold id=${v.id} (external_id=${v.external_id})`);
+          // Auto zustava jako "sold", ale fotky uklidime z R2 (data pole nenabobtnava)
+          if (!KEEP_SOLD_PHOTOS && fileIds.length) {
+            await api('PATCH', `/items/stock_vehicles/${v.id}`, { photos: [] }); // odpoj M2M
+            photosDeleted += await deletePhotosThrottled(fileIds, `id=${v.id}`);
+          }
         } catch (e) {
           warn(`  Sold patch selhal id=${v.id}: ${e.message}`);
         }
@@ -708,6 +746,7 @@ async function markMissingAsSold(seenIds) {
     }
   }
   if (marked === 0) info('  Žádné chybějící vozy.');
+  else if (!DRY_RUN && !KEEP_SOLD_PHOTOS) info(`  Celkem smazáno fotek: ${photosDeleted}`);
   return marked;
 }
 
@@ -722,13 +761,7 @@ async function main() {
   if (SKIP_SOLD) console.log('  ⚠  SKIP-SOLD — neoznačuji prodané');
   console.log('');
 
-  DIRECTUS_URL = (await prompt('Directus URL [https://sfr-motor-directus.onrender.com]: ')).trim()
-    || 'https://sfr-motor-directus.onrender.com';
-  EMAIL = (await prompt('Email: ')).trim();
-  PASSWORD = (await prompt('Heslo: ')).trim();
-  console.log('');
-
-  await login();
+  await resolveCreds();
   ok('Auth OK (s auto-refresh při token expiry)');
 
   // Krok 1: Listing
