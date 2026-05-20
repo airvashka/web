@@ -5117,3 +5117,6 @@ html.scrolled-down .subnav {
   .mag-cta h2 { font-size: 28px; }
   .mag-head { flex-direction: column; align-items: flex-start; }
 }
+
+/* Recenze sekce — jednotný vertikální rytmus pruhů (kontakt + titulka) */
+.reviews-section { padding: var(--section-pad) 0; }
