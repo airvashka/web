@@ -119,7 +119,7 @@ const fmtKm = (n?: number | null) => (n === 0 || !n ? '0 km' : `${n.toLocaleStr
 const otherBrands = await directusGet<Brand>('brands', {
   filter: { status: { _eq: 'published' }, slug: { _neq: brandSlug } },
   sort: ['sort'],
-  fields: ['id', 'slug', 'name', 'tagline'],
+  fields: ['id', 'slug', 'name', 'tagline', 'tile_eyebrow', 'tile_description'],
   limit: 3,
 });
 
@@ -514,7 +514,11 @@ const activeBrand = Astro.params.brand;
       <h2 class="why-title" style="margin-bottom: 40px;">Tři značky pod jednou střechou.</h2>
       <div class="brand-strip-grid">
         {[brand, ...otherBrands].slice(0, 3).map((b) => {
-          const strip = STRIP[b.slug] ?? { tag: '', ds: b.tagline ?? '' };
+          const bx = b as any;
+          const strip = {
+            tag: bx.tile_eyebrow ?? STRIP[b.slug]?.tag ?? '',
+            ds: bx.tile_description ?? STRIP[b.slug]?.ds ?? b.tagline ?? '',
+          };
           const isActive = b.slug === activeBrand;
           return (
             <a class={`brand-tile${isActive ? ' is-active' : ''}`} href={`/${b.slug}`}>
