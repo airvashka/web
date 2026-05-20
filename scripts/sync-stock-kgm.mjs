@@ -381,16 +381,32 @@ async function parseDetail(detailUrl) {
     });
   }
 
-  // 4) Optional packages — pod nadpisem "Příplatková výbava"
+  // 4) Optional packages — sekce "Příplatková výbava".
+  // KGM ji renderuje jako akordeon: <div class="accordion__button">Příplatková výbava</div>
+  // + sousedni <div class="accordion__collapse"><ul class="profile__list"><li>...</li></ul></div>.
+  // (Drive hledano jako h2/h3 + nasledujici ul -> mineno, proto bylo prazdne.)
   const optionalPackages = [];
-  $('h2, h3').each((_, el) => {
-    if (/příplatková\s+výbava/i.test($(el).text())) {
-      $(el).nextUntil('h2, h3', 'ul').find('li').each((__, li) => {
-        const txt = $(li).text().trim();
-        if (txt) optionalPackages.push(txt);
-      });
-    }
+  $('.accordion__button').each((_, el) => {
+    if (!/příplatková\s+výbava/i.test($(el).text())) return;
+    const collapse = $(el).next('.accordion__collapse').length
+      ? $(el).next('.accordion__collapse')
+      : $(el).closest('.accordion__item').find('.accordion__collapse').first();
+    collapse.find('li').each((__, li) => {
+      const txt = $(li).text().trim();
+      if (txt) optionalPackages.push(txt);
+    });
   });
+  // Fallback pro pripadnou starsi/jinou strukturu (h2/h3 + nasledujici ul)
+  if (optionalPackages.length === 0) {
+    $('h2, h3').each((_, el) => {
+      if (/příplatková\s+výbava/i.test($(el).text())) {
+        $(el).nextUntil('h2, h3', 'ul').find('li').each((__, li) => {
+          const txt = $(li).text().trim();
+          if (txt) optionalPackages.push(txt);
+        });
+      }
+    });
+  }
 
   // 5) Standardní výbava grouped — H2 nadpisy + UL po nich
   const features = {};
@@ -524,7 +540,7 @@ function buildSyncFields(parsed, fkIds, trimLevelSnapshot) {
 function buildCreateFields(parsed, fkIds, trimLevelSnapshot) {
   return {
     ...buildSyncFields(parsed, fkIds, trimLevelSnapshot),
-    status: 'imported',
+    status: 'published',
     external_source: 'kgm',
     external_id: parsed.externalId,
     brand: fkIds.brandId,

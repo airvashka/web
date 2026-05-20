@@ -234,22 +234,27 @@ const statusBadge = v.availability === 'in_stock' ? { cls: 'dark', label: 'Sklad
 
 // Equipment grouped — funguje pro nové groupy ({category, items}) i legacy flat array
 const rawFeatures = (trim as any)?.features ?? [];
-let grouped = getGroupedFeatures(rawFeatures);
-// Fallback: importované vozy (OMODA/JAECOO feed) nemají napojený trim, ale výbavu
-// mají v trim_level_snapshot.equip — grupy ve tvaru { title, items: [{ title }] }.
-if (grouped.length === 0) {
-  const feedEquip = (v.trim_level_snapshot as any)?.equip;
-  if (Array.isArray(feedEquip)) {
-    grouped = feedEquip
-      .map((g: any) => ({
-        label: g?.title ?? g?.category ?? 'Výbava',
-        items: Array.isArray(g?.items)
-          ? g.items.map((it: any) => (typeof it === 'string' ? it : it?.title)).filter(Boolean)
-          : [],
-      }))
-      .filter((g: any) => g.items.length > 0);
-  }
+// Standardní výbava: PRIMÁRNĚ z feedu/scrapu konkrétního vozu, jinak z napojeného trimu.
+//   OMODA/JAECOO feed → snapshot.equip   = [{ title, items: [{ title }] }]
+//   KGM scrape        → snapshot.features = { kategorie: [string] }
+//   ruční / legacy    → trim.features (getGroupedFeatures)
+const _snap = (v.trim_level_snapshot as any) ?? {};
+let feedGrouped: Array<{ label: string; items: string[] }> = [];
+if (Array.isArray(_snap.equip)) {
+  feedGrouped = _snap.equip
+    .map((g: any) => ({
+      label: g?.title ?? g?.category ?? 'Výbava',
+      items: Array.isArray(g?.items)
+        ? g.items.map((it: any) => (typeof it === 'string' ? it : it?.title)).filter(Boolean)
+        : [],
+    }))
+    .filter((g: any) => g.items.length > 0);
+} else if (_snap.features && typeof _snap.features === 'object' && !Array.isArray(_snap.features)) {
+  feedGrouped = Object.entries(_snap.features)
+    .map(([label, items]) => ({ label, items: Array.isArray(items) ? (items as any[]).map(String).filter(Boolean) : [] }))
+    .filter((g) => g.items.length > 0);
 }
+let grouped = feedGrouped.length > 0 ? feedGrouped : getGroupedFeatures(rawFeatures);
 // Flat seznam pro highlights heuristiku (čte se napříč skupinami)
 const features: string[] = grouped.flatMap((g) => g.items);
 
@@ -291,6 +296,13 @@ const allSpecs = [...tdEntries, ...vehicleSpecs];
 const half = Math.ceil(allSpecs.length / 2);
 const specsLeft = allSpecs.slice(0, half);
 const specsRight = allSpecs.slice(half);
+
+// Příplatková výbava tohoto konkrétního vozu = ruční extra_features + to, co
+// scraper našel v sekci "Příplatková výbava" (trim_level_snapshot.optional_packages).
+const extraListUniq: string[] = [...new Set([
+  ...(Array.isArray((v as any).extra_features) ? (v as any).extra_features : []),
+  ...(Array.isArray(snapshot.optional_packages) ? snapshot.optional_packages : []),
+].map((s: any) => String(s).trim()).filter(Boolean))];
 
 // Highlights — fetch z site_settings (editovatelné v adminu), fallback na hardcoded.
 type Highlight = { icon: string; title: string; subtitle: string };
@@ -646,15 +658,15 @@ const salesPhoneLink = telLink(salesPhone);
             ))}
           </div>
 
-          {/* Extra features — konkrétní výbava TOHOTO vozu, mimo trim a packety */}
-          {Array.isArray((v as any).extra_features) && (v as any).extra_features.length > 0 && (
+          {/* Příplatková výbava / extra — konkrétní výbava TOHOTO vozu mimo standard */}
+          {extraListUniq.length > 0 && (
             <div class="extra-features">
               <div class="extra-features-head">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
                 <h3>Tento konkrétní vůz má navíc</h3>
               </div>
               <ul class="extra-features-list">
-                {((v as any).extra_features as string[]).map((f) => (
+                {extraListUniq.map((f) => (
                   <li>
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
                     <span>{f}</span>

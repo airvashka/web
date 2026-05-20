@@ -249,7 +249,7 @@ async function processVehicle(v, i, total, brandId) {
     id = existing.id; ok(`${label} updated id=${id}`);
   } else {
     const payload = {
-      ...m.sync, status: 'imported', external_source: 'omoda-jaecoo', external_id: m.vin,
+      ...m.sync, status: 'published', external_source: 'omoda-jaecoo', external_id: m.vin,
       brand: brandId, model: modelId, model_year: year?.id ?? null, listed_at: new Date().toISOString(),
     };
     id = (await api('POST', '/items/stock_vehicles', payload)).data?.id;
