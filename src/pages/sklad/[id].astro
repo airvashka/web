@@ -234,7 +234,22 @@ const statusBadge = v.availability === 'in_stock' ? { cls: 'dark', label: 'Sklad
 
 // Equipment grouped — funguje pro nové groupy ({category, items}) i legacy flat array
 const rawFeatures = (trim as any)?.features ?? [];
-const grouped = getGroupedFeatures(rawFeatures);
+let grouped = getGroupedFeatures(rawFeatures);
+// Fallback: importované vozy (OMODA/JAECOO feed) nemají napojený trim, ale výbavu
+// mají v trim_level_snapshot.equip — grupy ve tvaru { title, items: [{ title }] }.
+if (grouped.length === 0) {
+  const feedEquip = (v.trim_level_snapshot as any)?.equip;
+  if (Array.isArray(feedEquip)) {
+    grouped = feedEquip
+      .map((g: any) => ({
+        label: g?.title ?? g?.category ?? 'Výbava',
+        items: Array.isArray(g?.items)
+          ? g.items.map((it: any) => (typeof it === 'string' ? it : it?.title)).filter(Boolean)
+          : [],
+      }))
+      .filter((g: any) => g.items.length > 0);
+  }
+}
 // Flat seznam pro highlights heuristiku (čte se napříč skupinami)
 const features: string[] = grouped.flatMap((g) => g.items);
 
@@ -250,9 +265,19 @@ const td: any = { ...modelTd, ...yearTd };
 // Dynamický výpis: vezmi všechno co user vyplnil v Models → Technical Data,
 // plus přidej "Převodovka", "Palivo", "Pohon" z odznaků na konkrétním voze
 // (pokud nejsou v td už uvedené).
-const tdEntries: Array<[string, string]> = Object.entries(td)
-  .filter(([, v]) => v !== null && v !== undefined && String(v).trim() !== '')
-  .map(([k, v]) => [k, String(v)] as [string, string]);
+// Feed specs (importované vozy OMODA/JAECOO) — per-VIN technická data ze snapshotu
+// ve tvaru [{ title, value }]. Když feed specs jsou, mají přednost před obecnými
+// technical_data modelu (jsou konkrétní pro tento vůz).
+const feedSpecs: Array<[string, string]> = Array.isArray(snapshot.specs)
+  ? snapshot.specs
+      .map((s: any) => [String(s?.title ?? '').trim(), String(s?.value ?? '').trim()] as [string, string])
+      .filter(([k, val]) => k && val)
+  : [];
+const tdEntries: Array<[string, string]> = feedSpecs.length > 0
+  ? feedSpecs
+  : Object.entries(td)
+      .filter(([, v]) => v !== null && v !== undefined && String(v).trim() !== '')
+      .map(([k, v]) => [k, String(v)] as [string, string]);
 
 // Vehicle-specific specs (jen pokud nejsou už v td)
 const vehicleSpecs: Array<[string, string]> = [];

@@ -9,11 +9,16 @@ import type { Brand, StockVehicle } from '@lib/types';
 
 /* ============================================================
    SKLAD LISTING — design extends Skladovka section z home.jsx
-   (samostatná listing page chybí v draftu — vytvořena konzistentně)
    Sidebar filtrů (vlevo) + .scard grid (vpravo)
+   SSR (prerender=false) — skladovka je vždy živá, nový/prodaný vůz se
+   projeví hned bez rebuildu. Edge cache 60s drží výkon.
    ============================================================ */
+export const prerender = false;
 
-const brands = await directusGet<Brand>('brands', { sort: ['sort'], fields: ['id', 'slug', 'name'] });
+Astro.response.headers.set('Cache-Control', 'public, s-maxage=60, stale-while-revalidate=300');
+
+// forceLive (3. param) = vždy čerstvý fetch z Directusu, žádná build-time cache.
+const brands = await directusGet<Brand>('brands', { sort: ['sort'], fields: ['id', 'slug', 'name'] }, true);
 
 type VehicleListItem = StockVehicle & {
   brand?: { name: string; slug: string };
@@ -42,7 +47,7 @@ const vehicles = await directusGet<VehicleListItem>('stock_vehicles', {
     'model_year.year',
     'trim_level.name',
   ],
-});
+}, true);
 
 function firstPhoto(v: VehicleListItem): string | null {
   if (!Array.isArray(v.photos) || v.photos.length === 0) return null;

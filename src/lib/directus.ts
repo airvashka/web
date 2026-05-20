@@ -291,11 +291,18 @@ function needsLiveFetch(opts: FetchOptions): boolean {
 
 export async function directusGet<T>(
   collection: string,
-  opts: FetchOptions = {}
+  opts: FetchOptions = {},
+  forceLive = false
 ): Promise<T[]> {
   if (!DIRECTUS_URL) {
     console.warn(`[directus] PUBLIC_DIRECTUS_URL není nastavena — collection "${collection}" vrací prázdná data.`);
     return [];
+  }
+
+  // forceLive → vždy čerstvý fetch bez jakékoli cache (pro SSR stránky jako /sklad,
+  // kde build-time prefetch/cache by vracela zastaralá data za běhu serveru).
+  if (forceLive) {
+    return doLiveFetch<T>(collection, { ...opts });
   }
 
   // Dev mode → vždy live fetch, žádný cache
