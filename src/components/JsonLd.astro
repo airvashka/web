@@ -12,6 +12,8 @@ interface Props {
   data: Record<string, any> | Array<Record<string, any>>;
 }
 const { data } = Astro.props;
-const json = JSON.stringify(data, null, 0);
+// Escape `<` → `<`, aby `</script>` v textových polích (excerpt, title…)
+// nemohl předčasně ukončit ld+json blok a vytéct jako viditelný text na stránce.
+const json = JSON.stringify(data, null, 0).replace(/</g, '\\u003c');
 ---
 <script type="application/ld+json" set:html={json}></script>
