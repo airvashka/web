@@ -207,7 +207,7 @@ const articles = articlesRaw.map((a) => {
               <span class="live-dot" aria-hidden="true"></span>
               <span>Aktualizováno dnes</span>
             </div>
-            <div class="btile-name">K odjezdu dnes.</div>
+            <div class="btile-name">K odjezdu <span data-pickup-when>dnes</span>.</div>
             <p class="btile-lead">Přes {totalStockCount} vozů na skladu napříč všemi značkami — kompletně připravené k převzetí.</p>
             <div class="btile-stats">
               <div class="btile-stat">
@@ -238,7 +238,7 @@ const articles = articlesRaw.map((a) => {
       <div class="skladovka-head">
         <div>
           <div class="section-eyebrow">Skladovka</div>
-          <h2>Odjet můžete dnes</h2>
+          <h2>Odjet můžete <span data-pickup-when>dnes</span></h2>
         </div>
         <a class="head-link" href="/sklad">
           Všech {totalStockCount}+ vozů
@@ -438,6 +438,23 @@ const articles = articlesRaw.map((a) => {
         [cards[i], cards[j]] = [cards[j], cards[i]];
       }
       cards.forEach((c) => grid.appendChild(c));
+    })();
+  </script>
+  <script>
+    /* Dynamické "dnes / už zítra / už v pondělí" podle prodejní otevírací doby
+       (Po–Pá 8–18, Čt do 20, So+Ne zavřeno). Počítá se v prohlížeči, Europe/Prague. */
+    (() => {
+      const spans = document.querySelectorAll('[data-pickup-when]');
+      if (!spans.length) return;
+      const parts = new Intl.DateTimeFormat('en-GB', { timeZone: 'Europe/Prague', weekday: 'short', hour: '2-digit', minute: '2-digit', hour12: false }).formatToParts(new Date());
+      const wd = parts.find((x) => x.type === 'weekday').value;
+      const mins = (+parts.find((x) => x.type === 'hour').value) * 60 + (+parts.find((x) => x.type === 'minute').value);
+      const isWeekday = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'].includes(wd);
+      const closeMin = wd === 'Thu' ? 20 * 60 : 18 * 60;
+      const openableToday = isWeekday && mins < closeMin;
+      let phrase = 'dnes';
+      if (!openableToday) phrase = (wd === 'Fri' || wd === 'Sat' || wd === 'Sun') ? 'už v pondělí' : 'už zítra';
+      spans.forEach((el) => { el.textContent = phrase; });
     })();
   </script>
 </BaseLayout>
