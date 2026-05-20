@@ -1,0 +1,79 @@
+---
+import BaseLayout from '@layouts/BaseLayout.astro';
+import Breadcrumbs from '@components/Breadcrumbs.astro';
+import { directusGet } from '@lib/directus';
+import { sanitizeHtml } from '@lib/sanitize';
+import { marked } from 'marked';
+
+/* ============================================================
+   StaticPage — renderuje jednu stránku z Directus kolekce `pages`
+   podle slugu (title + markdown body). Používá se pro:
+   - /informace/[slug]  (cookies, ochrana-udaju, podminky)
+   - /o-nas, /kariera, /partneri
+   Obsah je editovatelný v Directus adminu.
+   ============================================================ */
+
+interface Props {
+  slug: string | undefined;
+  parent?: { label: string; href: string };
+}
+
+const { slug, parent } = Astro.props;
+
+interface PageItem {
+  id: number;
+  slug: string;
+  title: string;
+  body?: string;
+  status?: string;
+}
+
+const rows = await directusGet<PageItem>('pages', {
+  filter: { slug: { _eq: slug }, status: { _eq: 'published' } },
+  limit: 1,
+  fields: ['*'],
+});
+const page = rows[0];
+if (!page) return Astro.redirect('/');
+
+marked.setOptions({ gfm: true, breaks: false });
+const bodyHtml = page.body ? sanitizeHtml(String(marked.parse(page.body))) : '';
+
+const crumbs = parent ? [parent, { label: page.title }] : [{ label: page.title }];
+---
+
+<BaseLayout title={page.title} description={`${page.title} — SFR Motor s.r.o.`}>
+  <Breadcrumbs items={crumbs} />
+
+  <section class="legal">
+    <div class="container">
+      <h1>{page.title}</h1>
+      <div class="legal-body" set:html={bodyHtml}></div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .legal { padding: 48px 0 96px; }
+  .legal .container { max-width: 820px; }
+  .legal h1 {
+    font-size: clamp(28px, 4vw, 42px);
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+    margin: 0 0 32px;
+  }
+  .legal-body { color: var(--ink, #1a1a1a); font-size: 16px; line-height: 1.75; }
+  .legal-body :global(h2) { font-size: 22px; margin: 40px 0 12px; letter-spacing: -0.01em; }
+  .legal-body :global(h3) { font-size: 18px; margin: 28px 0 8px; }
+  .legal-body :global(p) { margin: 0 0 16px; }
+  .legal-body :global(ul),
+  .legal-body :global(ol) { margin: 0 0 16px; padding-left: 22px; }
+  .legal-body :global(li) { margin: 0 0 6px; }
+  .legal-body :global(a) {
+    color: var(--brand, #F25C1B);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+  .legal-body :global(em) { color: rgba(0, 0, 0, 0.5); font-style: italic; font-size: 14px; }
+  .legal-body :global(strong) { font-weight: 600; }
+</style>

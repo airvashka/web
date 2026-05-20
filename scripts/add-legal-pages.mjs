@@ -1,8 +1,9 @@
 #!/usr/bin/env node
 /**
- * SFR Motor — legal_pages kolekce + seed (Cookies, Ochrana osobnich udaju, Podminky).
- * Vytvori editovatelnou kolekci `legal_pages` a seedne stranky.
- * Existujici stranky NEPREPISUJE. Frontend: src/pages/informace/[slug].astro.
+ * SFR Motor — `pages` kolekce + seed.
+ * Statice/obsahove stranky: cookies, ochrana-udaju, podminky (sekce informace),
+ * o-nas, kariera, partneri (sekce standalone). Existujici NEPREPISUJE.
+ * Frontend: src/pages/informace/[slug].astro + /o-nas, /kariera, /partneri.
  * Pouziti:  cd web && node scripts/add-legal-pages.mjs
  */
 import readline from 'node:readline/promises';
@@ -111,22 +112,57 @@ Webové stránky provozuje společnost **SFR Motor s.r.o.**, IČO 08263523, se s
 
 _Poslední aktualizace: ${TODAY}_`;
 
+const ONAS_BODY = `## O nás
+
+Společnost **SFR Motor** působí na pražském trhu od roku 2019, kdy otevřela své první autorizované prodejní a servisní místo a stala se ambasadorem značky v regionu Praha a okolí. Od počátku jsme věřili v kvalitu nabízených vozů a jejich vynikající poměr ceny a užitné hodnoty — a zákazníci nám dali za pravdu.
+
+Jak rostl zájem o naše vozy a služby, rozrůstaly se i naše kapacity. V březnu 2022 jsme proto přesunuli kompletní provoz do nové, prostornější provozovny na adrese **Ďáblická 553/2, Praha 8**. Najdete zde moderní showroom s prostorem pro vystavení celé modelové řady, kvalitní technické zázemí pro komplexní péči o vozidla i dostatek parkovacích míst. Provozovna je snadno dostupná autem i městskou hromadnou dopravou — jen jednu zastávku autobusem od stanice metra Střížkov.
+
+Dnes jsme autorizovaným prodejcem a servisem značek **KGM, OMODA & JAECOO a Farizon**. Naším cílem zůstává to, s čím jsme začínali: poskytovat kvalitní služby s osobním přístupem a být připraveni růst společně s našimi zákazníky.
+
+Těšíme se na vaši návštěvu.
+
+_Váš SFR Motor team_`;
+
+const KARIERA_BODY = `## Kariéra
+
+Rozšiřujeme náš tým a hledáme nové kolegy, kteří chtějí pracovat s moderními vozy v přátelském prostředí. Aktuálně posilujeme zejména **servisní oddělení** — uvítáme automechaniky a servisní techniky, kteří mají chuť se učit a růst.
+
+Co u nás najdete: zázemí stabilní a rostoucí firmy, moderní servisní provoz na adrese Ďáblická 553/2 v Praze 8, práci se značkami KGM, OMODA & JAECOO a Farizon a kolektiv, který táhne za jeden provaz.
+
+Máte zájem se přidat? Pošlete nám svůj životopis na [info@sfr-motor.cz](mailto:info@sfr-motor.cz) — ozveme se vám.
+
+_Poslední aktualizace: ${TODAY}_`;
+
+const PARTNERI_BODY = `## Partneři
+
+Vážíme si spolupráce s partnery, kteří sdílejí náš důraz na kvalitu a aktivní životní styl.
+
+Spolupracujeme se společností **Decathlon**. Nově připravujeme také spolupráci se sportovními areály **HAMR centrum Braník** a **HAMR centrum Záběhlice**.
+
+Máte zájem o partnerství se SFR Motor? Ozvěte se nám na [info@sfr-motor.cz](mailto:info@sfr-motor.cz).
+
+_Poslední aktualizace: ${TODAY}_`;
+
 const SEED_PAGES = [
-  { slug: 'cookies',       title: 'Zásady používání cookies', body: COOKIES_BODY,  sort: 1 },
-  { slug: 'ochrana-udaju', title: 'Ochrana osobních údajů',   body: GDPR_BODY,     sort: 2 },
-  { slug: 'podminky',      title: 'Obchodní podmínky',        body: PODMINKY_BODY, sort: 3 },
+  { slug: 'cookies',       title: 'Zásady používání cookies', body: COOKIES_BODY,  section: 'informace',  sort: 1 },
+  { slug: 'ochrana-udaju', title: 'Ochrana osobních údajů',   body: GDPR_BODY,     section: 'informace',  sort: 2 },
+  { slug: 'podminky',      title: 'Obchodní podmínky',        body: PODMINKY_BODY, section: 'informace',  sort: 3 },
+  { slug: 'o-nas',         title: 'O nás',                    body: ONAS_BODY,     section: 'standalone', sort: 4 },
+  { slug: 'kariera',       title: 'Kariéra',                  body: KARIERA_BODY,  section: 'standalone', sort: 5 },
+  { slug: 'partneri',      title: 'Partneři',                 body: PARTNERI_BODY, section: 'standalone', sort: 6 },
 ];
 
 async function collectionExists() {
-  try { await api('GET', '/collections/legal_pages'); return true; } catch { return false; }
+  try { await api('GET', '/collections/pages'); return true; } catch { return false; }
 }
 
 async function createCollection() {
   await api('POST', '/collections', {
-    collection: 'legal_pages',
+    collection: 'pages',
     meta: {
-      icon: 'gavel',
-      note: 'Pravni a informacni stranky. Zobrazuji se na /informace/{slug}. Obsah pis v Markdownu.',
+      icon: 'description',
+      note: 'Obsahove a pravni stranky. section=informace -> /informace/{slug}; section=standalone -> /{slug}. Obsah pis v Markdownu.',
       display_template: '{{title}}',
       sort_field: 'sort',
       archive_field: 'status',
@@ -143,30 +179,37 @@ async function createCollection() {
             { text: 'Koncept', value: 'draft' },
             { text: 'Archivovano', value: 'archived' },
           ] } } },
-      { field: 'sort', type: 'integer', meta: { interface: 'input', hidden: true, width: 'half', sort: 2 } },
+      { field: 'section', type: 'string', schema: { default_value: 'standalone' },
+        meta: { interface: 'select-dropdown', width: 'half', sort: 2, display: 'labels',
+          note: 'informace = /informace/{slug} (cookies, GDPR, podminky). standalone = /{slug} (o-nas, kariera, partneri).',
+          options: { choices: [
+            { text: 'Informace (/informace/...)', value: 'informace' },
+            { text: 'Samostatna (/...)', value: 'standalone' },
+          ] } } },
+      { field: 'sort', type: 'integer', meta: { interface: 'input', hidden: true, width: 'half', sort: 3 } },
       { field: 'slug', type: 'string', schema: { is_nullable: false, is_unique: true },
-        meta: { interface: 'input', width: 'half', sort: 3, required: true,
-          note: 'URL: /informace/{slug}. Napr. "cookies".', options: { slug: true, placeholder: 'cookies' } } },
+        meta: { interface: 'input', width: 'half', sort: 4, required: true,
+          note: 'URL slug. Napr. "cookies" nebo "o-nas".', options: { slug: true, placeholder: 'o-nas' } } },
       { field: 'title', type: 'string', schema: { is_nullable: false },
-        meta: { interface: 'input', width: 'full', sort: 4, required: true, options: { placeholder: 'Zasady cookies' } } },
+        meta: { interface: 'input', width: 'full', sort: 5, required: true, options: { placeholder: 'O nas' } } },
       { field: 'body', type: 'text',
-        meta: { interface: 'input-rich-text-md', width: 'full', sort: 5, note: 'Obsah v Markdownu.' } },
-      { field: 'date_created', type: 'timestamp', meta: { interface: 'datetime', readonly: true, hidden: true, width: 'half', sort: 6, special: ['date-created'] } },
-      { field: 'date_updated', type: 'timestamp', meta: { interface: 'datetime', readonly: true, hidden: true, width: 'half', sort: 7, special: ['date-updated'] } },
+        meta: { interface: 'input-rich-text-md', width: 'full', sort: 6, note: 'Obsah v Markdownu.' } },
+      { field: 'date_created', type: 'timestamp', meta: { interface: 'datetime', readonly: true, hidden: true, width: 'half', sort: 7, special: ['date-created'] } },
+      { field: 'date_updated', type: 'timestamp', meta: { interface: 'datetime', readonly: true, hidden: true, width: 'half', sort: 8, special: ['date-updated'] } },
     ],
   });
-  ok('Kolekce legal_pages vytvorena');
+  ok('Kolekce pages vytvorena');
 }
 
 async function seed() {
   let existing = [];
   try {
-    const r = await api('GET', '/items/legal_pages?fields=slug&limit=-1');
+    const r = await api('GET', '/items/pages?fields=slug&limit=-1');
     existing = (r?.data ?? []).map((x) => x.slug);
   } catch { /* prazdna kolekce */ }
   for (const p of SEED_PAGES) {
     if (existing.includes(p.slug)) { info(`stranka "${p.slug}" uz existuje - nechavam beze zmeny`); continue; }
-    await api('POST', '/items/legal_pages', { ...p, status: 'published' });
+    await api('POST', '/items/pages', { ...p, status: 'published' });
     ok(`stranka "${p.slug}" vytvorena (${p.title})`);
   }
 }
@@ -186,10 +229,10 @@ async function findPublicPolicy() {
 async function addPublicRead(policyId) {
   try {
     await api('POST', '/permissions', {
-      policy: policyId, collection: 'legal_pages', action: 'read', fields: ['*'],
+      policy: policyId, collection: 'pages', action: 'read', fields: ['*'],
       permissions: { _and: [{ status: { _eq: 'published' } }] },
     });
-    ok('public read permission pro legal_pages nastaveno');
+    ok('public read permission pro pages nastaveno');
   } catch (e) {
     if (e.status === 400 && (e.message.includes('unique') || e.message.includes('exists'))) {
       info('public read permission uz existuje');
@@ -198,7 +241,7 @@ async function addPublicRead(policyId) {
 }
 
 async function main() {
-  console.log('\n=== SFR Motor - legal_pages (Cookies + GDPR + Podminky) ===\n');
+  console.log('\n=== SFR Motor - pages (legal + o-nas/kariera/partneri) ===\n');
   URL = (await prompt('Directus URL [https://sfr-motor-directus.onrender.com]: ')).trim()
     || 'https://sfr-motor-directus.onrender.com';
   const email = (await prompt('Admin email: ')).trim();
@@ -209,18 +252,18 @@ async function main() {
   TOKEN = auth?.data?.access_token;
   if (!TOKEN) { console.error('Auth selhal'); process.exit(1); }
   ok('Auth OK\n');
-  if (await collectionExists()) info('Kolekce legal_pages uz existuje - preskakuji vytvoreni.');
+  if (await collectionExists()) info('Kolekce pages uz existuje - preskakuji vytvoreni.');
   else await createCollection();
   console.log('');
   await seed();
   console.log('');
   const policy = await findPublicPolicy();
   if (policy) { info(`Public policy: ${policy.name} (${policy.id})`); await addPublicRead(policy.id); }
-  else warn('Public policy nenalezena - nastav read pro legal_pages rucne v adminu.');
+  else warn('Public policy nenalezena - nastav read pro pages rucne v adminu.');
   console.log('\n=== Hotovo! ===\n');
-  console.log(`Over API:   ${URL}/items/legal_pages`);
-  console.log(`Edituj:     ${URL}/admin/content/legal_pages`);
-  console.log('Frontend:   /informace/cookies , /informace/ochrana-udaju , /informace/podminky\n');
+  console.log(`Over API:   ${URL}/items/pages`);
+  console.log(`Edituj:     ${URL}/admin/content/pages`);
+  console.log('Frontend:   /informace/cookies, /informace/ochrana-udaju, /informace/podminky, /o-nas, /kariera, /partneri\n');
   rl.close();
 }
 
