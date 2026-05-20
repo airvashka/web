@@ -15,6 +15,8 @@
  * čtečky obrazovky i Google bot vědí co je v obrázku. H1 textový zůstává.
  */
 
+import { directusGet, directusAsset } from '@lib/directus';
+
 interface Props {
   slug: string;
   variant?: 'dark' | 'light';
@@ -31,13 +33,23 @@ const BRAND_LABELS: Record<string, string> = {
 };
 const label = BRAND_LABELS[slug] ?? slug.toUpperCase();
 
+// Logo z Directusu (brands.logo) — co nahraješ v adminu. Fallback na statický
+// /brand-logos/{slug}.svg, kdyby u značky logo nebylo nahrané.
+let logoSrc = `/brand-logos/${slug}.svg`;
+try {
+  const rows = await directusGet<any>('brands', { filter: { slug: { _eq: slug } }, limit: 1, fields: ['slug', 'logo'] });
+  const lg = rows?.[0]?.logo;
+  const logoId = typeof lg === 'string' ? lg : (lg?.id ?? lg?.directus_files_id ?? null);
+  if (logoId) logoSrc = directusAsset(logoId);
+} catch { /* nech statický fallback */ }
+
 // Pouze pokud caller explicitně předá height, aplikujeme inline style.
 // Jinak nech CSS pravidla (clamp v global.css) volnou ruku.
 const heightStyle = height ? `height: ${height}px;` : '';
 ---
 
 <img
-  src={`/brand-logos/${slug}.svg`}
+  src={logoSrc}
   alt={label}
   class={`brand-logo brand-logo--single brand-logo--${slug} ${className} variant-${variant}`}
   style={heightStyle}
