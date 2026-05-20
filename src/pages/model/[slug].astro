@@ -1307,4 +1307,13 @@ if (promoActive && promoDescription) {
     });
   </script>
 
-  <!-
+  <!-- ===== AI ASISTENT (floating widget) — JEN PRO KGM MODELY ===== -->
+  {brand.slug === 'kgm' && (
+    <ModelChatWidget
+      brandSlug={brand.slug}
+      brandName={brand.name}
+      modelSlug={rawModel.slug}
+      modelName={rawModel.name}
+    />
+  )}
+</BaseLayout>
