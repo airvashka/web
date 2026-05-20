@@ -722,8 +722,8 @@ async function main() {
   if (SKIP_SOLD) console.log('  ⚠  SKIP-SOLD — neoznačuji prodané');
   console.log('');
 
-  DIRECTUS_URL = (await prompt('Directus URL [https://directus-production-3e67.up.railway.app]: ')).trim()
-    || 'https://directus-production-3e67.up.railway.app';
+  DIRECTUS_URL = (await prompt('Directus URL [https://sfr-motor-directus.onrender.com]: ')).trim()
+    || 'https://sfr-motor-directus.onrender.com';
   EMAIL = (await prompt('Email: ')).trim();
   PASSWORD = (await prompt('Heslo: ')).trim();
   console.log('');
