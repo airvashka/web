@@ -100,6 +100,9 @@ Hlavní rizika:
 
 **Fix popisně**: Buď vytvořit alespoň minimální stránky (GDPR, obchodní podmínky, cookies), nebo skrýt nefunkční odkazy v Footer dokud nejsou hotové. Astro routes pro `/o-nas`, `/kariera`, `/partneri` nejsou kritické — můžou pryč.
 
+**STATUS: ✅ RESOLVED 2026-05-20**
+Vytvořena editovatelná Directus kolekce `pages` (slug, title, body md, status, section) + seed skript `scripts/add-legal-pages.mjs`. Vznikl sdílený komponent `StaticPage.astro` a všech 6 stránek: `/informace/cookies`, `/informace/ochrana-udaju`, `/informace/podminky` (section=informace přes `pages/informace/[slug].astro`) a `/o-nas`, `/kariera`, `/partneri` (section=standalone, named routes). Footer i consent odkaz v lead formulářích (`/informace/ochrana-udaju`) teď resolvují — 404 storm vyřešen. Obsah editovatelný v `/admin/content/pages`.
+
 ---
 
 ### 5) Žádné canonical URLs + `trailingSlash: 'ignore'`
@@ -111,6 +114,9 @@ Hlavní rizika:
 - `[brand].astro`, `model/[slug].astro`, `sklad/[id].astro`, `magazin/[slug].astro` — všechny generují JSON-LD se správnou URL, ale HTML neukazuje canonical.
 
 **Fix popisně**: V `BaseLayout.astro` přidat povinný prop `canonicalUrl` (nebo automatický z `Astro.url.pathname` + site URL) a vykreslit `<link rel="canonical" href={...}>`. Zvážit `trailingSlash: 'never'` a redirecty.
+
+**STATUS: ✅ RESOLVED 2026-05-20**
+`BaseLayout.astro` teď generuje canonical automaticky: `Astro.site` (`https://sfr-motor.cz`) + `Astro.url.pathname` normalizovaný (strip koncového lomítka, vyjma rootu) → `<link rel="canonical">` + `<meta property="og:url">`. Přidán volitelný prop `canonical` pro override (paginace/filtry). `trailingSlash` ponecháno na `'ignore'` záměrně — normalizovaný canonical řeší dedup bez rizika redirectů; flip na `'never'` lze udělat později, pokud bude potřeba tvrdé přesměrování.
 
 ---
 
@@ -126,6 +132,9 @@ const DIRECTUS_URL = import.meta.env.PUBLIC_DIRECTUS_URL || 'https://directus-pr
 - Také `directus-production-3e67.up.railway.app` zní jako produkční instance — útočník má rovnou cíl pro brute-force loginu nebo dependency vulnerabilities scan.
 
 **Fix popisně**: Odstranit fallback, ať explicitně failuje (vyhodit error). Případně mít neutrální fallback `https://localhost` (jen pro lokální dev), produkce musí mít env nastavenou.
+
+**STATUS: ✅ RESOLVED 2026-05-20**
+Railway fallback odstraněn ve všech 3 souborech (`admin/cenik.astro:15`, `api/cenik/save.ts:34`, `api/cenik/analyze.ts:231`) → sjednoceno na `import.meta.env.PUBLIC_DIRECTUS_URL ?? import.meta.env.DIRECTUS_URL ?? ''` (stejný vzor jako `lib/directus.ts`). Ověřeno grepem: žádný `railway.app` v `src/`. Produkce musí mít `PUBLIC_DIRECTUS_URL` nastavenou na Vercelu (Render URL) — což má.
 
 ---
 

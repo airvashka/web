@@ -31,7 +31,7 @@ import type { APIRoute } from 'astro';
 
 export const prerender = false;
 
-const DIRECTUS_URL = import.meta.env.PUBLIC_DIRECTUS_URL || 'https://directus-production-3e67.up.railway.app';
+const DIRECTUS_URL = import.meta.env.PUBLIC_DIRECTUS_URL ?? import.meta.env.DIRECTUS_URL ?? '';
 
 // ─── Helpers ─────────────────────────────────────────────
 
