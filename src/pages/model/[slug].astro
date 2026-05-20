@@ -412,14 +412,23 @@ const promoLabel: string = ((rawModel as any).promo_label ?? '').toString().trim
 const promoDiscountAmount: number = Number((rawModel as any).promo_discount_amount ?? 0) || 0;
 const promoValidTo: string | null = (rawModel as any).promo_valid_to ?? null;
 const promoDescription: string = (rawModel as any).promo_description ?? '';
-// Render markdown pro popis akce (lehký inline marked import — pokud chybí, fallback na plain text)
+// Render markdown pro popis akce — sanitizace přes DOMPurify (XSS prevention).
+// Promo description je editovaná v Directus adminu, ale i admin obsah sanitizujem
+// pro případ kompromitovaného účtu / typos / paste z neznámého zdroje.
 let promoDescriptionHtml: string = '';
 if (promoActive && promoDescription) {
   try {
     const { marked } = await import('marked');
-    promoDescriptionHtml = marked.parse(promoDescription) as string;
+    const { sanitizeHtml } = await import('@lib/sanitize');
+    const raw = marked.parse(promoDescription) as string;
+    promoDescriptionHtml = sanitizeHtml(raw);
   } catch {
-    promoDescriptionHtml = `<p>${promoDescription.replace(/\n/g, '</p><p>')}</p>`;
+    // Plain text fallback — escape HTML entities přes textContent simulation
+    promoDescriptionHtml = `<p>${promoDescription
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/\n/g, '</p><p>')}</p>`;
   }
 }
 ---
