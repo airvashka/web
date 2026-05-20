@@ -1456,9 +1456,9 @@ button.thumb-more {
    aby bylo čitelné na tmavém hero. Nahrávej klidně originální barvu, zbělá se samo. */
 .mhero-title .mhero-logo {
   display: block;
-  height: clamp(52px, 8.5vw, 128px);
-  width: auto;
-  max-width: min(100%, 560px);
+  height: clamp(44px, 7vw, 104px);  /* jednotná výška pro všechna loga */
+  width: auto;                       /* šířka dopočítaná z poměru stran */
+  max-width: 100%;                   /* jen pojistka proti přetečení (mobil) */
   object-fit: contain;
   filter: brightness(0) invert(1);
 }
