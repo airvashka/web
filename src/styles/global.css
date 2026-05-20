@@ -5120,3 +5120,12 @@ html.scrolled-down .subnav {
 
 /* Recenze sekce — jednotný vertikální rytmus pruhů (kontakt + titulka) */
 .reviews-section { padding: var(--section-pad) 0; }
+
+/* Titulka (.home na <main>) — střídání bílá/krémová mezi pruhy pro vizuální
+   odlišení. Scopnuté na .home, takže skladovka/reviews/ig na ostatních
+   stránkách zůstávají beze změny.
+   Pořadí pruhů: brand-tiles(bílá) > skladovka(krém) > split(bílá) >
+   reviews(krém) > video(bílá) > ig(krém) > magazin(bílá). */
+.home .skladovka { background: var(--bg-cream); }
+.home .reviews-section { background: var(--bg-cream); }
+.home .ig-section { background: var(--bg-cream); }

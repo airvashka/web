@@ -10,6 +10,7 @@ interface Props {
   description?: string;
   ogImage?: string;
   canonical?: string;
+  mainClass?: string;
 }
 
 const {
@@ -17,6 +18,7 @@ const {
   description = 'SFR Motor — autorizovaný dealer KGM, OMODA & JAECOO a Farizon. Skladové vozy, servis pro všechny značky, prodej a doplňkové služby. Praha-Ďáblice.',
   ogImage,
   canonical,
+  mainClass,
 } = Astro.props;
 
 const siteName = 'SFR Motor';
@@ -98,7 +100,7 @@ try {
 <body>
   <Header />
 
-  <main id="main">
+  <main id="main" class={mainClass}>
     <slot />
   </main>
 
