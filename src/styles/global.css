@@ -24,9 +24,9 @@
   --radius-lg: 20px;
   --max: 1320px;
   --pad: 32px;
-  /* Jednotný vertikální rytmus pruhů (sekcí). Responzivní: ~64px mobil → 96px desktop.
-     Používá se napříč stránkami pro konzistentní odsazení pruhů. */
-  --section-pad: clamp(64px, 7vw, 96px);
+  /* Jednotný vertikální rytmus pruhů (sekcí). Responzivní: ~40px mobil → 64px desktop.
+     Mezi dvěma pruhy se sčítá spodní+horní padding (cca 2×). Snadno doladíš tady. */
+  --section-pad: clamp(40px, 4.5vw, 64px);
   /* Noto Sans (universal Latin) — KGM-style consistent across web. Stejný font
      pro display i body, liší se jen weight (display = 600-700 bold, body = 400).
      POZN: Použito Noto Sans (ne Noto Sans KR) — Korean varianta nemá Latin
