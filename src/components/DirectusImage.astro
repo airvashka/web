@@ -59,6 +59,18 @@ const style = styleParts.join('; ');
 const hasSrc = !!src;
 const mid = widths[Math.floor(widths.length / 2)];
 
+// #17 CLS: kdyz mame aspectRatio (a nejsme ve fill modu), dodame intrinsic width/height
+// odvozene z pomeru -> browser rezervuje misto pred nactenim (bez distorze, img ma width:100%).
+let imgW: number | undefined;
+let imgH: number | undefined;
+if (aspectRatio && !fill) {
+  const parts = aspectRatio.split('/').map((n) => parseFloat(n.trim()));
+  if (parts.length === 2 && parts[0] > 0 && parts[1] > 0) {
+    imgW = mid;
+    imgH = Math.round((mid * parts[1]) / parts[0]);
+  }
+}
+
 const mainSrc = hasSrc ? directusAsset(src!, { width: mid, format: 'webp', quality: 80 }) : '';
 const srcset = hasSrc
   ? widths.map((w) => `${directusAsset(src!, { width: w, format: 'webp', quality: 80 })} ${w}w`).join(', ')
@@ -73,6 +85,8 @@ const srcset = hasSrc
     alt={alt}
     loading={loading}
     decoding="async"
+    width={imgW}
+    height={imgH}
     fetchpriority={fetchpriority}
     class={className}
     style={style}

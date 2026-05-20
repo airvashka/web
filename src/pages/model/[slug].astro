@@ -1261,7 +1261,10 @@ if (promoActive && promoDescription) {
     /* === Hero video — Safari autoplay pojistka ===
        Safari (zvláště iOS) občas přeskočí autoplay i u muted+playsinline videí.
        Force-play s retry; pokud i tak Safari odmítne, ponecháme poster + AI fallback. */
+    const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     document.querySelectorAll('video[data-autoplay-hero]').forEach((v) => {
+      // #13 a11y: uživatel s prefers-reduced-motion — žádný autoplay (necháme poster)
+      if (prefersReduced) { try { v.removeAttribute('autoplay'); v.pause(); } catch {} return; }
       // Force muted property (atribut nemusí stačit ve všech iOS verzích)
       try { v.muted = true; v.setAttribute('muted', ''); } catch {}
       const tryPlay = () => {
@@ -1304,13 +1307,4 @@ if (promoActive && promoDescription) {
     });
   </script>
 
-  <!-- ===== AI ASISTENT (floating widget) — JEN PRO KGM MODELY ===== -->
-  {brand.slug === 'kgm' && (
-    <ModelChatWidget
-      brandSlug={brand.slug}
-      brandName={brand.name}
-      modelSlug={rawModel.slug}
-      modelName={rawModel.name}
-    />
-  )}
-</BaseLayout>
+  <!-

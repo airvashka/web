@@ -160,6 +160,7 @@ const navItems: Array<{ label: string; href: string; key: NonNullable<Props['act
       toggle.setAttribute('aria-expanded', 'true');
       toggle.classList.add('is-open');
       document.body.style.overflow = 'hidden';
+      document.body.classList.add('drawer-open');
       backdrop?.classList.add('is-visible');
     }
     function closeDrawer() {
@@ -169,6 +170,7 @@ const navItems: Array<{ label: string; href: string; key: NonNullable<Props['act
       toggle.setAttribute('aria-expanded', 'false');
       toggle.classList.remove('is-open');
       document.body.style.overflow = '';
+      document.body.classList.remove('drawer-open');
       backdrop?.classList.remove('is-visible');
     }
     toggle.addEventListener('click', function (e) {

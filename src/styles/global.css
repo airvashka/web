@@ -19,6 +19,10 @@
   --ok: #1F8A4D;
   --danger: #B43A2C;
   --warning: #B27516;
+  --bg-card: #fff;            /* alias pro karty (LeadForm aj.) */
+  --success: var(--ok);       /* alias na --ok */
+  --nav-height: 76px;         /* vyska hlavni nav (desktop) */
+  --nav-height-mobile: 64px;  /* vyska hlavni nav (mobile) */
   --radius: 14px;
   --radius-sm: 10px;
   --radius-lg: 20px;
@@ -391,6 +395,7 @@ input, textarea, select { font: inherit; }
 .gallery-counter {
   position: absolute; bottom: 20px; left: 20px;
   background: rgba(11,11,12,0.7);
+  -webkit-backdrop-filter: blur(8px);
   backdrop-filter: blur(8px);
   color: #fff;
   font-family: var(--font-mono);
@@ -1688,7 +1693,7 @@ button.thumb-more {
 
 .subnav {
   position: sticky;
-  top: 76px;
+  top: var(--nav-height);
   z-index: 45;
   background: #fff;
   border-bottom: 1px solid var(--line);
@@ -3419,6 +3424,7 @@ html.scrolled-down .subnav {
   align-items: center;
   gap: 8px;
   background: rgba(0, 0, 0, 0.18);
+  -webkit-backdrop-filter: blur(4px);
   backdrop-filter: blur(4px);
   -webkit-backdrop-filter: blur(4px);
   padding: 6px 12px 6px 10px;
@@ -4238,6 +4244,7 @@ html.scrolled-down .subnav {
   border-radius: 5px;
   background: rgba(0,0,0,0.78);
   color: #fff;
+  -webkit-backdrop-filter: blur(6px);
   backdrop-filter: blur(6px);
 }
 .tcard .face .role-tag.is-sales { background: var(--accent); }
@@ -4587,7 +4594,7 @@ html.scrolled-down .subnav {
   .mhero-inner { padding: 40px 0 200px; }
   .mhero-stats-inner { grid-template-columns: 1fr 1fr; gap: 14px; }
   .mhero-price, .mhero-stats .btn { grid-column: span 2; justify-self: stretch; }
-  .subnav { top: 64px; }
+  .subnav { top: var(--nav-height-mobile); }
   .subnav-inner { justify-content: flex-start; padding: 0 var(--pad); gap: 0; }
   .subnav-link { padding: 18px 14px; font-size: 13px; }
   .subnav-sep { display: none; }
@@ -4843,6 +4850,7 @@ html.scrolled-down .subnav {
   letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--ink);
+  -webkit-backdrop-filter: blur(6px);
   backdrop-filter: blur(6px);
 }
 .acard-body { padding: 22px 24px 24px; flex: 1; display: flex; flex-direction: column; }
@@ -5129,3 +5137,23 @@ html.scrolled-down .subnav {
 .home .skladovka { background: var(--bg-cream); }
 .home .reviews-section { background: var(--bg-cream); }
 .home .ig-section { background: var(--bg-cream); }
+
+/* A11y: viditelny focus ring pro klavesnici (focus-visible). Mys (:focus) zustava beze zmeny.
+   !important prebije lokalni `outline: none` u inputu/tlacitek bez vizualni regrese pro mys. */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible,
+[tabindex]:focus-visible,
+.input:focus-visible,
+.textarea:focus-visible,
+.select:focus-visible {
+  outline: 2px solid var(--accent) !important;
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* #14: kdyz je otevreny mobilni drawer, schovej plovouci chat widget (jinak prebiji menu) */
+body.drawer-open .chat-widget { display: none !important; }
+
