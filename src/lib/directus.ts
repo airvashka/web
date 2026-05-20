@@ -68,19 +68,34 @@ const PREFETCH_COLLECTIONS = [
 const collectionData = new Map<string, any[]>();
 let prefetchPromise: Promise<void> | null = null;
 
-async function fetchFullCollection(collection: string): Promise<any[]> {
+async function fetchFullCollection(collection: string, attempt = 1): Promise<any[]> {
+  const MAX_RETRIES = 3;
+  const url = `${DIRECTUS_URL}/items/${collection}?limit=-1&fields=*`;
   try {
-    const url = `${DIRECTUS_URL}/items/${collection}?limit=-1&fields=*`;
     const res = await fetch(url, { headers: { 'Content-Type': 'application/json' } });
     if (!res.ok) {
       // Collection nemusí existovat — to je OK, vrátíme prázdné
       if (res.status === 403 || res.status === 404) return [];
+      // 5xx / 429 = přetížený nebo probouzející se Directus (Render cold start, nával
+      // paralelních prefetch dotazů) → retry s backoffem, ať build nepadá na prázdná data.
+      if ((res.status >= 500 || res.status === 429) && attempt <= MAX_RETRIES) {
+        const delay = 400 * attempt; // 400ms, 800ms, 1200ms
+        console.warn(`[directus] prefetch ${collection} → ${res.status}, retry ${attempt}/${MAX_RETRIES} za ${delay}ms`);
+        await new Promise((r) => setTimeout(r, delay));
+        return fetchFullCollection(collection, attempt + 1);
+      }
       console.warn(`[directus] prefetch ${collection} → ${res.status}`);
       return [];
     }
     const json = await res.json();
     return Array.isArray(json.data) ? json.data : json.data ? [json.data] : [];
   } catch (err: any) {
+    if (attempt <= MAX_RETRIES) {
+      const delay = 400 * attempt;
+      console.warn(`[directus] prefetch ${collection} error (${err?.message}), retry ${attempt}/${MAX_RETRIES} za ${delay}ms`);
+      await new Promise((r) => setTimeout(r, delay));
+      return fetchFullCollection(collection, attempt + 1);
+    }
     console.warn(`[directus] prefetch ${collection} error: ${err?.message}`);
     return [];
   }

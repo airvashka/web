@@ -34,21 +34,26 @@ const rows = await directusGet<PageItem>('pages', {
   fields: ['*'],
 });
 const page = rows[0];
-if (!page) return Astro.redirect('/');
 
+// Pozn.: ŽÁDNÝ Astro.redirect() tady — komponenta se renderuje uprostřed streamu
+// stránky, takže redirect by hodil ResponseSentError a shodil celý build.
+// Když data chybí (např. přechodný 503 z Directusu při buildu), ukážeme fallback.
 marked.setOptions({ gfm: true, breaks: false });
-const bodyHtml = page.body ? sanitizeHtml(String(marked.parse(page.body))) : '';
+const pageTitle = page?.title ?? 'Stránka se připravuje';
+const bodyHtml = page?.body ? sanitizeHtml(String(marked.parse(page.body))) : '';
 
-const crumbs = parent ? [parent, { label: page.title }] : [{ label: page.title }];
+const crumbs = parent ? [parent, { label: pageTitle }] : [{ label: pageTitle }];
 ---
 
-<BaseLayout title={page.title} description={`${page.title} — SFR Motor s.r.o.`}>
+<BaseLayout title={pageTitle} description={`${pageTitle} — SFR Motor s.r.o.`}>
   <Breadcrumbs items={crumbs} />
 
   <section class="legal">
     <div class="container">
-      <h1>{page.title}</h1>
-      <div class="legal-body" set:html={bodyHtml}></div>
+      <h1>{pageTitle}</h1>
+      {bodyHtml
+        ? <div class="legal-body" set:html={bodyHtml}></div>
+        : <p>Obsah této stránky se připravuje.</p>}
     </div>
   </section>
 </BaseLayout>
