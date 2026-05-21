@@ -938,8 +938,15 @@ function renderMatrix() {
   }
   html += `<tr><td colspan="${colspan}" style="padding-top:10px;"><button type="button" class="me-add-section">+ Přidat sekci</button></td></tr>`;
   html += '</tbody></table></div>';
+  // Zachovej scroll pozici — re-render jinak skočí nahoru po každé úpravě
+  const _prevBox = container.querySelector('.matrix-scroll');
+  const _prevTop = _prevBox ? _prevBox.scrollTop : 0;
+  const _prevWin = window.scrollY;
   container.innerHTML = html;
   wireMatrix(container);
+  const _newBox = container.querySelector('.matrix-scroll');
+  if (_newBox) _newBox.scrollTop = _prevTop;
+  window.scrollTo(0, _prevWin);
   $('count-trims').textContent = trims.length;
 }
 
@@ -1038,6 +1045,27 @@ function wireMatrix(container) {
 }
 
 // Počet řádků matice (pro Save confirm)
+// Dopočítej a zapiš sekci (category) ke všem optional/package položkám podle toho,
+// kde reálně v matici jsou (vč. posunů přes "+ řádek"). Volá se před uložením,
+// aby umístění drželo i bez re-kliknutí do buňky.
+function syncItemCategories() {
+  const trims = CURRENT_DATA.trims || [];
+  const featureToSection = new Map();
+  for (const t of trims) for (const sec of (t.features || [])) {
+    const name = featTrim(sec.section); if (!name) continue;
+    for (const it of (sec.items || [])) { const f = featTrim(it); if (f && !featureToSection.has(f)) featureToSection.set(f, name); }
+  }
+  for (const t of trims) {
+    for (const o of (t.optional_items || [])) { const f = featTrim(o.name); if (f && !featureToSection.has(f)) featureToSection.set(f, featTrim(o.category) || MATRIX_OTHER_SECTION); }
+    for (const p of (t.package_items || [])) { const f = featTrim(p.name); if (f && !featureToSection.has(f)) featureToSection.set(f, featTrim(p.category) || MATRIX_OTHER_SECTION); }
+  }
+  for (const d of MATRIX_DECLARED) if (d.feature) featureToSection.set(d.feature, d.section);
+  for (const t of trims) {
+    for (const o of (t.optional_items || [])) { const s = featureToSection.get(featTrim(o.name)); if (s) o.category = s; }
+    for (const p of (t.package_items || [])) { const s = featureToSection.get(featTrim(p.name)); if (s) p.category = s; }
+  }
+}
+
 function matrixRowCount() {
   return buildMatrixModel().reduce((a, s) => a + s.features.length, 0);
 }
@@ -1382,6 +1410,7 @@ $('save-btn').addEventListener('click', async () => {
   const totalRows = matrixRowCount();
   if (!confirm(`Uložit do "${$('year-select').selectedOptions[0]?.textContent}":\n${CURRENT_DATA.trims.length} výbavových stupňů, ${totalRows} řádků, ${CURRENT_DATA.packages.length} paketů.\n\nPokračovat?`)) return;
 
+  syncItemCategories();
   $('save-btn').disabled = true;
   $('save-btn').textContent = '⏳ Ukládám...';
 
