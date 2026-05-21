@@ -163,14 +163,19 @@ const DIRECTUS_URL = import.meta.env.PUBLIC_DIRECTUS_URL ?? import.meta.env.DIRE
 
     /* ── Maticový editor výbavy ── */
     .matrix-scroll { overflow: auto; max-height: 72vh; border: 1px solid #e0e0e0; border-radius: 8px; }
-    .matrix-edit { width: 100%; border-collapse: collapse; font-size: 13px; min-width: 560px; }
+    .matrix-edit { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 13px; min-width: 560px; }
     .matrix-edit th, .matrix-edit td { border-bottom: 1px solid #eee; }
     .matrix-edit thead th { background: #fafafa; padding: 8px; vertical-align: top; position: sticky; top: 0; z-index: 5; box-shadow: 0 2px 0 #e0e0e0; }
     .me-feature-head { text-align: left; font-weight: 700; color: #555; min-width: 220px; }
     .me-trim-head { text-align: center; }
     .me-trim-name { width: 100%; box-sizing: border-box; font-weight: 700; text-align: center; border: 1px solid #d0d0d5; border-radius: 4px; padding: 4px 6px; margin-bottom: 3px; }
+    .me-trim-move { display: flex; align-items: center; gap: 3px; margin-bottom: 3px; }
+    .me-trim-move .me-trim-name { flex: 1 1 auto; min-width: 0; margin-bottom: 0; }
+    .me-trim-left, .me-trim-right { flex: 0 0 auto; background: #eef4ff; color: #1f6feb; border: 1px solid #cfe0ff; border-radius: 4px; width: 20px; height: 24px; font-size: 10px; line-height: 1; cursor: pointer; padding: 0; }
+    .me-trim-left:disabled, .me-trim-right:disabled { opacity: 0.3; cursor: default; }
+    .me-trim-head { border-left: 1px solid #eef0f3; }
     .me-trim-price { width: 100%; box-sizing: border-box; font-size: 11px; text-align: center; border: 1px solid #e0e0e5; border-radius: 4px; padding: 3px 6px; color: #666; }
-    .me-section-row td { background: #1f6feb0d; padding: 8px; }
+    .me-section-row td { background: #e8eefc; padding: 9px 8px; border-top: 2px solid #c7d6f5; border-bottom: 1px solid #c7d6f5; }
     .me-section-name { font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; font-size: 12px; color: #1f6feb; border: 1px solid transparent; background: transparent; border-radius: 4px; padding: 4px 6px; min-width: 200px; }
     .me-section-name:focus { background: #fff; border-color: #1f6feb; outline: none; }
     .me-add-row { margin-left: 8px; background: #eef4ff; color: #1f6feb; border: 1px solid #cfe0ff; border-radius: 4px; padding: 3px 9px; font-size: 11px; cursor: pointer; }
@@ -179,7 +184,7 @@ const DIRECTUS_URL = import.meta.env.PUBLIC_DIRECTUS_URL ?? import.meta.env.DIRE
     .me-feature-name:focus { background: #fff; border-color: #1f6feb; outline: none; }
     .me-del-row { width: 20px; background: transparent; color: #c0392b; border: none; cursor: pointer; font-size: 15px; line-height: 1; opacity: 0.5; }
     .me-del-row:hover { opacity: 1; }
-    .me-cell { text-align: center; cursor: pointer; padding: 8px 6px !important; font-weight: 600; user-select: none; }
+    .me-cell { text-align: center; vertical-align: middle; cursor: pointer; padding: 8px 6px !important; font-weight: 600; user-select: none; border-left: 1px solid #eef0f3; }
     .me-cell:hover { outline: 2px solid #1f6feb; outline-offset: -2px; }
     .me-add-section { background: #2f9b5c; color: #fff; border: none; border-radius: 5px; padding: 7px 16px; font-size: 12px; cursor: pointer; }
 
@@ -898,7 +903,11 @@ function renderMatrix() {
   html += '<th class="me-feature-head">Prvek výbavy</th>';
   trims.forEach((t, ti) => {
     html += `<th class="me-trim-head">
-      <input class="me-trim-name" data-ti="${ti}" type="text" value="${escapeAttr(t.name ?? '')}" placeholder="Stupeň" />
+      <div class="me-trim-move">
+        <button type="button" class="me-trim-left" data-ti="${ti}" title="Posunout doleva"${ti === 0 ? ' disabled' : ''}>◀</button>
+        <input class="me-trim-name" data-ti="${ti}" type="text" value="${escapeAttr(t.name ?? '')}" placeholder="Stupeň" />
+        <button type="button" class="me-trim-right" data-ti="${ti}" title="Posunout doprava"${ti === trims.length - 1 ? ' disabled' : ''}>▶</button>
+      </div>
       <input class="me-trim-price" data-ti="${ti}" type="text" value="${t.list_price ?? ''}" placeholder="cena Kč" />
     </th>`;
   });
@@ -946,6 +955,21 @@ function wireMatrix(container) {
       const v = parseInt(e.target.value.replace(/\s/g, ''), 10);
       CURRENT_DATA.trims[ti].list_price = Number.isFinite(v) ? v : undefined;
     });
+  });
+
+  // Posun sloupce (stupně) doleva/doprava
+  const moveTrim = (from, to) => {
+    if (to < 0 || to >= CURRENT_DATA.trims.length) return;
+    const arr = CURRENT_DATA.trims;
+    const [m] = arr.splice(from, 1);
+    arr.splice(to, 0, m);
+    renderMatrix();
+  };
+  container.querySelectorAll('.me-trim-left').forEach((btn) => {
+    btn.addEventListener('click', (e) => { e.preventDefault(); const ti = parseInt(btn.dataset.ti, 10); moveTrim(ti, ti - 1); });
+  });
+  container.querySelectorAll('.me-trim-right').forEach((btn) => {
+    btn.addEventListener('click', (e) => { e.preventDefault(); const ti = parseInt(btn.dataset.ti, 10); moveTrim(ti, ti + 1); });
   });
 
   // Přejmenování sekce (na blur/change)
@@ -1194,7 +1218,7 @@ function formatPricingValue(v) {
 
 function renderColors(ext, int, trims) {
   const container = $('colors-container');
-  let html = '<p class="muted" style="margin-bottom:10px;">Klikni do buňky s cenou a zvol: <strong>✓ V ceně</strong> · <strong>cena</strong> · <strong>— nedostupné</strong>.</p>';
+  let html = '<p class="muted" style="margin-bottom:10px;">Texty (název, kód, typ) přepiš přímo v poli. Klikni do buňky s cenou a zvol: <strong>✓ V ceně</strong> · <strong>cena</strong> · <strong>— nedostupné</strong>.</p>';
 
   const dispCell = (v) => {
     if (v === undefined || v === null || v === '' || v === '-' || v === '–') return { cls: 'cell-unavailable', txt: '–' };
@@ -1212,6 +1236,7 @@ function renderColors(ext, int, trims) {
     const d = dispCell(v);
     return `<td class="cell color-cell ${d.cls}" data-cgroup="${grp}" data-cidx="${idx}" data-slug="${slug}" title="Klik = změnit" style="cursor:pointer;">${d.txt}</td>`;
   };
+  const txtCell = (val, grp, idx, field, extra) => `<td style="padding:4px 6px;"><input class="col-txt" data-cgroup="${grp}" data-cidx="${idx}" data-field="${field}" type="text" value="${escapeAttr(val ?? '')}" style="width:100%;box-sizing:border-box;border:1px solid transparent;background:transparent;border-radius:4px;padding:5px 6px;${extra || ''}" /></td>`;
 
   if (ext?.length) {
     html += '<h3>Exteriér</h3><table style="width:100%;border-collapse:collapse;font-size:13px;"><thead><tr><th style="text-align:left;padding:6px;background:#f5f5f7;">Barva</th><th style="padding:6px;background:#f5f5f7;">Kód</th><th style="padding:6px;background:#f5f5f7;">Typ</th>';
@@ -1219,7 +1244,7 @@ function renderColors(ext, int, trims) {
     html += '</tr></thead><tbody>';
     for (let i = 0; i < ext.length; i++) {
       const c = ext[i];
-      html += `<tr><td style="padding:6px;">${escapeHtml(c.name ?? '')}</td><td style="padding:6px;color:#999;">${escapeHtml(c.code ?? '')}</td><td style="padding:6px;">${escapeHtml(c.type ?? '')}</td>`;
+      html += `<tr>${txtCell(c.name, 'ext', i, 'name')}${txtCell(c.code, 'ext', i, 'code', 'color:#999;')}${txtCell(c.type, 'ext', i, 'type')}`;
       for (const t of trims) html += priceCell(c, t, 'ext', i);
       html += '</tr>';
     }
@@ -1231,7 +1256,7 @@ function renderColors(ext, int, trims) {
     html += '</tr></thead><tbody>';
     for (let i = 0; i < int.length; i++) {
       const c = int[i];
-      html += `<tr><td style="padding:6px;">${escapeHtml(c.name ?? '')}</td><td style="padding:6px;color:#999;">${escapeHtml(c.code ?? '')}</td><td style="padding:6px;">${escapeHtml(c.material ?? '')}</td>`;
+      html += `<tr>${txtCell(c.name, 'int', i, 'name')}${txtCell(c.code, 'int', i, 'code', 'color:#999;')}${txtCell(c.material, 'int', i, 'material')}`;
       for (const t of trims) html += priceCell(c, t, 'int', i);
       html += '</tr>';
     }
@@ -1245,6 +1270,16 @@ function renderColors(ext, int, trims) {
       e.stopPropagation();
       openColorMenu(td, td.dataset.cgroup, parseInt(td.dataset.cidx, 10), td.dataset.slug);
     });
+  });
+  container.querySelectorAll('.col-txt').forEach((inp) => {
+    inp.addEventListener('input', (e) => {
+      const grp = e.target.dataset.cgroup;
+      const arr = grp === 'ext' ? CURRENT_DATA.colors_exterior : CURRENT_DATA.colors_interior;
+      const c = arr && arr[parseInt(e.target.dataset.cidx, 10)];
+      if (c) c[e.target.dataset.field] = e.target.value;
+    });
+    inp.addEventListener('focus', (e) => { e.target.style.background = '#fff'; e.target.style.borderColor = '#1f6feb'; });
+    inp.addEventListener('blur', (e) => { e.target.style.background = 'transparent'; e.target.style.borderColor = 'transparent'; });
   });
 }
 
@@ -1281,12 +1316,13 @@ function openColorMenu(anchorEl, grp, idx, slug) {
 
 function renderTechData(td) {
   const tbody = $('techdata-tbody');
+  const tbl = $('techdata-table'); if (tbl) tbl.style.width = '100%';
   if (!td || typeof td !== 'object' || Array.isArray(td)) { td = {}; CURRENT_DATA.technical_data = td; }
   tbody.innerHTML = '';
   for (const [k, v] of Object.entries(td)) {
     const tr = document.createElement('tr');
     tr.innerHTML = `
-      <td style="padding:4px 6px;"><input class="td-key" data-key="${escapeAttr(k)}" type="text" value="${escapeAttr(k)}" style="width:100%;box-sizing:border-box;border:1px solid transparent;background:transparent;border-radius:4px;padding:5px 6px;font-weight:500;" /></td>
+      <td style="padding:4px 6px;width:34%;"><input class="td-key" data-key="${escapeAttr(k)}" type="text" value="${escapeAttr(k)}" style="width:100%;box-sizing:border-box;border:1px solid transparent;background:transparent;border-radius:4px;padding:5px 6px;font-weight:500;" /></td>
       <td style="padding:4px 6px;"><input class="td-val" data-key="${escapeAttr(k)}" type="text" value="${escapeAttr(String(v))}" style="width:100%;box-sizing:border-box;border:1px solid transparent;background:transparent;border-radius:4px;padding:5px 6px;" /></td>
       <td style="padding:4px 6px;width:40px;text-align:center;"><button type="button" class="td-del" data-key="${escapeAttr(k)}" title="Smazat" style="background:transparent;color:#c0392b;border:none;cursor:pointer;font-size:15px;">×</button></td>`;
     tbody.appendChild(tr);

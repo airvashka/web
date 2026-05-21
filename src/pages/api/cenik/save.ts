@@ -235,6 +235,8 @@ export const POST: APIRoute = async ({ request }) => {
             package_items: t.package_items,
           };
           if (t.list_price !== undefined && t.list_price !== null) payload.list_price = t.list_price;
+          // Pořadí sloupců (stupňů) z matice → Directus sort, ať drží po reloadu i na webu
+          payload.sort = trims.indexOf(t);
 
           const existing = existingByName.get(String(t.name ?? '').trim().toLowerCase());
           if (existing) {
