@@ -180,10 +180,12 @@ const DIRECTUS_URL = import.meta.env.PUBLIC_DIRECTUS_URL ?? import.meta.env.DIRE
     .me-section-name:focus { background: #fff; border-color: #1f6feb; outline: none; }
     .me-add-row { margin-left: 8px; background: #eef4ff; color: #1f6feb; border: 1px solid #cfe0ff; border-radius: 4px; padding: 3px 9px; font-size: 11px; cursor: pointer; }
     .me-feature { padding: 4px 6px; }
-    .me-feature-name { width: calc(100% - 26px); box-sizing: border-box; border: 1px solid transparent; background: transparent; border-radius: 4px; padding: 5px 6px; font-size: 13px; }
+    .me-feature-name { width: 100%; box-sizing: border-box; border: 1px solid transparent; background: transparent; border-radius: 4px; padding: 5px 6px; font-size: 13px; }
     .me-feature-name:focus { background: #fff; border-color: #1f6feb; outline: none; }
     .me-del-row { width: 20px; background: transparent; color: #c0392b; border: none; cursor: pointer; font-size: 15px; line-height: 1; opacity: 0.5; }
     .me-del-row:hover { opacity: 1; }
+    .me-row-ctrls { display: flex; align-items: center; gap: 3px; margin-top: 4px; }
+    .me-row-up, .me-row-down { background: #eef4ff; color: #1f6feb; border: 1px solid #cfe0ff; border-radius: 4px; width: 22px; height: 20px; font-size: 9px; line-height: 1; cursor: pointer; padding: 0; }
     .me-cell { text-align: center; vertical-align: middle; cursor: pointer; padding: 8px 6px !important; font-weight: 600; user-select: none; border-left: 1px solid #eef0f3; }
     .me-cell:hover { outline: 2px solid #1f6feb; outline-offset: -2px; }
     .me-add-section { background: #2f9b5c; color: #fff; border: none; border-radius: 5px; padding: 7px 16px; font-size: 12px; cursor: pointer; }
@@ -748,6 +750,36 @@ function buildMatrixModel() {
 }
 
 // Stav buňky pro daný trim + prvek
+// Pořadí řádků — přerovnání podkladových polí, aby drželo i po reloadu a na webu
+function applyRowOrder(order) {
+  const idx = new Map(order.map((f, i) => [f, i]));
+  const key = (name) => idx.has(name) ? idx.get(name) : 1e9;
+  for (const t of (CURRENT_DATA.trims || [])) {
+    for (const sec of (t.features || [])) {
+      if (Array.isArray(sec.items)) sec.items.sort((a, b) => key(featTrim(a)) - key(featTrim(b)));
+    }
+    if (Array.isArray(t.optional_items)) t.optional_items.sort((a, b) => key(featTrim(a.name)) - key(featTrim(b.name)));
+    if (Array.isArray(t.package_items)) t.package_items.sort((a, b) => key(featTrim(a.name)) - key(featTrim(b.name)));
+  }
+}
+function moveRow(section, feature, dir) {
+  const model = buildMatrixModel();
+  const sec = model.find((s) => s.section === section);
+  if (!sec) return;
+  const i = sec.features.indexOf(feature);
+  const j = i + dir;
+  if (i < 0 || j < 0 || j >= sec.features.length) return;
+  const secF = sec.features.slice();
+  const tmp = secF[i]; secF[i] = secF[j]; secF[j] = tmp;
+  const order = [];
+  for (const s of model) {
+    if (s.section === section) order.push(...secF);
+    else order.push(...s.features);
+  }
+  applyRowOrder(order);
+  renderMatrix();
+}
+
 function cellStateFor(t, feature) {
   for (const sec of (t.features || [])) {
     if ((sec.items || []).some((it) => featTrim(it) === feature)) return { state: 'standard' };
@@ -923,7 +955,11 @@ function renderMatrix() {
     for (const feature of sec.features) {
       html += `<tr><td class="me-feature">
         <input class="me-feature-name" data-old="${escapeAttr(feature)}" type="text" value="${escapeAttr(feature)}" />
-        <button type="button" class="me-del-row" data-feature="${escapeAttr(feature)}" title="Smazat řádek">×</button>
+        <span class="me-row-ctrls">
+          <button type="button" class="me-row-up" data-section="${escapeAttr(sec.section)}" data-feature="${escapeAttr(feature)}" title="Posunout nahoru">▲</button>
+          <button type="button" class="me-row-down" data-section="${escapeAttr(sec.section)}" data-feature="${escapeAttr(feature)}" title="Posunout dolů">▼</button>
+          <button type="button" class="me-del-row" data-feature="${escapeAttr(feature)}" title="Smazat řádek">×</button>
+        </span>
       </td>`;
       trims.forEach((t, ti) => {
         const st = cellStateFor(t, feature);
@@ -1019,6 +1055,14 @@ function wireMatrix(container) {
       }
       renderMatrix();
     });
+  });
+
+  // Posun řádku nahoru/dolů (v rámci sekce)
+  container.querySelectorAll('.me-row-up').forEach((btn) => {
+    btn.addEventListener('click', (e) => { e.preventDefault(); moveRow(btn.dataset.section, btn.dataset.feature, -1); });
+  });
+  container.querySelectorAll('.me-row-down').forEach((btn) => {
+    btn.addEventListener('click', (e) => { e.preventDefault(); moveRow(btn.dataset.section, btn.dataset.feature, 1); });
   });
 
   // Smazat řádek
