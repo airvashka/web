@@ -860,16 +860,24 @@ function openCellMenu(anchorEl, ti, section, feature) {
   menu.appendChild(mk('—  Nedostupné', 'cm-none', () => setCell(ti, section, feature, 'none')));
 
   document.body.appendChild(menu);
+  // Fixed pozice ve viewport souřadnicích — robustní vůči scrollu i sticky prvkům.
+  menu.style.position = 'fixed';
   const r = anchorEl.getBoundingClientRect();
-  let top = window.scrollY + r.bottom + 4;
-  let left = window.scrollX + r.left;
-  // udrž v okně horizontálně
-  const mw = 200;
-  if (left + mw > window.scrollX + document.documentElement.clientWidth) {
-    left = window.scrollX + document.documentElement.clientWidth - mw - 8;
+  const mw = menu.offsetWidth || 200;
+  const mh = menu.offsetHeight || 280;
+  const vw = document.documentElement.clientWidth;
+  const vh = window.innerHeight;
+  let left = r.left;
+  if (left + mw > vw - 8) left = vw - mw - 8;
+  left = Math.max(8, left);
+  let top = r.bottom + 4;
+  // když se dole nevejde, překlop menu NAD buňku
+  if (top + mh > vh - 8) {
+    top = r.top - mh - 4;
+    if (top < 8) top = Math.max(8, vh - mh - 8);
   }
   menu.style.top = top + 'px';
-  menu.style.left = Math.max(8, left) + 'px';
+  menu.style.left = left + 'px';
   // zavři klikem mimo (po aktuálním clicku)
   setTimeout(() => document.addEventListener('click', closeCellMenu, { once: true }), 0);
 }
