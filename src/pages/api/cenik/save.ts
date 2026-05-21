@@ -82,6 +82,7 @@ interface CenikData {
     list_price?: number;
     features?: Array<{ section: string; items: string[] }>;
     optional_items?: Array<{ name: string; code?: string; price: number }>;
+    package_items?: Array<{ name: string; package_code?: string; package_name?: string }>;
     packages_available?: string[];
   }>;
   packages?: Array<{
@@ -100,6 +101,7 @@ interface DirectusTrim {
   list_price?: number;
   features: Array<{ category: string; items: string[] }>;
   optional_items: Array<{ name: string; code?: string; price: number }>;
+  package_items: Array<{ name: string; package_code?: string; package_name?: string }>;
 }
 
 interface DirectusPackage {
@@ -130,12 +132,28 @@ function normalizeOptionalItems(items: Array<{ name: string; code?: string; pric
     }));
 }
 
+function normalizePackageItems(items: Array<{ name: string; package_code?: string; package_name?: string }> = []): Array<{ name: string; package_code?: string; package_name?: string }> {
+  return items
+    .filter((it) => it && it.name && (it.package_code || it.package_name))
+    .map((it) => {
+      const code = it.package_code ? String(it.package_code).trim() : '';
+      const name = it.package_name ? String(it.package_name).trim() : '';
+      return {
+        name: String(it.name).trim(),
+        package_code: code || undefined,
+        // Když chybí čitelný název paketu, použij aspoň kód, ať má buňka co zobrazit.
+        package_name: name || code || undefined,
+      };
+    });
+}
+
 function transformCenik(data: CenikData): { trims: DirectusTrim[]; packages: DirectusPackage[] } {
   const trims: DirectusTrim[] = (data.trims ?? []).map((t) => ({
     name: String(t.name ?? '').trim(),
     list_price: t.list_price,
     features: normalizeFeatures(t.features),
     optional_items: normalizeOptionalItems(t.optional_items),
+    package_items: normalizePackageItems(t.package_items),
   }));
 
   const packages: DirectusPackage[] = (data.packages ?? []).map((p) => ({
@@ -214,6 +232,7 @@ export const POST: APIRoute = async ({ request }) => {
             status: 'published',
             features: t.features,
             optional_items: t.optional_items,
+            package_items: t.package_items,
           };
           if (t.list_price !== undefined && t.list_price !== null) payload.list_price = t.list_price;
 
@@ -221,7 +240,7 @@ export const POST: APIRoute = async ({ request }) => {
           if (existing) {
             await dapi(directus_token, 'PATCH', `/items/trim_levels/${existing.id}`, payload);
             summary.trims_updated++;
-            summary.details.push(`Trim "${t.name}" → updated (id=${existing.id}, ${t.features.length} sekcí, ${t.optional_items.length} optional)`);
+            summary.details.push(`Trim "${t.name}" → updated (id=${existing.id}, ${t.features.length} sekcí, ${t.optional_items.length} optional, ${t.package_items.length} v paketu)`);
           } else {
             const created = await dapi(directus_token, 'POST', '/items/trim_levels', payload);
             summary.trims_created++;

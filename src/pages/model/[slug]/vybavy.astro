@@ -115,8 +115,8 @@ const optionPackages = latestYear
    a podporuje optional_items per trim (zobrazí cenu v buňce).
    ============================================================ */
 
-// Cell value: 'standard' (✓), 'unavailable' (—), nebo { price } (číslo Kč)
-type CellValue = 'standard' | 'unavailable' | { price: number };
+// Cell value: 'standard' (✓), 'unavailable' (—), { price } (číslo Kč), nebo { packageName } (jen v paketu)
+type CellValue = 'standard' | 'unavailable' | { price: number } | { packageName: string };
 
 interface CompareRow {
   feature: string;
@@ -134,6 +134,11 @@ const trimFeaturesMap: Map<string, Record<string, Set<string>>> = new Map();
 // Per-trim mapa: optional_items
 type OptItem = { name: string; code?: string; price: number };
 const trimOptionalsMap: Map<string, OptItem[]> = new Map();
+// Per-trim mapa: package_items (feature name → název paketu pro daný trim)
+const trimPackagesMap: Map<string, Map<string, string>> = new Map();
+// Globální feature → kategorie (z features napříč trimy) — kvůli zařazení package_items
+// do správné sekce (package_item nenese sekci, ale stejný prvek bývá "S" u vyššího trimu).
+const featureCategoryMap: Map<string, string> = new Map();
 
 // Canonical pořadí kategorií = pořadí z prvního trimu s daty (zachová admin order),
 // doplněné o případně extra kategorie z dalších trimů.
@@ -147,13 +152,28 @@ for (const t of trims) {
     const key = String(g.key ?? '').trim();
     if (!key) continue; // skip empty keys (rozbíjely render first cat)
     if (!map[key]) map[key] = new Set();
-    g.items.forEach((it) => map[key].add(String(it)));
+    g.items.forEach((it) => {
+      const name = String(it);
+      map[key].add(name);
+      if (!featureCategoryMap.has(name)) featureCategoryMap.set(name, key);
+    });
     if (!seenCat.has(key)) { seenCat.add(key); canonicalOrder.push(key); }
   }
   trimFeaturesMap.set(String(t.id), map);
 
   const opts = Array.isArray((t as any).optional_items) ? (t as any).optional_items : [];
   trimOptionalsMap.set(String(t.id), opts.filter((o: any) => o && o.name && Number.isFinite(Number(o.price))));
+
+  // package_items: feature dostupná pro tento trim JEN v paketu → název paketu do buňky
+  const pkgItems = Array.isArray((t as any).package_items) ? (t as any).package_items : [];
+  const pkgMap = new Map<string, string>();
+  for (const p of pkgItems) {
+    if (!p || !p.name) continue;
+    const label = String(p.package_name || p.package_code || '').trim();
+    if (!label) continue;
+    pkgMap.set(String(p.name).trim(), label);
+  }
+  trimPackagesMap.set(String(t.id), pkgMap);
 }
 
 const compareData: CompareCategory[] = [];
@@ -164,12 +184,26 @@ for (const cat of canonicalOrder) {
   for (const trimMap of trimFeaturesMap.values()) {
     if (trimMap[cat]) trimMap[cat].forEach((f) => allFeaturesInCat.add(f));
   }
+  // package_items, jejichž prvek patří (dle jiného trimu) do této kategorie,
+  // přidej jako řádky — aby stejný řádek ukázal ✓ u vyššího trimu a paket u nižšího.
+  for (const pkgMap of trimPackagesMap.values()) {
+    for (const fname of pkgMap.keys()) {
+      if (featureCategoryMap.get(fname) === cat) allFeaturesInCat.add(fname);
+    }
+  }
   if (allFeaturesInCat.size === 0) continue;
 
   const rows: CompareRow[] = [...allFeaturesInCat].sort((a, b) => a.localeCompare(b, 'cs')).map((feature) => {
     const cells: Record<string, CellValue> = {};
     for (const t of trims) {
-      cells[String(t.id)] = trimFeaturesMap.get(String(t.id))?.[cat]?.has(feature) ? 'standard' : 'unavailable';
+      const id = String(t.id);
+      if (trimFeaturesMap.get(id)?.[cat]?.has(feature)) {
+        cells[id] = 'standard';
+      } else if (trimPackagesMap.get(id)?.has(feature)) {
+        cells[id] = { packageName: trimPackagesMap.get(id)!.get(feature)! };
+      } else {
+        cells[id] = 'unavailable';
+      }
     }
     return { feature, cells };
   });
@@ -178,6 +212,28 @@ for (const cat of canonicalOrder) {
     label: CATEGORY_LABELS[cat as keyof typeof CATEGORY_LABELS] ?? cat,
     rows,
   });
+}
+
+// 1b) Package-only prvky bez sekce (nikde nejsou "S", takže featureCategoryMap je nezná)
+//     → samostatná pseudo-kategorie, ať se neztratí.
+const orphanPkgNames = new Set<string>();
+for (const pkgMap of trimPackagesMap.values()) {
+  for (const fname of pkgMap.keys()) {
+    if (!featureCategoryMap.has(fname)) orphanPkgNames.add(fname);
+  }
+}
+if (orphanPkgNames.size > 0) {
+  const rows: CompareRow[] = [...orphanPkgNames].sort((a, b) => a.localeCompare(b, 'cs')).map((feature) => {
+    const cells: Record<string, CellValue> = {};
+    for (const t of trims) {
+      const id = String(t.id);
+      cells[id] = trimPackagesMap.get(id)?.has(feature)
+        ? { packageName: trimPackagesMap.get(id)!.get(feature)! }
+        : 'unavailable';
+    }
+    return { feature, cells };
+  });
+  compareData.push({ key: '__v_paketu', label: 'Dostupné jen v paketu', rows });
 }
 
 // 2) Optional items — separátní pseudo-kategorie "Dokoupitelné položky" na konci
@@ -237,7 +293,7 @@ function trimPrice(t: TrimLevel): string {
         {brand.name} {rawModel.name} — co je v jakém stupni
       </h1>
       <p class="lead" style="max-width: 64ch; margin-bottom: 40px;">
-        Matrice všech prvků výbavy. <strong>✓</strong> znamená v ceně, <span style="color: var(--text-muted);">—</span> není k dispozici, číslo je příplatek. Pokud chceš jen rychlý přehled, vrať se na <a href={`/model/${rawModel.slug}#ceny`}>karty výbavových stupňů</a>.
+        Matrice všech prvků výbavy. <strong>✓</strong> znamená v ceně, <span style="color: var(--text-muted);">—</span> není k dispozici, číslo je příplatek, <span style="color: var(--accent);">název paketu</span> = dostupné jen v daném paketu. Pokud chceš jen rychlý přehled, vrať se na <a href={`/model/${rawModel.slug}#ceny`}>karty výbavových stupňů</a>.
       </p>
 
       {trims.length === 0 ? (
@@ -274,7 +330,6 @@ function trimPrice(t: TrimLevel): string {
                       <tr>
                         <td class="compare-feature">
                           {row.feature}
-                          {row.code && <span class="compare-feature-code"> ({row.code})</span>}
                         </td>
                         {trims.map((t) => {
                           const v = row.cells[String(t.id)];
@@ -290,6 +345,13 @@ function trimPrice(t: TrimLevel): string {
                             return (
                               <td class={`compare-cell optional${hl}`}>
                                 <span class="compare-price">{v.price.toLocaleString('cs-CZ')} Kč</span>
+                              </td>
+                            );
+                          }
+                          if (typeof v === 'object' && v && 'packageName' in v) {
+                            return (
+                              <td class={`compare-cell package${hl}`}>
+                                <span class="compare-package">{v.packageName}</span>
                               </td>
                             );
                           }
@@ -716,6 +778,21 @@ function trimPrice(t: TrimLevel): string {
     font-weight: 700;
     font-size: 13.5px;
     font-family: var(--font-display, inherit);
+  }
+  /* Paket — odznak s názvem paketu (prvek dostupný jen v paketu) */
+  .compare-cell.package .compare-package {
+    display: inline-block;
+    background: rgba(242, 92, 27, 0.10);
+    color: var(--accent, #F25C1B);
+    font-weight: 700;
+    font-size: 11.5px;
+    font-family: var(--font-display, inherit);
+    letter-spacing: 0.02em;
+    padding: 3px 9px;
+    border-radius: 999px;
+    border: 1px solid rgba(242, 92, 27, 0.25);
+    white-space: nowrap;
+    line-height: 1.4;
   }
   .compare-dash {
     color: var(--line-2, #d0d0d5);

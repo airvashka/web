@@ -34,7 +34,11 @@ PŘEVOD MATRIX → PER-TRIM (povinné):
 - Pro každý trim (sloupec) projdi všechny řádky:
   - Pokud cell = "S" → feature je včleněn → patří do \`trims[i].features\` pod sekcí ze sloupce 1 řádku
   - Pokud cell = číslo (např. "49900") → feature je dokoupitelný → \`trims[i].optional_items.push({ name, code, price: 49900 })\`
-  - Pokud cell = kód paketu (např. "CLUB+") → \`trims[i].packages_available.push("CLUB+")\` (unique) a feature je součástí paketu (uveď v \`packages[].contents\`)
+  - Pokud cell = kód paketu (např. "CLUB+") → feature je pro tento trim dostupná JEN v paketu. Udělej TŘI věci:
+      a) \`trims[i].package_items.push({ name, package_code: "CLUB+", package_name: "CLUB+ paket" })\` ← KLÍČOVÉ: zachovává vazbu KTERÝ prvek je v KTERÉM paketu pro TENTO trim. Bez toho matice neumí vykreslit paket do buňky.
+      b) \`trims[i].packages_available.push("CLUB+")\` (unique)
+      c) feature uveď i v \`packages[].contents\`
+    POZN.: package_items NENÍ duplikát features ani optional_items — je to třetí, oddělený stav buňky (✓ / cena / PAKET / —).
   - Pokud cell = "-" → ignoruj pro tento trim
   - Pokud cell = "S (Hybrid)" → \`features\` s notou v názvu "Adaptivní tempomat (pouze pro Hybrid verze)"
 - Příklad: Torres má řádek "Panoramatická střecha" s cells = ["-", "29900", "S"]:
@@ -141,9 +145,9 @@ PDF řádek "Panoramatická střecha (kód: ISN)" má cells: ["-", "29900", "S"]
 PDF řádek "Vyhřívaný volant" má cells: ["-", "CLUB+", "S"].
 
 Výsledek pro tento KUS dat:
-- CLUB:    feature ignored (cell "-"); CLUB.packages_available += "CLUB+" jen pokud paket existuje a má CLUB+ price
-- STYLE:   optional_items += { name: "Panoramatická střecha", code: "ISN", price: 29900 }; packages_available += "CLUB+" (vyhřívaný volant je v CLUB+)
-- PREMIUM: features.EXTERIÉR += "Panoramatická střecha"; features.KOMFORT += "Vyhřívaný volant"
+- CLUB:    obě features ignored (cell "-")
+- STYLE:   optional_items += { name: "Panoramatická střecha", code: "ISN", price: 29900 } (cell "29900"); package_items += { name: "Vyhřívaný volant", package_code: "CLUB+", package_name: "CLUB+ paket" } (cell "CLUB+"); packages_available += "CLUB+"
+- PREMIUM: features.EXTERIÉR += "Panoramatická střecha"; features.KOMFORT += "Vyhřívaný volant" (obě "S")
 
 Plus packages[] dostane:
 \`\`\`
@@ -164,6 +168,8 @@ KLÍČOVÁ PRAVIDLA
    - price = integer Kč (např. 29900)
 
 4) **PACKAGES_AVAILABLE = list kódů paketů** dostupných pro tento trim (např. ["CLUB+", "BLACK"]). Pokud trim nemá pakety, prázdné [].
+
+4b) **PACKAGE_ITEMS = prvky dostupné pro tento trim JEN v paketu** (cell = kód paketu v matrix-style). Každý: { name (LITERAL z PDF), package_code (např. "CLUB+"), package_name (např. "CLUB+ paket") }. Toto je oddělené od features (✓ v ceně) i optional_items (samostatná cena) — je to čtvrtý stav buňky. Pokud trim nemá nic v paketech, prázdné [].
 
 5) **PACKAGES (samostatné pole)**:
    - name (např. "CLUB+ paket"), code (např. "CLUB+"), contents (list features co paket přidává), pricing_per_trim (object: trim_slug → price | "standard" | "unavailable")
@@ -366,6 +372,19 @@ Použij tool extract_pricelist a předej strukturovaná data. Vyplň co najdeš,
                   description: 'Kódy paketů dostupných pro tento trim (např. ["CLUB+", "BLACK"]). Cena paketu je v packages[].pricing_per_trim. Pokud trim nemá pakety, [].',
                   items: { type: 'string' },
                 },
+                package_items: {
+                  type: 'array',
+                  description: 'Prvky výbavy dostupné pro tento trim JEN jako součást paketu (v matrix-style ceníku = buňka obsahuje kód paketu místo "S" nebo ceny). Oddělené od features i optional_items.',
+                  items: {
+                    type: 'object',
+                    properties: {
+                      name: { type: 'string', description: 'Název prvku LITERAL z PDF (např. "Vyhřívaný volant")' },
+                      package_code: { type: 'string', description: 'Kód paketu, ve kterém je prvek dostupný (např. "CLUB+", "BLACK")' },
+                      package_name: { type: 'string', description: 'Název paketu (např. "CLUB+ paket"). Pokud znáš jen kód, zopakuj kód.' },
+                    },
+                    required: ['name', 'package_code'],
+                  },
+                },
               },
               required: ['name', 'features'],
             },
@@ -524,7 +543,7 @@ Použij tool extract_pricelist a předej strukturovaná data. Vyplň co najdeš,
       if (Array.isArray(extracted.trims)) {
         extracted.trims = extracted.trims.map((t: any, i: number) => {
           if (t && typeof t === 'object') {
-            for (const innerKey of ['features', 'optional_items', 'packages_available']) {
+            for (const innerKey of ['features', 'optional_items', 'packages_available', 'package_items']) {
               if (innerKey in t) t[innerKey] = ensureParsed(t[innerKey], `trims[${i}].${innerKey}`);
             }
           }
@@ -549,6 +568,7 @@ Použij tool extract_pricelist a předej strukturovaná data. Vyplň co najdeš,
         if (typeof t.features === 'string') t.features = [];
         if (typeof t.optional_items === 'string') t.optional_items = [];
         if (typeof t.packages_available === 'string') t.packages_available = [];
+        if (typeof t.package_items === 'string') t.package_items = [];
       }
     }
 
