@@ -162,10 +162,10 @@ const DIRECTUS_URL = import.meta.env.PUBLIC_DIRECTUS_URL ?? import.meta.env.DIRE
     .cell-other { background: #ffd6d6; color: #b43a2c; }
 
     /* ── Maticový editor výbavy ── */
-    .matrix-scroll { overflow-x: auto; border: 1px solid #e0e0e0; border-radius: 8px; }
+    .matrix-scroll { overflow: auto; max-height: 72vh; border: 1px solid #e0e0e0; border-radius: 8px; }
     .matrix-edit { width: 100%; border-collapse: collapse; font-size: 13px; min-width: 560px; }
     .matrix-edit th, .matrix-edit td { border-bottom: 1px solid #eee; }
-    .matrix-edit thead th { background: #fafafa; padding: 8px; vertical-align: top; position: sticky; top: 0; z-index: 2; }
+    .matrix-edit thead th { background: #fafafa; padding: 8px; vertical-align: top; position: sticky; top: 0; z-index: 5; box-shadow: 0 2px 0 #e0e0e0; }
     .me-feature-head { text-align: left; font-weight: 700; color: #555; min-width: 220px; }
     .me-trim-head { text-align: center; }
     .me-trim-name { width: 100%; box-sizing: border-box; font-weight: 700; text-align: center; border: 1px solid #d0d0d5; border-radius: 4px; padding: 4px 6px; margin-bottom: 3px; }
@@ -1194,26 +1194,33 @@ function formatPricingValue(v) {
 
 function renderColors(ext, int, trims) {
   const container = $('colors-container');
-  let html = '';
-  const colorPriceCell = (c, trim) => {
-    const slug = slugifyJs(trim.name);
-    // Akceptuj jak pricing_per_trim object, tak fallback array cells (legacy)
+  let html = '<p class="muted" style="margin-bottom:10px;">Klikni do buňky s cenou a zvol: <strong>✓ V ceně</strong> · <strong>cena</strong> · <strong>— nedostupné</strong>.</p>';
+
+  const dispCell = (v) => {
+    if (v === undefined || v === null || v === '' || v === '-' || v === '–') return { cls: 'cell-unavailable', txt: '–' };
+    const s = (typeof v === 'string') ? v.trim().toLowerCase() : '';
+    if (s === 'unavailable' || s === 'nedostupné') return { cls: 'cell-unavailable', txt: '–' };
+    if (s === 'standard' || s === 's' || s === 'v ceně' || s === 'v cene') return { cls: 'cell-standard', txt: 'V ceně' };
+    const num = (typeof v === 'number') ? v : parseInt(String(v).replace(/\s/g, ''), 10);
+    if (Number.isFinite(num)) return (num === 0) ? { cls: 'cell-standard', txt: 'V ceně' } : { cls: 'cell-optional', txt: num.toLocaleString('cs-CZ') + ' Kč' };
+    return { cls: 'cell-standard', txt: String(v) };
+  };
+  const priceCell = (c, t, grp, idx) => {
+    const slug = slugifyJs(t.name);
     let v = c.pricing_per_trim?.[slug];
-    if (v === undefined && Array.isArray(c.cells)) v = c.cells[trims.indexOf(trim)];
-    if (v === undefined || v === '' || v === '-' || v === '–') return `<td class="cell cell-unavailable">–</td>`;
-    if (typeof v === 'number') return `<td class="cell cell-optional">${v.toLocaleString('cs-CZ')}</td>`;
-    const num = parseInt(String(v).replace(/\s/g, ''), 10);
-    if (Number.isFinite(num)) return `<td class="cell cell-optional">${num.toLocaleString('cs-CZ')}</td>`;
-    return `<td class="cell cell-standard">${escapeHtml(String(v))}</td>`;
+    if (v === undefined && Array.isArray(c.cells)) v = c.cells[trims.indexOf(t)];
+    const d = dispCell(v);
+    return `<td class="cell color-cell ${d.cls}" data-cgroup="${grp}" data-cidx="${idx}" data-slug="${slug}" title="Klik = změnit" style="cursor:pointer;">${d.txt}</td>`;
   };
 
   if (ext?.length) {
     html += '<h3>Exteriér</h3><table style="width:100%;border-collapse:collapse;font-size:13px;"><thead><tr><th style="text-align:left;padding:6px;background:#f5f5f7;">Barva</th><th style="padding:6px;background:#f5f5f7;">Kód</th><th style="padding:6px;background:#f5f5f7;">Typ</th>';
     for (const t of trims) html += `<th style="padding:6px;background:#f5f5f7;text-align:center;">${escapeHtml(t.name)}</th>`;
     html += '</tr></thead><tbody>';
-    for (const c of ext) {
+    for (let i = 0; i < ext.length; i++) {
+      const c = ext[i];
       html += `<tr><td style="padding:6px;">${escapeHtml(c.name ?? '')}</td><td style="padding:6px;color:#999;">${escapeHtml(c.code ?? '')}</td><td style="padding:6px;">${escapeHtml(c.type ?? '')}</td>`;
-      for (const t of trims) html += colorPriceCell(c, t);
+      for (const t of trims) html += priceCell(c, t, 'ext', i);
       html += '</tr>';
     }
     html += '</tbody></table>';
@@ -1222,25 +1229,105 @@ function renderColors(ext, int, trims) {
     html += '<h3 style="margin-top:16px;">Interiér</h3><table style="width:100%;border-collapse:collapse;font-size:13px;"><thead><tr><th style="text-align:left;padding:6px;background:#f5f5f7;">Barva</th><th style="padding:6px;background:#f5f5f7;">Kód</th><th style="padding:6px;background:#f5f5f7;">Materiál</th>';
     for (const t of trims) html += `<th style="padding:6px;background:#f5f5f7;text-align:center;">${escapeHtml(t.name)}</th>`;
     html += '</tr></thead><tbody>';
-    for (const c of int) {
+    for (let i = 0; i < int.length; i++) {
+      const c = int[i];
       html += `<tr><td style="padding:6px;">${escapeHtml(c.name ?? '')}</td><td style="padding:6px;color:#999;">${escapeHtml(c.code ?? '')}</td><td style="padding:6px;">${escapeHtml(c.material ?? '')}</td>`;
-      for (const t of trims) html += colorPriceCell(c, t);
+      for (const t of trims) html += priceCell(c, t, 'int', i);
       html += '</tr>';
     }
     html += '</tbody></table>';
   }
-  if (!html) html = '<p class="muted">Žádné barvy v ceníku.</p>';
+  if (!ext?.length && !int?.length) html = '<p class="muted">Žádné barvy v ceníku.</p>';
   container.innerHTML = html;
+
+  container.querySelectorAll('.color-cell').forEach((td) => {
+    td.addEventListener('click', (e) => {
+      e.stopPropagation();
+      openColorMenu(td, td.dataset.cgroup, parseInt(td.dataset.cidx, 10), td.dataset.slug);
+    });
+  });
+}
+
+function openColorMenu(anchorEl, grp, idx, slug) {
+  closeCellMenu();
+  const arr = grp === 'ext' ? CURRENT_DATA.colors_exterior : CURRENT_DATA.colors_interior;
+  const c = arr && arr[idx];
+  if (!c) return;
+  if (!c.pricing_per_trim || typeof c.pricing_per_trim !== 'object' || Array.isArray(c.pricing_per_trim)) c.pricing_per_trim = {};
+  const menu = document.createElement('div');
+  menu.className = 'cell-menu';
+  const act = (fn) => { fn(); closeCellMenu(); renderColors(CURRENT_DATA.colors_exterior, CURRENT_DATA.colors_interior, CURRENT_DATA.trims); };
+  const mk = (label, cls, fn) => { const b = document.createElement('button'); b.type = 'button'; b.className = 'cell-menu-btn ' + (cls || ''); b.textContent = label; b.addEventListener('click', (e) => { e.stopPropagation(); act(fn); }); return b; };
+  menu.appendChild(mk('✓  V ceně', 'cm-standard', () => { c.pricing_per_trim[slug] = 'standard'; }));
+  menu.appendChild(mk('Cena…', 'cm-price', () => {
+    const cur = c.pricing_per_trim[slug];
+    const curVal = (typeof cur === 'number') ? cur : '';
+    const v = prompt('Cena v Kč:', curVal);
+    if (v === null) return;
+    const num = parseInt(String(v).replace(/\s/g, ''), 10);
+    if (Number.isFinite(num)) c.pricing_per_trim[slug] = num;
+  }));
+  menu.appendChild(mk('—  Nedostupné', 'cm-none', () => { c.pricing_per_trim[slug] = 'unavailable'; }));
+  document.body.appendChild(menu);
+  menu.style.position = 'fixed';
+  const r = anchorEl.getBoundingClientRect();
+  const mw = menu.offsetWidth || 200, mh = menu.offsetHeight || 160;
+  const vw = document.documentElement.clientWidth, vh = window.innerHeight;
+  let left = r.left; if (left + mw > vw - 8) left = vw - mw - 8; left = Math.max(8, left);
+  let top = r.bottom + 4; if (top + mh > vh - 8) { top = r.top - mh - 4; if (top < 8) top = Math.max(8, vh - mh - 8); }
+  menu.style.top = top + 'px'; menu.style.left = left + 'px';
+  setTimeout(() => document.addEventListener('click', closeCellMenu, { once: true }), 0);
 }
 
 function renderTechData(td) {
   const tbody = $('techdata-tbody');
+  if (!td || typeof td !== 'object' || Array.isArray(td)) { td = {}; CURRENT_DATA.technical_data = td; }
   tbody.innerHTML = '';
-  for (const [k, v] of Object.entries(td ?? {})) {
+  for (const [k, v] of Object.entries(td)) {
     const tr = document.createElement('tr');
-    tr.innerHTML = `<td style="padding:6px;font-weight:500;">${escapeHtml(k)}</td><td style="padding:6px;">${escapeHtml(String(v))}</td>`;
+    tr.innerHTML = `
+      <td style="padding:4px 6px;"><input class="td-key" data-key="${escapeAttr(k)}" type="text" value="${escapeAttr(k)}" style="width:100%;box-sizing:border-box;border:1px solid transparent;background:transparent;border-radius:4px;padding:5px 6px;font-weight:500;" /></td>
+      <td style="padding:4px 6px;"><input class="td-val" data-key="${escapeAttr(k)}" type="text" value="${escapeAttr(String(v))}" style="width:100%;box-sizing:border-box;border:1px solid transparent;background:transparent;border-radius:4px;padding:5px 6px;" /></td>
+      <td style="padding:4px 6px;width:40px;text-align:center;"><button type="button" class="td-del" data-key="${escapeAttr(k)}" title="Smazat" style="background:transparent;color:#c0392b;border:none;cursor:pointer;font-size:15px;">×</button></td>`;
     tbody.appendChild(tr);
   }
+  const addTr = document.createElement('tr');
+  addTr.innerHTML = `<td colspan="3" style="padding:8px 6px;"><button type="button" id="td-add" style="background:#eef4ff;color:#1f6feb;border:1px solid #cfe0ff;border-radius:5px;padding:6px 14px;font-size:12px;cursor:pointer;">+ řádek</button></td>`;
+  tbody.appendChild(addTr);
+
+  tbody.querySelectorAll('.td-val').forEach((inp) => {
+    inp.addEventListener('input', (e) => { CURRENT_DATA.technical_data[e.target.dataset.key] = e.target.value; });
+    inp.addEventListener('focus', (e) => { e.target.style.background = '#fff'; e.target.style.borderColor = '#1f6feb'; });
+    inp.addEventListener('blur', (e) => { e.target.style.background = 'transparent'; e.target.style.borderColor = 'transparent'; });
+  });
+  tbody.querySelectorAll('.td-key').forEach((inp) => {
+    inp.addEventListener('focus', (e) => { e.target.style.background = '#fff'; e.target.style.borderColor = '#1f6feb'; });
+    inp.addEventListener('blur', (e) => { e.target.style.background = 'transparent'; e.target.style.borderColor = 'transparent'; });
+    inp.addEventListener('change', (e) => {
+      const oldK = e.target.dataset.key;
+      const newK = e.target.value.trim();
+      if (!newK || newK === oldK) return;
+      const obj = CURRENT_DATA.technical_data;
+      const rebuilt = {};
+      for (const [k, v] of Object.entries(obj)) rebuilt[k === oldK ? newK : k] = v;
+      CURRENT_DATA.technical_data = rebuilt;
+      renderTechData(CURRENT_DATA.technical_data);
+    });
+  });
+  tbody.querySelectorAll('.td-del').forEach((btn) => {
+    btn.addEventListener('click', (e) => {
+      delete CURRENT_DATA.technical_data[btn.dataset.key];
+      renderTechData(CURRENT_DATA.technical_data);
+    });
+  });
+  const addBtn = $('td-add');
+  if (addBtn) addBtn.addEventListener('click', () => {
+    const obj = CURRENT_DATA.technical_data;
+    let n = 1, key = 'Nový údaj';
+    while (Object.prototype.hasOwnProperty.call(obj, key)) { n++; key = 'Nový údaj ' + n; }
+    obj[key] = '';
+    renderTechData(obj);
+  });
 }
 
 // ─── Tabs ────────────────────────────────────────────────
