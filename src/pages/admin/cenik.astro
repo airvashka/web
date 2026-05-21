@@ -246,6 +246,10 @@ const DIRECTUS_URL = import.meta.env.PUBLIC_DIRECTUS_URL ?? import.meta.env.DIRE
         <select id="year-select" disabled><option value="">— nejdřív model —</option></select>
       </div>
     </div>
+    <div style="margin-top: 14px; display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+      <button id="load-existing-btn" class="secondary" disabled>Načíst uložený ceník</button>
+      <span class="muted" id="load-existing-status">Vyber rok a edituj data přímo — bez nahrávání PDF.</span>
+    </div>
   </div>
 
   <!-- UPLOAD -->
@@ -438,6 +442,88 @@ $('model-select').addEventListener('change', async (e) => {
     $('year-select').innerHTML += `<option value="${y.id}">${escapeHtml(label)}</option>`;
   }
 });
+
+$('year-select').addEventListener('change', (e) => {
+  $('load-existing-btn').disabled = !e.target.value;
+});
+
+// ─── Načíst uložený ceník z Directus (edit bez PDF) ──────
+$('load-existing-btn').addEventListener('click', loadExisting);
+
+async function loadExisting() {
+  const yearId = $('year-select').value;
+  if (!yearId) { alert('Vyber modelový rok'); return; }
+  const btn = $('load-existing-btn');
+  const status = $('load-existing-status');
+  btn.disabled = true;
+  status.textContent = '⏳ Načítám z Directus...';
+  try {
+    await refreshAccessToken();
+    const [trimsR, pkgsR, yearR] = await Promise.all([
+      api(`/items/trim_levels?filter[model_year][_eq]=${yearId}&sort=sort&fields=*&limit=50`),
+      api(`/items/option_packages?filter[model_year][_eq]=${yearId}&sort=name&fields=*&limit=50`),
+      api(`/items/model_years/${yearId}?fields=technical_data,pricelist_colors_exterior,pricelist_colors_interior`),
+    ]);
+
+    const pricingToObj = (p) => {
+      if (!p) return {};
+      if (Array.isArray(p)) {
+        const o = {};
+        for (const x of p) if (x && x.trim_slug) o[x.trim_slug] = x.price;
+        return o;
+      }
+      return (typeof p === 'object') ? p : {};
+    };
+
+    const trims = (trimsR.data || []).map((t) => ({
+      name: t.name,
+      list_price: t.list_price,
+      features: Array.isArray(t.features)
+        ? t.features.map((fe) => ({ section: fe.category ?? fe.section ?? '', items: Array.isArray(fe.items) ? fe.items : [] }))
+        : [],
+      optional_items: Array.isArray(t.optional_items) ? t.optional_items : [],
+      package_items: Array.isArray(t.package_items) ? t.package_items : [],
+    }));
+
+    const packages = (pkgsR.data || []).map((p) => ({
+      name: p.name,
+      code: p.code ?? '',
+      contents: Array.isArray(p.features) ? p.features : [],
+      pricing_per_trim: pricingToObj(p.pricing_per_trim),
+    }));
+
+    const tdRaw = yearR.data?.technical_data;
+    const technical_data = {};
+    if (Array.isArray(tdRaw)) {
+      for (const row of tdRaw) if (row && row.label) technical_data[row.label] = row.value;
+    } else if (tdRaw && typeof tdRaw === 'object') {
+      Object.assign(technical_data, tdRaw);
+    }
+
+    const mapColors = (arr) => (Array.isArray(arr) ? arr : []).map((c) => ({ ...c, pricing_per_trim: pricingToObj(c.pricing_per_trim) }));
+    const colors_exterior = mapColors(yearR.data?.pricelist_colors_exterior);
+    const colors_interior = mapColors(yearR.data?.pricelist_colors_interior);
+
+    if (!trims.length && !packages.length) {
+      status.textContent = '⚠ Pro tento rok zatím nejsou v Directus žádné výbavové stupně ani pakety.';
+      btn.disabled = false;
+      return;
+    }
+
+    const data = {
+      detected: { model_name: $('model-select').selectedOptions[0]?.textContent || '' },
+      trims, packages, colors_exterior, colors_interior, technical_data,
+    };
+    CURRENT_DATA = data;
+    showReview(data);
+    status.textContent = `✓ Načteno: ${trims.length} stupňů, ${packages.length} paketů. Edituj a ulož.`;
+  } catch (e) {
+    status.textContent = `✗ Načtení selhalo: ${e.message}`;
+  } finally {
+    btn.disabled = false;
+  }
+}
+
 
 // ─── Upload ─────────────────────────────────────────────
 const dz = $('drop-zone');
