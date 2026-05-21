@@ -129,145 +129,86 @@ interface CompareCategory {
   rows: CompareRow[];
 }
 
-// Per-trim mapa: { categoryKey → Set<featureName> }
-const trimFeaturesMap: Map<string, Record<string, Set<string>>> = new Map();
-// Per-trim mapa: optional_items
-type OptItem = { name: string; code?: string; price: number };
-const trimOptionalsMap: Map<string, OptItem[]> = new Map();
-// Per-trim mapa: package_items (feature name → název paketu pro daný trim)
-const trimPackagesMap: Map<string, Map<string, string>> = new Map();
-// Globální feature → kategorie (z features napříč trimy) — kvůli zařazení package_items
-// do správné sekce (package_item nenese sekci, ale stejný prvek bývá "S" u vyššího trimu).
-const featureCategoryMap: Map<string, string> = new Map();
+// ── Sjednocený build matice (zrcadlí admin /admin/cenik) ──
+// Zdroje: features (✓), optional_items (cena), package_items (paket).
+// Pořadí i zařazení do sekcí = jako v adminu: first-occurrence + uložená category.
+const OTHER_SECTION = 'Ostatní';
+type OptItem = { name: string; price: number; category?: string };
+type PkgItem = { name: string; label: string; category?: string };
+const trimFeatures = new Map<string, Array<{ section: string; items: string[] }>>();
+const trimOptionals = new Map<string, OptItem[]>();
+const trimPackages = new Map<string, PkgItem[]>();
 
-// Canonical pořadí kategorií = pořadí z prvního trimu s daty (zachová admin order),
-// doplněné o případně extra kategorie z dalších trimů.
-const canonicalOrder: string[] = [];
-const seenCat = new Set<string>();
+const featureToSection = new Map<string, string>();
+const sectionOrder: string[] = [];
+const seenSec = new Set<string>();
+const ensureSectionInOrder = (s: string) => { if (s && !seenSec.has(s)) { seenSec.add(s); sectionOrder.push(s); } };
 
+// 1) features určují sekce a jejich pořadí
 for (const t of trims) {
-  const groups = getGroupedFeatures((t as any).features);
-  const map: Record<string, Set<string>> = {};
+  const groups = getGroupedFeatures((t as any).features)
+    .map((g: any) => ({ section: String(g.key ?? '').trim(), items: (g.items || []).map((x: any) => String(x)) }))
+    .filter((g) => g.section);
+  trimFeatures.set(String(t.id), groups);
   for (const g of groups) {
-    const key = String(g.key ?? '').trim();
-    if (!key) continue; // skip empty keys (rozbíjely render first cat)
-    if (!map[key]) map[key] = new Set();
-    g.items.forEach((it) => {
-      const name = String(it);
-      map[key].add(name);
-      if (!featureCategoryMap.has(name)) featureCategoryMap.set(name, key);
-    });
-    if (!seenCat.has(key)) { seenCat.add(key); canonicalOrder.push(key); }
+    ensureSectionInOrder(g.section);
+    for (const it of g.items) { const fn = it.trim(); if (fn && !featureToSection.has(fn)) featureToSection.set(fn, g.section); }
   }
-  trimFeaturesMap.set(String(t.id), map);
-
-  const opts = Array.isArray((t as any).optional_items) ? (t as any).optional_items : [];
-  trimOptionalsMap.set(String(t.id), opts.filter((o: any) => o && o.name && Number.isFinite(Number(o.price))));
-
-  // package_items: feature dostupná pro tento trim JEN v paketu → název paketu do buňky
-  const pkgItems = Array.isArray((t as any).package_items) ? (t as any).package_items : [];
-  const pkgMap = new Map<string, string>();
-  for (const p of pkgItems) {
-    if (!p || !p.name) continue;
-    const label = String(p.package_name || p.package_code || '').trim();
-    if (!label) continue;
-    pkgMap.set(String(p.name).trim(), label);
-  }
-  trimPackagesMap.set(String(t.id), pkgMap);
+  const opts: OptItem[] = (Array.isArray((t as any).optional_items) ? (t as any).optional_items : [])
+    .filter((o: any) => o && o.name && Number.isFinite(Number(o.price)))
+    .map((o: any) => ({ name: String(o.name).trim(), price: Number(o.price), category: o.category ? String(o.category).trim() : '' }));
+  trimOptionals.set(String(t.id), opts);
+  const pkgs: PkgItem[] = (Array.isArray((t as any).package_items) ? (t as any).package_items : [])
+    .filter((p: any) => p && p.name)
+    .map((p: any) => ({ name: String(p.name).trim(), label: String(p.package_name || p.package_code || '').trim(), category: p.category ? String(p.category).trim() : '' }))
+    .filter((p: PkgItem) => p.label);
+  trimPackages.set(String(t.id), pkgs);
 }
 
-const compareData: CompareCategory[] = [];
-
-// 1) Standard features per category
-for (const cat of canonicalOrder) {
-  const allFeaturesInCat = new Set<string>();
-  for (const trimMap of trimFeaturesMap.values()) {
-    if (trimMap[cat]) trimMap[cat].forEach((f) => allFeaturesInCat.add(f));
-  }
-  // package_items, jejichž prvek patří (dle jiného trimu) do této kategorie,
-  // přidej jako řádky — aby stejný řádek ukázal ✓ u vyššího trimu a paket u nižšího.
-  for (const pkgMap of trimPackagesMap.values()) {
-    for (const fname of pkgMap.keys()) {
-      if (featureCategoryMap.get(fname) === cat) allFeaturesInCat.add(fname);
-    }
-  }
-  if (allFeaturesInCat.size === 0) continue;
-
-  const rows: CompareRow[] = [...allFeaturesInCat].sort((a, b) => a.localeCompare(b, 'cs')).map((feature) => {
-    const cells: Record<string, CellValue> = {};
-    for (const t of trims) {
-      const id = String(t.id);
-      if (trimFeaturesMap.get(id)?.[cat]?.has(feature)) {
-        cells[id] = 'standard';
-      } else if (trimPackagesMap.get(id)?.has(feature)) {
-        cells[id] = { packageName: trimPackagesMap.get(id)!.get(feature)! };
-      } else {
-        cells[id] = 'unavailable';
-      }
-    }
-    return { feature, cells };
-  });
-  compareData.push({
-    key: cat,
-    label: CATEGORY_LABELS[cat as keyof typeof CATEGORY_LABELS] ?? cat,
-    rows,
-  });
-}
-
-// 1b) Package-only prvky bez sekce (nikde nejsou "S", takže featureCategoryMap je nezná)
-//     → samostatná pseudo-kategorie, ať se neztratí.
-const orphanPkgNames = new Set<string>();
-for (const pkgMap of trimPackagesMap.values()) {
-  for (const fname of pkgMap.keys()) {
-    if (!featureCategoryMap.has(fname)) orphanPkgNames.add(fname);
-  }
-}
-if (orphanPkgNames.size > 0) {
-  const rows: CompareRow[] = [...orphanPkgNames].sort((a, b) => a.localeCompare(b, 'cs')).map((feature) => {
-    const cells: Record<string, CellValue> = {};
-    for (const t of trims) {
-      const id = String(t.id);
-      cells[id] = trimPackagesMap.get(id)?.has(feature)
-        ? { packageName: trimPackagesMap.get(id)!.get(feature)! }
-        : 'unavailable';
-    }
-    return { feature, cells };
-  });
-  compareData.push({ key: '__v_paketu', label: 'Dostupné jen v paketu', rows });
-}
-
-// 2) Optional items — separátní pseudo-kategorie "Dokoupitelné položky" na konci
-type OptAgg = { code?: string; cells: Record<string, number> };
-const optAggregated = new Map<string, OptAgg>();
+// 2) optional/package doplní sekci (dle category) + pořadí
 for (const t of trims) {
-  const opts = trimOptionalsMap.get(String(t.id)) ?? [];
-  for (const o of opts) {
-    const name = String(o.name).trim();
-    if (!name) continue;
-    if (!optAggregated.has(name)) optAggregated.set(name, { code: o.code, cells: {} });
-    const entry = optAggregated.get(name)!;
-    entry.cells[String(t.id)] = Number(o.price);
-    if (o.code && !entry.code) entry.code = String(o.code);
+  for (const o of trimOptionals.get(String(t.id)) || []) {
+    if (o.name && !featureToSection.has(o.name)) { const s = o.category || OTHER_SECTION; featureToSection.set(o.name, s); ensureSectionInOrder(s); }
+  }
+  for (const p of trimPackages.get(String(t.id)) || []) {
+    if (p.name && !featureToSection.has(p.name)) { const s = p.category || OTHER_SECTION; featureToSection.set(p.name, s); ensureSectionInOrder(s); }
   }
 }
 
-if (optAggregated.size > 0) {
-  const rows: CompareRow[] = [...optAggregated.entries()]
-    .sort(([a], [b]) => a.localeCompare(b, 'cs'))
-    .map(([name, info]) => {
-      const cells: Record<string, CellValue> = {};
-      for (const t of trims) {
-        const price = info.cells[String(t.id)];
-        cells[String(t.id)] = price > 0 ? { price } : 'unavailable';
-      }
-      return { feature: name, code: info.code, cells };
-    });
-  compareData.push({
-    key: '__dokoupitelne',
-    label: 'Dokoupitelné položky',
-    rows,
-  });
+// 3) řádky per sekce (first-occurrence pořadí)
+const sectionRows = new Map<string, string[]>();
+const addRow = (s: string, fn: string) => { if (!sectionRows.has(s)) sectionRows.set(s, []); const a = sectionRows.get(s)!; if (!a.includes(fn)) a.push(fn); };
+for (const t of trims) {
+  for (const g of trimFeatures.get(String(t.id)) || []) for (const it of g.items) { const fn = it.trim(); if (fn) addRow(featureToSection.get(fn) || g.section, fn); }
 }
+for (const t of trims) {
+  for (const o of trimOptionals.get(String(t.id)) || []) if (o.name) addRow(featureToSection.get(o.name) || OTHER_SECTION, o.name);
+  for (const p of trimPackages.get(String(t.id)) || []) if (p.name) addRow(featureToSection.get(p.name) || OTHER_SECTION, p.name);
+}
+
+let finalSections = sectionOrder.filter((s) => sectionRows.has(s));
+for (const s of sectionRows.keys()) if (!finalSections.includes(s)) finalSections.push(s);
+finalSections = finalSections.filter((s) => s !== OTHER_SECTION);
+if (sectionRows.has(OTHER_SECTION)) finalSections.push(OTHER_SECTION);
+
+function cellFor(t: any, feature: string): CellValue {
+  for (const g of (trimFeatures.get(String(t.id)) || [])) if (g.items.some((it) => it.trim() === feature)) return 'standard';
+  const o = (trimOptionals.get(String(t.id)) || []).find((x) => x.name === feature);
+  if (o) return { price: o.price };
+  const p = (trimPackages.get(String(t.id)) || []).find((x) => x.name === feature);
+  if (p) return { packageName: p.label };
+  return 'unavailable';
+}
+
+const compareData: CompareCategory[] = finalSections.map((section) => ({
+  key: section,
+  label: CATEGORY_LABELS[section as keyof typeof CATEGORY_LABELS] ?? section,
+  rows: (sectionRows.get(section) || []).map((feature) => {
+    const cells: Record<string, CellValue> = {};
+    for (const t of trims) cells[String(t.id)] = cellFor(t, feature);
+    return { feature, cells } as CompareRow;
+  }),
+})).filter((c) => c.rows.length > 0);
 
 // Cena trimu pro header
 function trimPrice(t: TrimLevel): string {

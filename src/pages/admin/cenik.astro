@@ -725,12 +725,12 @@ function buildMatrixModel() {
   for (const t of trims) {
     for (const o of (t.optional_items || [])) {
       const f = featTrim(o.name); if (!f) continue;
-      if (!featureToSection.has(f)) featureToSection.set(f, MATRIX_OTHER_SECTION);
+      if (!featureToSection.has(f)) featureToSection.set(f, featTrim(o.category) || MATRIX_OTHER_SECTION);
       addRow(featureToSection.get(f), f);
     }
     for (const p of (t.package_items || [])) {
       const f = featTrim(p.name); if (!f) continue;
-      if (!featureToSection.has(f)) featureToSection.set(f, MATRIX_OTHER_SECTION);
+      if (!featureToSection.has(f)) featureToSection.set(f, featTrim(p.category) || MATRIX_OTHER_SECTION);
       addRow(featureToSection.get(f), f);
     }
   }
@@ -778,12 +778,13 @@ function setCell(ti, section, feature, newState, extra) {
     if (!Array.isArray(sec.items)) sec.items = [];
     if (!sec.items.includes(feature)) sec.items.push(feature);
   } else if (newState === 'price') {
-    t.optional_items.push({ name: feature, code: '', price: extra.price });
+    t.optional_items.push({ name: feature, code: '', price: extra.price, category: section });
   } else if (newState === 'package') {
     t.package_items.push({
       name: feature,
       package_code: extra.package_code || '',
       package_name: extra.package_name || extra.package_code || '',
+      category: section,
     });
   }
   // 'none' → nic (už vyčištěno)
@@ -1117,44 +1118,11 @@ function renderPackages(packages, trims) {
 
   // Pricing cells inline edit (pricing_per_trim object)
   container.querySelectorAll('.pkg-pricing td.cell').forEach((td) => {
-    td.addEventListener('click', () => {
-      if (td.querySelector('input')) return;
+    td.addEventListener('click', (e) => {
+      e.stopPropagation();
       const tbl = td.closest('.pkg-pricing');
       const pi = parseInt(tbl.dataset.pkgIdx, 10);
-      const slug = td.dataset.pkgTrimSlug;
-      if (!CURRENT_DATA.packages[pi].pricing_per_trim) CURRENT_DATA.packages[pi].pricing_per_trim = {};
-      const cur = CURRENT_DATA.packages[pi].pricing_per_trim[slug];
-      const curStr = (typeof cur === 'number') ? String(cur) : (cur ?? '');
-      const input = document.createElement('input');
-      input.type = 'text';
-      input.value = curStr;
-      input.placeholder = 'číslo / standard / unavailable';
-      input.style.cssText = 'width:100%;box-sizing:border-box;border:2px solid #1f6feb;padding:4px 6px;font-size:13px;text-align:center;border-radius:3px;';
-      td.textContent = '';
-      td.appendChild(input);
-      input.focus(); input.select();
-      const commit = (save) => {
-        if (save) {
-          const v = input.value.trim();
-          let parsed;
-          if (v === '' || v === '-' || v === '–') parsed = 'unavailable';
-          else if (v.toLowerCase() === 'standard' || v === 'S') parsed = 'standard';
-          else if (v.toLowerCase() === 'unavailable') parsed = 'unavailable';
-          else {
-            const num = parseInt(v.replace(/\s/g, ''), 10);
-            parsed = Number.isFinite(num) ? num : v;
-          }
-          CURRENT_DATA.packages[pi].pricing_per_trim[slug] = parsed;
-        }
-        const v = CURRENT_DATA.packages[pi].pricing_per_trim[slug];
-        td.textContent = formatPricingValue(v);
-        td.className = `cell ${pricingCellClass(v)}`;
-      };
-      input.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter') { e.preventDefault(); commit(true); }
-        else if (e.key === 'Escape') { e.preventDefault(); commit(false); }
-      });
-      input.addEventListener('blur', () => commit(true));
+      openPkgMenu(td, pi, td.dataset.pkgTrimSlug);
     });
   });
 
@@ -1203,6 +1171,36 @@ function slugifyJs(s) {
 }
 
 // Pricing hodnota → třída cellu (barva)
+function openPkgMenu(anchorEl, pi, slug) {
+  closeCellMenu();
+  const pkg = CURRENT_DATA.packages[pi];
+  if (!pkg) return;
+  if (!pkg.pricing_per_trim || typeof pkg.pricing_per_trim !== 'object') pkg.pricing_per_trim = {};
+  const menu = document.createElement('div');
+  menu.className = 'cell-menu';
+  const act = (fn) => { fn(); closeCellMenu(); renderPackages(CURRENT_DATA.packages, CURRENT_DATA.trims); };
+  const mk = (label, cls, fn) => { const b = document.createElement('button'); b.type = 'button'; b.className = 'cell-menu-btn ' + (cls || ''); b.textContent = label; b.addEventListener('click', (e) => { e.stopPropagation(); act(fn); }); return b; };
+  menu.appendChild(mk('✓  V ceně', 'cm-standard', () => { pkg.pricing_per_trim[slug] = 'standard'; }));
+  menu.appendChild(mk('Cena…', 'cm-price', () => {
+    const cur = pkg.pricing_per_trim[slug];
+    const curVal = (typeof cur === 'number') ? cur : '';
+    const v = prompt('Cena paketu v Kč:', curVal);
+    if (v === null) return;
+    const num = parseInt(String(v).replace(/\s/g, ''), 10);
+    if (Number.isFinite(num)) pkg.pricing_per_trim[slug] = num;
+  }));
+  menu.appendChild(mk('—  Nedostupné', 'cm-none', () => { pkg.pricing_per_trim[slug] = 'unavailable'; }));
+  document.body.appendChild(menu);
+  menu.style.position = 'fixed';
+  const r = anchorEl.getBoundingClientRect();
+  const mw = menu.offsetWidth || 200, mh = menu.offsetHeight || 160;
+  const vw = document.documentElement.clientWidth, vh = window.innerHeight;
+  let left = r.left; if (left + mw > vw - 8) left = vw - mw - 8; left = Math.max(8, left);
+  let top = r.bottom + 4; if (top + mh > vh - 8) { top = r.top - mh - 4; if (top < 8) top = Math.max(8, vh - mh - 8); }
+  menu.style.top = top + 'px'; menu.style.left = left + 'px';
+  setTimeout(() => document.addEventListener('click', closeCellMenu, { once: true }), 0);
+}
+
 function pricingCellClass(v) {
   if (v === 'standard') return 'cell-standard';
   if (v === 'unavailable' || v == null) return 'cell-unavailable';

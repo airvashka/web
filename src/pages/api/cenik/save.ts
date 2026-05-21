@@ -122,17 +122,18 @@ function normalizeFeatures(features: Array<{ section: string; items: string[] }>
     .filter((f) => f.category && f.items.length > 0);
 }
 
-function normalizeOptionalItems(items: Array<{ name: string; code?: string; price: number }> = []): Array<{ name: string; code?: string; price: number }> {
+function normalizeOptionalItems(items: Array<{ name: string; code?: string; price: number; category?: string }> = []): Array<{ name: string; code?: string; price: number; category?: string }> {
   return items
     .filter((it) => it && it.name && Number.isFinite(it.price))
     .map((it) => ({
       name: String(it.name).trim(),
       code: it.code ? String(it.code).trim() : undefined,
       price: Math.round(Number(it.price)),
+      category: it.category ? String(it.category).trim() : undefined,
     }));
 }
 
-function normalizePackageItems(items: Array<{ name: string; package_code?: string; package_name?: string }> = []): Array<{ name: string; package_code?: string; package_name?: string }> {
+function normalizePackageItems(items: Array<{ name: string; package_code?: string; package_name?: string; category?: string }> = []): Array<{ name: string; package_code?: string; package_name?: string; category?: string }> {
   return items
     .filter((it) => it && it.name && (it.package_code || it.package_name))
     .map((it) => {
@@ -143,6 +144,7 @@ function normalizePackageItems(items: Array<{ name: string; package_code?: strin
         package_code: code || undefined,
         // Když chybí čitelný název paketu, použij aspoň kód, ať má buňka co zobrazit.
         package_name: name || code || undefined,
+        category: it.category ? String(it.category).trim() : undefined,
       };
     });
 }
