@@ -697,49 +697,50 @@ function buildMatrixModel() {
   const sectionOrder = [];
   const seenSec = new Set();
   const featureToSection = new Map();
+  const ensureSec = (s) => { if (s && !seenSec.has(s)) { seenSec.add(s); sectionOrder.push(s); } };
 
+  // 1) standardní features → sekce (+ pořadí sekcí)
   for (const t of trims) {
     for (const sec of (t.features || [])) {
       const name = featTrim(sec.section);
       if (!name) continue;
-      if (!seenSec.has(name)) { seenSec.add(name); sectionOrder.push(name); }
+      ensureSec(name);
       for (const it of (sec.items || [])) {
         const f = featTrim(it);
         if (f && !featureToSection.has(f)) featureToSection.set(f, name);
       }
     }
   }
-  for (const s of MATRIX_EXTRA_SECTIONS) {
-    if (!seenSec.has(s)) { seenSec.add(s); sectionOrder.push(s); }
+  // 2) optional/package → sekce dle uložené category (jen pokud ji ještě neznáme)
+  for (const t of trims) {
+    for (const o of (t.optional_items || [])) {
+      const f = featTrim(o.name); if (!f) continue;
+      if (!featureToSection.has(f)) { const s = featTrim(o.category) || MATRIX_OTHER_SECTION; featureToSection.set(f, s); ensureSec(s); }
+    }
+    for (const p of (t.package_items || [])) {
+      const f = featTrim(p.name); if (!f) continue;
+      if (!featureToSection.has(f)) { const s = featTrim(p.category) || MATRIX_OTHER_SECTION; featureToSection.set(f, s); ensureSec(s); }
+    }
+  }
+  // 3) deklarované (+ řádek) PŘEPÍŠOU sekci prvku — explicitní umístění, žádné duplikáty
+  for (const s of MATRIX_EXTRA_SECTIONS) ensureSec(s);
+  for (const d of MATRIX_DECLARED) {
+    if (!d.feature) continue;
+    featureToSection.set(d.feature, d.section);
+    ensureSec(d.section);
   }
 
+  // 4) řádky — KAŽDÝ prvek právě jednou, do své (jediné) sekce
   const sectionRows = new Map();
   const addRow = (s, f) => {
     if (!sectionRows.has(s)) sectionRows.set(s, []);
     const arr = sectionRows.get(s);
     if (!arr.includes(f)) arr.push(f);
   };
-
   for (const [f, s] of featureToSection) addRow(s, f);
-
-  for (const t of trims) {
-    for (const o of (t.optional_items || [])) {
-      const f = featTrim(o.name); if (!f) continue;
-      if (!featureToSection.has(f)) featureToSection.set(f, featTrim(o.category) || MATRIX_OTHER_SECTION);
-      addRow(featureToSection.get(f), f);
-    }
-    for (const p of (t.package_items || [])) {
-      const f = featTrim(p.name); if (!f) continue;
-      if (!featureToSection.has(f)) featureToSection.set(f, featTrim(p.category) || MATRIX_OTHER_SECTION);
-      addRow(featureToSection.get(f), f);
-    }
-  }
-
-  for (const d of MATRIX_DECLARED) addRow(d.section, d.feature);
 
   let order = sectionOrder.filter((s) => sectionRows.has(s));
   for (const s of sectionRows.keys()) if (!order.includes(s)) order.push(s);
-  // "Ostatní" vždy na konec
   order = order.filter((s) => s !== MATRIX_OTHER_SECTION);
   if (sectionRows.has(MATRIX_OTHER_SECTION)) order.push(MATRIX_OTHER_SECTION);
 
