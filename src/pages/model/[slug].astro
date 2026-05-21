@@ -860,6 +860,10 @@ if (promoActive && promoDescription) {
             for (const g of groups) for (const item of g.items) flat.push(item);
             return flat;
           });
+          const pkgPerTrim = trims.map((t) => {
+            const items = Array.isArray((t as any).package_items) ? (t as any).package_items : [];
+            return items.map((p: any) => String(p?.name ?? '').trim()).filter(Boolean);
+          });
           const normSet = (arr: string[]) => new Set(arr.map((s) => s.trim().toLowerCase()));
           return (
             <div class={`trims trims-${trims.length}`}>
@@ -885,12 +889,22 @@ if (promoActive && promoDescription) {
                   // První trim → top 5 features
                   teaserItems = flat.slice(0, 5);
                 } else {
-                  // Vyšší trim → diff oproti předchozímu
+                  // Vyšší trim → diff oproti předchozímu (features + prvky z paketů)
                   const prevSet = normSet(flatPerTrim[i - 1]);
-                  const diff = flat.filter((f) => !prevSet.has(f.trim().toLowerCase()));
-                  teaserLabel = `Navíc oproti ${trims[i - 1].name}:`;
-                  teaserItems = diff.slice(0, 5);
-                  extraCount = Math.max(0, diff.length - teaserItems.length);
+                  const pkgExtra = pkgPerTrim[i].filter((f) => !prevSet.has(f.trim().toLowerCase()));
+                  const diff = [
+                    ...flat.filter((f) => !prevSet.has(f.trim().toLowerCase())),
+                    ...pkgExtra,
+                  ];
+                  if (diff.length > 0) {
+                    teaserLabel = `Navíc oproti ${trims[i - 1].name}:`;
+                    teaserItems = diff.slice(0, 5);
+                    extraCount = Math.max(0, diff.length - teaserItems.length);
+                  } else {
+                    // Stejná výbava jako předchozí (jiný paket/cena) → ukaž vlastní výbavu
+                    teaserLabel = 'Z výbavy například:';
+                    teaserItems = flat.slice(0, 5);
+                  }
                 }
 
                 const highlightNote = isRecommended ? ((t as any).highlight_note || '').trim() : '';
@@ -943,17 +957,7 @@ if (promoActive && promoDescription) {
                   <div class="pkg-name">{pkg.name}</div>
                   {pkg.description && <p class="pkg-desc">{pkg.description}</p>}
                   {Array.isArray(pkg.features) && pkg.features.length > 0 && (
-                    <ul class="pkg-list">
-                      {pkg.features.slice(0, 8).map((f: string) => (
-                        <li>
-                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-                          <span>{f}</span>
-                        </li>
-                      ))}
-                      {pkg.features.length > 8 && (
-                        <li class="pkg-more">+ {pkg.features.length - 8} dalších</li>
-                      )}
-                    </ul>
+                    <div class="pkg-count">celkem {pkg.features.length} položek</div>
                   )}
                 </div>
               ))}
@@ -966,8 +970,8 @@ if (promoActive && promoDescription) {
           <a class="trims-cta" href={`/model/${rawModel.slug}/vybavy`}>
             <div>
               <div class="trims-cta-eyebrow">Srovnání výbavových stupňů</div>
-              <div class="trims-cta-title">Kompletní matrice — vidíte přesně co kde je</div>
-              <div class="trims-cta-sub">Sloupce výbavových stupňů × řádky všech prvků výbavy + paketové ceny + barvy.</div>
+              <div class="trims-cta-title">Kompletní ceník — vidíte přesně, co kde je</div>
+              <div class="trims-cta-sub">Všechny stupně, příplatky, pakety i barvy přehledně na jednom místě.</div>
             </div>
             <span class="trims-cta-arrow">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
