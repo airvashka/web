@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 /**
  * SFR Motor — přidá `feature_order` JSON pole do model_years.
  *
@@ -10,6 +11,7 @@
  *   (prvek "v ceně" jen u vyšších stupňů lze posunout nahoru nad prvek z nižších).
  *
  *   Matice (admin i web) řadí řádky uvnitř sekce podle indexu v tomto poli;
+ *   prvky, které v poli nejsou, zůstávají v původním pořadí (first-occurrence).
  *
  * Idempotentní — pokud field existuje, jen info, nic nemění.
  *
