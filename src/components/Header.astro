@@ -165,7 +165,7 @@ const navItems: Array<{ label: string; href: string; key: NonNullable<Props['act
     let data;
     try { data = JSON.parse(dataEl.textContent || '{}'); } catch (e) { return; }
 
-    const DAY_ABBR = ['ne', 'po', 'út', 'st', 'čt', 'pá', 'so']; // index = Google day (0=Ne)
+    const DAY_NEXT = ['v neděli', 'v pondělí', 'v úterý', 've středu', 've čtvrtek', 'v pátek', 'v sobotu']; // index = Google day (0=Ne)
 
     function nowPrague() {
       const p = new Intl.DateTimeFormat('en-GB', {
@@ -211,8 +211,8 @@ const navItems: Array<{ label: string; href: string; key: NonNullable<Props['act
       }
       if (!nextOpen) return { open: false, text: 'zavřeno' };
       const sameDay = nextOpen.day === now.dow && nextOpenWM < (now.dow * 1440 + 1440);
-      if (sameDay) return { open: false, text: 'zavřeno · otevře ' + fmt(nextOpen.time) };
-      return { open: false, text: 'zavřeno · otevře ' + DAY_ABBR[nextOpen.day] + ' ' + fmt(nextOpen.time) };
+      if (sameDay) return { open: false, text: 'zavřeno · otevře v ' + fmt(nextOpen.time) };
+      return { open: false, text: 'zavřeno · otevře ' + DAY_NEXT[nextOpen.day] + ' ' + fmt(nextOpen.time) };
     }
 
     function render() {
