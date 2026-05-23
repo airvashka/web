@@ -1,5 +1,6 @@
 ---
 import { FALLBACK_SALES_PHONE, telLink, getDealerContacts } from '@lib/contacts';
+import googleData from '../data/google-reviews.json';
 
 interface Props {
   active?: 'kgm' | 'omoda-jaecoo' | 'farizon' | 'sklad' | 'servis' | 'magazin' | 'kontakt';
@@ -16,6 +17,15 @@ const salesPhonesJson = JSON.stringify(contacts.sales.map((c) => c.phone));
 // Server-side default (zobrazí se před tím než JS rotuje)
 const defaultPhone = contacts.sales[0]?.phone ?? FALLBACK_SALES_PHONE;
 const defaultPhoneLink = telLink(defaultPhone);
+
+// Oteviraci doba pro topbar - strukturovane periody obou pobocek (Prodejna + Servis).
+// Stav otevreno/zavreno se pocita client-side v case Evropa/Praha; svatky a vyjimecne
+// dny resi Google pres current_opening_hours (data se obnovuji 3x/den pres stock-sync deploy).
+const gd = googleData as any;
+const openingJson = JSON.stringify({
+  prodejna: gd?.prodej?.hours_periods ?? null,
+  servis: gd?.servis?.hours_periods ?? null,
+});
 
 const navItems: Array<{ label: string; href: string; key: NonNullable<Props['active']> }> = [
   { label: 'KGM', href: '/kgm', key: 'kgm' },
@@ -35,9 +45,9 @@ const navItems: Array<{ label: string; href: string; key: NonNullable<Props['act
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
       Ďáblická 553/2, Praha 8
     </span>
-    <span class="topbar-item">
+    <span class="topbar-item topbar-hours" data-opening-status>
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-      Po–Pá 8–18 (Čt do 20) · So–Ne zavřeno
+      <span data-opening-text>Prodejna Po–Pá 8–18 (Čt do 20) · Servis Po–Pá 8–17</span>
     </span>
     <a class="topbar-item" href={`tel:${defaultPhoneLink}`} data-sales-phone style="text-decoration:none;color:inherit;">
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.86 19.86 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.86 19.86 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
@@ -108,9 +118,9 @@ const navItems: Array<{ label: string; href: string; key: NonNullable<Props['act
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
       Ďáblická 553/2, Praha 8
     </div>
-    <div class="mobile-drawer-info-item">
+    <div class="mobile-drawer-info-item" data-opening-status>
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-      Po–Pá 8–18 (Čt do 20) · So–Ne zavřeno
+      <span data-opening-text>Prodejna Po–Pá 8–18 (Čt do 20) · Servis Po–Pá 8–17</span>
     </div>
   </div>
 </div>
@@ -119,6 +129,8 @@ const navItems: Array<{ label: string; href: string; key: NonNullable<Props['act
 <!-- Client-side phone rotation data — JSON pool prodejních telefonů z Directus.
      JS níže random-pickne a updatne všechny data-sales-phone elementy. -->
 <script type="application/json" id="sales-phones-data" set:html={salesPhonesJson}></script>
+<!-- Oteviraci doba - strukturovane periody obou pobocek (Google), stav se pocita client-side. -->
+<script type="application/json" id="opening-data" set:html={openingJson}></script>
 
 <script>
   // ===== Sales phone rotation =====
@@ -142,6 +154,91 @@ const navItems: Array<{ label: string; href: string; key: NonNullable<Props['act
     } catch (err) {
       // Fallback default zůstane — žádný break
       console.warn('[phones] rotation failed', err);
+    }
+  })();
+
+  // ===== Oteviraci doba: stav otevreno/zavreno (cas Evropa/Praha) =====
+  // Pocita z Google period (current_opening_hours -> svatky zohledneny) obou pobocek.
+  (function () {
+    const dataEl = document.getElementById('opening-data');
+    if (!dataEl) return;
+    let data;
+    try { data = JSON.parse(dataEl.textContent || '{}'); } catch (e) { return; }
+
+    const DAY_ABBR = ['ne', 'po', 'út', 'st', 'čt', 'pá', 'so']; // index = Google day (0=Ne)
+
+    function nowPrague() {
+      const p = new Intl.DateTimeFormat('en-GB', {
+        timeZone: 'Europe/Prague', hour12: false,
+        weekday: 'short', hour: '2-digit', minute: '2-digit',
+      }).formatToParts(new Date());
+      const m = {};
+      p.forEach((x) => { m[x.type] = x.value; });
+      const wd = { Sun: 0, Mon: 1, Tue: 2, Wed: 3, Thu: 4, Fri: 5, Sat: 6 }[m.weekday] ?? 0;
+      let hh = parseInt(m.hour, 10); if (hh === 24) hh = 0;
+      return { dow: wd, min: hh * 60 + parseInt(m.minute, 10) };
+    }
+
+    function toMin(t) { // "HHMM" -> minuty od pulnoci
+      const s = String(t).padStart(4, '0');
+      return parseInt(s.slice(0, 2), 10) * 60 + parseInt(s.slice(2), 10);
+    }
+    function fmt(t) { // "HHMM" -> "H:MM"
+      const s = String(t).padStart(4, '0');
+      return parseInt(s.slice(0, 2), 10) + ':' + s.slice(2);
+    }
+
+    function statusFor(periods, now) {
+      if (!Array.isArray(periods) || periods.length === 0) return null;
+      // Nonstop: jediny period s open 0000 a bez close
+      if (periods.length === 1 && periods[0].open && !periods[0].close
+          && String(periods[0].open.time) === '0000') {
+        return { open: true, text: 'otevřeno nonstop' };
+      }
+      const nowWM = now.dow * 1440 + now.min;
+      let nextOpenWM = Infinity, nextOpen = null;
+      for (const per of periods) {
+        if (!per.open || !per.close) continue;
+        const oWM = per.open.day * 1440 + toMin(per.open.time);
+        let cWM = per.close.day * 1440 + toMin(per.close.time);
+        if (cWM <= oWM) cWM += 7 * 1440; // pres pulnoc / prelom tydne
+        // otevreno ted? (i s posunem o tyden kvuli wrapu Ne)
+        if ((oWM <= nowWM && nowWM < cWM) || (oWM <= nowWM + 7 * 1440 && nowWM + 7 * 1440 < cWM)) {
+          return { open: true, text: 'otevřeno do ' + fmt(per.close.time) };
+        }
+        let cand = oWM; if (cand < nowWM) cand += 7 * 1440;
+        if (cand < nextOpenWM) { nextOpenWM = cand; nextOpen = per.open; }
+      }
+      if (!nextOpen) return { open: false, text: 'zavřeno' };
+      const sameDay = nextOpen.day === now.dow && nextOpenWM < (now.dow * 1440 + 1440);
+      if (sameDay) return { open: false, text: 'zavřeno · otevře ' + fmt(nextOpen.time) };
+      return { open: false, text: 'zavřeno · otevře ' + DAY_ABBR[nextOpen.day] + ' ' + fmt(nextOpen.time) };
+    }
+
+    function render() {
+      const now = nowPrague();
+      const branches = [['Prodejna', data.prodejna], ['Servis', data.servis]];
+      const parts = [];
+      for (const [label, periods] of branches) {
+        const st = statusFor(periods, now);
+        if (!st) continue;
+        const cls = st.open ? 'oh-open' : 'oh-closed';
+        const lbl = label.replace(/&/g, '&amp;').replace(/</g, '&lt;');
+        const txt = st.text.replace(/&/g, '&amp;').replace(/</g, '&lt;');
+        parts.push('<span class="oh-branch"><span class="oh-dot ' + cls + '"></span>'
+          + lbl + ' ' + txt + '</span>');
+      }
+      if (parts.length === 0) return; // nech staticky fallback
+      const html = parts.join('<span class="oh-sep">·</span>');
+      document.querySelectorAll('[data-opening-text]').forEach((el) => { el.innerHTML = html; });
+    }
+
+    try {
+      render();
+      // Prepocitej kazdou minutu (prechod otevreno<->zavreno bez reloadu)
+      setInterval(render, 60 * 1000);
+    } catch (e) {
+      console.warn('[opening-hours] render failed', e);
     }
   })();
 
@@ -226,6 +323,21 @@ const navItems: Array<{ label: string; href: string; key: NonNullable<Props['act
 </script>
 
 <style is:global>
+  /* ===== Oteviraci doba (topbar + mobile drawer) ===== */
+  .oh-branch { display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; }
+  .oh-sep { margin: 0 9px; opacity: 0.45; }
+  .oh-dot {
+    width: 7px; height: 7px; border-radius: 50%; flex: none; display: inline-block;
+    background: #9aa0a6;
+  }
+  .oh-dot.oh-open { background: #37c46b; box-shadow: 0 0 0 3px rgba(55, 196, 107, 0.18); }
+  .oh-dot.oh-closed { background: #e0564f; box-shadow: 0 0 0 3px rgba(224, 86, 79, 0.16); }
+  .topbar-hours [data-opening-text] { display: inline-flex; align-items: center; flex-wrap: wrap; }
+  .mobile-drawer-info-item[data-opening-status] [data-opening-text] {
+    display: flex; flex-direction: column; align-items: flex-start; gap: 4px;
+  }
+  .mobile-drawer-info-item[data-opening-status] .oh-sep { display: none; }
+
   /* Smart hide-on-scroll — MOBILE (fixed pozice) + DESKTOP (headroom přes sticky).
      Mobile: position fixed + transform (iOS Safari friendly).
      Desktop: nav je sticky a při scroll-down klesne mimo viewport přes transform,

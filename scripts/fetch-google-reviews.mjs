@@ -36,7 +36,7 @@ if (!API_KEY) {
   process.exit(0);
 }
 
-const FIELDS = 'name,rating,user_ratings_total,reviews,url,formatted_address,formatted_phone_number,opening_hours';
+const FIELDS = 'name,rating,user_ratings_total,reviews,url,formatted_address,formatted_phone_number,opening_hours,current_opening_hours,utc_offset';
 
 async function fetchPlace(placeId, label) {
   if (!placeId) {
@@ -71,6 +71,11 @@ async function fetchPlace(placeId, label) {
     address: result.formatted_address,
     phone: result.formatted_phone_number,
     opening_hours: result.opening_hours?.weekday_text ?? null,
+    // Strukturované periody pro výpočet otevřeno/zavřeno v prohlížeči.
+    // Preferujeme current_opening_hours (zohledňuje svátky/výjimky pro aktuální týden),
+    // fallback na běžné opening_hours. Tvar: [{ open:{day,time}, close:{day,time} }, ...]
+    // day: 0=neděle … 6=sobota, time: "HHMM".
+    hours_periods: (result.current_opening_hours ?? result.opening_hours)?.periods ?? null,
   };
 }
 
