@@ -509,6 +509,18 @@ input, textarea, select { font: inherit; }
   color: var(--text);
   margin: 0 0 10px;
 }
+/* Stav + Dostupnost — výrazné boxy pod fotogalerií (detail vozu) */
+.under-gallery { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 14px; }
+.under-gallery .ug-item {
+  flex: 1; min-width: 120px;
+  display: flex; flex-direction: column; gap: 2px;
+  padding: 10px 16px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: #fff;
+}
+.under-gallery .ug-lab { font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-muted); }
+.under-gallery .ug-val { font-size: 16px; font-weight: 600; color: var(--text); }
 .info-meta-chips {
   list-style: none; padding: 0; margin: 0 0 28px;
   display: flex; flex-wrap: wrap; gap: 8px;
