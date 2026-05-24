@@ -266,7 +266,7 @@ const articles = articlesRaw.map((a) => {
             else if (isHighlighted) pillLabel = 'Novinka';
 
             const photoId = v.photos?.[0]?.directus_files_id;
-            const trim = v.trim_level_snapshot?.name ?? '';
+            const trim = v.trim_level_snapshot?.name ?? v.trim_level_snapshot?.raw_name ?? '';
             const modelName = v.model?.name ?? 'Vůz';
             const brandName = v.brand?.name ?? '';
             const carYear = v.model_year?.year ?? '';
@@ -299,13 +299,13 @@ const articles = articlesRaw.map((a) => {
                   <FuelIcon type={fuelType} />
                 </div>
                 <div class="body">
-                  <div class="nm">{brandName} {modelName}</div>
+                  <div class="brand">{brandName}</div>
+                  <div class="nm">{modelName}</div>
                   {trim && <div class="var">{trim}</div>}
                   <div class="specs">
                     {fuelLabel && <span class="fuel">{fuelLabel}</span>}
                     {transmissionLabel && <span>{transmissionLabel}</span>}
                     {is4wd && <span>4×4</span>}
-                    {carYear && <span>{carYear}</span>}
                   </div>
                   <div class="foot">
                     <span class="km">{fmtKm(v.km)}</span>

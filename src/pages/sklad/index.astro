@@ -210,7 +210,7 @@ const fmtKm = (n?: number | null) => (n === 0 || !n ? '0 km' : `${n.toLocaleStr
                 else if (isHighlighted) pillLabel = 'Novinka';
 
                 const photoId = firstPhoto(v);
-                const trimName = v.trim_level?.name ?? (v.trim_level_snapshot as any)?.name ?? '';
+                const trimName = v.trim_level?.name ?? (v.trim_level_snapshot as any)?.name ?? (v.trim_level_snapshot as any)?.raw_name ?? '';
                 const carYear = v.model_year?.year ?? '';
                 const conditionLabel = conditionLabels[v.condition ?? ''] ?? '';
                 const fuelLabel = fuelLabels[v.model?.fuel_type ?? ''] ?? '';
@@ -249,13 +249,13 @@ const fmtKm = (n?: number | null) => (n === 0 || !n ? '0 km' : `${n.toLocaleStr
                       <FuelIcon type={v.model?.fuel_type ?? ''} />
                     </div>
                     <div class="body">
-                      <div class="nm">{v.brand?.name ?? ''} {v.model?.name ?? ''}</div>
+                      <div class="brand">{v.brand?.name ?? ''}</div>
+                      <div class="nm">{v.model?.name ?? ''}</div>
                       {trimName && <div class="var">{trimName}</div>}
                       <div class="specs">
                         {fuelLabel && <span class="fuel">{fuelLabel}</span>}
                         {transmissionLabel && <span>{transmissionLabel}</span>}
                         {is4wd && <span>4×4</span>}
-                        {carYear && <span>{carYear}</span>}
                       </div>
                       <div class="foot">
                         <span class="km">{fmtKm(v.km)}</span>

@@ -3686,9 +3686,17 @@ html.scrolled-down .subnav {
   color: var(--text);
 }
 /* Min-heights aby všechny karty měly stejnou strukturu i s různými daty */
+.scard .brand { min-height: 14px; }
 .scard .nm { min-height: 22px; }
 .scard .var { min-height: 17px; }
 .scard .specs { min-height: 26px; }
+/* Varianta C: značka drobně nahoře / model velký / výbava accentem */
+.scard .brand {
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  color: var(--text-muted);
+  margin-bottom: -6px;
+}
 .scard .nm {
   font-family: var(--font-display);
   font-weight: 600;
@@ -3698,8 +3706,9 @@ html.scrolled-down .subnav {
 }
 .scard .var {
   font-size: 13.5px;
-  color: var(--text-muted);
-  margin-top: -10px;
+  font-weight: 500;
+  color: var(--accent);
+  margin-top: -6px;
 }
 /* Info chips — palivo, rok, stav, převodovka. Jen to co máme. */
 .scard .specs {

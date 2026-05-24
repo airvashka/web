@@ -1001,7 +1001,7 @@ if (promoActive && promoDescription) {
         <div class="skladovka-grid" data-stock-shuffle data-visible-count="4">
           {stockOfModel.map((v: any) => {
             const photoId = v.photos?.[0]?.directus_files_id;
-            const trim = v.trim_level?.name ?? v.trim_level_snapshot?.name ?? '';
+            const trim = v.trim_level?.name ?? v.trim_level_snapshot?.name ?? v.trim_level_snapshot?.raw_name ?? '';
             const carYear = v.model_year?.year ?? '';
             const isNew = v.condition === 'new';
             const isHl = v.highlighted;
@@ -1047,13 +1047,13 @@ if (promoActive && promoDescription) {
                   <FuelIcon type={fuelType} />
                 </div>
                 <div class="body">
-                  <div class="nm">{brand.name} {rawModel.name}</div>
+                  <div class="brand">{brand.name}</div>
+                  <div class="nm">{rawModel.name}</div>
                   {trim && <div class="var">{trim}</div>}
                   <div class="specs">
                     {fuelLabel && <span class="fuel">{fuelLabel}</span>}
                     {transmissionLabel && <span>{transmissionLabel}</span>}
                     {is4wd && <span>4×4</span>}
-                    {carYear && <span>{carYear}</span>}
                   </div>
                   <div class="foot">
                     <span class="km">{fmtKm(v.km)}</span>

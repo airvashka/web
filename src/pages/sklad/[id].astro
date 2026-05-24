@@ -207,11 +207,12 @@ const transmissionLabels: Record<string, string> = { manual: 'Manuál', automati
 const drivetrainLabels: Record<string, string> = { fwd: 'FWD', rwd: 'RWD', awd: 'AWD', '4wd': '4×4' };
 const fuelLabels: Record<string, string> = { petrol: 'Benzín', diesel: 'Diesel', hybrid: 'Hybrid', phev: 'PHEV', ev: 'Elektro' };
 
-const title = `${brand?.name ?? ''} ${model?.name ?? ''}${trim ? ' ' + trim.name : ''}`.trim();
+const trimDisplay = trim?.name ?? (v.trim_level_snapshot as any)?.name ?? (v.trim_level_snapshot as any)?.raw_name ?? '';
+const title = `${brand?.name ?? ''} ${model?.name ?? ''}${trimDisplay ? ' ' + trimDisplay : ''}`.trim();
 const fuelLabel = model ? (fuelLabels[(model as any).fuel_type] ?? '—') : '—';
 const transmissionLabel = v.transmission ? (transmissionLabels[v.transmission] ?? v.transmission) : null;
 const drivetrainLabel = v.drivetrain ? (drivetrainLabels[v.drivetrain] ?? v.drivetrain) : null;
-const year = modelYear?.year ?? (v.first_registration ? new Date(v.first_registration).getFullYear() : null);
+const year = (v.trim_level_snapshot as any)?.year ?? modelYear?.year ?? (v.first_registration ? new Date(v.first_registration).getFullYear() : null);
 
 // Barva karoserie — priorita: color_ref (M2O) > color_code (legacy text)
 const colorRef = (v as any).color_ref ?? null;
@@ -837,7 +838,7 @@ const salesPhoneLink = telLink(salesPhone);
           <div class="skladovka-grid">
             {similar.map((s: any) => {
               const photoId = s.photos?.[0]?.directus_files_id;
-              const trimName = s.trim_level?.name ?? s.trim_level_snapshot?.name ?? '';
+              const trimName = s.trim_level?.name ?? s.trim_level_snapshot?.name ?? s.trim_level_snapshot?.raw_name ?? '';
               const carYear = s.model_year?.year ?? '';
               const conditionLabel = s.condition === 'new' ? 'Nové' : s.condition === 'demo' ? 'Předváděcí' : 'Ojeté';
               const conditionCls = s.condition === 'new' ? 'new' : s.condition === 'demo' ? 'demo' : 'used';
@@ -878,13 +879,13 @@ const salesPhoneLink = telLink(salesPhone);
                     <FuelIcon type={fuelType} />
                   </div>
                   <div class="body">
-                    <div class="nm">{brandName} {modelName}</div>
+                    <div class="brand">{brandName}</div>
+                    <div class="nm">{modelName}</div>
                     {trimName && <div class="var">{trimName}</div>}
                     <div class="specs">
                       {fuelLabel && <span class="fuel">{fuelLabel}</span>}
                       {transmissionLabel && <span>{transmissionLabel}</span>}
                       {is4wd && <span>4×4</span>}
-                      {carYear && <span>{carYear}</span>}
                     </div>
                     <div class="foot">
                       <span class="km">{fmtK(s.km)}</span>

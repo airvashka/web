@@ -647,12 +647,25 @@ async function processVehicle(detailUrl, index, total) {
     trimLevelId: trim?.id ?? null,
   };
 
+  // Technická data konkrétního vozu z feedu — bez operativních/duplicitních klíčů
+  // (cena, km, dostupnost, barvy, rok, stupeň se zobrazují jinde). Slouží jako
+  // tech-data fallback na detailu, když vůz nemá model_year v DB.
+  const SPEC_EXCLUDE = new Set([
+    'Cena', 'Cena s DPH', 'Cena bez DPH', 'Stav tachometru', 'Dostupnost',
+    'Stav vozu', 'Barva', 'Barva interiéru', 'Výbavový stupeň', 'Rok výroby',
+  ]);
+  const snapshotSpecs = Object.entries(parsed.spec ?? {})
+    .filter(([k, val]) => k && val && !SPEC_EXCLUDE.has(k))
+    .map(([k, val]) => ({ title: k, value: String(val) }));
+
   const trimLevelSnapshot = {
     raw_name: parsed.spec['Výbavový stupeň'] ?? null,
+    year: year,
     motorization: parsed.spec['Motorizace'] ?? null,
     color: parsed.spec['Barva'] ?? null,
     interior_color: parsed.spec['Barva interiéru'] ?? null,
     seats: parsed.spec['Počet míst'] ?? null,
+    specs: snapshotSpecs,
     optional_packages: parsed.optionalPackages,
     features: parsed.features,
     source: 'kgm',
