@@ -441,11 +441,11 @@ const salesPhoneLink = telLink(salesPhone);
             </div>
           )}
           <div class="under-gallery">
-            {conditionLabel && conditionLabel !== '—' && (
-              <div class="ug-item"><span class="ug-lab">Stav</span><span class="ug-val">{conditionLabel}</span></div>
-            )}
             {availabilityLabel && availabilityLabel !== '—' && (
-              <div class="ug-item"><span class="ug-lab">Dostupnost</span><span class="ug-val">{availabilityLabel}</span></div>
+              <span class="ug-avail"><span class="ug-dot"></span>{availabilityLabel}{v.availability === 'in_stock' ? ' v Praze' : ''}</span>
+            )}
+            {conditionLabel && conditionLabel !== '—' && (
+              <span class={`ug-cond ug-cond--${v.condition ?? 'new'}`}>{conditionLabel}</span>
             )}
           </div>
         </div>
