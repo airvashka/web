@@ -284,11 +284,14 @@ const feedSpecs: Array<[string, string]> = Array.isArray(snapshot.specs)
       .map((s: any) => [String(s?.title ?? '').trim(), String(s?.value ?? '').trim()] as [string, string])
       .filter(([k, val]) => k && val)
   : [];
-const tdEntries: Array<[string, string]> = feedSpecs.length > 0
-  ? feedSpecs
-  : Object.entries(td)
-      .filter(([, v]) => v !== null && v !== undefined && String(v).trim() !== '')
-      .map(([k, v]) => [k, String(v)] as [string, string]);
+const curatedEntries: Array<[string, string]> = Object.entries(td)
+  .filter(([, v]) => v !== null && v !== undefined && String(v).trim() !== '')
+  .map(([k, v]) => [k, String(v)] as [string, string]);
+// Bohatší zdroj vyhrává: KGM má bohatá kurátorská tech data (z /model dle roku),
+// OMODA/JAECOO bohatý per-vůz feed. Vozy bez model_year padnou na feed (snapshot.specs).
+const tdEntries: Array<[string, string]> = curatedEntries.length >= feedSpecs.length
+  ? curatedEntries
+  : feedSpecs;
 
 // Vehicle-specific specs (jen pokud nejsou už v td)
 const vehicleSpecs: Array<[string, string]> = [];
@@ -298,6 +301,27 @@ if (fuelLabel && fuelLabel !== '—' && !hasKey(/palivo|fuel/i)) vehicleSpecs.pu
 if (drivetrainLabel && !hasKey(/pohon|drivetrain/i)) vehicleSpecs.push(['Pohon', drivetrainLabel]);
 
 const allSpecs = [...tdEntries, ...vehicleSpecs];
+
+// ── Hero boxy: unifikovaný lookup hodnot napříč kurátorskými (td) i feed daty ──
+const _specSearch: Array<[string, string]> = [...curatedEntries, ...feedSpecs];
+const specFind = (re: RegExp): string | null => {
+  for (const [k, val] of _specSearch) {
+    if (re.test(k) && val && String(val).trim() !== '') return String(val).trim();
+  }
+  return null;
+};
+// Výkon: přímý klíč (kW), jinak vytáhni z "Motorizace … (120kW/163k)"
+const _motor = specFind(/motorizace|^motor/i) ?? String(snapshot.motorization ?? '');
+const _pwKwDirect = (specFind(/čist[ýy].*v[ýy]kon|max.*v[ýy]kon|v[ýy]kon.*kw|^kw$/i) ?? '').match(/\d+(?:[.,]\d+)?/)?.[0] ?? null;
+const _pwKwMotor = _motor.match(/(\d+(?:[.,]\d+)?)\s*kw/i)?.[1] ?? null;
+const _pwKsMotor = _motor.match(/(\d+)\s*k\b/i)?.[1] ?? null;
+const _pwKw = _pwKwDirect ?? _pwKwMotor;
+const heroPower: string | null = _pwKw
+  ? (_pwKsMotor ? `${_pwKw} kW / ${_pwKsMotor} k` : `${_pwKw} kW`)
+  : null;
+// Počet míst / sedadel
+const heroSeats: string | null = specFind(/po[čc]et\s*(m[íi]st|sedadel)/i)
+  ?? (snapshot.seats ? (String(snapshot.seats).replace(/[^0-9]/g, '') || null) : null);
 // Rozděl na dva sloupce zhruba půl na půl
 const half = Math.ceil(allSpecs.length / 2);
 const specsLeft = allSpecs.slice(0, half);
@@ -416,6 +440,14 @@ const salesPhoneLink = telLink(salesPhone);
               )}
             </div>
           )}
+          <div class="under-gallery">
+            {conditionLabel && conditionLabel !== '—' && (
+              <div class="ug-item"><span class="ug-lab">Stav</span><span class="ug-val">{conditionLabel}</span></div>
+            )}
+            {availabilityLabel && availabilityLabel !== '—' && (
+              <div class="ug-item"><span class="ug-lab">Dostupnost</span><span class="ug-val">{availabilityLabel}</span></div>
+            )}
+          </div>
         </div>
 
         <!-- Info side -->
@@ -514,39 +546,28 @@ const salesPhoneLink = telLink(salesPhone);
                 </div>
               </div>
             )}
-            {(() => {
-              // Robustní lookup výkonu — projedu td a najdu cokoli co se týká výkonu
-              const findValue = (re: RegExp): string | null => {
-                for (const [k, val] of Object.entries(td)) {
-                  if (re.test(k) && val != null && String(val).trim() !== '') return String(val);
-                }
-                return null;
-              };
-              // První zkusíme jednotlivé klíče (kW/k zvlášť), pak souhrnný
-              const powerKw = findValue(/výkon.*\(?kw\)?/i) ?? findValue(/^výkon.*kw/i) ?? findValue(/^kw$/i);
-              const powerKs = findValue(/výkon.*\(?[kp]s?\)?$/i) ?? findValue(/^výkon.*[kp]s/i);
-              // Souhrnný "Max. výkon" jako fallback
-              const powerCombined = findValue(/max.*výkon|^výkon$/i);
-              const powerDisplay = powerKw && powerKs
-                ? `${powerKw} kW / ${powerKs} k`
-                : powerKw
-                  ? `${powerKw} kW`
-                  : powerKs
-                    ? `${powerKs} k`
-                    : powerCombined;
-              if (!powerDisplay) return null;
-              return (
-                <div class="spec-card">
-                  <span class="ic">
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-                  </span>
-                  <div>
-                    <span class="lab">Výkon</span>
-                    <span class="val">{powerDisplay}</span>
-                  </div>
+                        {heroPower && (
+              <div class="spec-card">
+                <span class="ic">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                </span>
+                <div>
+                  <span class="lab">Výkon</span>
+                  <span class="val">{heroPower}</span>
                 </div>
-              );
-            })()}
+              </div>
+            )}
+            {heroSeats && (
+              <div class="spec-card">
+                <span class="ic">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                </span>
+                <div>
+                  <span class="lab">Míst</span>
+                  <span class="val">{heroSeats}</span>
+                </div>
+              </div>
+            )}
           </div>
 
           <div class="cta-stack">
@@ -588,12 +609,11 @@ const salesPhoneLink = telLink(salesPhone);
                 </>
               )}
             </div>
-            <dl class="about-meta">
-              {v.vin && <div><dt>VIN</dt><dd>{v.vin}</dd></div>}
-              <div><dt>Stav</dt><dd>{conditionLabel}</dd></div>
-              <div><dt>Dostupnost</dt><dd>{availabilityLabel}</dd></div>
-              <div><dt>Záruka</dt><dd>Dle modelu</dd></div>
-            </dl>
+            {v.vin && (
+              <dl class="about-meta">
+                <div><dt>VIN</dt><dd>{v.vin}</dd></div>
+              </dl>
+            )}
           </div>
           <div class="about-highlights">
             {highlights.map((h) => (
@@ -644,7 +664,7 @@ const salesPhoneLink = telLink(salesPhone);
         <div class="container">
           <div class="section-eyebrow">Výbava</div>
           <h2 class="section-title">
-            {trim?.name ? `Standardní výbava — ${trim.name}` : 'Co je v ceně'}
+            {trimDisplay ? `Co je v ceně — ${trimDisplay}` : 'Co je v ceně'}
           </h2>
           <div class="equip-grid equip-grid-full">
             {grouped.map((cat) => (
