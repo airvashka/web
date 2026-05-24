@@ -4606,6 +4606,8 @@ html.scrolled-down .subnav {
   :root { --pad: 24px; }
   .topbar-inner { gap: 14px; font-size: 11.5px; overflow: hidden; }
   .topbar-right { display: none; }
+  .topbar-hours { display: none; }
+  .topbar-item { white-space: nowrap; }
   .nav-inner { height: 64px; gap: 16px; }
   .nav-links { display: none; }
   .nav-cta { display: none; }
@@ -4672,7 +4674,7 @@ html.scrolled-down .subnav {
   .brand-tiles-grid { grid-template-columns: 1fr; grid-template-rows: auto; }
   .split-grid { grid-template-columns: 1fr; }
   .split-card { padding: 36px 32px; min-height: 0; }
-  .hhero-inner { padding: 70px 0; }
+  .hhero-inner { padding: 70px var(--pad); }
   .hhero-counter { display: none; }
   .team-grid { grid-template-columns: repeat(2, 1fr); }
   .fgrid { grid-template-columns: 1fr; }
@@ -5201,3 +5203,23 @@ select:focus-visible,
 /* #14: kdyz je otevreny mobilni drawer, schovej plovouci chat widget (jinak prebiji menu) */
 body.drawer-open .chat-widget { display: none !important; }
 
+
+
+/* ===== Mobilní fixy 2026-05-24 (analýza bugů) ===== */
+@media (max-width: 700px) {
+  .brand-tiles-head, .skladovka-head { grid-template-columns: 1fr; gap: 14px; }
+  .btile { aspect-ratio: auto; min-height: 200px; }
+  .btile.is-promo .btile-body { padding: 26px 24px 28px; }
+  .btile-watermark { display: none; }
+}
+@media (max-width: 429px) {
+  .about-highlights { grid-template-columns: 1fr; }
+  .highlight-subtitle { display: none; }
+}
+
+/* iOS: form pole >=16px, jinak Safari zoomne stránku při fokusu (max-width 700) */
+@media (max-width: 700px) {
+  input, select, textarea,
+  .input, .textarea, .select,
+  .field input, .field textarea, .field select { font-size: 16px; }
+}
