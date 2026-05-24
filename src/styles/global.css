@@ -499,6 +499,16 @@ input, textarea, select { font: inherit; }
   letter-spacing: 0.04em;
   color: var(--accent);
 }
+/* Hero title (analogicky kartě): značka barevně / model / výbava */
+.info-brand { color: var(--accent); }
+.info-trim {
+  font-family: var(--font-display);
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  color: var(--text);
+  margin: 0 0 10px;
+}
 .info-meta-chips {
   list-style: none; padding: 0; margin: 0 0 28px;
   display: flex; flex-wrap: wrap; gap: 8px;
