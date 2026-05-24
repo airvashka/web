@@ -4606,8 +4606,10 @@ html.scrolled-down .subnav {
   :root { --pad: 24px; }
   .topbar-inner { gap: 14px; font-size: 11.5px; overflow: hidden; }
   .topbar-right { display: none; }
-  .topbar-hours { display: none; }
-  .topbar-item { white-space: nowrap; }
+  .topbar-item:not(.topbar-hours) { display: none; }   /* na mobilu jen otevírací doba */
+  .topbar-hours { display: inline-flex; }
+  .topbar-hours [data-opening-text] { flex-direction: column; align-items: flex-start; gap: 2px; }
+  .topbar-hours .oh-sep { display: none; }
   .nav-inner { height: 64px; gap: 16px; }
   .nav-links { display: none; }
   .nav-cta { display: none; }
@@ -4687,7 +4689,6 @@ html.scrolled-down .subnav {
 }
 
 @media (max-width: 520px) {
-  .topbar { display: none; }
   .equip-grid { grid-template-columns: 1fr; }
   .trust-inner { grid-template-columns: 1fr; }
   .footer-grid { grid-template-columns: 1fr; }
