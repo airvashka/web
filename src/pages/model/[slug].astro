@@ -759,7 +759,7 @@ if (promoActive && promoDescription) {
 
             {/* KGM-style configurator — velká fotka + selector POD fotkou */}
             <div class="cs-wrap" data-cs-stage>
-              <div class="cs-stage">
+              <div class={`cs-stage${brand.slug === 'omoda-jaecoo' ? ' cs-stage--studio' : ''}`}>
                 {colorOptions.map((c, i) => {
                   const photoId = c.photo ?? c.photo_file ?? null;
                   const hex = (c.hex ?? '').trim();

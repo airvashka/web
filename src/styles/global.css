@@ -1985,6 +1985,30 @@ html.scrolled-down .subnav {
   background: var(--bg-soft);
 }
 
+/* === Studio backdrop pro transparentní PNG (OMODA/JAECOO) ====================
+   Místo 2 obrázků (pozadí + auto) maluju scénu pomocí gradientů a stín
+   pod auto dělám přes drop-shadow, který respektuje siluetu PNG. */
+.cs-stage.cs-stage--studio {
+  background:
+    radial-gradient(120% 65% at 50% 95%, rgba(20, 30, 50, 0.10) 0%, rgba(20, 30, 50, 0) 60%),
+    radial-gradient(70% 45% at 50% 115%, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0) 70%),
+    linear-gradient(180deg, #ffffff 0%, #f3f5f8 55%, #e6eaef 100%);
+}
+.cs-stage--studio .cs-photo img {
+  object-fit: contain;
+  padding: 4% 6% 8%;
+  box-sizing: border-box;
+  filter: drop-shadow(0 22px 22px rgba(10, 20, 40, 0.18))
+          drop-shadow(0 6px 8px rgba(10, 20, 40, 0.10));
+}
+@media (max-width: 640px) {
+  .cs-stage--studio .cs-photo img {
+    padding: 6% 4% 10%;
+    filter: drop-shadow(0 12px 12px rgba(10, 20, 40, 0.16));
+  }
+}
+
+
 /* Selector — pod fotkou, full width, name vlevo + swatches vpravo */
 .cs-selector {
   display: flex;

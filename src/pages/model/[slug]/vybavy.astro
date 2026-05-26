@@ -504,15 +504,18 @@ function trimPrice(t: TrimLevel): string {
 </BaseLayout>
 
 <style>
-  /* === Colors pricelist (sekce pod compare matrix) === */
+  /* === Colors pricelist (sekce pod compare matrix) — sjednoceno s matice === */
   .colors-pricelist .colors-table-title {
+    margin: 0;
+    padding: 14px 16px 10px;
+    background: var(--bg-soft);
     font-family: var(--font-display);
-    font-weight: 600;
-    font-size: 16px;
+    font-weight: 700;
+    font-size: 13px;
+    letter-spacing: 0.1em;
     text-transform: uppercase;
-    letter-spacing: 0.06em;
-    color: var(--ink);
-    margin: 24px 0 10px;
+    color: var(--accent, #F25C1B);
+    border-top: 3px solid var(--accent, #F25C1B);
   }
   .colors-table-wrap {
     border: 1px solid var(--line);
@@ -544,6 +547,13 @@ function trimPrice(t: TrimLevel): string {
   }
   .colors-table thead th.num,
   .colors-table tbody td.num { text-align: right; }
+  .colors-table thead th.num {
+    color: var(--accent, #F25C1B);
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 13px;
+    letter-spacing: 0.05em;
+  }
   .colors-table tbody td {
     padding: 11px 14px;
     border-bottom: 1px solid var(--line, #e5e5e5);
@@ -555,8 +565,18 @@ function trimPrice(t: TrimLevel): string {
   .colors-table .muted-cell { color: var(--text-muted, #6b7280); font-size: 13px; }
   .colors-table .kc { color: var(--text-muted, #6b7280); font-size: 12px; }
   /* 3 stavy pricing cellu — jako u paketů (V ceně / cena / —) */
-  .colors-table .cell-standard { color: #1e7b5f; font-weight: 600; }
-  .colors-table .cell-price    { color: var(--accent, #F25C1B); font-weight: 700; }
+  .colors-table .cell-standard {
+    color: var(--ok, #2f9b5c);
+    font-weight: 700;
+    font-family: var(--font-display);
+    font-size: 13px;
+  }
+  .colors-table .cell-price {
+    color: var(--accent, #F25C1B);
+    font-weight: 700;
+    font-family: var(--font-display);
+    font-size: 13.5px;
+  }
   .colors-table .cell-unavail  { color: var(--text-muted, #9ca3af); font-weight: 400; }
   .colors-table .cell-other    { color: var(--ink, #111); }
 
