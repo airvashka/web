@@ -1636,19 +1636,20 @@ button.thumb-more {
 .dl-card {
   display: flex;
   align-items: center;
-  gap: 16px;
-  padding: 20px 22px;
+  gap: 18px;
+  padding: 22px 22px;
   background: #fff;
   border: 1px solid var(--line);
   border-radius: var(--radius);
   text-decoration: none;
   color: var(--ink);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
   transition: border-color .15s, transform .15s, box-shadow .15s;
 }
 .dl-card:hover {
   border-color: var(--accent);
-  transform: translateY(-2px);
-  box-shadow: 0 12px 28px -14px rgba(0,0,0,0.16);
+  transform: translateY(-3px);
+  box-shadow: 0 18px 36px -16px rgba(242,92,27,0.22);
 }
 .dl-card--price-list-promo {
   border-color: var(--accent);
@@ -1657,12 +1658,12 @@ button.thumb-more {
 .dl-card--price-list-promo:hover { box-shadow: 0 12px 28px -14px rgba(242,92,27,0.3); }
 
 .dl-card-icon {
-  width: 48px; height: 48px;
+  width: 52px; height: 52px;
   display: grid; place-items: center;
   flex-shrink: 0;
   border-radius: 12px;
-  background: var(--bg-soft);
-  color: var(--ink);
+  background: var(--accent);
+  color: #fff;
 }
 .dl-card--price-list-promo .dl-card-icon {
   background: var(--accent);
@@ -1683,8 +1684,8 @@ button.thumb-more {
 .dl-card-title {
   display: block;
   font-family: var(--font-display);
-  font-weight: 600;
-  font-size: 15px;
+  font-weight: 700;
+  font-size: 17px;
   letter-spacing: -0.01em;
   color: var(--ink);
   margin-bottom: 2px;
@@ -1701,12 +1702,21 @@ button.thumb-more {
   flex-shrink: 0;
   font-family: var(--font-display);
   font-size: 12px;
-  font-weight: 600;
-  letter-spacing: 0.1em;
+  font-weight: 700;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: var(--text-muted);
+  color: var(--accent);
+  background: var(--accent-soft, rgba(242,92,27,0.10));
+  padding: 9px 14px;
+  border-radius: 999px;
+  border: 1px solid rgba(242, 92, 27, 0.22);
+  transition: background .15s, color .15s, border-color .15s;
 }
-.dl-card:hover .dl-card-action { color: var(--accent); }
+.dl-card:hover .dl-card-action {
+  background: var(--accent);
+  color: #fff;
+  border-color: var(--accent);
+}
 
 @media (max-width: 520px) {
   .dl-card { padding: 16px; }
