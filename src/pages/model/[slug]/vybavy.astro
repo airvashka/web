@@ -491,8 +491,11 @@ function trimPrice(t: TrimLevel): string {
 
       <Disclaimer kind="price" />
 
+      <div style="margin-top: 48px;">
+        <a class="btn btn-outline" href={`/model/${rawModel.slug}`}>← Zpět na {rawModel.name}</a>
+      </div>
 
-      <div style="margin-top: 64px; padding: 28px; background: var(--bg-soft); border-radius: var(--radius); display: flex; gap: 16px; align-items: center; flex-wrap: wrap;">
+      <div style="margin-top: 24px; padding: 28px; background: var(--bg-soft); border-radius: var(--radius); display: flex; gap: 16px; align-items: center; flex-wrap: wrap;">
         <div style="flex: 1; min-width: 280px;">
           <h3 style="margin: 0 0 6px; font-family: var(--font-display); font-weight: 600; font-size: 18px;">
             Líbí se vám výbava? Vyberte si vůz skladem

@@ -551,11 +551,11 @@ if (promoActive && promoDescription) {
               {promoLabel || (promoDiscountAmount > 0 ? `Sleva ${promoDiscountAmount.toLocaleString('cs-CZ')} Kč` : 'Aktuální akce')}
             </h2>
             {(rawModel as any).promo_image && (
-              <div class="promo-image-inline" data-transparent={(rawModel as any).promo_image_transparent ? 'true' : null}>
+              <a class="promo-image-inline promo-image-link" href={`/model/${rawModel.slug}/akce`} data-transparent={(rawModel as any).promo_image_transparent ? 'true' : null} aria-label="Detail akce">
                 <DirectusImage src={(rawModel as any).promo_image} alt={promoLabel || 'Akce'} widths={[600, 1000, 1600, 2000]} loading="lazy" />
-              </div>
+              </a>
             )}
-            {promoDescriptionHtml && (
+            {promoDescriptionHtml && !((rawModel as any).promo_image) && (
               <div class="promo-desc" set:html={promoDescriptionHtml} />
             )}
             <div class="promo-cta-row">
