@@ -1303,24 +1303,28 @@ if (promoActive && promoDescription) {
       else v.addEventListener('loadeddata', tryPlay, { once: true });
     });
 
-    /* === Color selector — swap aktivní fotky + jména po kliknutí na swatch === */
-    document.querySelectorAll('[data-cs-stage]').forEach((stage) => {
-      const photos = stage.querySelectorAll('.cs-photo');
-      const swatches = stage.querySelectorAll('.cs-swatch');
-      const nameEl = stage.querySelector('[data-cs-name]');
-      swatches.forEach((sw) => {
-        sw.addEventListener('click', () => {
-          const idx = sw.dataset.idx;
-          const name = sw.dataset.name || '';
-          photos.forEach((p) => p.classList.toggle('is-active', p.dataset.idx === idx));
-          swatches.forEach((s) => {
-            const on = s.dataset.idx === idx;
-            s.classList.toggle('is-active', on);
-            s.setAttribute('aria-checked', on ? 'true' : 'false');
-          });
-          if (nameEl) nameEl.textContent = name;
-        });
+    /* === Color selector — swap aktivní fotky + jména po kliknutí na swatch ===
+       Event delegation na document → funguje, i kdyby swatch nebyl v DOMu při
+       attach (např. lazy-loaded sekce). Bere libovolný kliknutý cíl uvnitř .cs-swatch
+       (i img/svg uvnitř buttonu), walks up přes closest(). String() coerce kvůli
+       data-idx mismatch (number vs string serialization). */
+    document.addEventListener('click', (e) => {
+      const sw = e.target && e.target.closest ? e.target.closest('.cs-swatch') : null;
+      if (!sw) return;
+      const stage = sw.closest('[data-cs-stage]');
+      if (!stage) return;
+      const idx = String(sw.dataset.idx ?? '');
+      const name = sw.dataset.name || '';
+      stage.querySelectorAll('.cs-photo').forEach((p) => {
+        p.classList.toggle('is-active', String(p.dataset.idx ?? '') === idx);
       });
+      stage.querySelectorAll('.cs-swatch').forEach((s) => {
+        const on = String(s.dataset.idx ?? '') === idx;
+        s.classList.toggle('is-active', on);
+        s.setAttribute('aria-checked', on ? 'true' : 'false');
+      });
+      const nameEl = stage.querySelector('[data-cs-name]');
+      if (nameEl) nameEl.textContent = name;
     });
   </script>
 
