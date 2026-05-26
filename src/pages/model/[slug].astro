@@ -558,7 +558,12 @@ if (promoActive && promoDescription) {
               <a class="btn btn-outline-light" href="/kontakt">Mám zájem o akci</a>
             </div>
           </div>
-          {promoDiscountAmount > 0 && (
+          {(rawModel as any).promo_image && (
+            <div class="promo-image" data-transparent={(rawModel as any).promo_image_transparent ? 'true' : null}>
+              <DirectusImage src={(rawModel as any).promo_image} alt={promoLabel || 'Akce'} aspectRatio="4/3" fit={(rawModel as any).promo_image_transparent ? 'contain' : 'cover'} widths={[400, 800, 1200]} loading="lazy" />
+            </div>
+          )}
+          {!(rawModel as any).promo_image && promoDiscountAmount > 0 && (
             <div class="promo-badge-big">
               <div class="promo-badge-label">Sleva</div>
               <div class="promo-badge-amount">
@@ -878,6 +883,7 @@ if (promoActive && promoDescription) {
                 const highlightLabel = ((t as any).highlight_label || '').trim() || 'Doporučujeme';
                 const cls = isRecommended ? 'trim dark' : 'trim light';
                 const price = t.promo_price ?? t.list_price ?? 0;
+                const hasTrimPromo = !!(t.promo_price && t.list_price && t.promo_price < t.list_price);
                 const trimFeatureCount = countFeatures((t as any).features);
                 const flat = flatPerTrim[i];
 
@@ -913,7 +919,14 @@ if (promoActive && promoDescription) {
                     {isRecommended && <div class="trim-badge">{highlightLabel}</div>}
                     {highlightNote && <div class="trim-highlight-note">{highlightNote}</div>}
                     <div class="trim-name">{t.name}</div>
-                    <div class="trim-price">{price.toLocaleString('cs-CZ')} Kč</div>
+                    {hasTrimPromo ? (
+                      <div class="trim-price-block">
+                        <div class="trim-price-list">{t.list_price!.toLocaleString('cs-CZ')} Kč</div>
+                        <div class="trim-price trim-price--promo">{t.promo_price!.toLocaleString('cs-CZ')} Kč</div>
+                      </div>
+                    ) : (
+                      <div class="trim-price">{price.toLocaleString('cs-CZ')} Kč</div>
+                    )}
                     <div class="trim-teaser">
                       {teaserItems.length > 0 ? (
                         <>

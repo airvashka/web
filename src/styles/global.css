@@ -2535,6 +2535,45 @@ html.scrolled-down .subnav {
   margin-bottom: 30px;
   font-variant-numeric: tabular-nums;
 }
+
+/* Trim s akční cenou — přeškrtnutá ceníková nad ní + bold accent dole */
+.trim-price-block {
+  margin-bottom: 30px;
+}
+.trim-price-list {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: 17px;
+  color: var(--text-muted);
+  text-decoration: line-through;
+  font-variant-numeric: tabular-nums;
+  margin-bottom: 2px;
+}
+.trim.dark .trim-price-list { color: rgba(255,255,255,0.5); }
+.trim-price--promo { color: var(--accent); }
+.trim.dark .trim-price--promo { color: var(--accent); }
+.trim-price-block .trim-price { margin-bottom: 0; }
+
+/* Promo banner image — fix aspect ratio, drží různé velikosti zdroje pod kontrolou */
+.promo-image {
+  flex-shrink: 0;
+  width: 360px;
+  max-width: 100%;
+  border-radius: var(--radius);
+  overflow: hidden;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.22);
+  background: #fff;
+}
+.promo-image img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.promo-image[data-transparent] { background: #fff; padding: 10px; box-sizing: border-box; }
+@media (max-width: 720px) {
+  .promo-image { width: 100%; }
+}
+
 /* ===== Trim teaser (zkrácená výbava + tlačítko na srovnání) ===== */
 .trim-teaser {
   margin: 0 0 24px;
