@@ -540,7 +540,7 @@ if (promoActive && promoDescription) {
   {promoActive && (
     <section class="promo-banner" id="akce">
       <div class="container">
-        <div class="promo-inner">
+        <div class="promo-inner" data-has-image={(rawModel as any).promo_image ? 'true' : null}>
           <div class="promo-side">
             <div class="promo-eyebrow">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.59 13.41 13.42 20.58a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
@@ -550,6 +550,11 @@ if (promoActive && promoDescription) {
             <h2 class="promo-label">
               {promoLabel || (promoDiscountAmount > 0 ? `Sleva ${promoDiscountAmount.toLocaleString('cs-CZ')} Kč` : 'Aktuální akce')}
             </h2>
+            {(rawModel as any).promo_image && (
+              <div class="promo-image-inline" data-transparent={(rawModel as any).promo_image_transparent ? 'true' : null}>
+                <DirectusImage src={(rawModel as any).promo_image} alt={promoLabel || 'Akce'} widths={[600, 1000, 1600, 2000]} loading="lazy" />
+              </div>
+            )}
             {promoDescriptionHtml && (
               <div class="promo-desc" set:html={promoDescriptionHtml} />
             )}
@@ -558,11 +563,6 @@ if (promoActive && promoDescription) {
               <a class="btn btn-outline-light" href="/kontakt">Mám zájem o akci</a>
             </div>
           </div>
-          {(rawModel as any).promo_image && (
-            <div class="promo-image" data-transparent={(rawModel as any).promo_image_transparent ? 'true' : null}>
-              <DirectusImage src={(rawModel as any).promo_image} alt={promoLabel || 'Akce'} aspectRatio="4/3" fit={(rawModel as any).promo_image_transparent ? 'contain' : 'cover'} widths={[400, 800, 1200]} loading="lazy" />
-            </div>
-          )}
           {!(rawModel as any).promo_image && promoDiscountAmount > 0 && (
             <div class="promo-badge-big">
               <div class="promo-badge-label">Sleva</div>

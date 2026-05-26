@@ -2554,24 +2554,26 @@ html.scrolled-down .subnav {
 .trim.dark .trim-price--promo { color: var(--accent); }
 .trim-price-block .trim-price { margin-bottom: 0; }
 
-/* Promo banner image — fix aspect ratio, drží různé velikosti zdroje pod kontrolou */
-.promo-image {
-  flex-shrink: 0;
-  width: 360px;
-  max-width: 100%;
+/* Promo banner image — full-width inline pod nadpisem, prirozeny aspect ratio.
+   Kdyz je data-has-image, promo-inner stack (zadny badge vpravo). */
+.promo-inner[data-has-image] { grid-template-columns: 1fr; }
+.promo-image-inline {
+  width: 100%;
+  margin: 6px 0 20px;
   border-radius: var(--radius);
   overflow: hidden;
+  background: rgba(0, 0, 0, 0.06);
   box-shadow: 0 12px 32px rgba(0, 0, 0, 0.22);
-  background: #fff;
 }
-.promo-image img {
+.promo-image-inline img {
   display: block;
   width: 100%;
   height: auto;
 }
-.promo-image[data-transparent] { background: #fff; padding: 10px; box-sizing: border-box; }
-@media (max-width: 720px) {
-  .promo-image { width: 100%; }
+.promo-image-inline[data-transparent] {
+  background: #fff;
+  padding: 14px;
+  box-sizing: border-box;
 }
 
 /* ===== Trim teaser (zkrácená výbava + tlačítko na srovnání) ===== */
