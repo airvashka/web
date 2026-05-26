@@ -766,7 +766,7 @@ if (promoActive && promoDescription) {
                   return (
                     <div class={`cs-photo${i === 0 ? ' is-active' : ''}`} data-idx={i}>
                       {photoId ? (
-                        <DirectusImage src={photoId} alt={c.name ?? ''} aspectRatio="21/9" widths={[800, 1400, 2000]} loading={i === 0 ? 'eager' : 'lazy'} />
+                        <DirectusImage src={photoId} alt={c.name ?? ''} aspectRatio="21/9" fit={brand.slug === 'omoda-jaecoo' ? 'contain' : 'cover'} widths={[800, 1400, 2000]} loading={i === 0 ? 'eager' : 'lazy'} />
                       ) : (
                         <span class="cs-photo-fallback" style={hex ? `background:${hex}` : ''}></span>
                       )}
