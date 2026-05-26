@@ -285,6 +285,20 @@ const fmtKm = (n?: number | null) => (n === 0 || !n ? '0 km' : `${n.toLocaleStr
     };
     let sortMode = 'newest';
 
+    // Zapíše aktuální stav filtrů do URL query parametrů (bookmarkable + sdílatelné)
+    function syncURL() {
+      const url = new URL(location.href);
+      const map = { brand: 'znacka', model: 'model', fuel: 'palivo', condition: 'stav', drivetrain: 'pohon' };
+      Object.entries(map).forEach(([key, q]) => {
+        const val = filters[key];
+        if (val && val !== 'all') url.searchParams.set(q, val);
+        else url.searchParams.delete(q);
+      });
+      if (sortMode && sortMode !== 'newest') url.searchParams.set('razeni', sortMode);
+      else url.searchParams.delete('razeni');
+      history.replaceState({}, '', url);
+    }
+
     function applyFilters() {
       const grid = document.querySelector('[data-grid]');
       if (!grid) return;
@@ -312,6 +326,7 @@ const fmtKm = (n?: number | null) => (n === 0 || !n ? '0 km' : `${n.toLocaleStr
         return (b.dataset.listedAt ?? '').localeCompare(a.dataset.listedAt ?? '');
       });
       visibleCards.forEach((c) => grid.appendChild(c));
+      syncURL();
       // Update čítače
       const count = document.querySelector('[data-result-count]');
       if (count) {
@@ -376,22 +391,38 @@ const fmtKm = (n?: number | null) => (n === 0 || !n ? '0 km' : `${n.toLocaleStr
       applyFilters();
     });
 
-    // URL query params — ?znacka=kgm, ?model=torres
+    // URL query params — ?znacka=kgm&model=torres&palivo=elektro&stav=novy&pohon=4wd&razeni=price-asc
     const params = new URLSearchParams(window.location.search);
-    const brandParam = params.get('znacka') ?? params.get('brand');
-    if (brandParam) {
-      const radio = document.querySelector(`[data-filters] input[name=brand][value="${brandParam}"]`);
-      if (radio) { radio.checked = true; filters.brand = brandParam; }
-    }
+    const URL_MAP = [
+      { qs: ['znacka', 'brand'], key: 'brand', radio: 'brand' },
+      { qs: ['palivo', 'fuel'], key: 'fuel', radio: 'fuel' },
+      { qs: ['stav', 'condition'], key: 'condition', radio: 'condition' },
+      { qs: ['pohon', 'drivetrain'], key: 'drivetrain', radio: 'drivetrain' },
+    ];
+    let hasAnyParam = false;
+    URL_MAP.forEach(({ qs, key, radio: rname }) => {
+      const v = qs.map((q) => params.get(q)).find(Boolean);
+      if (!v) return;
+      const r = document.querySelector(`[data-filters] input[name=${rname}][value="${v}"]`);
+      if (r) { r.checked = true; filters[key] = v; hasAnyParam = true; }
+    });
     const modelParam = params.get('model');
     if (modelParam) {
       const ms = document.querySelector('[data-filter-model]');
       if (ms) {
         const opt = ms.querySelector(`option[value="${modelParam}"]`);
-        if (opt) { ms.value = modelParam; filters.model = modelParam; }
+        if (opt) { ms.value = modelParam; filters.model = modelParam; hasAnyParam = true; }
       }
     }
-    if (brandParam || modelParam) applyFilters();
+    const sortParam = params.get('razeni') ?? params.get('sort');
+    if (sortParam) {
+      const ss = document.querySelector('[data-sort]');
+      if (ss) {
+        const o = ss.querySelector(`option[value="${sortParam}"]`);
+        if (o) { ss.value = sortParam; sortMode = sortParam; hasAnyParam = true; }
+      }
+    }
+    if (hasAnyParam) applyFilters();
   </script>
 
   <style>

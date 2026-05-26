@@ -52,6 +52,49 @@ const mapEmbedUrl = 'https://maps.google.com/maps?q=%C4%8Eablicka+553%2F2%2C+182
     </div>
   </section>
 
+  <section class="formpanel" id="poptavka" data-screen-label="05 Form">
+    <div class="container formpanel-grid">
+      <div>
+        <div class="section-eyebrow">Napište nám</div>
+        <h2>Máte dotaz nebo poptávku?</h2>
+        <p class="lead">Vyplňte krátký formulář — ozveme se do 24 hodin. Nebo zvolte konkrétního prodejce / technika výše a napište mu přímo.</p>
+      </div>
+      <form class="fcard" data-lead-form data-form-type="contact" data-context-aware>
+        <h3>Kontaktní formulář</h3>
+        <div class="fgrid">
+          <div class="field full">
+            <label>Vaše jméno <span class="req">*</span></label>
+            <input type="text" name="customer_name" required minlength="2" maxlength="200" />
+          </div>
+          <div class="field">
+            <label>E-mail <span class="req">*</span></label>
+            <input type="email" name="customer_email" required maxlength="200" />
+          </div>
+          <div class="field">
+            <label>Telefon</label>
+            <input type="tel" name="customer_phone" maxlength="50" pattern="[+0-9\s\-()]+" />
+          </div>
+          <div class="field full">
+            <label>Téma zprávy</label>
+            <input type="text" name="subject" placeholder="Např. zájem o Torres EVX" maxlength="200" />
+          </div>
+          <div class="field full">
+            <label>Zpráva (nepovinné)</label>
+            <textarea name="message" maxlength="2000"></textarea>
+          </div>
+        </div>
+        <input type="text" name="_hp_website" tabindex="-1" autocomplete="off" class="honeypot" />
+        <TurnstileWidget />
+        <label class="check">
+          <input type="checkbox" required />
+          Souhlasím se zpracováním osobních údajů dle <a href="/informace/ochrana-udaju">GDPR</a>
+        </label>
+        <button class="btn btn-primary" type="submit">Odeslat zprávu</button>
+        <div class="lead-status" data-lead-status></div>
+      </form>
+    </div>
+  </section>
+
   <section class="kinfo" data-screen-label="02 Adresa">
     <div class="container kinfo-grid">
       <div class="kinfo-map">
@@ -145,48 +188,6 @@ const mapEmbedUrl = 'https://maps.google.com/maps?q=%C4%8Eablicka+553%2F2%2C+182
     </div>
   </section>
 
-  <section class="formpanel" id="poptavka" data-screen-label="05 Form">
-    <div class="container formpanel-grid">
-      <div>
-        <div class="section-eyebrow">Napište nám</div>
-        <h2>Máte dotaz nebo poptávku?</h2>
-        <p class="lead">Vyplňte krátký formulář — ozveme se do 24 hodin. Nebo zvolte konkrétního prodejce / technika výše a napište mu přímo.</p>
-      </div>
-      <form class="fcard" data-lead-form data-form-type="contact" data-context-aware>
-        <h3>Kontaktní formulář</h3>
-        <div class="fgrid">
-          <div class="field full">
-            <label>Vaše jméno <span class="req">*</span></label>
-            <input type="text" name="customer_name" required minlength="2" maxlength="200" />
-          </div>
-          <div class="field">
-            <label>E-mail <span class="req">*</span></label>
-            <input type="email" name="customer_email" required maxlength="200" />
-          </div>
-          <div class="field">
-            <label>Telefon</label>
-            <input type="tel" name="customer_phone" maxlength="50" pattern="[+0-9\s\-()]+" />
-          </div>
-          <div class="field full">
-            <label>Téma zprávy</label>
-            <input type="text" name="subject" placeholder="Např. zájem o Torres EVX" maxlength="200" />
-          </div>
-          <div class="field full">
-            <label>Zpráva (nepovinné)</label>
-            <textarea name="message" maxlength="2000"></textarea>
-          </div>
-        </div>
-        <input type="text" name="_hp_website" tabindex="-1" autocomplete="off" class="honeypot" />
-        <TurnstileWidget />
-        <label class="check">
-          <input type="checkbox" required />
-          Souhlasím se zpracováním osobních údajů dle <a href="/informace/ochrana-udaju">GDPR</a>
-        </label>
-        <button class="btn btn-primary" type="submit">Odeslat zprávu</button>
-        <div class="lead-status" data-lead-status></div>
-      </form>
-    </div>
-  </section>
 
   <script>
     // Parse URL params (?form=test_drive&model=korando&brand=kgm)
