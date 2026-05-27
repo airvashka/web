@@ -1,0 +1,20 @@
+# ENV s credentials — NIKDY na GitHub
+.env
+.env.local
+.env.production
+.env.*.local
+!.env.example
+
+# Node deps (kdyby někdo udělal lokální install v ucl-proxy)
+node_modules/
+npm-debug.log*
+
+# Backupy / dumps
+*.sql
+*.dump
+backup-*.tar.gz
+
+# Editory
+.DS_Store
+Thumbs.db
+*.swp

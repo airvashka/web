@@ -1,0 +1,179 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# SFR Motor — Docker Compose stack
+#
+# Služby:
+#   postgres   — DB pro Directus
+#   redis      — cache + rate limiting pro Directus
+#   minio      — S3-compatible storage (fotky, PDF, .docx); nahrazuje Cloudflare R2
+#   minio-init — jednorázový job: vytvoří bucket + nastaví public read policy
+#   directus   — headless CMS (admin.sfr-motor.cz)
+#   ucl-proxy  — Node.js mikroservis pro UCL kalkulačku (api.sfr-motor.cz/leasing)
+#
+# Volumes mountujem na /data/* aby data přežila docker compose down -v + byly
+# přehledně k backupování. WebGlobe snapshoty zachytí celý /data.
+#
+# Spuštění: docker compose up -d
+# Logy:     docker compose logs -f [service]
+# Restart:  docker compose restart [service]
+# ─────────────────────────────────────────────────────────────────────────────
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - /data/postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - sfr-net
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    command: ["redis-server", "--requirepass", "${REDIS_PASSWORD}", "--appendonly", "yes"]
+    volumes:
+      - /data/redis:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD}", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - sfr-net
+
+  minio:
+    image: minio/minio:latest
+    restart: unless-stopped
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+      MINIO_REGION: ${MINIO_REGION}
+    volumes:
+      - /data/minio:/data
+    ports:
+      # Exposujem jen na localhost — Nginx na hostu proxyje sem.
+      - "127.0.0.1:9000:9000"   # S3 API
+      - "127.0.0.1:9001:9001"   # MinIO admin console (interní use)
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+    networks:
+      - sfr-net
+
+  # Jednorázový init: vytvoří bucket + nastaví public-read policy aby fotky
+  # byly přístupné přes https://api.sfr-motor.cz/files/...
+  minio-init:
+    image: minio/mc:latest
+    depends_on:
+      minio:
+        condition: service_healthy
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+      MINIO_BUCKET: ${MINIO_BUCKET}
+    entrypoint: >
+      /bin/sh -c "
+      mc alias set local http://minio:9000 $$MINIO_ROOT_USER $$MINIO_ROOT_PASSWORD;
+      mc mb --ignore-existing local/$$MINIO_BUCKET;
+      mc anonymous set download local/$$MINIO_BUCKET;
+      echo 'MinIO bucket ready';
+      "
+    networks:
+      - sfr-net
+
+  directus:
+    image: directus/directus:11
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+    environment:
+      KEY: ${DIRECTUS_KEY}
+      SECRET: ${DIRECTUS_SECRET}
+
+      ADMIN_EMAIL: ${DIRECTUS_ADMIN_EMAIL}
+      ADMIN_PASSWORD: ${DIRECTUS_ADMIN_PASSWORD}
+
+      DB_CLIENT: pg
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_DATABASE: ${POSTGRES_DB}
+      DB_USER: ${POSTGRES_USER}
+      DB_PASSWORD: ${POSTGRES_PASSWORD}
+
+      CACHE_ENABLED: "true"
+      CACHE_STORE: redis
+      REDIS: redis://:${REDIS_PASSWORD}@redis:6379
+
+      PUBLIC_URL: ${DIRECTUS_PUBLIC_URL}
+
+      CORS_ENABLED: ${DIRECTUS_CORS_ENABLED}
+      CORS_ORIGIN: ${DIRECTUS_CORS_ORIGIN}
+
+      RATE_LIMITER_ENABLED: ${DIRECTUS_RATE_LIMITER_ENABLED}
+      RATE_LIMITER_POINTS: ${DIRECTUS_RATE_LIMITER_POINTS}
+      RATE_LIMITER_DURATION: ${DIRECTUS_RATE_LIMITER_DURATION}
+      RATE_LIMITER_STORE: redis
+
+      # MinIO storage (S3 driver)
+      STORAGE_LOCATIONS: ${STORAGE_LOCATIONS}
+      STORAGE_MINIO_DRIVER: ${STORAGE_MINIO_DRIVER}
+      STORAGE_MINIO_KEY: ${STORAGE_MINIO_KEY}
+      STORAGE_MINIO_SECRET: ${STORAGE_MINIO_SECRET}
+      STORAGE_MINIO_BUCKET: ${STORAGE_MINIO_BUCKET}
+      STORAGE_MINIO_REGION: ${STORAGE_MINIO_REGION}
+      STORAGE_MINIO_ENDPOINT: ${STORAGE_MINIO_ENDPOINT}
+      STORAGE_MINIO_FORCE_PATH_STYLE: ${STORAGE_MINIO_FORCE_PATH_STYLE}
+
+      # Stabilita
+      WEBSOCKETS_ENABLED: "false"
+      LOG_LEVEL: info
+    volumes:
+      - /data/directus/uploads:/directus/uploads
+      - /data/directus/extensions:/directus/extensions
+    ports:
+      - "127.0.0.1:8055:8055"
+    networks:
+      - sfr-net
+
+  ucl-proxy:
+    build:
+      context: ./ucl-proxy
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    environment:
+      UNICREDIT_AUTH_URL: ${UNICREDIT_AUTH_URL}
+      UNICREDIT_CALC_URL: ${UNICREDIT_CALC_URL}
+      UNICREDIT_USERNAME: ${UNICREDIT_USERNAME}
+      UNICREDIT_PASSWORD: ${UNICREDIT_PASSWORD}
+      UNICREDIT_CLIENT_SECRET: ${UNICREDIT_CLIENT_SECRET}
+      ALLOWED_ORIGINS: ${UCL_PROXY_ALLOWED_ORIGINS}
+      PORT: "3001"
+    ports:
+      - "127.0.0.1:3001:3001"
+    networks:
+      - sfr-net
+
+  # Nginx jako reverse proxy NEběží v Docker — jede na hostu, aby Certbot
+  # mohl normálně sahat na /etc/letsencrypt + reload. Host nginx pak proxyje
+  # do těchto kontejnerů přes localhost porty (níže expose).
+  # Viz nginx/sfr-motor.conf
+
+networks:
+  sfr-net:
+    driver: bridge
