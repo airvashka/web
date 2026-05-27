@@ -1,0 +1,195 @@
+---
+import BaseLayout from '@layouts/BaseLayout.astro';
+import DirectusImage from '@components/DirectusImage.astro';
+import { directusGet } from '@lib/directus';
+import { buildStockSlug } from '@lib/stockSlug';
+import type { StockVehicle } from '@lib/types';
+
+/* /sklad-3 — Design preview "Archetype C: Trust & Transparency Marketplace". Slepá URL. */
+export const prerender = false;
+Astro.response.headers.set('Cache-Control', 'public, s-maxage=60, stale-while-revalidate=300');
+Astro.response.headers.set('X-Robots-Tag', 'noindex, nofollow');
+
+type V = StockVehicle & {
+  brand?: { name: string; slug: string };
+  model?: { name: string; slug: string; fuel_type?: string };
+  trim_level?: { name: string } | null;
+  model_year?: { year: number } | null;
+  photos?: Array<{ directus_files_id: string }>;
+  transmission?: string;
+  drivetrain?: string;
+};
+
+const vehicles = await directusGet<V>('stock_vehicles', {
+  filter: { status: { _eq: 'published' }, availability: { _neq: 'sold' } },
+  sort: ['-listed_at', 'sort'],
+  fields: [
+    'id', 'list_price', 'promo_price', 'km',
+    'condition', 'availability',
+    'transmission', 'drivetrain',
+    'photos.directus_files_id',
+    'brand.name', 'brand.slug',
+    'model.name', 'model.slug', 'model.fuel_type',
+    'model_year.year',
+    'trim_level.name',
+  ],
+}, true);
+
+const fuelLabels: Record<string, string> = { petrol: 'Benzín', diesel: 'Diesel', hybrid: 'Hybrid', phev: 'PHEV', ev: 'Elektro' };
+const txLabels: Record<string, string> = { automatic: 'Automat', manual: 'Manuál', dct: 'DCT', cvt: 'CVT' };
+const dtLabels: Record<string, string> = { fwd: 'FWD', rwd: 'RWD', '4wd': '4×4', awd: 'AWD' };
+
+const fmt = (n?: number | null) => n ? `${n.toLocaleString('cs-CZ')} Kč` : '—';
+---
+
+<BaseLayout title="Sklad — Design C" description="Preview design C">
+  <style>
+    .c-page * { box-sizing: border-box; }
+    .c-page { background: #F5F6F9; min-height: 100vh; padding: 20px 0 60px; }
+    .c-container { max-width: 1320px; margin: 0 auto; padding: 0 20px; }
+    .c-preview-note { background: #FFF4DB; border-left: 4px solid #B97307; padding: 10px 16px; margin-bottom: 20px; border-radius: 6px; font-size: 13px; color: #6B4D00; }
+
+    .c-hero { background: #fff; border-radius: 10px; padding: 24px; margin-bottom: 20px; }
+    .c-hero h1 { font-size: 24px; font-weight: 700; margin: 0 0 6px; letter-spacing: -0.01em; color: #1B1F2A; }
+    .c-hero p { color: #6E7383; margin: 0; font-size: 14px; }
+    .c-trust { display: flex; gap: 20px; margin-top: 14px; flex-wrap: wrap; }
+    .c-badge { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; color: #41475B; font-weight: 500; }
+    .c-badge svg { width: 14px; height: 14px; stroke: #117C4F; fill: none; stroke-width: 2.5; }
+
+    .c-grid { display: grid; grid-template-columns: 1fr; gap: 14px; }
+
+    .c-card { background: #fff; border-radius: 10px; overflow: hidden; box-shadow: 0 1px 0 rgba(0,0,0,0.04), 0 2px 8px rgba(20,30,60,0.08); transition: box-shadow 0.18s; display: grid; grid-template-columns: 320px 1fr 220px; cursor: pointer; text-decoration: none; color: inherit; }
+    .c-card:hover { box-shadow: 0 2px 0 rgba(0,0,0,0.05), 0 10px 30px rgba(20,30,60,0.14); }
+
+    .c-media { position: relative; background: #ECEEF3; aspect-ratio: 4/3; overflow: hidden; }
+    .c-media :global(img) { width: 100% !important; height: 100% !important; object-fit: cover; display: block; }
+    .c-empty { width: 100%; height: 100%; display: grid; place-items: center; color: #ccc; font-size: 13px; }
+    .c-status { position: absolute; top: 10px; left: 10px; display: flex; flex-direction: column; gap: 4px; align-items: flex-start; }
+    .c-st { font-size: 10.5px; padding: 4px 8px; border-radius: 4px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.02em; color: #fff; }
+    .c-st-skl { background: #117C4F; }
+    .c-st-way { background: #8D5C00; }
+    .c-st-ord { background: #5B5560; }
+    .c-st-deal { background: #C8202B; }
+
+    .c-main { padding: 18px 20px; display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+    .c-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
+    .c-brand { font-size: 11.5px; color: #6E7383; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600; }
+    .c-title { font-size: 17px; font-weight: 700; margin: 2px 0; letter-spacing: -0.005em; color: #1B1F2A; }
+    .c-sub { font-size: 13px; color: #41475B; margin: 0; }
+
+    .c-fav { width: 36px; height: 36px; border-radius: 999px; background: #F4F6FA; border: 0; display: grid; place-items: center; cursor: pointer; flex-shrink: 0; }
+    .c-fav svg { width: 18px; height: 18px; stroke: #41475B; fill: none; stroke-width: 2; }
+
+    .c-specs { display: flex; flex-wrap: wrap; gap: 6px 8px; }
+    .c-spec { display: inline-flex; align-items: center; gap: 5px; font-size: 12.5px; color: #41475B; padding: 3px 9px; background: #EEF0F4; border-radius: 999px; }
+    .c-spec strong { color: #1B1F2A; font-weight: 600; }
+
+    .c-foot-meta { display: flex; gap: 14px; font-size: 12px; color: #6E7383; padding-top: 6px; border-top: 1px solid #EEF0F4; margin-top: auto; flex-wrap: wrap; }
+
+    .c-side { padding: 18px 20px; border-left: 1px solid #EEF0F4; background: linear-gradient(180deg, #FBFCFE 0%, #fff 100%); display: flex; flex-direction: column; gap: 10px; justify-content: space-between; }
+    .c-price-old { font-size: 13px; color: #6E7383; text-decoration: line-through; margin: 0; }
+    .c-price-val { font-size: 24px; font-weight: 800; letter-spacing: -0.02em; margin: 0; color: #1B1F2A; }
+    .c-price-vat { font-size: 11.5px; color: #6E7383; margin: 0; }
+    .c-price-rating { display: inline-flex; align-items: center; gap: 6px; padding: 4px 8px; background: #E2F4EC; color: #117C4F; border-radius: 4px; font-size: 11px; font-weight: 700; margin-top: 4px; }
+    .c-cta { background: #1F6FEB; color: #fff; text-align: center; padding: 11px; border-radius: 6px; text-decoration: none; font-weight: 700; font-size: 13.5px; display: block; }
+
+    @media (max-width: 1100px) { .c-card { grid-template-columns: 280px 1fr 180px; } }
+    @media (max-width: 880px) {
+      .c-card { grid-template-columns: 1fr; }
+      .c-media { aspect-ratio: 16/10; }
+      .c-side { border-left: 0; border-top: 1px solid #EEF0F4; }
+    }
+  </style>
+
+  <section class="c-page">
+    <div class="c-container">
+      <div class="c-preview-note">
+        <strong>Náhled designu C — Trust &amp; Transparency Marketplace</strong> · Reálná data z Directusu · Po výběru bude smazáno
+      </div>
+
+      <div class="c-hero">
+        <h1>{vehicles.length} vozů KGM, OMODA &amp; JAECOO a Farizon</h1>
+        <p>Transparentní ceny, ověřená historie. Vozy přímo od autorizovaného prodejce.</p>
+        <div class="c-trust">
+          <span class="c-badge"><svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg> Autorizovaný prodejce 3 značek</span>
+          <span class="c-badge"><svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg> Záruka až 8 let</span>
+          <span class="c-badge"><svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg> Doprava po celé ČR</span>
+        </div>
+      </div>
+
+      <div class="c-grid">
+        {vehicles.map((v) => {
+          const photoId = Array.isArray(v.photos) && v.photos.length > 0
+            ? (typeof v.photos[0] === 'string' ? v.photos[0] : (v.photos[0] as any)?.directus_files_id)
+            : null;
+          const brandName = v.brand?.name ?? '';
+          const modelName = v.model?.name ?? '';
+          const trimName = v.trim_level?.name ?? (v as any).trim_level_snapshot ?? '';
+          const year = v.model_year?.year;
+          const fuel = v.model?.fuel_type ? (fuelLabels[v.model.fuel_type] ?? v.model.fuel_type) : '';
+          const tx = v.transmission ? (txLabels[v.transmission] ?? v.transmission) : '';
+          const dt = v.drivetrain ? (dtLabels[v.drivetrain] ?? v.drivetrain) : '';
+          const km = (v.km === 0 || !v.km) ? '0 km' : `${v.km.toLocaleString('cs-CZ')} km`;
+          const isOnOrder = v.availability === 'on_order';
+          const isOnWay = v.availability === 'on_the_way';
+          const isInStock = v.availability === 'in_stock';
+          const finalPrice = v.promo_price ?? v.list_price;
+          const hasDiscount = v.promo_price && v.list_price && v.promo_price < v.list_price;
+          const detailUrl = `/sklad/${buildStockSlug({ id: v.id, brand: v.brand?.slug, model: v.model?.slug })}`;
+
+          return (
+            <a class="c-card" href={detailUrl}>
+              <div class="c-media">
+                {photoId ? (
+                  <DirectusImage src={photoId} alt={`${brandName} ${modelName}`} widths={[400, 600, 800]} loading="lazy" />
+                ) : (
+                  <div class="c-empty">Bez fotky</div>
+                )}
+                <div class="c-status">
+                  {hasDiscount && <span class="c-st c-st-deal">Akce</span>}
+                  {isInStock && <span class="c-st c-st-skl">Skladem Praha</span>}
+                  {isOnWay && <span class="c-st c-st-way">Na cestě</span>}
+                  {isOnOrder && <span class="c-st c-st-ord">Na objednání</span>}
+                </div>
+              </div>
+              <div class="c-main">
+                <div class="c-head">
+                  <div>
+                    <div class="c-brand">{brandName}</div>
+                    <h3 class="c-title">{modelName} {trimName}</h3>
+                    {hasDiscount && <p class="c-sub">Akční cena</p>}
+                  </div>
+                  <button class="c-fav" type="button" aria-label="Uložit" onclick="event.preventDefault();">
+                    <svg viewBox="0 0 24 24"><path d="M12 21s-7-4.5-7-10a4 4 0 0 1 7-2.7A4 4 0 0 1 19 11c0 5.5-7 10-7 10z"/></svg>
+                  </button>
+                </div>
+                <div class="c-specs">
+                  {year && <span class="c-spec"><strong>{year}</strong></span>}
+                  {fuel && <span class="c-spec">{fuel}</span>}
+                  {tx && <span class="c-spec">{tx}</span>}
+                  {dt && <span class="c-spec">{dt}</span>}
+                  <span class="c-spec"><strong>{km}</strong></span>
+                  {v.condition === 'new' && <span class="c-spec">Nový</span>}
+                  {v.condition === 'demo' && <span class="c-spec">Předváděcí</span>}
+                </div>
+                <div class="c-foot-meta">
+                  <span>Praha 9 — Ďáblice</span>
+                  {hasDiscount && <span>Doprava ZDARMA</span>}
+                </div>
+              </div>
+              <div class="c-side">
+                <div>
+                  {hasDiscount && <p class="c-price-old">{fmt(v.list_price)}</p>}
+                  <p class="c-price-val">{fmt(finalPrice)}</p>
+                  <p class="c-price-vat">vč. DPH</p>
+                  {hasDiscount && <span class="c-price-rating">✓ Skvělá cena</span>}
+                </div>
+                <span class="c-cta">{isOnOrder ? 'Konfigurovat' : 'Zobrazit detail'}</span>
+              </div>
+            </a>
+          );
+        })}
+      </div>
+    </div>
+  </section>
+</BaseLayout>

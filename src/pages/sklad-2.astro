@@ -1,0 +1,183 @@
+---
+import BaseLayout from '@layouts/BaseLayout.astro';
+import DirectusImage from '@components/DirectusImage.astro';
+import { directusGet } from '@lib/directus';
+import { buildStockSlug } from '@lib/stockSlug';
+import type { StockVehicle } from '@lib/types';
+
+/* /sklad-2 — Design preview "Archetype B: Premium Brand Showcase". Slepá URL. */
+export const prerender = false;
+Astro.response.headers.set('Cache-Control', 'public, s-maxage=60, stale-while-revalidate=300');
+Astro.response.headers.set('X-Robots-Tag', 'noindex, nofollow');
+
+type V = StockVehicle & {
+  brand?: { name: string; slug: string };
+  model?: { name: string; slug: string; fuel_type?: string };
+  trim_level?: { name: string } | null;
+  model_year?: { year: number } | null;
+  photos?: Array<{ directus_files_id: string }>;
+  transmission?: string;
+  drivetrain?: string;
+};
+
+const vehicles = await directusGet<V>('stock_vehicles', {
+  filter: { status: { _eq: 'published' }, availability: { _neq: 'sold' } },
+  sort: ['-listed_at', 'sort'],
+  fields: [
+    'id', 'list_price', 'promo_price', 'km',
+    'condition', 'availability',
+    'transmission', 'drivetrain',
+    'photos.directus_files_id',
+    'brand.name', 'brand.slug',
+    'model.name', 'model.slug', 'model.fuel_type',
+    'model_year.year',
+    'trim_level.name',
+  ],
+}, true);
+
+const fuelLabels: Record<string, string> = { petrol: 'Benzín', diesel: 'Diesel', hybrid: 'Hybrid', phev: 'PHEV', ev: 'Elektro' };
+const txLabels: Record<string, string> = { automatic: 'Automat', manual: 'Manuál', dct: 'DCT', cvt: 'CVT' };
+const dtLabels: Record<string, string> = { fwd: 'FWD', rwd: 'RWD', '4wd': '4×4', awd: 'AWD' };
+
+const fmt = (n?: number | null) => n ? `${n.toLocaleString('cs-CZ')} Kč` : '—';
+---
+
+<BaseLayout title="Sklad — Design B" description="Preview design B">
+  <style>
+    .b-page * { box-sizing: border-box; }
+    .b-page { background: #fff; min-height: 100vh; padding: 30px 0 80px; }
+    .b-container { max-width: 1440px; margin: 0 auto; padding: 0 40px; }
+    .b-preview-note { background: #FFF4DB; border-left: 4px solid #B97307; padding: 10px 16px; margin-bottom: 30px; border-radius: 6px; font-size: 13px; color: #6B4D00; }
+
+    .b-hero { padding: 50px 0 36px; border-bottom: 1px solid #F5F5F7; margin-bottom: 36px; }
+    .b-eyebrow { font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; color: #8B7233; margin: 0 0 14px; font-weight: 600; }
+    .b-title { font-family: Georgia, "Times New Roman", serif; font-size: clamp(34px, 5vw, 56px); font-weight: 400; letter-spacing: -0.025em; margin: 0 0 18px; line-height: 1.05; color: #0E0E12; }
+    .b-sub { color: #7A7A85; margin: 0; font-size: 16px; max-width: 620px; }
+    .b-meta { display: flex; gap: 40px; margin-top: 32px; flex-wrap: wrap; }
+    .b-meta-num { font-family: Georgia, serif; font-size: 28px; font-weight: 400; display: block; color: #0E0E12; }
+    .b-meta-lbl { font-size: 11px; color: #7A7A85; text-transform: uppercase; letter-spacing: 0.08em; }
+
+    .b-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 48px 36px; }
+
+    .b-card { background: #fff; overflow: hidden; cursor: pointer; position: relative; text-decoration: none; color: inherit; transition: transform 0.4s cubic-bezier(0.2,0.8,0.2,1); }
+    .b-card:hover { transform: translateY(-4px); }
+    .b-media { position: relative; aspect-ratio: 16 / 9; background: linear-gradient(180deg, #F0F0F2 0%, #E5E5EA 100%); overflow: hidden; }
+    .b-media :global(img) { width: 100% !important; height: 100% !important; object-fit: cover; display: block; transition: transform 0.8s cubic-bezier(0.2,0.8,0.2,1); }
+    .b-card:hover .b-media :global(img) { transform: scale(1.04); }
+    .b-empty { width: 100%; height: 100%; display: grid; place-items: center; color: #ccc; font-size: 13px; }
+
+    .b-status { position: absolute; top: 20px; left: 20px; display: flex; gap: 8px; }
+    .b-st { font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; padding: 6px 11px; background: rgba(255,255,255,0.96); color: #0E0E12; font-weight: 600; }
+    .b-st-gold { background: #C8A24A; color: #fff; }
+    .b-st-dark { background: #0E0E12; color: #fff; }
+    .b-st-danger { background: #B81F1F; color: #fff; }
+
+    .b-action { position: absolute; top: 20px; right: 20px; }
+    .b-icon-btn { width: 40px; height: 40px; border-radius: 999px; background: rgba(255,255,255,0.96); border: 0; display: grid; place-items: center; cursor: pointer; }
+    .b-icon-btn svg { width: 18px; height: 18px; stroke: #0E0E12; fill: none; stroke-width: 1.5; }
+
+    .b-body { padding: 24px 4px 0; }
+    .b-card-eyebrow { font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: #7A7A85; font-weight: 600; margin: 0 0 8px; }
+    .b-card-title { font-family: Georgia, serif; font-size: 22px; font-weight: 400; letter-spacing: -0.015em; margin: 0 0 4px; line-height: 1.2; color: #0E0E12; }
+    .b-card-sub { font-size: 14px; color: #2A2A33; margin: 0 0 18px; }
+
+    .b-specs { display: flex; gap: 28px; flex-wrap: wrap; padding: 14px 0; border-top: 1px solid #F5F5F7; border-bottom: 1px solid #F5F5F7; margin-bottom: 18px; }
+    .b-spec-item { display: flex; flex-direction: column; gap: 2px; }
+    .b-spec-val { font-size: 14px; font-weight: 600; color: #0E0E12; }
+    .b-spec-lbl { font-size: 10.5px; color: #7A7A85; text-transform: uppercase; letter-spacing: 0.08em; }
+
+    .b-bottom { display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; padding-bottom: 8px; }
+    .b-price-old { font-size: 13px; color: #7A7A85; text-decoration: line-through; margin: 0; }
+    .b-price-val { font-family: Georgia, serif; font-size: 26px; font-weight: 400; letter-spacing: -0.01em; margin: 0; color: #0E0E12; }
+    .b-price-vat { font-size: 11.5px; color: #7A7A85; margin-top: 2px; }
+    .b-cta { color: #0E0E12; font-size: 13px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; display: inline-flex; align-items: center; gap: 6px; padding-bottom: 4px; border-bottom: 1px solid #0E0E12; text-decoration: none; }
+
+    @media (max-width: 880px) {
+      .b-grid { grid-template-columns: 1fr; gap: 48px; }
+      .b-container { padding: 0 24px; }
+    }
+  </style>
+
+  <section class="b-page">
+    <div class="b-container">
+      <div class="b-preview-note">
+        <strong>Náhled designu B — Premium Brand Showcase</strong> · Reálná data z Directusu · Po výběru bude smazáno
+      </div>
+
+      <div class="b-hero">
+        <p class="b-eyebrow">Skladové vozy · sezóna 2026</p>
+        <h1 class="b-title">Vůz, který vás čeká.<br/>Dnes, nebo zítra.</h1>
+        <p class="b-sub">Pečlivě vybraná nabídka modelů KGM, OMODA &amp; JAECOO a Farizon. Skladem v Praze i k objednání podle vašich přání.</p>
+        <div class="b-meta">
+          <div><span class="b-meta-num">{vehicles.length}</span><span class="b-meta-lbl">Vozů v nabídce</span></div>
+          <div><span class="b-meta-num">{new Set(vehicles.map(v => v.model?.slug).filter(Boolean)).size}</span><span class="b-meta-lbl">Modelů</span></div>
+          <div><span class="b-meta-num">7 let</span><span class="b-meta-lbl">Záruka</span></div>
+        </div>
+      </div>
+
+      <div class="b-grid">
+        {vehicles.map((v) => {
+          const photoId = Array.isArray(v.photos) && v.photos.length > 0
+            ? (typeof v.photos[0] === 'string' ? v.photos[0] : (v.photos[0] as any)?.directus_files_id)
+            : null;
+          const brandName = v.brand?.name ?? '';
+          const modelName = v.model?.name ?? '';
+          const trimName = v.trim_level?.name ?? (v as any).trim_level_snapshot ?? '';
+          const year = v.model_year?.year;
+          const fuel = v.model?.fuel_type ? (fuelLabels[v.model.fuel_type] ?? v.model.fuel_type) : '—';
+          const tx = v.transmission ? (txLabels[v.transmission] ?? v.transmission) : '—';
+          const dt = v.drivetrain ? (dtLabels[v.drivetrain] ?? v.drivetrain) : '—';
+          const km = (v.km === 0 || !v.km) ? '0 km' : `${v.km.toLocaleString('cs-CZ')} km`;
+          const isOnOrder = v.availability === 'on_order';
+          const isOnWay = v.availability === 'on_the_way';
+          const finalPrice = v.promo_price ?? v.list_price;
+          const hasDiscount = v.promo_price && v.list_price && v.promo_price < v.list_price;
+          const detailUrl = `/sklad/${buildStockSlug({ id: v.id, brand: v.brand?.slug, model: v.model?.slug })}`;
+
+          return (
+            <a class="b-card" href={detailUrl}>
+              <div class="b-media">
+                {photoId ? (
+                  <DirectusImage src={photoId} alt={`${brandName} ${modelName}`} widths={[600, 900, 1200]} loading="lazy" />
+                ) : (
+                  <div class="b-empty">Bez fotky</div>
+                )}
+                <div class="b-status">
+                  {hasDiscount && <span class="b-st b-st-gold">Akce</span>}
+                  {isOnOrder && <span class="b-st">Na objednání</span>}
+                  {isOnWay && <span class="b-st">Na cestě</span>}
+                  {!isOnOrder && !isOnWay && v.condition === 'new' && <span class="b-st b-st-dark">Nový</span>}
+                  {!isOnOrder && !isOnWay && v.condition === 'demo' && <span class="b-st">Demo</span>}
+                </div>
+                <div class="b-action">
+                  <button class="b-icon-btn" type="button" aria-label="Uložit" onclick="event.preventDefault();">
+                    <svg viewBox="0 0 24 24"><path d="M12 21s-7-4.5-7-10a4 4 0 0 1 7-2.7A4 4 0 0 1 19 11c0 5.5-7 10-7 10z"/></svg>
+                  </button>
+                </div>
+              </div>
+              <div class="b-body">
+                <p class="b-card-eyebrow">{brandName}{year ? ` · ${year}` : ''}</p>
+                <h3 class="b-card-title">{modelName} {trimName}</h3>
+                <p class="b-card-sub">{[fuel, tx, dt].filter(x => x && x !== '—').join(' · ')}</p>
+                <div class="b-specs">
+                  <div class="b-spec-item"><span class="b-spec-val">{fuel}</span><span class="b-spec-lbl">Palivo</span></div>
+                  <div class="b-spec-item"><span class="b-spec-val">{tx}</span><span class="b-spec-lbl">Převodovka</span></div>
+                  <div class="b-spec-item"><span class="b-spec-val">{dt}</span><span class="b-spec-lbl">Pohon</span></div>
+                  <div class="b-spec-item"><span class="b-spec-val">{km}</span><span class="b-spec-lbl">Najeto</span></div>
+                </div>
+                <div class="b-bottom">
+                  <div>
+                    {hasDiscount && <p class="b-price-old">{fmt(v.list_price)}</p>}
+                    <p class="b-price-val">{fmt(finalPrice)}</p>
+                    <p class="b-price-vat">vč. DPH</p>
+                  </div>
+                  <span class="b-cta">Prohlédnout →</span>
+                </div>
+              </div>
+            </a>
+          );
+        })}
+      </div>
+    </div>
+  </section>
+</BaseLayout>

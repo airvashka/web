@@ -1,0 +1,184 @@
+---
+import BaseLayout from '@layouts/BaseLayout.astro';
+import DirectusImage from '@components/DirectusImage.astro';
+import { directusGet } from '@lib/directus';
+import { buildStockSlug } from '@lib/stockSlug';
+import type { StockVehicle } from '@lib/types';
+
+/* ============================================================
+   /sklad-1 — Design preview "Archetype A: Modern Authorized Dealer"
+   Slepá URL pro Jardovo porovnání. Po výběru smazat.
+   Reálná data z Directusu, jen jiný design.
+   ============================================================ */
+export const prerender = false;
+Astro.response.headers.set('Cache-Control', 'public, s-maxage=60, stale-while-revalidate=300');
+Astro.response.headers.set('X-Robots-Tag', 'noindex, nofollow');
+
+type V = StockVehicle & {
+  brand?: { name: string; slug: string };
+  model?: { name: string; slug: string; fuel_type?: string };
+  trim_level?: { name: string } | null;
+  model_year?: { year: number } | null;
+  photos?: Array<{ directus_files_id: string }>;
+  transmission?: string;
+  drivetrain?: string;
+};
+
+const vehicles = await directusGet<V>('stock_vehicles', {
+  filter: { status: { _eq: 'published' }, availability: { _neq: 'sold' } },
+  sort: ['-listed_at', 'sort'],
+  fields: [
+    'id', 'vin', 'list_price', 'promo_price', 'km',
+    'condition', 'availability', 'color_code',
+    'transmission', 'drivetrain', 'listed_at',
+    'photos.directus_files_id',
+    'brand.name', 'brand.slug',
+    'model.name', 'model.slug', 'model.fuel_type',
+    'model_year.year',
+    'trim_level.name',
+  ],
+}, true);
+
+const fuelLabels: Record<string, string> = { petrol: 'Benzín', diesel: 'Diesel', hybrid: 'Hybrid', phev: 'PHEV', ev: 'Elektro' };
+const txLabels: Record<string, string> = { automatic: 'Automat', manual: 'Manuál', dct: 'DCT', cvt: 'CVT' };
+const dtLabels: Record<string, string> = { fwd: 'FWD', rwd: 'RWD', '4wd': '4×4', awd: 'AWD' };
+
+const fmt = (n?: number | null) => n ? `${n.toLocaleString('cs-CZ')} Kč` : '—';
+
+const stats = {
+  inStock: vehicles.filter(v => v.availability === 'in_stock').length,
+  onWay: vehicles.filter(v => v.availability === 'on_the_way').length,
+  onOrder: vehicles.filter(v => v.availability === 'on_order').length,
+};
+---
+
+<BaseLayout title="Sklad — Design A" description="Preview design A">
+  <style>
+    .a-page * { box-sizing: border-box; }
+    .a-page { background: #FAFAFB; min-height: 100vh; padding: 24px 0 60px; }
+    .a-container { max-width: 1280px; margin: 0 auto; padding: 0 24px; }
+    .a-preview-note { background: #FFF4DB; border-left: 4px solid #B97307; padding: 10px 16px; margin-bottom: 20px; border-radius: 6px; font-size: 13px; color: #6B4D00; }
+    .a-hero { background: #fff; border-radius: 16px; padding: 32px; margin-bottom: 24px; box-shadow: 0 1px 2px rgba(0,0,0,0.04); }
+    .a-hero h1 { font-size: clamp(24px, 3vw, 32px); font-weight: 700; letter-spacing: -0.02em; margin: 0 0 6px; color: #1A1A1F; }
+    .a-hero p { color: #6B6B73; margin: 0 0 20px; font-size: 15px; }
+    .a-stats { display: flex; gap: 32px; flex-wrap: wrap; }
+    .a-stat { display: flex; flex-direction: column; gap: 2px; }
+    .a-stat-val { font-size: 22px; font-weight: 700; color: #1A1A1F; }
+    .a-stat-lbl { font-size: 11px; color: #6B6B73; text-transform: uppercase; letter-spacing: 0.06em; }
+
+    .a-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)); gap: 20px; }
+
+    .a-card { background: #fff; border-radius: 16px; overflow: hidden; box-shadow: 0 1px 2px rgba(0,0,0,0.04), 0 8px 24px rgba(0,0,0,0.06); transition: transform 0.2s, box-shadow 0.2s; position: relative; display: flex; flex-direction: column; cursor: pointer; text-decoration: none; color: inherit; }
+    .a-card:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.08), 0 16px 40px rgba(0,0,0,0.12); }
+    .a-media { position: relative; aspect-ratio: 16 / 11; background: #F2F2F4; overflow: hidden; }
+    .a-media :global(img) { width: 100% !important; height: 100% !important; object-fit: cover; display: block; }
+    .a-media-empty { width: 100%; height: 100%; display: grid; place-items: center; color: #ccc; font-size: 12px; }
+    .a-badges { position: absolute; top: 12px; left: 12px; display: flex; gap: 6px; z-index: 2; }
+    .a-pill { color: #fff; padding: 5px 10px; border-radius: 999px; font-size: 11px; font-weight: 600; letter-spacing: 0.02em; backdrop-filter: blur(8px); }
+    .a-pill-new { background: #E85D2C; }
+    .a-pill-demo { background: rgba(26,26,31,0.85); }
+    .a-pill-order { background: #5B5560; }
+    .a-pill-way { background: #B97307; }
+    .a-fav { position: absolute; top: 12px; right: 12px; width: 36px; height: 36px; border-radius: 999px; background: rgba(255,255,255,0.92); border: 0; display: grid; place-items: center; cursor: pointer; backdrop-filter: blur(8px); z-index: 2; }
+    .a-fav svg { width: 18px; height: 18px; stroke: #1A1A1F; fill: none; stroke-width: 2; }
+
+    .a-body { padding: 16px; display: flex; flex-direction: column; gap: 10px; flex: 1; }
+    .a-brand { font-size: 11px; color: #6B6B73; text-transform: uppercase; letter-spacing: 0.06em; font-weight: 600; }
+    .a-title { font-size: 16px; font-weight: 600; margin: 0; line-height: 1.3; letter-spacing: -0.01em; color: #1A1A1F; }
+    .a-subtitle { font-size: 13px; color: #4A4A52; margin: 0; }
+
+    .a-specs { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 12px; padding: 8px 0; border-top: 1px solid #F0F0F2; border-bottom: 1px solid #F0F0F2; }
+    .a-spec { display: flex; align-items: center; gap: 6px; font-size: 12px; color: #4A4A52; }
+    .a-spec svg { width: 14px; height: 14px; stroke: #6B6B73; fill: none; stroke-width: 1.8; flex-shrink: 0; }
+
+    .a-price-row { display: flex; justify-content: space-between; align-items: flex-end; gap: 8px; }
+    .a-price-val { font-size: 20px; font-weight: 700; letter-spacing: -0.01em; color: #1A1A1F; }
+    .a-price-old { font-size: 12px; color: #6B6B73; text-decoration: line-through; }
+    .a-price-vat { font-size: 11px; color: #6B6B73; }
+
+    .a-foot { display: flex; gap: 6px; align-items: center; padding-top: 6px; flex-wrap: wrap; }
+    .a-chip { display: inline-flex; align-items: center; gap: 4px; padding: 3px 8px; border-radius: 999px; background: #E5F4ED; color: #14855E; font-size: 10px; font-weight: 600; }
+  </style>
+
+  <section class="a-page">
+    <div class="a-container">
+      <div class="a-preview-note">
+        <strong>Náhled designu A — Modern Authorized Dealer</strong> · Reálná data z Directusu · Po výběru bude smazáno
+      </div>
+
+      <div class="a-hero">
+        <h1>Skladové vozy</h1>
+        <p>Vyberte si z nabídky {vehicles.length} vozů KGM, OMODA &amp; JAECOO a Farizon.</p>
+        <div class="a-stats">
+          <div class="a-stat"><span class="a-stat-val">{stats.inStock}</span><span class="a-stat-lbl">Skladem</span></div>
+          <div class="a-stat"><span class="a-stat-val">{stats.onWay}</span><span class="a-stat-lbl">Na cestě</span></div>
+          <div class="a-stat"><span class="a-stat-val">{stats.onOrder}</span><span class="a-stat-lbl">Na objednání</span></div>
+        </div>
+      </div>
+
+      <div class="a-grid">
+        {vehicles.map((v) => {
+          const photoId = Array.isArray(v.photos) && v.photos.length > 0
+            ? (typeof v.photos[0] === 'string' ? v.photos[0] : (v.photos[0] as any)?.directus_files_id)
+            : null;
+          const brandName = v.brand?.name ?? '';
+          const modelName = v.model?.name ?? '';
+          const trimName = v.trim_level?.name ?? (v as any).trim_level_snapshot ?? '';
+          const year = v.model_year?.year;
+          const fuel = v.model?.fuel_type ? (fuelLabels[v.model.fuel_type] ?? v.model.fuel_type) : '';
+          const tx = v.transmission ? (txLabels[v.transmission] ?? v.transmission) : '';
+          const dt = v.drivetrain ? (dtLabels[v.drivetrain] ?? v.drivetrain) : '';
+          const km = (v.km === 0 || !v.km) ? '0 km' : `${v.km.toLocaleString('cs-CZ')} km`;
+          const isOnOrder = v.availability === 'on_order';
+          const isOnWay = v.availability === 'on_the_way';
+          const finalPrice = v.promo_price ?? v.list_price;
+          const hasDiscount = v.promo_price && v.list_price && v.promo_price < v.list_price;
+          const detailUrl = isOnOrder
+            ? `/sklad/${buildStockSlug({ id: v.id, brand: v.brand?.slug, model: v.model?.slug })}`
+            : `/sklad/${buildStockSlug({ id: v.id, brand: v.brand?.slug, model: v.model?.slug })}`;
+
+          return (
+            <a class="a-card" href={detailUrl}>
+              <div class="a-media">
+                {photoId ? (
+                  <DirectusImage src={photoId} alt={`${brandName} ${modelName}`} widths={[400, 600, 800]} loading="lazy" />
+                ) : (
+                  <div class="a-media-empty">Bez fotky</div>
+                )}
+                <div class="a-badges">
+                  {isOnOrder && <span class="a-pill a-pill-order">Na objednání</span>}
+                  {isOnWay && <span class="a-pill a-pill-way">Na cestě</span>}
+                  {!isOnOrder && !isOnWay && v.condition === 'new' && <span class="a-pill a-pill-new">Nové</span>}
+                  {!isOnOrder && !isOnWay && v.condition === 'demo' && <span class="a-pill a-pill-demo">Demo</span>}
+                </div>
+                <button class="a-fav" type="button" aria-label="Uložit" onclick="event.preventDefault();">
+                  <svg viewBox="0 0 24 24"><path d="M12 21s-7-4.5-7-10a4 4 0 0 1 7-2.7A4 4 0 0 1 19 11c0 5.5-7 10-7 10z"/></svg>
+                </button>
+              </div>
+              <div class="a-body">
+                <div class="a-brand">{brandName}</div>
+                <h3 class="a-title">{modelName} {trimName}</h3>
+                <p class="a-subtitle">{fuel}{year ? ` · ${year}` : ''}</p>
+                <div class="a-specs">
+                  <div class="a-spec"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg> {km}</div>
+                  {tx && <div class="a-spec"><svg viewBox="0 0 24 24"><path d="M4 17h16M4 12h16M4 7h16"/></svg> {tx}</div>}
+                  {dt && <div class="a-spec"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/></svg> {dt}</div>}
+                </div>
+                <div class="a-price-row">
+                  <div>
+                    {hasDiscount && <div class="a-price-old">{fmt(v.list_price)}</div>}
+                    <div class="a-price-val">{fmt(finalPrice)}</div>
+                    <div class="a-price-vat">vč. DPH</div>
+                  </div>
+                </div>
+                <div class="a-foot">
+                  <span class="a-chip">✓ Autorizovaný prodejce</span>
+                </div>
+              </div>
+            </a>
+          );
+        })}
+      </div>
+    </div>
+  </section>
+</BaseLayout>
