@@ -3880,6 +3880,60 @@ a.promo-image-link:hover {
 .scard .pill--used { background: #8A6E50; color: #fff; }     /* warm hnědá — Ojeté */
 .scard .pill--on-order { background: #5B5560; color: #fff; } /* tmavě šedá — Na objednání */
 
+/* Vč. DPH label za cenou na stock card. Zákonný požadavek pro B2C ceny.
+   Cílíme na poslední span uvnitř .scard .price (= finální cena, ne přeškrtnutá .price-before). */
+.scard .price > span:last-child::after {
+  content: ' vč. DPH';
+  font-size: 9px;
+  font-weight: 400;
+  color: var(--text-dim);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  margin-left: 2px;
+  vertical-align: middle;
+  opacity: 0.7;
+}
+/* Stejně pro alternativní layout (.amount class — homepage feature carousel) */
+.scard .amount::after,
+.amount-vat::after {
+  content: ' vč. DPH';
+  font-size: 9px;
+  font-weight: 400;
+  color: var(--text-dim);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  margin-left: 2px;
+  vertical-align: middle;
+  opacity: 0.7;
+}
+
+/* /model/[slug] — trim ceny v ceník bloku. Přidáváme jen u finální ceny
+   (.trim-price), ne u přeškrtnuté list (.trim-price-list). */
+.trim-price::after,
+.trim-price--promo::after {
+  content: ' vč. DPH';
+  font-size: 10px;
+  font-weight: 400;
+  color: var(--text-dim);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  margin-left: 4px;
+  vertical-align: middle;
+  opacity: 0.7;
+}
+
+/* /sklad/[id] sticky CTA bar dole — cena tam taky potřebuje "vč. DPH" */
+.sticky-cta .price::after {
+  content: ' vč. DPH';
+  font-size: 9px;
+  font-weight: 400;
+  color: rgba(255, 255, 255, 0.7);    /* sticky CTA má tmavé pozadí */
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  margin-left: 4px;
+  vertical-align: middle;
+}
+
 /* ────────────────────────────────────────────────────────────────────────
    Color picker pro build-to-order vozy (/sklad/[id] kde availability='on_order')
    Swatch klik změní hero foto. Hex barvy z model_color_exterior.hex.
