@@ -1,6 +1,6 @@
 # SFR Motor VPS — setup & migration guide
 
-Backend stack pro SFR Motor web: **Directus + Postgres + Redis + MinIO + UCL leasing proxy** v Docker Compose, deployed na WebGlobe VPS Standard (Ubuntu 22.04 LTS).
+Backend stack pro SFR Motor web: **Directus + Postgres + Redis + MinIO + UCL leasing proxy** v Docker Compose, deployed na WebGlobe VPS (Ubuntu 22.04 nebo 24.04 LTS).
 
 ## Co tu je
 
@@ -20,8 +20,8 @@ vps-setup/
 
 ## Předpoklady
 
-- WebGlobe VPS Standard objednaný (2 vCPU / 4 GB / 60 GB SSD)
-- Ubuntu 22.04 LTS instalovaný (výběr při objednávce)
+- WebGlobe VPS objednaný (min. 2 vCPU / 4 GB / 20 GB SSD)
+- Ubuntu 22.04 nebo 24.04 LTS instalovaný (výběr při objednávce)
 - Přístup k SSH (IP + root heslo z emailu od WebGlobe)
 - Přístup k doménovému registrátoru pro nastavení DNS A záznamů
 
@@ -57,7 +57,7 @@ Zadej heslo z emailu od WebGlobe. Při prvním připojení potvrď fingerprint (
 Stáhneš a spustíš `setup-vps.sh` (jednou):
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/SFR-Motor/sfr-motor-web/main/vps-setup/setup-vps.sh -o setup.sh
+curl -fsSL https://raw.githubusercontent.com/airvashka/web/main/vps-setup/setup-vps.sh -o setup.sh
 chmod +x setup.sh
 ./setup.sh
 ```

@@ -2,11 +2,11 @@
 # ─────────────────────────────────────────────────────────────────────────────
 # SFR Motor — VPS bootstrap skript
 #
-# Spouští se JEDNOU na čerstvém WebGlobe VPS Standard (Ubuntu 22.04 LTS).
+# Spouští se JEDNOU na čerstvém WebGlobe VPS (Ubuntu 22.04 nebo 24.04 LTS).
 # Připraví server: Docker, Nginx, Certbot, firewall, /data strukturu, repo clone.
 #
 # Použití:
-#   curl -fsSL https://raw.githubusercontent.com/SFR-Motor/sfr-motor-web/main/vps-setup/setup-vps.sh -o setup.sh
+#   curl -fsSL https://raw.githubusercontent.com/airvashka/web/main/vps-setup/setup-vps.sh -o setup.sh
 #   chmod +x setup.sh
 #   ./setup.sh
 #
@@ -14,7 +14,7 @@
 # ─────────────────────────────────────────────────────────────────────────────
 set -euo pipefail
 
-REPO_URL="https://github.com/SFR-Motor/sfr-motor-web.git"
+REPO_URL="https://github.com/airvashka/web.git"
 REPO_DIR="/opt/sfr-motor"
 DATA_DIR="/data"
 APP_USER="sfr"
