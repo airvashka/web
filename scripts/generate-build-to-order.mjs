@@ -147,21 +147,31 @@ async function main() {
   console.log(`[btoorder] Mode: ${APPLY ? 'APPLY' : 'DRY RUN'}`);
   if (BRAND_FILTER) console.log(`[btoorder] Brand filter: ${BRAND_FILTER}`);
 
-  // 1) Načti trim_levels (kde list_price > 0) + relace
+  // 1) Načti trim_levels (kde list_price > 0 a status=published) + relace.
+  // Pozor: trim_levels NEMÁ přímý FK na model. Model je dostupný přes model_year:
+  //   trim_levels.model_year → model_years.model → models → brands
   const trimsFilter = {
     'filter[list_price][_gt]': '0',
-    'fields': 'id,name,list_price,model.id,model.name,model.slug,model.brand.id,model.brand.name,model.brand.slug,year,coming_soon',
+    'filter[status][_eq]': 'published',
+    'fields': 'id,name,list_price,model_year.id,model_year.year,model_year.model.id,model_year.model.name,model_year.model.slug,model_year.model.brand.id,model_year.model.brand.name,model_year.model.brand.slug',
     'limit': '500',
   };
   if (BRAND_FILTER) {
-    trimsFilter['filter[model][brand][slug][_eq]'] = BRAND_FILTER;
+    trimsFilter['filter[model_year][model][brand][slug][_eq]'] = BRAND_FILTER;
   }
   const trimsQuery = new URLSearchParams(trimsFilter).toString();
   const trimsResp = await api('GET', `/items/trim_levels?${trimsQuery}`);
   let trims = trimsResp.data ?? [];
-  // Vyfiltruj coming_soon a chybějící relace
-  trims = trims.filter((t) => !t.coming_soon && t.model && t.model.brand);
-  console.log(`[btoorder] Načteno ${trims.length} trim_levels (po filtru coming_soon)`);
+  // Vyfiltruj chybějící relace (orphaned trim_levels). Normalizuj: t.model_year.model → t.model pro pohodlí.
+  trims = trims
+    .filter((t) => t.model_year && t.model_year.model && t.model_year.model.brand)
+    .map((t) => ({
+      ...t,
+      model: t.model_year.model,
+      year: t.model_year.year,
+      modelYearId: t.model_year.id,
+    }));
+  console.log(`[btoorder] Načteno ${trims.length} trim_levels (status=published, s validním model+brand)`);
 
   // 2) Pro každý trim spočítej kombinace
   // Plan = { externalId, brandSlug, modelSlug, trimName, trimId, modelId, brandId, listPrice, transmission, drivetrain }
@@ -181,6 +191,7 @@ async function main() {
         trimName: t.name,
         trimId: t.id,
         modelId: t.model.id,
+        modelYearId: t.modelYearId,
         brandId: t.model.brand.id,
         listPrice: t.list_price,
         transmission: c.transmission,
@@ -215,6 +226,7 @@ async function main() {
     const payload = {
       brand: p.brandId,
       model: p.modelId,
+      model_year: p.modelYearId,    // stock_vehicles.model_year je FK na model_years
       trim_level: p.trimId,
       list_price: p.listPrice,
       availability: 'on_order',
