@@ -3908,9 +3908,12 @@ a.promo-image-link:hover {
 }
 
 /* /model/[slug] — trim ceny v ceník bloku. Přidáváme jen u finální ceny
-   (.trim-price), ne u přeškrtnuté list (.trim-price-list). */
+   (.trim-price), ne u přeškrtnuté list (.trim-price-list).
+   /[brand] — modelové karty (.price-val, .price-val--promo). */
 .trim-price::after,
-.trim-price--promo::after {
+.trim-price--promo::after,
+.price-val::after,
+.price-val--promo::after {
   content: ' vč. DPH';
   font-size: 10px;
   font-weight: 400;
@@ -3961,29 +3964,30 @@ a.promo-image-link:hover {
 .color-swatch {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  padding: 6px 12px 6px 6px;
+  justify-content: center;
+  padding: 4px;
   background: #fff;
-  border: 1.5px solid #e0e0e4;
-  border-radius: 999px;
+  border: 2px solid #e0e0e4;
+  border-radius: 50%;
   cursor: pointer;
-  font-size: 13px;
-  color: var(--text);
-  transition: border-color 0.15s, box-shadow 0.15s;
+  transition: border-color 0.15s, box-shadow 0.15s, transform 0.15s;
 }
-.color-swatch:hover { border-color: var(--accent); }
+.color-swatch:hover {
+  border-color: var(--accent);
+  transform: scale(1.05);
+}
 .color-swatch.is-active {
   border-color: var(--accent);
-  box-shadow: 0 0 0 2px rgba(231, 121, 41, 0.15);
+  box-shadow: 0 0 0 3px rgba(231, 121, 41, 0.2);
 }
 .color-swatch .swatch-dot {
-  width: 20px; height: 20px;
+  width: 36px; height: 36px;
   border-radius: 50%;
   background: var(--swatch-color, #888);
-  border: 1.5px solid rgba(0,0,0,0.12);
+  border: 1px solid rgba(0,0,0,0.1);
   flex: 0 0 auto;
 }
-.color-swatch .swatch-name { white-space: nowrap; }
+/* Tooltip via title attribute na hover */
 .color-picker-note {
   margin: 10px 0 0;
   font-size: 12px;

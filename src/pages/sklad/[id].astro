@@ -512,17 +512,17 @@ const salesPhoneLink = telLink(salesPhone);
                     data-color-photo={c.photo}
                     data-color-name={c.name}
                     data-color-surcharge={c.surcharge}
-                    aria-label={c.name}
+                    aria-label={c.name + (c.surcharge > 0 ? ` (+${c.surcharge.toLocaleString('cs-CZ')} Kč)` : '')}
+                    title={c.name + (c.surcharge > 0 ? ` (+${c.surcharge.toLocaleString('cs-CZ')} Kč)` : '')}
                     style={c.hex ? `--swatch-color: ${c.hex}` : ''}
                   >
                     <span
                       class="swatch-dot"
                       style={c.swatch
-                        ? `background-image: url('${directusAsset(c.swatch, { width: 60, format: 'jpg', quality: 80 })}'); background-size: cover; background-position: center;`
+                        ? `background-image: url('${directusAsset(c.swatch, { width: 120, format: 'jpg', quality: 85 })}'); background-size: cover; background-position: center;`
                         : ''
                       }
                     ></span>
-                    <span class="swatch-name">{c.name}{c.surcharge > 0 ? ` (+${c.surcharge.toLocaleString('cs-CZ')} Kč)` : ''}</span>
                   </button>
                 ))}
               </div>
