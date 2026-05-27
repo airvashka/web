@@ -3936,6 +3936,42 @@ a.promo-image-link:hover {
   color: var(--text-dim);
 }
 
+/* Doplňková výbava list — položky z trim_levels.optional_items */
+.optional-items-list {
+  list-style: none;
+  padding: 0; margin: 0;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 6px;
+  max-width: 900px;
+}
+@media (min-width: 720px) {
+  .optional-items-list { grid-template-columns: 1fr 1fr; gap: 6px 32px; }
+}
+.optional-item {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  padding: 10px 0;
+  border-bottom: 1px solid #e6e6ea;
+  font-size: 14px;
+  line-height: 1.4;
+}
+.optional-item-name { flex: 1; color: var(--text); }
+.optional-item-code {
+  font-family: monospace;
+  font-size: 11px;
+  color: var(--text-dim);
+  background: #f0f0f3;
+  padding: 1px 6px;
+  border-radius: 4px;
+}
+.optional-item-price {
+  font-weight: 600;
+  color: var(--accent);
+  white-space: nowrap;
+}
+
 /* Fuel icon — overlay bottom-right na fotce, barva odpovídá typu pohonu.
    Vizuálně doplňuje top stripe a chips — okamžitý vizuální signál co je za pohon. */
 .scard .pic .fuel-icon {
