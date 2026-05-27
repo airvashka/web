@@ -51,6 +51,57 @@ const DEFAULT_COMBOS = [
   { transmission: 'automatic', drivetrain: 'fwd' },
 ];
 
+// Cenové delty se čtou DYNAMICKY z trim_levels.optional_items per-trim.
+// Heuristika match v findOptionalDelta() — name musí obsahovat klíčová slova
+// pro automat / 4WD. Pokud trim NEMÁ daný optional_item, znamená to že
+// kombinace je už zahrnutá v base (např. Torres aut FWD = jen base, automat
+// není volitelný — je standard) nebo daná kombinace neexistuje.
+
+const TRANSMISSION_KEYWORDS = {
+  automatic: /automat/i,            // "Automatická převodovka Aisin"
+  dct: /dct|dvojspojk/i,
+  cvt: /cvt|variator/i,
+};
+const DRIVETRAIN_KEYWORDS = {
+  '4wd': /4x4|4×4|pohon\s+vsech\s+kol|pohon\s+všech\s+kol|awd|4wd/i,
+  awd:   /awd|all.?wheel|pohon\s+vsech\s+kol|pohon\s+všech\s+kol/i,
+};
+
+function findOptionalDelta(optionalItems, predicate) {
+  if (!Array.isArray(optionalItems)) return 0;
+  const found = optionalItems.find((it) => predicate.test(String(it?.name || '')));
+  return found ? (Number(found.price) || 0) : 0;
+}
+
+function computePrice(basePrice, optionalItems, combo) {
+  let price = basePrice;
+  // Transmission delta
+  const tRe = TRANSMISSION_KEYWORDS[combo.transmission];
+  if (tRe) price += findOptionalDelta(optionalItems, tRe);
+  // Drivetrain delta
+  const dRe = DRIVETRAIN_KEYWORDS[combo.drivetrain];
+  if (dRe) price += findOptionalDelta(optionalItems, dRe);
+  return price;
+}
+
+// Detekce co je v base ceně trimu na základě list_price + optional_items.
+// Korando Style má list_price=549900 = manuál FWD (base). Optional_items obsahuje
+// "Automatická převodovka +43900" a "Pohon 4x4 +49900". Cokoli NENÍ v optional_items
+// se buď neprodává, nebo je v base. Praxe: pokud trim NEMÁ automat v opts → automat
+// VŮBEC NENÍ dostupný (vůz je jen manuál). Pokud nemá 4WD v opts → vůz je jen FWD.
+//
+// Výjimky: některé trimy (Torres, Rexton) jsou JEN automat. Tj. trim NEMÁ "Automat"
+// v opts, ale není manuál — je rovnou automat v base. Heuristika: pokud base trim
+// je dražší než nejnižší trim modelu a NEMÁ automat v opts → automat je v base.
+// Pro start ale použijeme jednoduchý: pokud opts má daný keyword, kombinace je
+// dostupná. Pokud nemá ALE matice (COMBOS) říká že existuje, věříme matici.
+function combosAvailableForTrim(trimDefaultCombos, optionalItems) {
+  // Default: vrátí všechny matice kombinace. Pokročilejší filtrace by
+  // mohla zrušit kombinace co nejsou v optional_items, ale to by
+  // nesprávně zrušilo trimy kde je automat/4WD v base.
+  return trimDefaultCombos;
+}
+
 const COMBOS_BY_MODEL_TRIM = {
   // KGM Korando — Olfinem prozkoumáno
   'korando': {
@@ -167,7 +218,7 @@ async function main() {
   const trimsFilter = {
     'filter[list_price][_gt]': '0',
     'filter[status][_eq]': 'published',
-    'fields': 'id,name,list_price,model_year.id,model_year.year,model_year.model.id,model_year.model.name,model_year.model.slug,model_year.model.brand.id,model_year.model.brand.name,model_year.model.brand.slug',
+    'fields': 'id,name,list_price,optional_items,model_year.id,model_year.year,model_year.model.id,model_year.model.name,model_year.model.slug,model_year.model.brand.id,model_year.model.brand.name,model_year.model.brand.slug',
     'limit': '500',
   };
   if (ALLOWED_BRANDS.length === 1) {
@@ -216,6 +267,7 @@ async function main() {
     const combos = modelCombos[trimSlugKey] ?? modelCombos['*'] ?? DEFAULT_COMBOS;
     for (const c of combos) {
       const externalId = safeSlug(`${brandSlug}-${modelSlug}-${trimSlugKey}-${comboShort(c)}`);
+      const finalPrice = computePrice(t.list_price, t.optional_items, c);
       plans.push({
         externalId,
         brandSlug,
@@ -225,7 +277,8 @@ async function main() {
         modelId: t.model.id,
         modelYearId: t.modelYearId,
         brandId: t.model.brand.id,
-        listPrice: t.list_price,
+        listPrice: finalPrice,         // už po přičtení delt
+        baseTrimPrice: t.list_price,   // pro debug
         transmission: c.transmission,
         drivetrain: c.drivetrain,
       });
