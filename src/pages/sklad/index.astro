@@ -431,6 +431,7 @@ const fmtKm = (n?: number | null) => (n === 0 || !n ? '0 km' : `${n.toLocaleStr
     });
 
     // URL query params — ?znacka=kgm&model=torres&palivo=elektro&stav=novy&pohon=4wd&razeni=price-asc
+    // Dostupnost je multi-value: ?dostupnost=on_order (přepne default filter)
     const params = new URLSearchParams(window.location.search);
     const URL_MAP = [
       { qs: ['znacka', 'brand'], key: 'brand', radio: 'brand' },
@@ -439,6 +440,19 @@ const fmtKm = (n?: number | null) => (n === 0 || !n ? '0 km' : `${n.toLocaleStr
       { qs: ['pohon', 'drivetrain'], key: 'drivetrain', radio: 'drivetrain' },
     ];
     let hasAnyParam = false;
+    // Availability via ?dostupnost=on_order nebo CSV (?dostupnost=on_order,on_the_way)
+    const availParam = params.get('dostupnost') ?? params.get('availability');
+    if (availParam) {
+      const wanted = availParam.split(',').map((s) => s.trim()).filter(Boolean);
+      // Reset default checkboxy a aplikuj jen ty z URL
+      availabilitySet.clear();
+      document.querySelectorAll('[data-avail-cb]').forEach((cb) => {
+        const on = wanted.includes(cb.value);
+        cb.checked = on;
+        if (on) availabilitySet.add(cb.value);
+      });
+      hasAnyParam = true;
+    }
     URL_MAP.forEach(({ qs, key, radio: rname }) => {
       const v = qs.map((q) => params.get(q)).find(Boolean);
       if (!v) return;
