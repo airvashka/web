@@ -112,7 +112,7 @@ const fmtKm = (n?: number | null) => (n === 0 || !n ? '0 km' : `${n.toLocaleStr
       {vehicles.length === 0 ? (
         <div class="sklad-empty">
           <p>Žádné vozy v adminu zatím nejsou. Napište nám, najdeme tu pravou.</p>
-          <a href="/kontakt" class="btn btn-primary" style="margin-top: 16px;">Napište nám</a>
+          <a href="/kontakt?form=stock_inquiry" class="btn btn-primary" style="margin-top: 16px;">Napište nám</a>
         </div>
       ) : (
         <div class="sklad-layout">

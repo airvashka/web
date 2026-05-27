@@ -506,7 +506,7 @@ function trimPrice(t: TrimLevel): string {
         </div>
         <div style="display: flex; gap: 10px;">
           <a class="btn btn-outline" href={`/sklad?model=${rawModel.slug}`}>Vozy skladem</a>
-          <a class="btn btn-primary" href="/kontakt">Mám zájem</a>
+          <a class="btn btn-primary" href={`/kontakt?form=model_inquiry&model=${rawModel.slug}${brand?.slug ? `&brand=${brand.slug}` : ''}`}>Mám zájem</a>
         </div>
       </div>
     </div>

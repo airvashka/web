@@ -98,7 +98,7 @@ const headline = promoLabel || (promoDiscountAmount > 0 ? `Sleva ${promoDiscount
       <div class="akce-cta-row">
         <a class="btn btn-outline" href={`/model/${rawModel.slug}`}>← Zpět na {rawModel.name}</a>
         <a class="btn btn-primary" href={`/sklad?model=${rawModel.slug}`}>Vybrat z akčních vozů →</a>
-        <a class="btn btn-outline" href={`/kontakt?form=model_inquiry&model=${rawModel.slug}&brand=${brand.slug}`}>Mám zájem o akci</a>
+        <a class="btn btn-outline" href={`/kontakt?form=akce&model=${rawModel.slug}&brand=${brand.slug}`}>Mám zájem o akci</a>
       </div>
     </div>
   </section>

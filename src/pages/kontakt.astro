@@ -208,21 +208,56 @@ const mapEmbedUrl = 'https://maps.google.com/maps?q=%C4%8Eablicka+553%2F2%2C+182
       if (brand) form.dataset.brandSlug = brand;
       if (vehicle) form.dataset.vehicleVin = vehicle;
 
-      // Update form title + subject prefill (UX hint)
+      // Update form title + subject + message prefill (UX hint).
+      // Texty pre-fill přesně reflektují textaci CTA tlačítka, ze kterého uživatel přišel
+      // — když klikl "Testovací jízda", titulek/zpráva mluví o testovací jízdě. Atd.
       const titleEl = form.querySelector('h3');
       const subjectInput = form.querySelector('input[name="subject"]');
       const messageTextarea = form.querySelector('textarea[name="message"]');
-      if (formType === 'test_drive' && model) {
-        if (titleEl) titleEl.textContent = `Testovací jízda — ${model.toUpperCase()}`;
-        if (subjectInput instanceof HTMLInputElement) subjectInput.value = `Žádost o testovací jízdu (${model})`;
-      } else if (formType === 'model_inquiry' && model) {
-        if (titleEl) titleEl.textContent = `Poptávka — ${model.toUpperCase()}`;
-        if (subjectInput instanceof HTMLInputElement) subjectInput.value = `Poptávka modelu ${model}`;
-      } else if (formType === 'akce' && model) {
-        if (titleEl) titleEl.textContent = `Poptávka — akce ${model.toUpperCase()}`;
-        if (subjectInput instanceof HTMLInputElement) subjectInput.value = `Poptávka — akce ${model}`;
+      const modelUC = model ? model.toUpperCase() : '';
+      const PRESETS = {
+        test_drive: {
+          title: model ? `Testovací jízda — ${modelUC}` : 'Žádost o testovací jízdu',
+          subject: model ? `Žádost o testovací jízdu (${model})` : 'Žádost o testovací jízdu',
+          message: model
+            ? `Rád/a bych si vyzkoušel/a vůz ${model} na testovací jízdě. Prosím o kontakt pro domluvení termínu.`
+            : 'Rád/a bych si vyzkoušel/a některý z vašich vozů na testovací jízdě. Prosím o kontakt.',
+        },
+        model_inquiry: {
+          title: model ? `Poptávka vozu — ${modelUC}` : 'Poptávka vozu',
+          subject: model ? `Poptávka vozu ${model}` : 'Poptávka vozu',
+          message: model
+            ? `Mám zájem o model ${model}. Prosím o zaslání aktuální nabídky a bližších informací.`
+            : 'Mám zájem o váš vůz. Prosím o zaslání aktuální nabídky.',
+        },
+        akce: {
+          title: model ? `Poptávka — akce ${modelUC}` : 'Poptávka — aktuální akce',
+          subject: model ? `Poptávka — akce ${model}` : 'Poptávka — aktuální akce',
+          message: model
+            ? `Mám zájem o aktuální akci na vůz ${model}. Prosím o zaslání bližších informací o akčních podmínkách.`
+            : 'Mám zájem o vaše aktuální akce. Prosím o zaslání bližších informací.',
+        },
+        stock_inquiry: {
+          title: vehicle ? `Poptávka vozu (VIN ${vehicle})` : 'Poptávka skladového vozu',
+          subject: vehicle ? `Poptávka skladového vozu (VIN ${vehicle})` : 'Poptávka skladového vozu',
+          message: vehicle
+            ? `Mám zájem o konkrétní vůz s VIN ${vehicle}. Prosím o bližší informace a dostupnost.`
+            : 'Hledám konkrétní vůz ve vašem skladu. Prosím o kontakt s aktuální nabídkou.',
+        },
+        service: {
+          title: 'Objednávka servisu',
+          subject: 'Objednávka servisu',
+          message: 'Chtěl/a bych objednat servis. Prosím o kontakt pro domluvení termínu.',
+        },
+      };
+      const preset = PRESETS[formType];
+      if (preset) {
+        if (titleEl) titleEl.textContent = preset.title;
+        if (subjectInput instanceof HTMLInputElement && !subjectInput.value) {
+          subjectInput.value = preset.subject;
+        }
         if (messageTextarea instanceof HTMLTextAreaElement && !messageTextarea.value) {
-          messageTextarea.value = `Mám zájem o aktuální akci na vůz ${model}. Prosím o zaslání bližších informací.`;
+          messageTextarea.value = preset.message;
         }
       }
 
