@@ -27,7 +27,10 @@ import process from 'node:process';
 const DIRECTUS_URL = process.env.DIRECTUS_URL || 'http://directus:8055';
 const TOKEN = process.env.DIRECTUS_TOKEN || '';
 const APPLY = process.argv.includes('--apply');
-const BRAND_FILTER = (process.argv.find((a) => a.startsWith('--brand='))?.split('=')[1] || '').toLowerCase();
+// Default allowlist: KGM. Lze přepsat --brands=kgm,omoda-jaecoo (CSV).
+// Farizon = užitkový segment, prodávaný individuálně přes B2B vztah, ne generovat.
+const BRANDS_ARG = (process.argv.find((a) => a.startsWith('--brands=') || a.startsWith('--brand='))?.split('=')[1] || '').toLowerCase();
+const ALLOWED_BRANDS = BRANDS_ARG ? BRANDS_ARG.split(',').map((s) => s.trim()).filter(Boolean) : ['kgm'];
 
 if (!TOKEN) {
   console.error('Chybi DIRECTUS_TOKEN v env. Vlozit do .env soubor STOCK_SYNC_DIRECTUS_TOKEN.');
@@ -129,6 +132,16 @@ function comboShort(c) {
   return `${t}-${d}`;
 }
 
+// Sanitize string pro external_id: a-z, 0-9, '-'. Lomítka v trim slugech (např. "l2h1/h2/h3")
+// nahradí pomlčkou, sjednotí víc pomlček na jednu.
+function safeSlug(s) {
+  return String(s || '')
+    .toLowerCase()
+    .replace(/[^a-z0-9-]/g, '-')
+    .replace(/-+/g, '-')
+    .replace(/^-+|-+$/g, '');
+}
+
 // ─── Directus API helpers ────────────────────────────────────────────────────
 async function api(method, path, body) {
   const opts = {
@@ -145,7 +158,7 @@ async function api(method, path, body) {
 async function main() {
   console.log(`[btoorder] Directus: ${DIRECTUS_URL}`);
   console.log(`[btoorder] Mode: ${APPLY ? 'APPLY' : 'DRY RUN'}`);
-  if (BRAND_FILTER) console.log(`[btoorder] Brand filter: ${BRAND_FILTER}`);
+  console.log(`[btoorder] Allowed brands: ${ALLOWED_BRANDS.join(', ')}`);
 
   // 1) Načti trim_levels (kde list_price > 0 a status=published) + relace.
   // Pozor: trim_levels NEMÁ přímý FK na model. Model je dostupný přes model_year:
@@ -156,33 +169,38 @@ async function main() {
     'fields': 'id,name,list_price,model_year.id,model_year.year,model_year.model.id,model_year.model.name,model_year.model.slug,model_year.model.brand.id,model_year.model.brand.name,model_year.model.brand.slug',
     'limit': '500',
   };
-  if (BRAND_FILTER) {
-    trimsFilter['filter[model_year][model][brand][slug][_eq]'] = BRAND_FILTER;
+  if (ALLOWED_BRANDS.length === 1) {
+    trimsFilter['filter[model_year][model][brand][slug][_eq]'] = ALLOWED_BRANDS[0];
   }
+  // Pokud víc značek, filtrujeme v paměti níže (Directus _in syntax přes URL je trochu jiný)
   const trimsQuery = new URLSearchParams(trimsFilter).toString();
   const trimsResp = await api('GET', `/items/trim_levels?${trimsQuery}`);
   let trims = trimsResp.data ?? [];
   // Vyfiltruj chybějící relace (orphaned trim_levels). Normalizuj: t.model_year.model → t.model pro pohodlí.
   trims = trims
     .filter((t) => t.model_year && t.model_year.model && t.model_year.model.brand)
+    .filter((t) => ALLOWED_BRANDS.includes(t.model_year.model.brand.slug))
     .map((t) => ({
       ...t,
       model: t.model_year.model,
       year: t.model_year.year,
       modelYearId: t.model_year.id,
     }));
-  console.log(`[btoorder] Načteno ${trims.length} trim_levels (raw, všechny ročníky)`);
+  console.log(`[btoorder] Načteno ${trims.length} trim_levels (po filtru brand: ${ALLOWED_BRANDS.join(',')})`);
 
-  // Filtruj jen nejnovější model_year per model — staré ročníky nemá smysl generovat
-  // jako "na objednání", už se neprodávají.
-  const latestYearByModel = new Map();
+  // Filtruj jen NEJNOVĚJŠÍ model_year per model. Staré ročníky nemá smysl generovat.
+  // Pokud má model víc model_years se stejným rokem (např. facelift 2026.1 + 2026.2),
+  // vybereme jen ten s nejvyšším model_year_id (deterministicky později added).
+  const latestByModel = new Map();   // model.id → { year, modelYearId }
   for (const t of trims) {
     const mId = t.model.id;
-    const cur = latestYearByModel.get(mId) ?? 0;
-    if (t.year > cur) latestYearByModel.set(mId, t.year);
+    const cur = latestByModel.get(mId);
+    if (!cur || t.year > cur.year || (t.year === cur.year && t.modelYearId > cur.modelYearId)) {
+      latestByModel.set(mId, { year: t.year, modelYearId: t.modelYearId });
+    }
   }
-  trims = trims.filter((t) => t.year === latestYearByModel.get(t.model.id));
-  console.log(`[btoorder] Po filtru latest-year-per-model: ${trims.length} trim_levels`);
+  trims = trims.filter((t) => t.modelYearId === latestByModel.get(t.model.id).modelYearId);
+  console.log(`[btoorder] Po filtru latest-model_year-per-model: ${trims.length} trim_levels`);
 
   // 2) Pro každý trim spočítej kombinace
   // Plan = { externalId, brandSlug, modelSlug, trimName, trimId, modelId, brandId, listPrice, transmission, drivetrain }
@@ -194,7 +212,7 @@ async function main() {
     const modelCombos = COMBOS_BY_MODEL_TRIM[modelSlug] ?? {};
     const combos = modelCombos[trimSlugKey] ?? modelCombos['*'] ?? DEFAULT_COMBOS;
     for (const c of combos) {
-      const externalId = `${brandSlug}-${modelSlug}-${trimSlugKey}-${comboShort(c)}`;
+      const externalId = safeSlug(`${brandSlug}-${modelSlug}-${trimSlugKey}-${comboShort(c)}`);
       plans.push({
         externalId,
         brandSlug,
