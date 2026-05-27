@@ -24,6 +24,30 @@ import express from 'express';
 const app = express();
 app.use(express.json({ limit: '50kb' }));
 
+// CORS — frontend volá z https://www.sfr-motor.cz, browser dělá preflight.
+// Bez správných hlaviček browser zablokuje response (i když Express ji vrátí).
+app.use((req, res, next) => {
+  const origin = req.headers.origin || '';
+  const corsAllowed = [
+    'https://sfr-motor.cz',
+    'https://www.sfr-motor.cz',
+    'https://beta.sfr-motor.cz',
+    'http://localhost:4321', // Astro dev server
+    'http://127.0.0.1:4321',
+  ];
+  // Vercel preview deployments — *.vercel.app
+  if (corsAllowed.includes(origin) || /^https:\/\/[\w-]+\.vercel\.app$/.test(origin)) {
+    res.setHeader('Access-Control-Allow-Origin', origin);
+    res.setHeader('Access-Control-Allow-Methods', 'POST, GET, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+    res.setHeader('Access-Control-Max-Age', '86400'); // cache preflight 24h
+  }
+  if (req.method === 'OPTIONS') {
+    return res.status(204).end();
+  }
+  next();
+});
+
 const PORT = Number(process.env.PORT) || 3001;
 const AUTH_URL = process.env.UNICREDIT_AUTH_URL
   || 'https://kalkulator-prep.unicreditleasing.sk/keycloak/realms/uclkalk/protocol/openid-connect/token';

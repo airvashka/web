@@ -32,9 +32,14 @@ const {
 
 const DOWNPAY_OPTIONS = [10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70];
 const MONTHS_OPTIONS = [12, 24, 36, 48, 60, 72, 84];
+
+// UCL kalkulačka — endpoint URL (produkce: VPS proxy https://api.sfr-motor.cz/leasing).
+// Předáno přes data-attribute → JS to vytáhne v `is:inline` scriptu (define:vars
+// nefunguje s is:inline). Fallback `/api/leasing` zachovává dev kompatibilitu.
+const UCL_PROXY_URL = import.meta.env.PUBLIC_UCL_PROXY_URL ?? '/api/leasing';
 ---
 
-<section class="leasing-calc" data-leasing-calc data-asset-price={assetPrice} data-is-used={isUsed ? '1' : '0'} data-group={groupCode}>
+<section class="leasing-calc" data-leasing-calc data-asset-price={assetPrice} data-is-used={isUsed ? '1' : '0'} data-group={groupCode} data-ucl-proxy={UCL_PROXY_URL}>
   <div class="lc-eyebrow">Financování od UniCredit Leasing</div>
 
   <div class="lc-result">
@@ -72,6 +77,7 @@ const MONTHS_OPTIONS = [12, 24, 36, 48, 60, 72, 84];
     const assetPrice = Number(wrap.dataset.assetPrice || 0);
     const isUsed = wrap.dataset.isUsed === '1';
     const groupCode = wrap.dataset.group || 'OA';
+    const UCL_PROXY_URL = wrap.dataset.uclProxy || '/api/leasing';
     const dp = wrap.querySelector('[data-lc-downpayment]');
     const mo = wrap.querySelector('[data-lc-months]');
     const amt = wrap.querySelector('[data-lc-amount]');
@@ -85,7 +91,7 @@ const MONTHS_OPTIONS = [12, 24, 36, 48, 60, 72, 84];
       amt.textContent = '…';
       meta.textContent = 'počítám…';
       try {
-        const r = await fetch('/api/leasing/calculate', {
+        const r = await fetch(`${UCL_PROXY_URL}/calculate`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({

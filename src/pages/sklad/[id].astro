@@ -794,7 +794,7 @@ const salesPhoneLink = telLink(salesPhone);
 
     <!-- ===== FINANCE (dark) — JEN KGM (lokální orientační kalkulačka) ===== -->
     {brand.slug === 'kgm' && (
-    <section class="section finance" id="finance" data-vehicle-brand={brand.name} data-vehicle-model={model?.name ?? title}>
+    <section class="section finance" id="finance" data-vehicle-brand={brand.name} data-vehicle-model={model?.name ?? title} data-vehicle-price={finalPrice ?? 0} data-directus-url={import.meta.env.PUBLIC_DIRECTUS_URL ?? ''} data-ucl-proxy={import.meta.env.PUBLIC_UCL_PROXY_URL ?? '/api/leasing'}>
       <div class="container">
         <div class="section-eyebrow">Financování</div>
         <h2 class="section-title">Spočítáme za 30 vteřin</h2>
@@ -1095,14 +1095,19 @@ const salesPhoneLink = telLink(salesPhone);
     </div>
   )}
 
-  <script define:vars={{ vehiclePrice: finalPrice ?? 0, DIRECTUS_URL: import.meta.env.PUBLIC_DIRECTUS_URL ?? '' }}>
+  <script is:inline>
     // ===== Finance kalkulačka — UCL Leasing API (reálný výpočet) =====
-    // Volá /api/leasing/calculate (backend proxy s UCL credentials).
-    // UCL si určí úrokovou sazbu sám podle své matrix (rateType=STANDARD).
+    // Volá `${UCL_PROXY_URL}/calculate` — produkce: https://api.sfr-motor.cz/leasing
+    // (VPS s fixní IP, kterou UCL whitelistne). Fallback `/api/leasing` zachovává
+    // dev kompatibilitu. Hodnoty se předávají přes data-atributy na #finance sekci
+    // (is:inline scripty nelze parametrizovat přes define:vars, viz feedback memo).
 
     const financeSection = document.querySelector('#finance');
     const vehicleBrand = financeSection ? financeSection.dataset.vehicleBrand || 'KGM' : 'KGM';
     const vehicleModel = financeSection ? financeSection.dataset.vehicleModel || '' : '';
+    const vehiclePrice = Number(financeSection?.dataset.vehiclePrice || 0);
+    const DIRECTUS_URL = financeSection?.dataset.directusUrl || '';
+    const UCL_PROXY_URL = financeSection?.dataset.uclProxy || '/api/leasing';
 
     const dpPctEl = document.querySelector('[data-dp-percent]');
     const dpPctSubEl = document.querySelector('[data-dp-percent-sub]');
@@ -1137,7 +1142,7 @@ const salesPhoneLink = telLink(salesPhone);
       if (totalEl) totalEl.textContent = '…';
 
       try {
-        const r = await fetch('/api/leasing/calculate', {
+        const r = await fetch(`${UCL_PROXY_URL}/calculate`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
