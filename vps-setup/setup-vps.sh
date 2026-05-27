@@ -58,11 +58,14 @@ ufw --force enable
 log "4/10 — App user '$APP_USER'"
 if ! id -u "$APP_USER" >/dev/null 2>&1; then
   useradd -m -s /bin/bash "$APP_USER"
-  usermod -aG docker "$APP_USER"
-  log "   uživatel '$APP_USER' vytvořen + přidán do docker group"
+  log "   uživatel '$APP_USER' vytvořen"
 else
-  log "   uživatel '$APP_USER' už existuje (skip)"
+  log "   uživatel '$APP_USER' už existuje"
 fi
+# Docker group musí proběhnout VŽDY (i u pre-existing usera z Ubuntu installeru).
+# Bez tohohle GitHub Actions deploy nefunguje (docker bez sudo nejede).
+usermod -aG docker "$APP_USER"
+log "   '$APP_USER' přidán do docker group (vyžaduje relog ať se group aktivuje)"
 
 log "5/10 — /data struktura (persistentní storage pro Docker volumes)"
 mkdir -p \
