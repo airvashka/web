@@ -86,10 +86,10 @@ const vehiclePackages: any[] = Array.isArray((v as any).option_packages)
       .filter(Boolean)
   : [];
 
-// Všech 6 navazujících queries paralelně přes Promise.all.
+// Všech 7 navazujících queries paralelně přes Promise.all.
 // Sériově by trvaly 6×1s = 6s. Paralelně ~1s (max ze 6).
 // Celkový page load: 1× vehicle + 1× parallel batch = 2 round-tripy.
-const [brands, models, trims, modelYears, siteSettingsResult, similarResult] = await Promise.all([
+const [brands, models, trims, modelYears, siteSettingsResult, similarResult, modelColorsResult] = await Promise.all([
   v.brand
     ? directusGet<Brand>('brands', { filter: { id: { _eq: Number(v.brand) } }, limit: 1 })
     : Promise.resolve([]),
@@ -132,12 +132,44 @@ const [brands, models, trims, modelYears, siteSettingsResult, similarResult] = a
         ],
       })
     : Promise.resolve([]),
+  // Barvy modelu (pro on_order color picker). Načítáme vždy — frontend rozhodne.
+  v.model
+    ? directusGet<any>('model_color_exterior', {
+        filter: { model: { _eq: Number(v.model) } },
+        sort: ['sort'],
+        fields: ['id', 'name', 'hex', 'code', 'photo', 'swatch', 'price_type', 'pricing_per_trim'],
+        limit: 50,
+      }).catch(() => [] as any[])
+    : Promise.resolve([]),
 ]);
 
 const brand = brands[0];
 const model = models[0];
 const trim = trims[0];
 const modelYear = modelYears[0];
+
+// Build-to-order color options (jen pro on_order vozy).
+// model_color_exterior má pro každou barvu photo (UUID) + pricing_per_trim s appriplátky per trim.
+const isOnOrder = v.availability === 'on_order';
+const trimSlugForColor = trim?.slug ?? (trim?.name ?? '').toLowerCase().replace(/\s+/g, '-').replace(/\+/g, '-plus');
+const colorOptions = isOnOrder && Array.isArray(modelColorsResult)
+  ? modelColorsResult
+      .filter((c: any) => c && c.photo && c.name)
+      .map((c: any) => {
+        const trimPricing = Array.isArray(c.pricing_per_trim)
+          ? c.pricing_per_trim.find((p: any) => p?.trim_slug === trimSlugForColor)
+          : null;
+        return {
+          id: c.id,
+          name: c.name,
+          hex: c.hex || '#888',
+          photo: c.photo,
+          swatch: c.swatch || c.photo,
+          surcharge: Number(trimPricing?.price ?? 0) || 0,
+          isBase: !trimPricing || Number(trimPricing.price) === 0,
+        };
+      })
+  : [];
 
 // Fotky M2M junction
 const photoIds: string[] = Array.isArray(v.photos)
@@ -428,10 +460,43 @@ const salesPhoneLink = telLink(salesPhone);
             )}
             {heroPhoto ? (
               <DirectusImage src={heroPhoto} alt={title} aspectRatio="auto" widths={[800, 1600]} loading="eager" fetchpriority="high" />
+            ) : isOnOrder && colorOptions.length > 0 ? (
+              <img
+                data-hero-color-img
+                src={directusAsset(colorOptions[0].photo, { width: 1600, format: 'jpg', quality: 85 })}
+                data-default-photo={colorOptions[0].photo}
+                alt={title}
+                style="width:100%;height:auto;object-fit:contain;background:#f3f3f5"
+              />
             ) : (
               <div style="padding: 40px; text-align: center; color: var(--text-dim);">Foto bude doplněno</div>
             )}
           </button>
+
+          {/* Color picker — jen pro on_order vozy s dostupnými barvami z model_color_exterior */}
+          {isOnOrder && colorOptions.length > 0 && (
+            <div class="color-picker" data-color-picker>
+              <div class="color-picker-title">Zvolte barvu vozu</div>
+              <div class="color-swatches">
+                {colorOptions.map((c, idx) => (
+                  <button
+                    type="button"
+                    class={`color-swatch ${idx === 0 ? 'is-active' : ''}`}
+                    data-color-id={c.id}
+                    data-color-photo={c.photo}
+                    data-color-name={c.name}
+                    data-color-surcharge={c.surcharge}
+                    aria-label={c.name}
+                    style={`--swatch-color: ${c.hex || '#888'}`}
+                  >
+                    <span class="swatch-dot"></span>
+                    <span class="swatch-name">{c.name}{c.surcharge > 0 ? ` (+${c.surcharge.toLocaleString('cs-CZ')} Kč)` : ''}</span>
+                  </button>
+                ))}
+              </div>
+              <p class="color-picker-note">Vybraná barva bude součástí poptávky.</p>
+            </div>
+          )}
           {(thumbIds.length > 0 || extraPhotos > 0) && (
             <div class="thumbs">
               {thumbIds.map((id, i) => (
@@ -1129,6 +1194,35 @@ const salesPhoneLink = telLink(salesPhone);
     const vehiclePrice = Number(financeSection?.dataset.vehiclePrice || 0);
     const DIRECTUS_URL = financeSection?.dataset.directusUrl || '';
     const UCL_PROXY_URL = financeSection?.dataset.uclProxy || '/api/leasing';
+
+    // ===== Build-to-order color picker — swap hero foto podle vybrané barvy =====
+    (function initColorPicker() {
+      const picker = document.querySelector('[data-color-picker]');
+      const heroImg = document.querySelector('[data-hero-color-img]');
+      if (!picker || !heroImg) return;
+      const swatches = picker.querySelectorAll('.color-swatch');
+      swatches.forEach((sw) => {
+        sw.addEventListener('click', () => {
+          const photoId = sw.dataset.colorPhoto;
+          const colorName = sw.dataset.colorName || '';
+          if (!photoId || !DIRECTUS_URL) return;
+          // Sestavujem URL stejnou strukturou jako directusAsset() v frontmatter
+          heroImg.src = `${DIRECTUS_URL}/assets/${photoId}?width=1600&format=jpg&quality=85`;
+          heroImg.alt = colorName;
+          // Toggle aktivní swatch
+          swatches.forEach((s) => s.classList.remove('is-active'));
+          sw.classList.add('is-active');
+          // Persistuj výběr přes URL hash aby zůstal po sdílení (volitelné)
+          try { window.history.replaceState(null, '', `#color=${sw.dataset.colorId}`); } catch {}
+        });
+      });
+      // Pre-select podle URL hash (např. /sklad/xyz#color=132)
+      const colorIdFromHash = (location.hash.match(/color=(\d+)/) || [])[1];
+      if (colorIdFromHash) {
+        const target = picker.querySelector(`.color-swatch[data-color-id="${colorIdFromHash}"]`);
+        if (target) target.click();
+      }
+    })();
 
     const dpPctEl = document.querySelector('[data-dp-percent]');
     const dpPctSubEl = document.querySelector('[data-dp-percent-sub]');

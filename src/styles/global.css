@@ -3880,6 +3880,62 @@ a.promo-image-link:hover {
 .scard .pill--used { background: #8A6E50; color: #fff; }     /* warm hnědá — Ojeté */
 .scard .pill--on-order { background: #5B5560; color: #fff; } /* tmavě šedá — Na objednání */
 
+/* ────────────────────────────────────────────────────────────────────────
+   Color picker pro build-to-order vozy (/sklad/[id] kde availability='on_order')
+   Swatch klik změní hero foto. Hex barvy z model_color_exterior.hex.
+   ──────────────────────────────────────────────────────────────────────── */
+.color-picker {
+  margin-top: 12px;
+  padding: 14px 16px;
+  background: #f7f7f8;
+  border: 1px solid #e6e6ea;
+  border-radius: 10px;
+}
+.color-picker-title {
+  font-size: 13px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  color: var(--text-dim);
+  margin-bottom: 10px;
+}
+.color-swatches {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.color-swatch {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px 6px 6px;
+  background: #fff;
+  border: 1.5px solid #e0e0e4;
+  border-radius: 999px;
+  cursor: pointer;
+  font-size: 13px;
+  color: var(--text);
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+.color-swatch:hover { border-color: var(--accent); }
+.color-swatch.is-active {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px rgba(231, 121, 41, 0.15);
+}
+.color-swatch .swatch-dot {
+  width: 20px; height: 20px;
+  border-radius: 50%;
+  background: var(--swatch-color, #888);
+  border: 1.5px solid rgba(0,0,0,0.12);
+  flex: 0 0 auto;
+}
+.color-swatch .swatch-name { white-space: nowrap; }
+.color-picker-note {
+  margin: 10px 0 0;
+  font-size: 12px;
+  color: var(--text-dim);
+}
+
 /* Fuel icon — overlay bottom-right na fotce, barva odpovídá typu pohonu.
    Vizuálně doplňuje top stripe a chips — okamžitý vizuální signál co je za pohon. */
 .scard .pic .fuel-icon {
