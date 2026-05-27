@@ -64,12 +64,28 @@ async function api(method, path, body) {
 }
 
 // ─── UCL volání ──────────────────────────────────────────────────────────────
+// Vypočítá finalPrice se stejnou prioritou jako frontend /sklad/[id].astro:
+//   1) stock.promo_price        (specifická akce na vozu)
+//   2) stock.list_price - model.promo_discount_amount  (modelová akce)
+//   3) stock.list_price         (běžná cena)
+function computeFinalPrice(v) {
+  const list = v.list_price ?? null;
+  const stockPromo = v.promo_price ?? null;
+  const modelDiscount = v.model?.promo_discount_amount ?? null;
+
+  if (stockPromo && stockPromo > 0) return stockPromo;
+  if (list && modelDiscount && modelDiscount > 0 && list - modelDiscount > 0) {
+    return list - modelDiscount;
+  }
+  return list;
+}
+
 async function fetchTeaserMonthly(vehicle) {
   // UCL VYŽADUJE brand + model (i když docs říká není required — vrací 500 jinak).
   // Viz feedback v /api/leasing/test.ts variant `client`.
   const brand = vehicle._brand_name || 'KGM';
-  const model = vehicle._model_name || vehicle.title || 'Korando';
-  const assetPrice = Math.round(Number(vehicle.price) || 0);
+  const model = vehicle._model_name || 'Korando';
+  const assetPrice = Math.round(Number(vehicle._final_price) || 0);
   if (assetPrice < 50_000) return null;     // UCL min 50k
 
   const payload = {
@@ -106,10 +122,11 @@ async function main() {
   console.log(`[teaser] Directus: ${DIRECTUS_URL}`);
   console.log(`[teaser] UCL proxy: ${UCL_PROXY_URL}`);
 
-  // Načti všechny KGM stock_vehicles (published + na cestě, pro každý počítáme).
-  // Field stock_vehicles.brand je M2O na brands tabulku — fetch s deep.
+  // Načti všechny KGM stock_vehicles. Pole price/title v collection NEEXISTUJE,
+  // používáme list_price + promo_price + model.promo_discount_amount.
+  // Pole stock_vehicles.brand je M2O na brands, .model je M2O na models — fetch s deep.
   const q = new URLSearchParams({
-    'fields': 'id,price,condition,title,brand.slug,brand.name,model.name,monthly_payment_from',
+    'fields': 'id,vin,list_price,promo_price,condition,brand.slug,brand.name,model.name,model.promo_discount_amount,monthly_payment_from',
     'filter[status][_in]': 'published,reserved',
     'filter[brand][slug][_eq]': KGM_BRAND_SLUG,
     'limit': '1000',
@@ -122,15 +139,23 @@ async function main() {
   for (const v of vehicles) {
     try {
       const brandName = v.brand?.name ?? 'KGM';
-      const modelName = v.model?.name ?? v.title ?? '';
+      const modelName = v.model?.name ?? '';
+      const finalPrice = computeFinalPrice(v);
+      const vehicleId = v.vin || v.id;
+      if (!finalPrice || finalPrice < 50_000) {
+        skip++;
+        console.log(`  [skip] #${vehicleId} ${brandName} ${modelName}: cena ${finalPrice ?? 'null'} pod UCL minimum`);
+        continue;
+      }
       const teaser = await fetchTeaserMonthly({
-        ...v,
         _brand_name: brandName,
         _model_name: modelName,
+        _final_price: finalPrice,
+        condition: v.condition,
       });
       if (teaser === null) {
         skip++;
-        console.log(`  [skip] #${v.id} — UCL vratil null (mozna pod min cenou)`);
+        console.log(`  [skip] #${vehicleId} — UCL vratil null`);
         continue;
       }
       // Update jen pokud se hodnota změnila (žádné zbytečné API calls)
@@ -140,10 +165,10 @@ async function main() {
       }
       await api('PATCH', `/items/stock_vehicles/${v.id}`, { monthly_payment_from: teaser });
       ok++;
-      console.log(`  [ok]   #${v.id} ${brandName} ${modelName}: ${teaser} Kč/měs`);
+      console.log(`  [ok]   #${vehicleId} ${brandName} ${modelName}: ${teaser} Kč/měs (z ${finalPrice} Kč)`);
     } catch (e) {
       fail++;
-      console.error(`  [fail] #${v.id}: ${e.message?.substring(0, 200)}`);
+      console.error(`  [fail] #${v.vin || v.id}: ${e.message?.substring(0, 200)}`);
     }
     // Drobné zpoždění aby UCL nedostala 60 calls/min flood
     await new Promise((r) => setTimeout(r, 100));
