@@ -1,0 +1,233 @@
+---
+/**
+ * UniCredit Leasing kalkulačka — UI komponenta.
+ *
+ * Použití (jen KGM vozy, na /sklad/[id]):
+ *   <LeasingCalculator assetPrice={price} isUsed={v.condition !== 'new'} />
+ *
+ * Komponenta:
+ *   - 2 selecty: akontace 10–70 % (krok 5), délka 12–84 měs (krok 12)
+ *   - Real-time call na /api/leasing/calculate při změně
+ *   - Default 20 % / 60 měsíců
+ *   - Zobrazí: měsíční splátka + RPSN + celkem k zaplacení
+ */
+interface Props {
+  assetPrice: number;
+  isUsed?: boolean;
+  groupCode?: string;            // OA (default), MOT, UA, EA…
+  defaultDownPaymentPercent?: number;
+  defaultMonths?: number;
+}
+
+const {
+  assetPrice,
+  isUsed = false,
+  groupCode = 'OA',
+  defaultDownPaymentPercent = 0.20,
+  defaultMonths = 60,
+} = Astro.props;
+
+// PREPROD: akontace 10–70 % po 5 %, splátky 12–84 po 12
+const DOWNPAY_OPTIONS = [10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70];
+const MONTHS_OPTIONS = [12, 24, 36, 48, 60, 72, 84];
+---
+
+<section class="leasing-calc" data-leasing-calc data-asset-price={assetPrice} data-is-used={isUsed ? '1' : '0'} data-group={groupCode}>
+  <div class="lc-head">
+    <div class="lc-eyebrow">Spočítat splátku</div>
+    <div class="lc-title">Financování od UniCredit Leasing</div>
+  </div>
+
+  <div class="lc-inputs">
+    <label class="lc-field">
+      <span class="lc-label">Akontace</span>
+      <select data-lc-downpayment>
+        {DOWNPAY_OPTIONS.map((p) => (
+          <option value={(p / 100).toString()} selected={Math.abs(p / 100 - defaultDownPaymentPercent) < 0.001}>{p} %</option>
+        ))}
+      </select>
+    </label>
+    <label class="lc-field">
+      <span class="lc-label">Délka splácení</span>
+      <select data-lc-months>
+        {MONTHS_OPTIONS.map((m) => (
+          <option value={m} selected={m === defaultMonths}>{m} měsíců</option>
+        ))}
+      </select>
+    </label>
+  </div>
+
+  <div class="lc-result" data-lc-result>
+    <div class="lc-result-main">
+      <span class="lc-result-label">Měsíční splátka</span>
+      <span class="lc-result-amount" data-lc-amount>—</span>
+    </div>
+    <div class="lc-result-meta" data-lc-meta>Vyberte parametry pro výpočet</div>
+  </div>
+
+  <p class="lc-disclaimer">
+    Orientační výpočet podle aktuální úrokové matice. Konkrétní podmínky vám rádi spočítáme při kontaktu.
+    Financování poskytuje UniCredit Leasing CZ, a.s.
+  </p>
+</section>
+
+<script is:inline>
+  (() => {
+    const wrap = document.querySelector('[data-leasing-calc]');
+    if (!wrap) return;
+    const assetPrice = Number(wrap.dataset.assetPrice || 0);
+    const isUsed = wrap.dataset.isUsed === '1';
+    const groupCode = wrap.dataset.group || 'OA';
+    const dp = wrap.querySelector('[data-lc-downpayment]');
+    const mo = wrap.querySelector('[data-lc-months]');
+    const amt = wrap.querySelector('[data-lc-amount]');
+    const meta = wrap.querySelector('[data-lc-meta]');
+    if (!dp || !mo || !amt || !meta) return;
+
+    let lastCallId = 0;
+
+    async function recalc() {
+      const callId = ++lastCallId;
+      amt.textContent = '…';
+      meta.textContent = 'Počítám…';
+      try {
+        const r = await fetch('/api/leasing/calculate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            assetPrice,
+            downPaymentPercent: parseFloat(dp.value),
+            numberOfInstallments: parseInt(mo.value, 10),
+            isUsed,
+            groupCode,
+          }),
+        });
+        // Pokud mezitím proběhl novější request, výsledek tohohle ignoruj
+        if (callId !== lastCallId) return;
+        const j = await r.json();
+        if (!r.ok || j.error) throw new Error(j.error || ('HTTP ' + r.status));
+        amt.textContent = j.monthlyPayment.toLocaleString('cs-CZ') + ' Kč';
+        const parts = [];
+        if (j.apr) parts.push('RPSN ' + j.apr.toFixed(2).replace('.', ',') + ' %');
+        if (j.totalToPay) parts.push('celkem ' + j.totalToPay.toLocaleString('cs-CZ') + ' Kč');
+        meta.textContent = parts.join(' · ') || 'Výpočet úspěšný';
+      } catch (e) {
+        if (callId !== lastCallId) return;
+        amt.textContent = '—';
+        meta.textContent = 'Výpočet se nepodařil. Pro nabídku nás kontaktujte.';
+      }
+    }
+
+    dp.addEventListener('change', recalc);
+    mo.addEventListener('change', recalc);
+    // Initial calculation
+    recalc();
+  })();
+</script>
+
+<style>
+  .leasing-calc {
+    margin-top: 24px;
+    padding: 22px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    background: var(--bg-soft, #fafaf7);
+  }
+  .lc-head { margin-bottom: 16px; }
+  .lc-eyebrow {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 4px;
+  }
+  .lc-title {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 17px;
+    color: var(--ink);
+  }
+  .lc-inputs {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+  .lc-field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .lc-label {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--text-muted, #6b7280);
+  }
+  .leasing-calc select {
+    appearance: none;
+    -webkit-appearance: none;
+    background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath fill='none' stroke='%23666' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round' d='M1 1l4 4 4-4'/%3E%3C/svg%3E") no-repeat right 12px center;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 10px 32px 10px 12px;
+    font: inherit;
+    font-size: 14px;
+    color: var(--ink);
+    cursor: pointer;
+    transition: border-color .15s;
+  }
+  .leasing-calc select:focus { outline: none; border-color: var(--accent); }
+  .leasing-calc select:hover { border-color: var(--accent); }
+
+  .lc-result {
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 18px 20px;
+    margin-bottom: 14px;
+  }
+  .lc-result-main {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 4px;
+    flex-wrap: wrap;
+  }
+  .lc-result-label {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 13px;
+    color: var(--text-muted, #6b7280);
+  }
+  .lc-result-amount {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 28px;
+    letter-spacing: -0.01em;
+    color: var(--accent);
+    font-variant-numeric: tabular-nums;
+  }
+  .lc-result-meta {
+    font-size: 12.5px;
+    color: var(--text-muted, #6b7280);
+    line-height: 1.4;
+  }
+  .lc-disclaimer {
+    font-size: 11px;
+    color: var(--text-muted, #6b7280);
+    line-height: 1.5;
+    margin: 0;
+  }
+
+  @media (max-width: 520px) {
+    .leasing-calc { padding: 18px; }
+    .lc-inputs { grid-template-columns: 1fr; }
+    .lc-result-amount { font-size: 24px; }
+  }
+</style>

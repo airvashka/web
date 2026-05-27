@@ -5,6 +5,7 @@ import DirectusImage from '@components/DirectusImage.astro';
 import Breadcrumbs from '@components/Breadcrumbs.astro';
 import JsonLd from '@components/JsonLd.astro';
 import TurnstileWidget from '@components/TurnstileWidget.astro';
+import LeasingCalculator from '@components/LeasingCalculator.astro';
 import { directusGet, directusAsset } from '@lib/directus';
 import { FALLBACK_SALES_PHONE, telLink } from '@lib/contacts';
 import { getGroupedFeatures, CATEGORY_LABELS } from '@lib/features';
@@ -476,7 +477,7 @@ const salesPhoneLink = telLink(salesPhone);
               )}
             </div>
           )}
-          {monthlyPayment && (
+          {monthlyPayment && brand.slug === 'kgm' && (
             <div class="info-finance">
               Financování od <strong style="color: var(--text);">{monthlyPayment.toLocaleString('cs-CZ')} Kč / měsíc</strong> &nbsp;—&nbsp;
               <a href="#finance">kalkulačka →</a>
@@ -624,6 +625,18 @@ const salesPhoneLink = telLink(salesPhone);
               <a class="btn btn-outline" href={`tel:${salesPhoneLink}`} data-sales-phone>Zavolat <span data-sales-phone-text>{salesPhone}</span></a>
             </div>
           </div>
+
+          {brand.slug === 'kgm' && finalPrice && finalPrice >= 50000 && (
+            <div id="finance">
+              <LeasingCalculator
+                assetPrice={finalPrice}
+                isUsed={v.condition !== 'new'}
+                groupCode="OA"
+                defaultDownPaymentPercent={0.20}
+                defaultMonths={60}
+              />
+            </div>
+          )}
 
         </div>
       </section>
