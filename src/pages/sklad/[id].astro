@@ -207,7 +207,7 @@ const monthlyPayment = v.monthly_payment_from ?? computeMinMonthly(finalPrice);
 
 // Labels
 const conditionLabels: Record<string, string> = { new: 'Nový', demo: 'Předváděcí', used: 'Ojetý' };
-const availabilityLabels: Record<string, string> = { in_stock: 'Skladem', on_the_way: 'Na cestě', reserved: 'Rezervováno', sold: 'Prodáno' };
+const availabilityLabels: Record<string, string> = { in_stock: 'Skladem', on_the_way: 'Na cestě', on_order: 'Na objednání', reserved: 'Rezervováno', sold: 'Prodáno' };
 const transmissionLabels: Record<string, string> = { manual: 'Manuál', automatic: 'Automat', dct: 'DCT', cvt: 'CVT', dht: 'Hybridní' };
 const drivetrainLabels: Record<string, string> = { fwd: 'FWD', rwd: 'RWD', awd: 'AWD', '4wd': '4×4' };
 const fuelLabels: Record<string, string> = { petrol: 'Benzín', diesel: 'Diesel', hybrid: 'Hybrid', phev: 'PHEV', ev: 'Elektro' };
@@ -241,6 +241,7 @@ const highlightLabel: string = ((v as any).highlight_label ?? '').toString().tri
 const statusBadge = v.availability === 'in_stock' ? { cls: 'dark', label: 'Skladem' }
   : v.availability === 'reserved' ? { cls: 'outline', label: 'Rezervováno' }
   : v.availability === 'sold' ? { cls: 'outline', label: 'Prodáno' }
+  : v.availability === 'on_order' ? { cls: 'outline', label: 'Na objednání' }
   : { cls: 'outline', label: 'Na cestě' };
 
 // Equipment grouped — funguje pro nové groupy ({category, items}) i legacy flat array
@@ -389,7 +390,7 @@ const salesPhoneLink = telLink(salesPhone);
     color: colorName,
     priceCzk: finalPrice,
     listPriceCzk: priceBeforePromo,
-    availability: (v.availability ?? 'in_stock') as 'in_stock' | 'on_the_way' | 'reserved' | 'sold',
+    availability: (v.availability ?? 'in_stock') as 'in_stock' | 'on_the_way' | 'on_order' | 'reserved' | 'sold',
     photoUrls: photoIds.slice(0, 5).map((id) => directusAsset(id, { width: 1200, format: 'jpg', quality: 85 })),
     description: (v.description ?? '').slice(0, 500) || undefined,
   })} />
@@ -620,11 +621,16 @@ const salesPhoneLink = telLink(salesPhone);
 
           <div class="cta-stack">
             <a class="btn btn-primary" href="#poptavka">
-              Mám zájem
+              {v.availability === 'on_order' ? 'Nezávazně poptat' : 'Mám zájem'}
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
             </a>
             <div class="cta-row">
-              <a class="btn btn-outline" href="#poptavka">Rezervovat</a>
+              {/* "Rezervovat" má smysl jen u fyzických vozů — u build-to-order místo toho "Hlídat naskladnění" */}
+              {v.availability === 'on_order' ? (
+                <a class="btn btn-outline" href="#poptavka">Hlídat naskladnění</a>
+              ) : (
+                <a class="btn btn-outline" href="#poptavka">Rezervovat</a>
+              )}
               <a class="btn btn-outline" href={`tel:${salesPhoneLink}`} data-sales-phone>Zavolat <span data-sales-phone-text>{salesPhone}</span></a>
             </div>
           </div>
@@ -1014,9 +1020,14 @@ const salesPhoneLink = telLink(salesPhone);
       <div class="container">
         <div class="contact-grid" data-screen-label="Contact">
           <div class="contact-copy">
-            <div class="section-eyebrow">Poptat vůz</div>
-            <h2 class="section-title">Mám zájem o tento vůz</h2>
-            <p>Rádi vám poskytneme více informací, připravíme nabídku na míru nebo domluvíme zkušební jízdu. Ozveme se vám co nejdříve.</p>
+            <div class="section-eyebrow">{v.availability === 'on_order' ? 'Nezávazná poptávka' : 'Poptat vůz'}</div>
+            <h2 class="section-title">{v.availability === 'on_order' ? 'Mám zájem o objednání' : 'Mám zájem o tento vůz'}</h2>
+            <p>
+              {v.availability === 'on_order'
+                ? 'Tento vůz není fyzicky skladem — vyrobíme jej na objednávku přesně podle vaší specifikace (barva, výbava). Termín dodání obvykle 4–8 týdnů. Ozveme se vám do 24 hodin s konkrétní nabídkou.'
+                : 'Rádi vám poskytneme více informací, připravíme nabídku na míru nebo domluvíme zkušební jízdu. Ozveme se vám co nejdříve.'
+              }
+            </p>
             <div class="contact-list">
               <div class="item">
                 <span class="ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.86 19.86 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.86 19.86 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg></span>
@@ -1068,7 +1079,7 @@ const salesPhoneLink = telLink(salesPhone);
     <span class="name">{title}</span>
     <span class="price">{finalPrice ? `${finalPrice.toLocaleString('cs-CZ')} Kč` : 'Cena na dotaz'}</span>
     <a class="btn" href="#poptavka" style="color:#fff;">
-      Mám zájem
+      {v.availability === 'on_order' ? 'Nezávazně poptat' : 'Mám zájem'}
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
     </a>
   </div>

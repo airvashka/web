@@ -172,6 +172,13 @@ const fmtKm = (n?: number | null) => (n === 0 || !n ? '0 km' : `${n.toLocaleStr
               </div>
             )}
 
+            <div class="fblock">
+              <h4>Dostupnost</h4>
+              <label><input type="checkbox" name="availability" value="in_stock" checked data-avail-cb /> Skladem</label>
+              <label><input type="checkbox" name="availability" value="on_the_way" checked data-avail-cb /> Na cestě</label>
+              <label><input type="checkbox" name="availability" value="on_order" data-avail-cb /> Na objednání</label>
+            </div>
+
             <button type="button" class="btn btn-outline" data-reset style="width:100%; margin-top:8px;">Resetovat</button>
           </aside>
 
@@ -237,6 +244,7 @@ const fmtKm = (n?: number | null) => (n === 0 || !n ? '0 km' : `${n.toLocaleStr
                     data-fuel={v.model?.fuel_type ?? ''}
                     data-condition={v.condition ?? ''}
                     data-drivetrain={v.drivetrain ?? ''}
+                    data-availability={v.availability ?? 'in_stock'}
                     data-price={displayPrice ?? 0}
                     data-listed-at={(v as any).listed_at ?? ''}
                   >
@@ -283,6 +291,9 @@ const fmtKm = (n?: number | null) => (n === 0 || !n ? '0 km' : `${n.toLocaleStr
     const filters = {
       brand: 'all', model: 'all', fuel: 'all', condition: 'all', drivetrain: 'all',
     };
+    // Dostupnost je multi-select (checkboxy). Default: skladem + na cestě (NE na objednání).
+    // Set ⊂ ['in_stock', 'on_the_way', 'on_order'] — prázdná = ukáže VŠE.
+    const availabilitySet = new Set(['in_stock', 'on_the_way']);
     let sortMode = 'newest';
 
     // Zapíše aktuální stav filtrů do URL query parametrů (bookmarkable + sdílatelné)
@@ -308,12 +319,16 @@ const fmtKm = (n?: number | null) => (n === 0 || !n ? '0 km' : `${n.toLocaleStr
         const el = c;
         const dt = el.dataset.drivetrain ?? '';
         const drivetrainOk = filters.drivetrain === 'all' || (filters.drivetrain === '4wd' && (dt === '4wd' || dt === 'awd'));
+        // Availability: prázdný set = ukáže vše, jinak musí matchnout
+        const av = el.dataset.availability ?? 'in_stock';
+        const availabilityOk = availabilitySet.size === 0 || availabilitySet.has(av);
         const ok =
           (filters.brand === 'all' || el.dataset.brand === filters.brand) &&
           (filters.model === 'all' || el.dataset.model === filters.model) &&
           (filters.fuel === 'all' || el.dataset.fuel === filters.fuel) &&
           (filters.condition === 'all' || el.dataset.condition === filters.condition) &&
-          drivetrainOk;
+          drivetrainOk &&
+          availabilityOk;
         if (ok) { el.style.display = ''; visible++; }
         else { el.style.display = 'none'; }
       });
@@ -362,6 +377,16 @@ const fmtKm = (n?: number | null) => (n === 0 || !n ? '0 km' : `${n.toLocaleStr
       });
     });
 
+    // Availability checkboxy (multi-select)
+    document.querySelectorAll('[data-avail-cb]').forEach((input) => {
+      input.addEventListener('change', (e) => {
+        const t = e.target;
+        if (t.checked) availabilitySet.add(t.value);
+        else availabilitySet.delete(t.value);
+        applyFilters();
+      });
+    });
+
     // Model select change
     document.querySelector('[data-filter-model]')?.addEventListener('change', (e) => {
       filters.model = e.target.value;
@@ -386,6 +411,13 @@ const fmtKm = (n?: number | null) => (n === 0 || !n ? '0 km' : `${n.toLocaleStr
     document.querySelector('[data-reset]')?.addEventListener('click', () => {
       Object.keys(filters).forEach((k) => { filters[k] = 'all'; });
       document.querySelectorAll('[data-filters] input[value=all]').forEach((i) => (i.checked = true));
+      // Availability — reset na default (skladem + na cestě, NE on_order)
+      availabilitySet.clear();
+      availabilitySet.add('in_stock');
+      availabilitySet.add('on_the_way');
+      document.querySelectorAll('[data-avail-cb]').forEach((cb) => {
+        cb.checked = ['in_stock', 'on_the_way'].includes(cb.value);
+      });
       const ms = document.querySelector('[data-filter-model]');
       if (ms) ms.value = 'all';
       applyFilters();

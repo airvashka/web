@@ -13,10 +13,12 @@
     "preview": "astro preview",
     "astro": "astro",
     "fetch-reviews": "node scripts/fetch-google-reviews.mjs",
-    "sync:stock": "node scripts/sync-stock-kgm.mjs ; node scripts/sync-stock-omoda-jaecoo.mjs ; node scripts/compute-teaser-payments.mjs ; node scripts/trigger-deploy.mjs",
+    "sync:stock": "node scripts/sync-stock-kgm.mjs ; node scripts/sync-stock-omoda-jaecoo.mjs ; node scripts/generate-build-to-order.mjs --apply ; node scripts/compute-teaser-payments.mjs ; node scripts/trigger-deploy.mjs",
     "sync:stock:kgm": "node scripts/sync-stock-kgm.mjs",
     "sync:stock:omoda": "node scripts/sync-stock-omoda-jaecoo.mjs",
-    "teaser:payments": "node scripts/compute-teaser-payments.mjs"
+    "teaser:payments": "node scripts/compute-teaser-payments.mjs",
+    "build-to-order:dry": "node scripts/generate-build-to-order.mjs",
+    "build-to-order:apply": "node scripts/generate-build-to-order.mjs --apply"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.32.1",
