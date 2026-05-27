@@ -1,0 +1,84 @@
+---
+/**
+ * VatToggle — globální přepínač zobrazení cen s/bez DPH.
+ *
+ * Persistuje volbu v localStorage (key: 'sfr-vat-mode' = 'private' | 'company').
+ * Default: 'private' (vč. DPH). Logika přepočtu + CSS override je v BaseLayout
+ * (globální script + body class). Tento component je jen UI prvek.
+ *
+ * Umístění: Header, případně mobile bottom bar.
+ */
+---
+
+<div class="vat-toggle" data-vat-toggle>
+  <button type="button" class="vat-toggle-btn" data-vat-mode="private" aria-pressed="true">
+    <span class="vat-toggle-label">Soukromá osoba</span>
+    <span class="vat-toggle-sub">s DPH</span>
+  </button>
+  <button type="button" class="vat-toggle-btn" data-vat-mode="company" aria-pressed="false">
+    <span class="vat-toggle-label">Firma</span>
+    <span class="vat-toggle-sub">bez DPH</span>
+  </button>
+</div>
+
+<style>
+  .vat-toggle {
+    display: inline-flex;
+    align-items: stretch;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 999px;
+    padding: 2px;
+    font-size: 12px;
+    line-height: 1.1;
+  }
+  .vat-toggle-btn {
+    appearance: none;
+    background: transparent;
+    border: none;
+    color: var(--text-on-dark, #fff);
+    cursor: pointer;
+    padding: 5px 12px;
+    border-radius: 999px;
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+    opacity: 0.65;
+    transition: opacity 0.15s, background 0.15s, color 0.15s;
+  }
+  .vat-toggle-btn:hover { opacity: 0.95; }
+  .vat-toggle-btn.is-active {
+    background: var(--accent, #e77929);
+    color: #fff;
+    opacity: 1;
+  }
+  .vat-toggle-label {
+    font-weight: 600;
+    font-size: 12px;
+  }
+  .vat-toggle-sub {
+    font-size: 9px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    opacity: 0.8;
+    margin-top: 1px;
+  }
+  /* Light variant (na bílém pozadí — např. v Header když není scroll) */
+  .header-light .vat-toggle,
+  .vat-toggle.is-light {
+    background: rgba(0, 0, 0, 0.04);
+    border-color: rgba(0, 0, 0, 0.08);
+  }
+  .header-light .vat-toggle-btn,
+  .is-light .vat-toggle-btn {
+    color: var(--text);
+  }
+
+  /* Mobile: zmenšit */
+  @media (max-width: 600px) {
+    .vat-toggle-btn { padding: 4px 8px; }
+    .vat-toggle-label { font-size: 11px; }
+    .vat-toggle-sub { font-size: 8px; }
+  }
+</style>

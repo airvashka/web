@@ -106,5 +106,99 @@ try {
 
   <Footer />
   <MobileBottomBar />
+
+  <!-- ===== GLOBÁLNÍ DPH PŘEPÍNAČ — logika ====
+       UI prvek je v Header (VatToggle component). Body class `vat-private` /
+       `vat-company` přepíná zobrazení (::after labels, hide kalkulačky).
+       JS přepočítává ceny inline z S DPH → bez DPH (÷1.21).
+       Persistuje v localStorage. -->
+  <script is:inline>
+    (function initVatToggle() {
+      const STORAGE_KEY = 'sfr-vat-mode';
+      const VAT_RATE = 0.21;
+      // Selectors všech elementů kde jsou ceny S DPH (z DB).
+      // POZOR: některé jsou span uvnitř, jiné celý element. Přepočítáváme jen
+      // pure-text obsah (řezání HTML značky uvnitř by rozbilo strike spans atd.).
+      const PRICE_SELECTORS = [
+        '.scard .price > span:last-child',
+        '.scard .amount',
+        '.trim-price',
+        '.trim-price--promo',
+        '.price-val',
+        '.price-val--promo',
+        '.compare-trim-price',
+        '.compare-trim-price--promo',
+        '.compare-price',
+        '.info-price .amount',
+        '.sticky-cta .price',
+        '.scard .price-before',
+        '.compare-trim-list-strike',
+        '.price-strike',
+      ];
+
+      function parsePrice(text) {
+        const match = String(text || '').match(/([\d\s ]+)\s*Kč?/i);
+        if (!match) return null;
+        const num = parseInt(match[1].replace(/[\s ]/g, ''), 10);
+        return Number.isFinite(num) && num > 0 ? num : null;
+      }
+
+      function fmtPrice(n, withSuffix) {
+        return n.toLocaleString('cs-CZ') + (withSuffix ? ' Kč' : '');
+      }
+
+      function applyMode(mode) {
+        // Body class přepíná CSS ::after labels (vč. DPH / bez DPH)
+        document.body.classList.toggle('vat-private', mode === 'private');
+        document.body.classList.toggle('vat-company', mode === 'company');
+        // Toggle button states
+        document.querySelectorAll('[data-vat-mode]').forEach((btn) => {
+          const active = btn.dataset.vatMode === mode;
+          btn.classList.toggle('is-active', active);
+          btn.setAttribute('aria-pressed', String(active));
+        });
+        // Přepočítej všechny ceny v DOM
+        document.querySelectorAll(PRICE_SELECTORS.join(',')).forEach((el) => {
+          // Při prvním běhu ulož original text do data-orig
+          if (!el.dataset.vatOrig) el.dataset.vatOrig = el.textContent;
+          const origText = el.dataset.vatOrig;
+          if (mode === 'company') {
+            const num = parsePrice(origText);
+            if (!num) return;
+            const noVat = Math.round(num / (1 + VAT_RATE));
+            // Zachovej formát originálního textu (s/bez "Kč" suffixu)
+            const hasKc = /Kč/i.test(origText);
+            el.textContent = fmtPrice(noVat, hasKc);
+          } else {
+            // Zpět na original
+            el.textContent = origText;
+          }
+        });
+      }
+
+      // Init: read localStorage, default 'private'
+      let initialMode = 'private';
+      try { initialMode = localStorage.getItem(STORAGE_KEY) || 'private'; } catch {}
+      // Apply hned (před první paint pokud možno)
+      if (document.body) applyMode(initialMode);
+      else document.addEventListener('DOMContentLoaded', () => applyMode(initialMode));
+
+      // Event delegation — toggle buttons jsou v Header
+      document.addEventListener('click', (e) => {
+        const btn = e.target.closest('[data-vat-mode]');
+        if (!btn) return;
+        const mode = btn.dataset.vatMode;
+        if (mode !== 'private' && mode !== 'company') return;
+        try { localStorage.setItem(STORAGE_KEY, mode); } catch {}
+        applyMode(mode);
+      });
+
+      // Re-apply na SPA navigaci (Astro view transitions — pokud zapnuto)
+      document.addEventListener('astro:page-load', () => {
+        const m = (() => { try { return localStorage.getItem(STORAGE_KEY) || 'private'; } catch { return 'private'; } })();
+        applyMode(m);
+      });
+    })();
+  </script>
 </body>
 </html>

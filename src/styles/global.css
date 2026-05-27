@@ -3942,6 +3942,60 @@ a.promo-image-link:hover {
 }
 
 /* ────────────────────────────────────────────────────────────────────────
+   VAT mode override — body.vat-company přepíše "vč. DPH" na "bez DPH"
+   a skryje UCL kalkulačku splátek (firmy si dělají leasing zvlášť).
+   Default je body.vat-private (= s DPH, kalkulačka aktivní).
+   ──────────────────────────────────────────────────────────────────────── */
+body.vat-company .scard .price > span:last-child::after,
+body.vat-company .scard .amount::after,
+body.vat-company .amount-vat::after,
+body.vat-company .trim-price::after,
+body.vat-company .trim-price--promo::after,
+body.vat-company .price-val::after,
+body.vat-company .price-val--promo::after,
+body.vat-company .compare-trim-price::after,
+body.vat-company .compare-trim-price--promo::after,
+body.vat-company .compare-price::after,
+body.vat-company .sticky-cta .price::after,
+body.vat-company .info-price .vat {
+  content: ' bez DPH';
+}
+/* .info-price .vat je text span, ne pseudo — ten musíme přepsat přes JS
+   nebo CSS trick. Použij data-attribute pattern: */
+body.vat-company .info-price .vat {
+  font-size: 0;
+}
+body.vat-company .info-price .vat::after {
+  content: 'bez DPH';
+  font-size: 13px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+/* Skryj UCL kalkulačku splátek pro firmy + zobraz info box místo. */
+body.vat-company .info-finance,
+body.vat-company #finance .calc-controls,
+body.vat-company #finance .calc-result,
+body.vat-company #finance .calc-info-grid,
+body.vat-company #finance .ucl-legal-details {
+  display: none;
+}
+body.vat-company #finance::after {
+  content: 'Firemní financování sjednáme individuálně — leasing nebo operativní leasing s plnou odpočitatelnou DPH. Kontaktujte nás.';
+  display: block;
+  padding: 24px 28px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 12px;
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 15px;
+  line-height: 1.5;
+  max-width: 600px;
+  margin: 16px auto 0;
+}
+
+/* ────────────────────────────────────────────────────────────────────────
    Color picker pro build-to-order vozy (/sklad/[id] kde availability='on_order')
    Swatch klik změní hero foto. Hex barvy z model_color_exterior.hex.
    ──────────────────────────────────────────────────────────────────────── */
