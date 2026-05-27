@@ -454,7 +454,10 @@ const fmtKm = (n?: number | null) => (n === 0 || !n ? '0 km' : `${n.toLocaleStr
         if (o) { ss.value = sortParam; sortMode = sortParam; hasAnyParam = true; }
       }
     }
-    if (hasAnyParam) applyFilters();
+    // Vždy aplikuj filtry na initial load — i bez URL params se musí
+    // aplikovat default availabilitySet (jen in_stock + on_the_way).
+    // Bez tohoto by se on_order vozy zobrazily i když checkbox není zaškrtnutý.
+    applyFilters();
   </script>
 
   <style>
