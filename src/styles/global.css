@@ -3909,11 +3909,15 @@ a.promo-image-link:hover {
 
 /* /model/[slug] — trim ceny v ceník bloku. Přidáváme jen u finální ceny
    (.trim-price), ne u přeškrtnuté list (.trim-price-list).
-   /[brand] — modelové karty (.price-val, .price-val--promo). */
+   /[brand] — modelové karty (.price-val, .price-val--promo).
+   /model/[slug]/vybavy — matrix ceník (.compare-trim-price + .compare-price). */
 .trim-price::after,
 .trim-price--promo::after,
 .price-val::after,
-.price-val--promo::after {
+.price-val--promo::after,
+.compare-trim-price::after,
+.compare-trim-price--promo::after,
+.compare-price::after {
   content: ' vč. DPH';
   font-size: 10px;
   font-weight: 400;
