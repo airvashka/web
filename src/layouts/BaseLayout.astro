@@ -114,6 +114,7 @@ try {
        Persistuje v localStorage. -->
   <script is:inline>
     (function initVatToggle() {
+      console.log('[vat-toggle] init started');
       const STORAGE_KEY = 'sfr-vat-mode';
       const VAT_RATE = 0.21;
       // Selectors všech elementů kde jsou ceny S DPH (z DB).
@@ -184,11 +185,14 @@ try {
       else document.addEventListener('DOMContentLoaded', () => applyMode(initialMode));
 
       // Event delegation — toggle buttons jsou v Header
+      const toggleButtons = document.querySelectorAll('[data-vat-mode]');
+      console.log('[vat-toggle] found', toggleButtons.length, 'toggle buttons');
       document.addEventListener('click', (e) => {
         const btn = e.target.closest('[data-vat-mode]');
         if (!btn) return;
         const mode = btn.dataset.vatMode;
         if (mode !== 'private' && mode !== 'company') return;
+        console.log('[vat-toggle] click — switching to', mode);
         try { localStorage.setItem(STORAGE_KEY, mode); } catch {}
         applyMode(mode);
       });
