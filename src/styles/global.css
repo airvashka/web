@@ -3878,6 +3878,7 @@ a.promo-image-link:hover {
 .scard .pill--new { background: #2F7A4D; color: #fff; }      /* zelená — Nové */
 .scard .pill--demo { background: #2A7A8F; color: #fff; }     /* teal — Předváděcí */
 .scard .pill--used { background: #8A6E50; color: #fff; }     /* warm hnědá — Ojeté */
+.scard .pill--on-order { background: #5B5560; color: #fff; } /* tmavě šedá — Na objednání */
 
 /* Fuel icon — overlay bottom-right na fotce, barva odpovídá typu pohonu.
    Vizuálně doplňuje top stripe a chips — okamžitý vizuální signál co je za pohon. */

@@ -219,11 +219,13 @@ const fmtKm = (n?: number | null) => (n === 0 || !n ? '0 km' : `${n.toLocaleStr
                 const photoId = firstPhoto(v);
                 const trimName = v.trim_level?.name ?? (v.trim_level_snapshot as any)?.name ?? (v.trim_level_snapshot as any)?.raw_name ?? '';
                 const carYear = v.model_year?.year ?? '';
-                const conditionLabel = conditionLabels[v.condition ?? ''] ?? '';
+                // Pro on_order vozy přepíšeme štítek "Nové" na "Na objednání"
+                const isOnOrder = v.availability === 'on_order';
+                const conditionLabel = isOnOrder ? 'Na objednání' : (conditionLabels[v.condition ?? ''] ?? '');
                 const fuelLabel = fuelLabels[v.model?.fuel_type ?? ''] ?? '';
                 const transmissionLabel = v.transmission === 'manual' ? 'Manuál' : v.transmission === 'automatic' ? 'Automat' : '';
                 const is4wd = v.drivetrain === '4wd' || v.drivetrain === 'awd';
-                const conditionCls = v.condition === 'new' ? 'new' : v.condition === 'demo' ? 'demo' : 'used';
+                const conditionCls = isOnOrder ? 'on-order' : (v.condition === 'new' ? 'new' : v.condition === 'demo' ? 'demo' : 'used');
                 // Cena: stock.promo > model promo (jen u nových vozů) > list
                 const baseList = v.list_price;
                 let displayPrice = v.promo_price ?? baseList;
@@ -274,7 +276,12 @@ const fmtKm = (n?: number | null) => (n === 0 || !n ? '0 km' : `${n.toLocaleStr
                           <span>{fmtPrice(displayPrice)}</span>
                         </div>
                       </div>
-                      <div class="stock-state">Skladem v Praze</div>
+                      <div class="stock-state">
+                        {v.availability === 'on_order' ? 'Na objednání — 4–8 týdnů'
+                          : v.availability === 'on_the_way' ? 'Na cestě'
+                          : v.availability === 'reserved' ? 'Rezervováno'
+                          : 'Skladem v Praze'}
+                      </div>
                     </div>
                   </a>
                 );

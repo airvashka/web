@@ -111,7 +111,7 @@ const stockOfModel = await directusGet<any>('stock_vehicles', {
   sort: ['-listed_at'],
   limit: 16,
   fields: [
-    'id', 'condition', 'km', 'list_price', 'promo_price', 'trim_level_snapshot',
+    'id', 'condition', 'availability', 'km', 'list_price', 'promo_price', 'trim_level_snapshot',
     'highlighted', 'highlight_label', 'transmission', 'drivetrain',
     'photos.directus_files_id', 'model_year.year', 'color_code', 'color_category',
     'trim_level.name',
@@ -1075,7 +1075,12 @@ if (promoActive && promoDescription) {
                       <span>{fmtPrice(price)}</span>
                     </div>
                   </div>
-                  <div class="stock-state">Skladem v Praze</div>
+                  <div class="stock-state">
+                    {v.availability === 'on_order' ? 'Na objednání — 4–8 týdnů'
+                      : v.availability === 'on_the_way' ? 'Na cestě'
+                      : v.availability === 'reserved' ? 'Rezervováno'
+                      : 'Skladem v Praze'}
+                  </div>
                 </div>
               </a>
             );
