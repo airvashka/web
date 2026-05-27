@@ -380,11 +380,22 @@ const half = Math.ceil(allSpecs.length / 2);
 const specsLeft = allSpecs.slice(0, half);
 const specsRight = allSpecs.slice(half);
 
-// Příplatková výbava tohoto konkrétního vozu = ruční extra_features + to, co
-// scraper našel v sekci "Příplatková výbava" (trim_level_snapshot.optional_packages).
+// Příplatková výbava tohoto konkrétního vozu = ruční extra_features + scrape
+// (trim_level_snapshot.optional_packages) + pro on_order vozy items co byly
+// zahrnuty v konfiguraci (matchují aktuální transmission/drivetrain v trim.optional_items).
+const _extraFromConfig: string[] = isOnOrder
+  ? _allOpts
+      .filter((oi: any) => {
+        const name = String(oi?.name ?? '');
+        return (_txRe && _txRe.test(name)) || (_dtRe && _dtRe.test(name));
+      })
+      .map((oi: any) => String(oi?.name ?? '').trim())
+      .filter(Boolean)
+  : [];
 const extraListUniq: string[] = [...new Set([
   ...(Array.isArray((v as any).extra_features) ? (v as any).extra_features : []),
   ...(Array.isArray(snapshot.optional_packages) ? snapshot.optional_packages : []),
+  ..._extraFromConfig,
 ].map((s: any) => String(s).trim()).filter(Boolean))];
 
 // Highlights — fetch z site_settings (editovatelné v adminu), fallback na hardcoded.
