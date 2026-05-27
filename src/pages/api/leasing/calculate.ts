@@ -201,9 +201,14 @@ export const POST: APIRoute = async ({ request }) => {
       headers: { 'Content-Type': 'application/json' },
     });
   } catch (e: any) {
+    // Detailní error pro debugging — cause obsahuje DNS/TLS/network info
+    const cause = e?.cause;
     return new Response(JSON.stringify({
       error: 'Calculation failed',
       detail: e?.message?.substring(0, 200) ?? null,
+      causeCode: cause?.code ?? null,
+      causeMessage: cause?.message?.substring(0, 200) ?? null,
+      step: e?.message?.startsWith('Auth') ? 'auth' : 'calc',
     }), { status: 500, headers: { 'Content-Type': 'application/json' } });
   }
 };

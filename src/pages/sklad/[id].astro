@@ -477,13 +477,17 @@ const salesPhoneLink = telLink(salesPhone);
               )}
             </div>
           )}
-          {monthlyPayment && brand.slug === 'kgm' && (
-            <div class="info-finance">
-              Financování od <strong style="color: var(--text);">{monthlyPayment.toLocaleString('cs-CZ')} Kč / měsíc</strong> &nbsp;—&nbsp;
-              <a href="#finance">kalkulačka →</a>
+          {brand.slug === 'kgm' && finalPrice && finalPrice >= 50000 && (
+            <div id="finance">
+              <LeasingCalculator
+                assetPrice={finalPrice}
+                isUsed={v.condition !== 'new'}
+                groupCode="OA"
+                defaultDownPaymentPercent={0.20}
+                defaultMonths={60}
+              />
             </div>
           )}
-
           <div class="spec-grid">
             {year && (
               <div class="spec-card">
@@ -625,18 +629,6 @@ const salesPhoneLink = telLink(salesPhone);
               <a class="btn btn-outline" href={`tel:${salesPhoneLink}`} data-sales-phone>Zavolat <span data-sales-phone-text>{salesPhone}</span></a>
             </div>
           </div>
-
-          {brand.slug === 'kgm' && finalPrice && finalPrice >= 50000 && (
-            <div id="finance">
-              <LeasingCalculator
-                assetPrice={finalPrice}
-                isUsed={v.condition !== 'new'}
-                groupCode="OA"
-                defaultDownPaymentPercent={0.20}
-                defaultMonths={60}
-              />
-            </div>
-          )}
 
         </div>
       </section>
