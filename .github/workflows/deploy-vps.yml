@@ -78,23 +78,26 @@ jobs:
 
             if [[ "$REBUILD_UCL" == "true" ]]; then
               echo "▶ rebuild + restart ucl-proxy"
-              sudo docker compose build ucl-proxy
-              sudo docker compose up -d ucl-proxy
+              # sfr user je v docker group → docker bez sudo
+              docker compose build ucl-proxy
+              docker compose up -d ucl-proxy
               sleep 3
-              sudo docker compose ps ucl-proxy
+              docker compose ps ucl-proxy
               curl -fsS http://127.0.0.1:3001/health
             else
               echo "▶ ucl-proxy beze změn, skip rebuild"
             fi
 
             if [[ "$RELOAD_NGINX" == "true" ]]; then
-              echo "▶ kopíruje nginx configy + reload"
+              echo "▶ kopíruje nginx configy + reload (přes sfr-deploy sudoers wrapper)"
+              # Nginx config copy + reload vyžaduje root (čte /etc/nginx).
+              # Sudoers rule /etc/sudoers.d/sfr-deploy umožní specific commands bez hesla.
               for conf in nginx/*.conf; do
                 base=$(basename "$conf")
-                sudo cp "$conf" "/etc/nginx/sites-available/$base"
+                sudo /bin/cp "$conf" "/etc/nginx/sites-available/$base"
               done
-              sudo nginx -t
-              sudo systemctl reload nginx
+              sudo /usr/sbin/nginx -t
+              sudo /bin/systemctl reload nginx
             else
               echo "▶ nginx config beze změn, skip reload"
             fi

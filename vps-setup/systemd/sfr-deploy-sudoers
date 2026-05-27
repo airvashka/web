@@ -1,0 +1,16 @@
+# SFR Motor — sudoers rule pro GitHub Actions deploy
+#
+# Umožní `sfr` user spustit konkrétní příkazy bez hesla, aby GitHub Action
+# workflow mohl bez interaktivního promptu kopírovat nginx configy a reloadovat.
+#
+# Install:
+#   sudo cp /opt/sfr-motor/vps-setup/systemd/sfr-deploy-sudoers /etc/sudoers.d/sfr-deploy
+#   sudo chmod 440 /etc/sudoers.d/sfr-deploy
+#   sudo visudo -c                # ověří syntax (-c = check only)
+#
+# Bezpečnost: omezeno na 3 konkrétní binárky, ne `ALL`. `sfr` stále potřebuje
+# heslo pro `sudo apt`, `sudo nano`, etc. Toto je jen pro automated deploy.
+
+sfr ALL=(root) NOPASSWD: /bin/cp /opt/sfr-motor/vps-setup/nginx/*.conf /etc/nginx/sites-available/*
+sfr ALL=(root) NOPASSWD: /usr/sbin/nginx -t
+sfr ALL=(root) NOPASSWD: /bin/systemctl reload nginx
