@@ -5,7 +5,6 @@ import DirectusImage from '@components/DirectusImage.astro';
 import Breadcrumbs from '@components/Breadcrumbs.astro';
 import JsonLd from '@components/JsonLd.astro';
 import TurnstileWidget from '@components/TurnstileWidget.astro';
-import LeasingCalculator from '@components/LeasingCalculator.astro';
 import { directusGet, directusAsset } from '@lib/directus';
 import { FALLBACK_SALES_PHONE, telLink } from '@lib/contacts';
 import { getGroupedFeatures, CATEGORY_LABELS } from '@lib/features';
@@ -477,15 +476,10 @@ const salesPhoneLink = telLink(salesPhone);
               )}
             </div>
           )}
-          {brand.slug === 'kgm' && finalPrice && finalPrice >= 50000 && (
-            <div id="finance">
-              <LeasingCalculator
-                assetPrice={finalPrice}
-                isUsed={v.condition !== 'new'}
-                groupCode="OA"
-                defaultDownPaymentPercent={0.20}
-                defaultMonths={60}
-              />
+          {monthlyPayment && brand.slug === 'kgm' && (
+            <div class="info-finance">
+              Financování od <strong style="color: var(--text);">{monthlyPayment.toLocaleString('cs-CZ')} Kč / měsíc</strong> &nbsp;—&nbsp;
+              <a href="#finance">kalkulačka →</a>
             </div>
           )}
           <div class="spec-grid">
@@ -798,7 +792,8 @@ const salesPhoneLink = telLink(salesPhone);
       </div>
     </section>
 
-    <!-- ===== FINANCE (dark) ===== -->
+    <!-- ===== FINANCE (dark) — JEN KGM (UCL leasing kalkulačka) ===== -->
+    {brand.slug === 'kgm' && (
     <section class="section finance" id="finance">
       <div class="container">
         <div class="section-eyebrow">Financování</div>
@@ -812,18 +807,8 @@ const salesPhoneLink = telLink(salesPhone);
                 <button type="button" class="chip" data-duration="24">24 měs</button>
                 <button type="button" class="chip" data-duration="36">36 měs</button>
                 <button type="button" class="chip" data-duration="48">48 měs</button>
-                <button type="button" class="chip" data-duration="60">60 měs</button>
-                <button type="button" class="chip active" data-duration="72">72 měs</button>
-              </div>
-            </div>
-
-            <!-- Úroková sazba -->
-            <div class="calc-row">
-              <div class="calc-label">Úroková sazba (p.a.)</div>
-              <div class="chips" data-rate-chips>
-                <button type="button" class="chip active" data-rate="4.9">4,9 %</button>
-                <button type="button" class="chip" data-rate="6.9">6,9 %</button>
-                <button type="button" class="chip" data-rate="8.9">8,9 %</button>
+                <button type="button" class="chip active" data-duration="60">60 měs</button>
+                <button type="button" class="chip" data-duration="72">72 měs</button>
               </div>
             </div>
 
@@ -832,7 +817,7 @@ const salesPhoneLink = telLink(salesPhone);
               <div class="calc-head">
                 <div class="calc-label" style="margin: 0;">Akontace</div>
                 <div class="val">
-                  <span data-dp-percent>60 %</span>
+                  <span data-dp-percent>20 %</span>
                   <span style="opacity:0.6; font-size:14px; margin-left:8px;">
                     (<span data-dp-amount-inline>—</span> Kč)
                   </span>
@@ -840,15 +825,15 @@ const salesPhoneLink = telLink(salesPhone);
               </div>
               <input
                 type="range"
-                min="0"
-                max="80"
-                value="60"
+                min="10"
+                max="70"
+                value="20"
                 step="5"
                 data-dp-slider
                 style="width:100%; accent-color: var(--accent);"
               />
               <div class="ticks">
-                <span>0 %</span><span>20 %</span><span>40 %</span><span>60 %</span><span>80 %</span>
+                <span>10 %</span><span>25 %</span><span>40 %</span><span>55 %</span><span>70 %</span>
               </div>
             </div>
           </div>
@@ -863,12 +848,16 @@ const salesPhoneLink = telLink(salesPhone);
                 <span class="sub-amount" data-vehicle-price>{finalPrice ? finalPrice.toLocaleString('cs-CZ') : '—'} Kč</span>
               </div>
               <div class="fsr">
-                <span class="sub">Akontace (<span data-dp-percent-sub>60 %</span>)</span>
-                <span class="sub-amount" data-dp-amount>{finalPrice ? Math.round(finalPrice * 0.6).toLocaleString('cs-CZ') : '—'} Kč</span>
+                <span class="sub">Akontace (<span data-dp-percent-sub>20 %</span>)</span>
+                <span class="sub-amount" data-dp-amount>{finalPrice ? Math.round(finalPrice * 0.2).toLocaleString('cs-CZ') : '—'} Kč</span>
               </div>
               <div class="fsr">
                 <span class="sub">Financovaná částka</span>
                 <span class="sub-amount" data-financed>—</span>
+              </div>
+              <div class="fsr">
+                <span class="sub">RPSN</span>
+                <span class="sub-amount" data-rpsn>—</span>
               </div>
               <div class="fsr">
                 <span class="sub">Celkem zaplaceno</span>
@@ -885,9 +874,9 @@ const salesPhoneLink = telLink(salesPhone);
           <strong>Orientační kalkulace</strong> — přesnou nabídku připraví naši specialisté podle vybrané leasingovky (UniCredit, ČSOB Leasing, ŠkoFIN…) a vaší individuální bonity. Žádný oficiální smluvní návrh, jen rámcový propočet.
         </div>
       </div>
-    </section>
+      </section>
+    )}
 
-    <!-- ===== SIMILAR CARS ===== -->
     {similar.length > 0 && (
       <section class="section">
         <div class="container">
@@ -1062,13 +1051,10 @@ const salesPhoneLink = telLink(salesPhone);
   )}
 
   <script define:vars={{ vehiclePrice: finalPrice ?? 0, DIRECTUS_URL: import.meta.env.PUBLIC_DIRECTUS_URL ?? '' }}>
-    // ===== Finance kalkulačka =====
-    // Vzorec anuita: M = (P × r) / (1 - (1+r)^-n)
-    //   P = financovaná částka (cena - akontace)
-    //   r = měsíční úrok = roční / 12
-    //   n = doba splácení v měsících
-    //
-    // Toto je ORIENTAČNÍ kalkulace. Reálná nabídka záleží na leasingovce a bonitě.
+    // ===== Finance kalkulačka (UCL Leasing API) =====
+    // Volá /api/leasing/calculate s parametry: assetPrice, downPaymentPercent, months.
+    // UCL si určí úrokovou sazbu sám (rateType=STANDARD).
+    // Pokud API selže (např. IP whitelist), fallback: ukáže "výpočet nedostupný".
 
     const dpPctEl = document.querySelector('[data-dp-percent]');
     const dpPctSubEl = document.querySelector('[data-dp-percent-sub]');
@@ -1077,45 +1063,57 @@ const salesPhoneLink = telLink(salesPhone);
     const monthlyEl = document.querySelector('[data-monthly]');
     const financedEl = document.querySelector('[data-financed]');
     const totalEl = document.querySelector('[data-total]');
+    const rpsnEl = document.querySelector('[data-rpsn]');
     const slider = document.querySelector('[data-dp-slider]');
     const durationChips = document.querySelectorAll('[data-duration-chips] .chip');
-    const rateChips = document.querySelectorAll('[data-rate-chips] .chip');
 
-    // Defaults sjednocené s hero "Financování od X Kč" — nejvýhodnější varianta:
-    // 60% akontace, 72 měsíců, 4.9% p.a. (čísla se shodují s computeMinMonthly výpočtem)
-    let duration = 72;
-    let dpPercent = 60;
-    let annualRatePct = 4.9;
+    // Defaults sjednocené s pre-selected chips: 20% akontace, 60 měsíců
+    let duration = 60;
+    let dpPercent = 20;
 
     const fmt = (n) => Math.round(n).toLocaleString('cs-CZ');
+    let lastCallId = 0;
 
-    function recalc() {
+    async function recalc() {
+      const callId = ++lastCallId;
       const dpAmt = Math.round(vehiclePrice * dpPercent / 100);
       const financed = vehiclePrice - dpAmt;
-      const monthlyRate = (annualRatePct / 100) / 12;
 
-      let monthly = 0;
-      let total = dpAmt;
-
-      if (financed > 0 && duration > 0) {
-        if (monthlyRate > 0) {
-          // Anuita
-          monthly = financed * (monthlyRate / (1 - Math.pow(1 + monthlyRate, -duration)));
-        } else {
-          // Úrok 0% → lineární split
-          monthly = financed / duration;
-        }
-        total = dpAmt + monthly * duration;
-      }
-
-      // Update UI
+      // Okamžitě update statické hodnoty (akontace, financovaná částka)
       if (dpPctEl) dpPctEl.textContent = dpPercent + ' %';
       if (dpPctSubEl) dpPctSubEl.textContent = dpPercent + ' %';
       if (dpAmountEl) dpAmountEl.textContent = fmt(dpAmt) + ' Kč';
       if (dpAmountInlineEl) dpAmountInlineEl.textContent = fmt(dpAmt);
       if (financedEl) financedEl.textContent = fmt(financed) + ' Kč';
-      if (monthlyEl) monthlyEl.textContent = fmt(monthly) + ' Kč';
-      if (totalEl) totalEl.textContent = fmt(total) + ' Kč';
+      if (monthlyEl) monthlyEl.textContent = '…';
+      if (rpsnEl) rpsnEl.textContent = '…';
+      if (totalEl) totalEl.textContent = '…';
+
+      try {
+        const r = await fetch('/api/leasing/calculate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            assetPrice: vehiclePrice,
+            downPaymentPercent: dpPercent / 100,
+            numberOfInstallments: duration,
+            isUsed: false,
+            groupCode: 'OA',
+          }),
+        });
+        if (callId !== lastCallId) return;
+        const j = await r.json();
+        if (!r.ok || j.error) throw new Error(j.error || ('HTTP ' + r.status));
+        if (monthlyEl) monthlyEl.textContent = fmt(j.monthlyPayment) + ' Kč';
+        if (rpsnEl) rpsnEl.textContent = j.apr.toFixed(2).replace('.', ',') + ' %';
+        if (totalEl) totalEl.textContent = fmt(j.totalToPay) + ' Kč';
+      } catch (e) {
+        if (callId !== lastCallId) return;
+        if (monthlyEl) monthlyEl.textContent = 'výpočet nedostupný';
+        if (rpsnEl) rpsnEl.textContent = '—';
+        if (totalEl) totalEl.textContent = '—';
+        console.warn('Leasing calc error:', e);
+      }
     }
 
     if (slider) {
@@ -1129,14 +1127,6 @@ const salesPhoneLink = telLink(salesPhone);
         durationChips.forEach((c) => c.classList.remove('active'));
         chip.classList.add('active');
         duration = Number(chip.dataset.duration);
-        recalc();
-      });
-    });
-    rateChips.forEach((chip) => {
-      chip.addEventListener('click', () => {
-        rateChips.forEach((c) => c.classList.remove('active'));
-        chip.classList.add('active');
-        annualRatePct = Number(chip.dataset.rate);
         recalc();
       });
     });
