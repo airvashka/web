@@ -169,10 +169,32 @@ services:
     networks:
       - sfr-net
 
+  # Stock cron — KGM + OMODA scraping. Profile "cron" = NEstartuje s `up`.
+  # Spouští se systemd timerem hostu: /etc/systemd/system/sfr-stock-sync.{service,timer}.
+  # Příkaz: `docker compose --profile cron run --rm stock-sync`.
+  # Image obsahuje Playwright + chromium (KGM stock vyžaduje JS rendering).
+  stock-sync:
+    build:
+      context: ..               # web/ root (vede přes Dockerfile s playwright)
+      dockerfile: Dockerfile
+    profiles:
+      - cron                    # nikdy auto-start, jen `compose run --profile cron`
+    environment:
+      DIRECTUS_URL: http://directus:8055    # interní Docker network = bez SSL hassle
+      DIRECTUS_EMAIL: ${STOCK_SYNC_DIRECTUS_EMAIL}
+      DIRECTUS_PASSWORD: ${STOCK_SYNC_DIRECTUS_PASSWORD}
+      # Pokud bys měl Vercel deploy hook (trigger-deploy.mjs to volá po sync):
+      VERCEL_DEPLOY_HOOK_URL: ${VERCEL_DEPLOY_HOOK_URL:-}
+    depends_on:
+      directus:
+        condition: service_started
+    networks:
+      - sfr-net
+
   # Nginx jako reverse proxy NEběží v Docker — jede na hostu, aby Certbot
   # mohl normálně sahat na /etc/letsencrypt + reload. Host nginx pak proxyje
   # do těchto kontejnerů přes localhost porty (níže expose).
-  # Viz nginx/sfr-motor.conf
+  # Viz nginx/sfr-motor.conf a nginx/monitor.conf
 
 networks:
   sfr-net:

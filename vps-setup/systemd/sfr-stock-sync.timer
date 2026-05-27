@@ -1,0 +1,27 @@
+# SFR Motor — Stock cron timer (12:00, 17:00, 21:00 CET = 10:00, 15:00, 19:00 UTC)
+# WebGlobe VPS běží v UTC — kontrola: `timedatectl`.
+#
+# Pokud chceš změnit čas, edituj OnCalendar řádky. Formát:
+#   *-*-* HH:MM:SS  (každý den, daný čas)
+# Více oddělených řádků = víc triggerů.
+
+[Unit]
+Description=SFR Motor — stock cron timer (12/17/21 CET)
+Requires=sfr-stock-sync.service
+
+[Timer]
+# CET je UTC+1 v zimě (CEST UTC+2 v létě). systemd `OnCalendar` umí lokální TZ:
+OnCalendar=*-*-* 12:00:00 Europe/Prague
+OnCalendar=*-*-* 17:00:00 Europe/Prague
+OnCalendar=*-*-* 21:00:00 Europe/Prague
+
+# Pokud systém ležel offline (např. restart) a propásl čas, dohoň co nejdřív:
+Persistent=true
+
+# Krátký jitter (0-300s) aby všechny VPS ve světě nezasahaly UCL/KGM/OMODA stejně
+RandomizedDelaySec=300
+
+Unit=sfr-stock-sync.service
+
+[Install]
+WantedBy=timers.target

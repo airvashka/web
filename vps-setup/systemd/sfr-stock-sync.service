@@ -1,0 +1,23 @@
+# SFR Motor — Stock cron oneshot
+# Spouští `docker compose --profile cron run --rm stock-sync` v VPS workdir.
+# Trigger: /etc/systemd/system/sfr-stock-sync.timer
+#
+# Install:
+#   sudo cp /opt/sfr-motor/vps-setup/systemd/sfr-stock-sync.* /etc/systemd/system/
+#   sudo systemctl daemon-reload
+#   sudo systemctl enable --now sfr-stock-sync.timer
+#   sudo systemctl list-timers sfr-stock-sync
+
+[Unit]
+Description=SFR Motor — stock cron (KGM + OMODA scraping)
+Wants=docker.service
+After=docker.service network-online.target
+Requires=docker.service
+
+[Service]
+Type=oneshot
+WorkingDirectory=/opt/sfr-motor/vps-setup
+ExecStart=/usr/bin/docker compose --profile cron run --rm stock-sync
+StandardOutput=journal
+StandardError=journal
+TimeoutStartSec=20min

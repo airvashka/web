@@ -1,0 +1,102 @@
+name: Deploy VPS
+
+# Trigger: push do `main` se změnami v vps-setup/ — VPS si pak stáhne kód a rebuild.
+# Frontend (Astro) deployuje Vercel automaticky přes svůj webhook, tohle ho neovlivňuje.
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'vps-setup/**'
+      - '.github/workflows/deploy-vps.yml'
+
+  # Manuální spuštění z GitHub UI (Actions → Deploy VPS → Run workflow)
+  workflow_dispatch:
+
+# Pouze 1 deploy v daný moment — nově pushnutý commit nahradí předchozí běh
+concurrency:
+  group: deploy-vps
+  cancel-in-progress: false   # nech doběhnout (jinak by mohl zůstat half-state na VPS)
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Detekce co se změnilo (pro conditional rebuild)
+        id: changes
+        run: |
+          # Jaké soubory se změnily v posledním commitu?
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            CHANGED="ALL"   # manuální trigger = rebuild všechno
+          else
+            CHANGED=$(git diff --name-only HEAD^ HEAD | grep '^vps-setup/' || true)
+          fi
+          echo "changed_files<<EOF" >> $GITHUB_OUTPUT
+          echo "$CHANGED" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+          # Které služby potřebují rebuild?
+          REBUILD_UCL=false
+          REBUILD_NGINX=false
+          if [[ "$CHANGED" == "ALL" ]] || echo "$CHANGED" | grep -q "vps-setup/ucl-proxy/"; then
+            REBUILD_UCL=true
+          fi
+          if [[ "$CHANGED" == "ALL" ]] || echo "$CHANGED" | grep -q "vps-setup/nginx/"; then
+            REBUILD_NGINX=true
+          fi
+          echo "rebuild_ucl=$REBUILD_UCL" >> $GITHUB_OUTPUT
+          echo "rebuild_nginx=$REBUILD_NGINX" >> $GITHUB_OUTPUT
+
+          echo "── Change summary ─────────"
+          echo "Files: $CHANGED"
+          echo "Rebuild ucl-proxy: $REBUILD_UCL"
+          echo "Reload nginx: $REBUILD_NGINX"
+
+      - name: Deploy přes SSH
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.VPS_HOST }}        # např. 62.109.137.145
+          username: ${{ secrets.VPS_USER }}    # např. sfr
+          key: ${{ secrets.VPS_SSH_KEY }}      # privátní část SSH deploy keye
+          port: 22
+          script_stop: true                     # zastaví při první chybě
+          script: |
+            set -euo pipefail
+
+            REBUILD_UCL="${{ steps.changes.outputs.rebuild_ucl }}"
+            RELOAD_NGINX="${{ steps.changes.outputs.rebuild_nginx }}"
+
+            echo "▶ git pull"
+            cd /opt/sfr-motor
+            git fetch origin main
+            git reset --hard origin/main
+
+            cd /opt/sfr-motor/vps-setup
+
+            if [[ "$REBUILD_UCL" == "true" ]]; then
+              echo "▶ rebuild + restart ucl-proxy"
+              sudo docker compose build ucl-proxy
+              sudo docker compose up -d ucl-proxy
+              sleep 3
+              sudo docker compose ps ucl-proxy
+              curl -fsS http://127.0.0.1:3001/health
+            else
+              echo "▶ ucl-proxy beze změn, skip rebuild"
+            fi
+
+            if [[ "$RELOAD_NGINX" == "true" ]]; then
+              echo "▶ kopíruje nginx configy + reload"
+              for conf in nginx/*.conf; do
+                base=$(basename "$conf")
+                sudo cp "$conf" "/etc/nginx/sites-available/$base"
+              done
+              sudo nginx -t
+              sudo systemctl reload nginx
+            else
+              echo "▶ nginx config beze změn, skip reload"
+            fi
+
+            echo "▶ deploy OK"
