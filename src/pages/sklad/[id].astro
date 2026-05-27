@@ -717,16 +717,16 @@ const salesPhoneLink = telLink(salesPhone);
           </div>
 
           <div class="cta-stack">
-            <a class="btn btn-primary" href="#poptavka">
+            <a class="btn btn-primary" href="#poptavka" data-intent={v.availability === 'on_order' ? 'order' : 'interest'}>
               {v.availability === 'on_order' ? 'Nezávazně poptat' : 'Mám zájem'}
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
             </a>
             <div class="cta-row">
               {/* "Rezervovat" má smysl jen u fyzických vozů — u build-to-order místo toho "Hlídat naskladnění" */}
               {v.availability === 'on_order' ? (
-                <a class="btn btn-outline" href="#poptavka">Hlídat naskladnění</a>
+                <a class="btn btn-outline" href="#poptavka" data-intent="watch">Hlídat naskladnění</a>
               ) : (
-                <a class="btn btn-outline" href="#poptavka">Rezervovat</a>
+                <a class="btn btn-outline" href="#poptavka" data-intent="reserve">Rezervovat</a>
               )}
               <a class="btn btn-outline" href={`tel:${salesPhoneLink}`} data-sales-phone>Zavolat <span data-sales-phone-text>{salesPhone}</span></a>
             </div>
@@ -944,7 +944,7 @@ const salesPhoneLink = telLink(salesPhone);
             Rádi vám připravíme nabídku na míru — <strong>fleet ceny, firemní leasing nebo operativní leasing</strong>
             s plnou odpočitatelnou DPH. Domluvíme se na podmínkách, které vám sednou.
           </p>
-          <a class="btn btn-primary finance-company-cta" href="#poptavka">
+          <a class="btn btn-primary finance-company-cta" href="#poptavka" data-intent="company">
             Poptat firemní nabídku
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
           </a>
@@ -1043,7 +1043,7 @@ const salesPhoneLink = telLink(salesPhone);
                 <span class="sub-amount" data-total>—</span>
               </div>
             </div>
-            <a class="btn btn-outline" style="background:transparent; color:#fff; border-color:#3A3A40; margin-top:24px;" href="#poptavka">
+            <a class="btn btn-outline" style="background:transparent; color:#fff; border-color:#3A3A40; margin-top:24px;" href="#poptavka" data-intent="finance">
               Požádat o financování
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
             </a>
@@ -1168,9 +1168,9 @@ const salesPhoneLink = telLink(salesPhone);
       <div class="container">
         <div class="contact-grid" data-screen-label="Contact">
           <div class="contact-copy">
-            <div class="section-eyebrow">{v.availability === 'on_order' ? 'Nezávazná poptávka' : 'Poptat vůz'}</div>
-            <h2 class="section-title">{v.availability === 'on_order' ? 'Mám zájem o objednání' : 'Mám zájem o tento vůz'}</h2>
-            <p>
+            <div class="section-eyebrow" data-poptavka-eyebrow>{v.availability === 'on_order' ? 'Nezávazná poptávka' : 'Poptat vůz'}</div>
+            <h2 class="section-title" data-poptavka-title>{v.availability === 'on_order' ? 'Mám zájem o objednání' : 'Mám zájem o tento vůz'}</h2>
+            <p data-poptavka-lead>
               {v.availability === 'on_order'
                 ? 'Tento vůz není fyzicky skladem — vyrobíme jej na objednávku přesně podle vaší specifikace (barva, výbava). Termín dodání obvykle 4–8 týdnů. Ozveme se vám do 24 hodin s konkrétní nabídkou.'
                 : 'Rádi vám poskytneme více informací, připravíme nabídku na míru nebo domluvíme zkušební jízdu. Ozveme se vám co nejdříve.'
@@ -1226,7 +1226,7 @@ const salesPhoneLink = telLink(salesPhone);
   <div class="sticky-cta" data-sticky-cta>
     <span class="name">{title}</span>
     <span class="price">{finalPrice ? `${finalPrice.toLocaleString('cs-CZ')} Kč` : 'Cena na dotaz'}</span>
-    <a class="btn" href="#poptavka" style="color:#fff;">
+    <a class="btn" href="#poptavka" style="color:#fff;" data-intent={v.availability === 'on_order' ? 'order' : 'interest'}>
       {v.availability === 'on_order' ? 'Nezávazně poptat' : 'Mám zájem'}
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
     </a>
@@ -1272,6 +1272,85 @@ const salesPhoneLink = telLink(salesPhone);
     const vehiclePrice = Number(financeSection?.dataset.vehiclePrice || 0);
     const DIRECTUS_URL = financeSection?.dataset.directusUrl || '';
     const UCL_PROXY_URL = financeSection?.dataset.uclProxy || '/api/leasing';
+
+    // ===== Intent-aware pre-fill poptávkového formuláře ==========
+    // Tlačítka na stránce (Mám zájem, Rezervovat, Hlídat naskladnění, Požádat o
+    // financování, Poptat firemní nabídku) mají data-intent="..." atribut.
+    // Po kliku JS pre-fillne nadpis sekce + zprávu v textarea — tak aby
+    // textace odpovídala záměru klienta.
+    (function initIntentPrefill() {
+      const titleEl = document.querySelector('[data-poptavka-title]');
+      const eyebrowEl = document.querySelector('[data-poptavka-eyebrow]');
+      const leadEl = document.querySelector('[data-poptavka-lead]');
+      const form = document.querySelector('[data-lead-form]');
+      const messageEl = form?.querySelector('textarea[name="message"]');
+      if (!titleEl || !form || !messageEl) return;
+
+      const vehicleLabel = form.dataset.vehicleLabel || '';
+      // Generický {title} bez ceny pro message body
+      const labelShort = vehicleLabel.split(' — ')[0] || vehicleLabel;
+
+      const PRESETS = {
+        interest: {
+          eyebrow: 'Mám zájem',
+          title: 'Mám zájem o tento vůz',
+          lead: 'Rádi vám poskytneme více informací, připravíme nabídku na míru nebo domluvíme zkušební jízdu. Ozveme se vám co nejdříve.',
+          message: `Mám zájem o vůz ${labelShort}. Prosím o kontakt s detaily nabídky.`,
+        },
+        reserve: {
+          eyebrow: 'Rezervace',
+          title: 'Rezervovat tento vůz',
+          lead: 'Rezervaci provedeme po krátkém telefonickém ověření. Ozveme se vám do 24 hodin s podmínkami a dalším postupem.',
+          message: `Rád/a bych si rezervoval/a vůz ${labelShort}. Prosím o kontakt s dalším postupem.`,
+        },
+        watch: {
+          eyebrow: 'Hlídání naskladnění',
+          title: 'Hlídat naskladnění',
+          lead: 'Až dorazí další vůz odpovídající této specifikaci, dáme vám vědět. Stačí kontaktní údaje a krátká zpráva.',
+          message: `Prosím dejte mi vědět, až bude na skladě další vůz typu ${labelShort}.`,
+        },
+        finance: {
+          eyebrow: 'Financování',
+          title: 'Žádost o financování',
+          lead: 'Spočítáme vám konkrétní leasing nebo úvěr na míru. Stačí kontakt — ozveme se s návrhem podle vašich preferencí.',
+          message: `Mám zájem o financování vozu ${labelShort}. Prosím o kontakt s návrhem leasingu nebo úvěru.`,
+        },
+        company: {
+          eyebrow: 'Firemní nabídka',
+          title: 'Poptávka firemního financování',
+          lead: 'Připravíme nabídku na míru — fleet ceny, firemní leasing nebo operativní leasing s plnou odpočitatelnou DPH.',
+          message: `Mám zájem o firemní nabídku na vůz ${labelShort} (fleet, operativní leasing s plnou odpočitatelnou DPH).`,
+        },
+        order: {
+          eyebrow: 'Nezávazná poptávka',
+          title: 'Mám zájem o objednání',
+          lead: 'Tento vůz není fyzicky skladem — vyrobíme jej na objednávku přesně podle vaší specifikace (barva, výbava). Termín dodání obvykle 4–8 týdnů. Ozveme se vám do 24 hodin s konkrétní nabídkou.',
+          message: `Mám zájem o objednání vozu ${labelShort} přesně podle mé specifikace. Prosím o kontakt s dalšími možnostmi (barva, výbava, termín dodání).`,
+        },
+      };
+
+      document.querySelectorAll('a[data-intent]').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const intent = btn.dataset.intent;
+          const preset = PRESETS[intent];
+          if (!preset) return;
+          if (eyebrowEl) eyebrowEl.textContent = preset.eyebrow;
+          if (titleEl) titleEl.textContent = preset.title;
+          if (leadEl) leadEl.textContent = preset.lead;
+          // Message: pre-fill jen pokud je textarea prázdná (klient si svůj text nesmaze)
+          if (messageEl instanceof HTMLTextAreaElement && !messageEl.value.trim()) {
+            messageEl.value = preset.message;
+          }
+          // form-type pro lead API (pro analytics + email routing)
+          form.dataset.formType = intent === 'company' ? 'company_inquiry'
+            : intent === 'finance' ? 'finance_inquiry'
+            : intent === 'reserve' ? 'reservation'
+            : intent === 'watch' ? 'stock_watch'
+            : intent === 'order' ? 'build_to_order'
+            : 'stock_inquiry';
+        });
+      });
+    })();
 
     // ===== Build-to-order color picker — swap hero foto podle vybrané barvy =====
     (function initColorPicker() {
