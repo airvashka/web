@@ -56,7 +56,13 @@ sed -i \
   -e "s|VYPLŇ_silné_heslo_pro_admin_login|${DIRECTUS_ADMIN_PW}|g" \
   .env
 
-chmod 600 .env
+# Permissions: 640 = owner R/W, group R, others nic.
+# Owner musí být `sfr` ne `root` — Docker Compose volaný jako `sfr` user (z GitHub
+# Actions deploy) potřebuje .env číst. Pokud běžíme jako root, chown na sfr:docker.
+chmod 640 .env
+if [[ "$(id -un)" == "root" ]] && id sfr >/dev/null 2>&1; then
+  chown sfr:docker .env
+fi
 
 # Output — JEDNORÁZOVÉ vypsání hesel
 cat <<EOF

@@ -91,10 +91,11 @@ jobs:
             if [[ "$RELOAD_NGINX" == "true" ]]; then
               echo "▶ kopíruje nginx configy + reload (přes sfr-deploy sudoers wrapper)"
               # Nginx config copy + reload vyžaduje root (čte /etc/nginx).
-              # Sudoers rule /etc/sudoers.d/sfr-deploy umožní specific commands bez hesla.
+              # Sudoers rule /etc/sudoers.d/sfr-deploy povoluje absolutní cestu
+              # /opt/sfr-motor/vps-setup/nginx/*.conf bez hesla — proto $(pwd)/$conf.
               for conf in nginx/*.conf; do
                 base=$(basename "$conf")
-                sudo /bin/cp "$conf" "/etc/nginx/sites-available/$base"
+                sudo /bin/cp "/opt/sfr-motor/vps-setup/$conf" "/etc/nginx/sites-available/$base"
               done
               sudo /usr/sbin/nginx -t
               sudo /bin/systemctl reload nginx
