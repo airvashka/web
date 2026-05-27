@@ -72,6 +72,8 @@ interface CalcRequest {
   assetPrice: number;            // Cena vozu s DPH (Kč)
   downPaymentPercent: number;    // 0.10 - 0.70
   numberOfInstallments: number;  // 12, 24, 36, 48, 60, 72, 84
+  brand?: string;                // např. "KGM" — UCL VYŽADUJE (i když docs říká není required)
+  model?: string;                // např. "Korando" — UCL VYŽADUJE
   isUsed?: boolean;              // false = NEW, true = USED
   groupCode?: string;            // OA (default), MOT, UA, EA…
   vatRate?: number;              // default 0.21
@@ -111,6 +113,8 @@ export const POST: APIRoute = async ({ request }) => {
   const groupCode = String(body.groupCode || 'OA').toUpperCase();
   const isUsed = !!body.isUsed;
   const vatRate = Number(body.vatRate) || 0.21;
+  const brand = String(body.brand || '').trim() || 'KGM';
+  const model = String(body.model || '').trim() || 'Korando';
 
   // PREPROD limits (UCL říká): akontace 10–70 % po 5 %, splátky 12–84 po 12
   if (assetPrice < 50_000 || assetPrice > 50_000_000) {
@@ -118,8 +122,8 @@ export const POST: APIRoute = async ({ request }) => {
       status: 400, headers: { 'Content-Type': 'application/json' },
     });
   }
-  if (downPaymentPercent < 0.10 || downPaymentPercent > 0.70) {
-    return new Response(JSON.stringify({ error: 'downPayment must be 10–70 %' }), {
+  if (downPaymentPercent < 0.10 || downPaymentPercent > 0.60) {
+    return new Response(JSON.stringify({ error: 'downPayment must be 10–60 %' }), {
       status: 400, headers: { 'Content-Type': 'application/json' },
     });
   }
@@ -133,24 +137,43 @@ export const POST: APIRoute = async ({ request }) => {
   const downPaymentAmount = Math.round(assetPrice * downPaymentPercent);
   const financedAmount = assetPrice - downPaymentAmount;
 
+  // UCL payload — kopíruje typický request z dokumentace (str 13).
+  // commission/mfee/administrationFee — UCL v PREPROD ignoruje (úroková matice
+  // vlastní), ale validace vyžaduje, aby byly přítomny. Pro PROD doladíme.
+  const today = new Date().toISOString().slice(0, 10);
+  // UCL backend VYŽADUJE clientIdentification + asset.brand + asset.model,
+  // i když dokumentace říká "není required". Bez nich vrací HTTP 500
+  // "Unexpected exception" (testováno empiricky v /api/leasing/test).
   const uclPayload = {
     multicalculation: false,
     financedAmount,
     assetPrice,
+    priceForInsurance: assetPrice,
     downPayment: downPaymentPercent,
     downPaymentMethod: 'PER',
     vatRate,
     numberOfInstallments: months,
-    financingType: 'UV',  // pro CZ jen UV
-    pns: 0.0,             // PREPROD bez balónu
+    financingType: 'UV',
+    pns: 0.0,
     rateType: 'STANDARD',
-    commission: 0,
-    mfee: 0,
+    // Commission/mfee dynamicky — UCL má per-partner limit (vyšší akontace =
+    // nižší financedAmount → nižší max commission). Bezpečné: 0.5 % z financedAmount,
+    // strop 4000. UCL v PREPROD hodnotu stejně ignoruje (vlastní matice), jen validuje.
+    commission: Math.max(100, Math.min(Math.round(financedAmount * 0.005), 4000)),
+    mfee: Math.max(100, Math.min(Math.round(financedAmount * 0.003), 2000)),
     administrationFee: 0,
+    drawdownDate: today,
     asset: {
       category: 'AL',
       group: groupCode,
       status: isUsed ? 'USED' : 'NEW',
+      brand,
+      model,
+    },
+    clientIdentification: {
+      personType: 'FON',
+      id: '900101/1234',
+      name: 'Klient',
     },
   };
 
@@ -166,8 +189,21 @@ export const POST: APIRoute = async ({ request }) => {
     });
     if (!uclResp.ok) {
       const txt = await uclResp.text().catch(() => '');
+      // Pokus o parse UCL error JSONu — vrátíme uživatelsky čitelný důvod
+      let userMessage: string | null = null;
+      let errorCode: string | null = null;
+      try {
+        const errData = JSON.parse(txt);
+        errorCode = errData?.errorCode ?? null;
+        // UCL někdy posílá konkrétní detail (např. NO_MATCHING_MATRIX_ASSIGNED_TO_PARTNER)
+        if (errData?.detail && typeof errData.detail === 'string') {
+          userMessage = errData.detail;
+        }
+      } catch { /* not JSON */ }
       return new Response(JSON.stringify({
         error: `UCL ${uclResp.status}`,
+        userMessage,
+        errorCode,
         detail: txt.substring(0, 300),
       }), { status: 502, headers: { 'Content-Type': 'application/json' } });
     }
@@ -189,12 +225,13 @@ export const POST: APIRoute = async ({ request }) => {
       financedAmount,
       downPaymentAmount,
       months,
-      // Disclaimers z legalData pro display
+      // Disclaimers z legalData pro display (UCL nám je posílá v každém OK response)
       disclaimers: {
         contract: data?.legalData?.arrangementContract ?? null,
         calc: data?.legalData?.arrangementCalc ?? null,
         chargeEnd: data?.legalData?.arrangementCChargeEnd ?? null,
         provider: data?.legalData?.providerInfo ?? null,
+        partnerInfo: data?.legalData?.partnerInfo ?? null,
       },
     }), {
       status: 200,

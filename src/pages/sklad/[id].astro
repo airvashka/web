@@ -792,9 +792,9 @@ const salesPhoneLink = telLink(salesPhone);
       </div>
     </section>
 
-    <!-- ===== FINANCE (dark) — JEN KGM (UCL leasing kalkulačka) ===== -->
+    <!-- ===== FINANCE (dark) — JEN KGM (lokální orientační kalkulačka) ===== -->
     {brand.slug === 'kgm' && (
-    <section class="section finance" id="finance">
+    <section class="section finance" id="finance" data-vehicle-brand={brand.name} data-vehicle-model={model?.name ?? title}>
       <div class="container">
         <div class="section-eyebrow">Financování</div>
         <h2 class="section-title">Spočítáme za 30 vteřin</h2>
@@ -826,14 +826,39 @@ const salesPhoneLink = telLink(salesPhone);
               <input
                 type="range"
                 min="10"
-                max="70"
+                max="60"
                 value="20"
                 step="5"
                 data-dp-slider
                 style="width:100%; accent-color: var(--accent);"
               />
               <div class="ticks">
-                <span>10 %</span><span>25 %</span><span>40 %</span><span>55 %</span><span>70 %</span>
+                <span>10 %</span><span>20 %</span><span>35 %</span><span>50 %</span><span>60 %</span>
+              </div>
+            </div>
+
+            <!-- Info bloky pod nastavením -->
+            <div class="calc-info-grid">
+              <div class="calc-info-tile">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                <div>
+                  <div class="calc-info-title">Bez navýšení</div>
+                  <div class="calc-info-desc">Akontace 10–60 %, doba 24–72 měs. Standardní úroková sazba dle ceníku UCL.</div>
+                </div>
+              </div>
+              <div class="calc-info-tile">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                <div>
+                  <div class="calc-info-title">UniCredit Leasing</div>
+                  <div class="calc-info-desc">Naše partnerská leasingovka. Schválení do 24 h, splátky beze srážek.</div>
+                </div>
+              </div>
+              <div class="calc-info-tile">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                <div>
+                  <div class="calc-info-title">Orientační výpočet</div>
+                  <div class="calc-info-desc">Konečnou nabídku připraví naši specialisté podle bonity klienta.</div>
+                </div>
               </div>
             </div>
           </div>
@@ -870,8 +895,28 @@ const salesPhoneLink = telLink(salesPhone);
             </a>
           </div>
         </div>
-        <div class="finance-note">
-          <strong>Orientační kalkulace</strong> — přesnou nabídku připraví naši specialisté podle vybrané leasingovky (UniCredit, ČSOB Leasing, ŠkoFIN…) a vaší individuální bonity. Žádný oficiální smluvní návrh, jen rámcový propočet.
+        <div class="ucl-legal" data-ucl-legal>
+          <details class="ucl-legal-details">
+            <summary>
+              <span class="ucl-legal-summary-title">Právní podmínky a reprezentativní příklad</span>
+              <span class="ucl-legal-summary-hint">Klikněte pro rozbalení</span>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="ucl-legal-chevron"><polyline points="6 9 12 15 18 9"/></svg>
+            </summary>
+            <div class="ucl-legal-body">
+              <div class="ucl-legal-block">
+                <div class="ucl-legal-label">Poskytovatel financování</div>
+                <p data-ucl-provider>—</p>
+              </div>
+              <div class="ucl-legal-block">
+                <div class="ucl-legal-label">Podmínky úvěru</div>
+                <p data-ucl-partner-info>—</p>
+              </div>
+              <div class="ucl-legal-block">
+                <div class="ucl-legal-label">Reprezentativní příklad</div>
+                <p data-ucl-arrangement>—</p>
+              </div>
+            </div>
+          </details>
         </div>
       </div>
       </section>
@@ -1051,10 +1096,13 @@ const salesPhoneLink = telLink(salesPhone);
   )}
 
   <script define:vars={{ vehiclePrice: finalPrice ?? 0, DIRECTUS_URL: import.meta.env.PUBLIC_DIRECTUS_URL ?? '' }}>
-    // ===== Finance kalkulačka (UCL Leasing API) =====
-    // Volá /api/leasing/calculate s parametry: assetPrice, downPaymentPercent, months.
-    // UCL si určí úrokovou sazbu sám (rateType=STANDARD).
-    // Pokud API selže (např. IP whitelist), fallback: ukáže "výpočet nedostupný".
+    // ===== Finance kalkulačka — UCL Leasing API (reálný výpočet) =====
+    // Volá /api/leasing/calculate (backend proxy s UCL credentials).
+    // UCL si určí úrokovou sazbu sám podle své matrix (rateType=STANDARD).
+
+    const financeSection = document.querySelector('#finance');
+    const vehicleBrand = financeSection ? financeSection.dataset.vehicleBrand || 'KGM' : 'KGM';
+    const vehicleModel = financeSection ? financeSection.dataset.vehicleModel || '' : '';
 
     const dpPctEl = document.querySelector('[data-dp-percent]');
     const dpPctSubEl = document.querySelector('[data-dp-percent-sub]');
@@ -1067,7 +1115,6 @@ const salesPhoneLink = telLink(salesPhone);
     const slider = document.querySelector('[data-dp-slider]');
     const durationChips = document.querySelectorAll('[data-duration-chips] .chip');
 
-    // Defaults sjednocené s pre-selected chips: 20% akontace, 60 měsíců
     let duration = 60;
     let dpPercent = 20;
 
@@ -1079,7 +1126,7 @@ const salesPhoneLink = telLink(salesPhone);
       const dpAmt = Math.round(vehiclePrice * dpPercent / 100);
       const financed = vehiclePrice - dpAmt;
 
-      // Okamžitě update statické hodnoty (akontace, financovaná částka)
+      // Okamžitě update lokální hodnoty (akontace, financovaná částka)
       if (dpPctEl) dpPctEl.textContent = dpPercent + ' %';
       if (dpPctSubEl) dpPctSubEl.textContent = dpPercent + ' %';
       if (dpAmountEl) dpAmountEl.textContent = fmt(dpAmt) + ' Kč';
@@ -1097,21 +1144,49 @@ const salesPhoneLink = telLink(salesPhone);
             assetPrice: vehiclePrice,
             downPaymentPercent: dpPercent / 100,
             numberOfInstallments: duration,
+            brand: vehicleBrand,
+            model: vehicleModel,
             isUsed: false,
             groupCode: 'OA',
           }),
         });
         if (callId !== lastCallId) return;
         const j = await r.json();
-        if (!r.ok || j.error) throw new Error(j.error || ('HTTP ' + r.status));
+        if (!r.ok || j.error) {
+          const err = new Error(j.error || ('HTTP ' + r.status));
+          err.userMessage = j.userMessage || null;
+          throw err;
+        }
+        // Vrátit normální velikost fontu po úspěšném výpočtu (po předchozí chybě mohl být zmenšený)
+        if (monthlyEl) monthlyEl.style.fontSize = '';
         if (monthlyEl) monthlyEl.textContent = fmt(j.monthlyPayment) + ' Kč';
         if (rpsnEl) rpsnEl.textContent = j.apr.toFixed(2).replace('.', ',') + ' %';
         if (totalEl) totalEl.textContent = fmt(j.totalToPay) + ' Kč';
+        // Vyplň UCL disclaimery (legalData z response)
+        if (j.disclaimers) {
+          const providerEl = document.querySelector('[data-ucl-provider]');
+          const partnerInfoEl = document.querySelector('[data-ucl-partner-info]');
+          const arrangementEl = document.querySelector('[data-ucl-arrangement]');
+          if (providerEl && j.disclaimers.provider) providerEl.textContent = j.disclaimers.provider;
+          if (partnerInfoEl && j.disclaimers.calc) partnerInfoEl.textContent = j.disclaimers.calc;
+          if (arrangementEl && j.disclaimers.contract) arrangementEl.textContent = j.disclaimers.contract;
+        }
       } catch (e) {
         if (callId !== lastCallId) return;
         if (monthlyEl) monthlyEl.textContent = 'výpočet nedostupný';
         if (rpsnEl) rpsnEl.textContent = '—';
         if (totalEl) totalEl.textContent = '—';
+        // Pokud UCL vrátil čitelný důvod, ukaž ho pod tlačítkem
+        const errMsg = (e && e.message) || '';
+        const userMsg = (e && e.userMessage) || '';
+        let displayMsg = userMsg;
+        if (!displayMsg && errMsg.includes('UCL')) {
+          displayMsg = 'Pro tuto kombinaci akontace a délky splácení není dostupná sazba. Zkuste jinou.';
+        }
+        if (displayMsg && monthlyEl) {
+          monthlyEl.style.fontSize = '15px';
+          monthlyEl.textContent = displayMsg;
+        }
         console.warn('Leasing calc error:', e);
       }
     }
