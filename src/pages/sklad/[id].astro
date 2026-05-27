@@ -184,9 +184,14 @@ if (stockPromoApplied && baseListPrice && stockPromoApplied < baseListPrice) {
 }
 const hasPromo = priceBeforePromo !== null && savings > 0;
 
-// Financování "od X Kč" — auto výpočet nejnižší možné splátky:
-// 60% akontace, 72 měsíců, 4.9% p.a.
-// Anuita: M = P × r / (1 − (1+r)^−n)
+// Financování "od X Kč" — primárně z DB pole `monthly_payment_from`, které
+// vyplňuje cron `scripts/compute-teaser-payments.mjs` po každém sync:stock
+// voláním UCL proxy s 60% akontace + 72 měsíců (nejnižší možná splátka).
+//
+// Fallback (lokální anuita 60%/72m/4.9% p.a.) zůstává pro:
+//   1) vozy které ještě neměly cron run (čerstvý import)
+//   2) UCL outage (UCL down → cron přeskočí, stará hodnota zůstane)
+//   3) značky kde UCL nemá data (zatím ne KGM — frontend teaser je jen pro KGM)
 function computeMinMonthly(price: number | null | undefined): number | null {
   if (!price || price <= 0) return null;
   const dpPct = 0.6;
