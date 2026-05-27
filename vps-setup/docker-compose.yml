@@ -181,6 +181,9 @@ services:
       - cron                    # nikdy auto-start, jen `compose run --profile cron`
     environment:
       DIRECTUS_URL: http://directus:8055    # interní Docker network = bez SSL hassle
+      # Preferenčně static admin token (rychlejší, neexpiruje). Pokud chybí,
+      # skripty padají zpět na email+password login.
+      DIRECTUS_TOKEN: ${STOCK_SYNC_DIRECTUS_TOKEN:-}
       DIRECTUS_EMAIL: ${STOCK_SYNC_DIRECTUS_EMAIL}
       DIRECTUS_PASSWORD: ${STOCK_SYNC_DIRECTUS_PASSWORD}
       # Pokud bys měl Vercel deploy hook (trigger-deploy.mjs to volá po sync):
