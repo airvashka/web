@@ -3973,26 +3973,35 @@ body.vat-company .info-price .vat::after {
   color: var(--text-muted);
 }
 
-/* Skryj UCL kalkulačku splátek pro firmy + zobraz info box místo. */
-body.vat-company .info-finance,
-body.vat-company #finance .calc-controls,
-body.vat-company #finance .calc-result,
-body.vat-company #finance .calc-info-grid,
-body.vat-company #finance .ucl-legal-details {
-  display: none;
+/* Firma mode na /sklad/[id] sekci #finance:
+   - Default (vat-private) — kalkulačka aktivní, info box skrytý
+   - vat-company — kalkulačka skryta, info box zobrazen */
+.finance-company-info { display: none; }
+body.vat-company #finance .section-eyebrow,
+body.vat-company #finance > .container > h2.section-title,
+body.vat-company #finance .finance-grid {
+  display: none !important;
 }
-body.vat-company #finance::after {
-  content: 'Firemní financování sjednáme individuálně — leasing nebo operativní leasing s plnou odpočitatelnou DPH. Kontaktujte nás.';
+body.vat-company #finance .finance-company-info {
   display: block;
-  padding: 24px 28px;
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 12px;
-  color: rgba(255, 255, 255, 0.85);
-  font-size: 15px;
-  line-height: 1.5;
-  max-width: 600px;
-  margin: 16px auto 0;
+  text-align: center;
+  padding: 8px 0 24px;
+}
+.finance-company-info .section-title {
+  color: var(--text-on-dark, #fff);
+  margin-bottom: 18px;
+}
+.finance-company-text {
+  color: rgba(255, 255, 255, 0.82);
+  font-size: 17px;
+  line-height: 1.55;
+  max-width: 640px;
+  margin: 0 auto 24px;
+}
+.finance-company-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
 }
 
 /* ────────────────────────────────────────────────────────────────────────

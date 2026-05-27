@@ -935,6 +935,21 @@ const salesPhoneLink = telLink(salesPhone);
     {brand.slug === 'kgm' && (
     <section class="section finance" id="finance" data-vehicle-brand={brand.name} data-vehicle-model={model?.name ?? title} data-vehicle-price={finalPrice ?? 0} data-directus-url={import.meta.env.PUBLIC_DIRECTUS_URL ?? ''} data-ucl-proxy={import.meta.env.PUBLIC_UCL_PROXY_URL ?? '/api/leasing'}>
       <div class="container">
+        {/* Pro firma mód (vat-company): místo kalkulačky info box s lead CTA.
+            Element je viditelný JEN když body.vat-company (CSS handluje display). */}
+        <div class="finance-company-info" data-finance-company>
+          <div class="section-eyebrow">Firemní financování</div>
+          <h2 class="section-title">Řešíte vozový park nebo flotilu?</h2>
+          <p class="finance-company-text">
+            Rádi vám připravíme nabídku na míru — <strong>fleet ceny, firemní leasing nebo operativní leasing</strong>
+            s plnou odpočitatelnou DPH. Domluvíme se na podmínkách, které vám sednou.
+          </p>
+          <a class="btn btn-primary finance-company-cta" href="#poptavka">
+            Poptat firemní nabídku
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+          </a>
+        </div>
+
         <div class="section-eyebrow">Financování</div>
         <h2 class="section-title">Spočítáme za 30 vteřin</h2>
         <div class="finance-grid">
