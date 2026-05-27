@@ -171,7 +171,18 @@ async function main() {
       year: t.model_year.year,
       modelYearId: t.model_year.id,
     }));
-  console.log(`[btoorder] Načteno ${trims.length} trim_levels (status=published, s validním model+brand)`);
+  console.log(`[btoorder] Načteno ${trims.length} trim_levels (raw, všechny ročníky)`);
+
+  // Filtruj jen nejnovější model_year per model — staré ročníky nemá smysl generovat
+  // jako "na objednání", už se neprodávají.
+  const latestYearByModel = new Map();
+  for (const t of trims) {
+    const mId = t.model.id;
+    const cur = latestYearByModel.get(mId) ?? 0;
+    if (t.year > cur) latestYearByModel.set(mId, t.year);
+  }
+  trims = trims.filter((t) => t.year === latestYearByModel.get(t.model.id));
+  console.log(`[btoorder] Po filtru latest-year-per-model: ${trims.length} trim_levels`);
 
   // 2) Pro každý trim spočítej kombinace
   // Plan = { externalId, brandSlug, modelSlug, trimName, trimId, modelId, brandId, listPrice, transmission, drivetrain }
@@ -253,13 +264,16 @@ async function main() {
   console.log(`  DELETE: ${toDelete.length}`);
   console.log('────────────────────────────────────────');
 
-  if (toCreate.length > 0 && toCreate.length <= 30) {
+  if (toCreate.length > 0) {
     console.log('\n  Vytvořit:');
     toCreate.forEach((p) => console.log(`    + ${p.externalId} (${p.payload.list_price.toLocaleString('cs-CZ')} Kč)`));
   }
-  if (toDelete.length > 0 && toDelete.length <= 30) {
+  if (toDelete.length > 0) {
     console.log('\n  Smazat (trim už neexistuje nebo se změnily kombinace):');
     toDelete.forEach((e) => console.log(`    - ${e.external_id} (id ${e.id})`));
+  }
+  if (toUpdate.length > 0) {
+    console.log(`\n  Aktualizovat: ${toUpdate.length} (cena/spec)`);
   }
 
   if (!APPLY) {
