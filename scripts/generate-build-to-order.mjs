@@ -133,10 +133,11 @@ function comboShort(c) {
 }
 
 // Sanitize string pro external_id: a-z, 0-9, '-'. Lomítka v trim slugech (např. "l2h1/h2/h3")
-// nahradí pomlčkou, sjednotí víc pomlček na jednu.
+// nahradí pomlčkou. `+` na konci trimů (např. "Style+") → "plus" aby nesplynul se "Style".
 function safeSlug(s) {
   return String(s || '')
     .toLowerCase()
+    .replace(/\+/g, 'plus')          // Style+ → styleplus (ne style)
     .replace(/[^a-z0-9-]/g, '-')
     .replace(/-+/g, '-')
     .replace(/^-+|-+$/g, '');
@@ -207,6 +208,8 @@ async function main() {
   const plans = [];
   for (const t of trims) {
     const modelSlug = t.model.slug;
+    // Pro klíč v COMBOS matici zachováme původní formát (lowercase + dashes mezi slovy),
+    // aby matchnul 'style+' (s plus znakem). safeSlug() až pro external_id.
     const trimSlugKey = (t.name || '').toLowerCase().trim().replace(/\s+/g, '-');
     const brandSlug = t.model.brand.slug;
     const modelCombos = COMBOS_BY_MODEL_TRIM[modelSlug] ?? {};
