@@ -560,7 +560,7 @@ if (promoActive && promoDescription) {
             )}
             <div class="promo-cta-row">
               <a class="btn btn-accent" href="#skladem">Vybrat z akčních vozů →</a>
-              <a class="btn btn-outline-light" href="/kontakt">Mám zájem o akci</a>
+              <a class="btn btn-outline-light" href={`/kontakt?form=akce&model=${rawModel.slug}&brand=${brand.slug}`}>Mám zájem o akci</a>
             </div>
           </div>
           {!(rawModel as any).promo_image && promoDiscountAmount > 0 && (

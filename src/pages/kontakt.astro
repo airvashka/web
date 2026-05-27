@@ -202,7 +202,7 @@ const mapEmbedUrl = 'https://maps.google.com/maps?q=%C4%8Eablicka+553%2F2%2C+182
       const form = document.querySelector('[data-context-aware]');
       if (!form) return;
 
-      const ALLOWED = ['contact', 'test_drive', 'service', 'stock_inquiry', 'model_inquiry'];
+      const ALLOWED = ['contact', 'test_drive', 'service', 'stock_inquiry', 'model_inquiry', 'akce'];
       if (formType && ALLOWED.includes(formType)) form.dataset.formType = formType;
       if (model) form.dataset.modelSlug = model;
       if (brand) form.dataset.brandSlug = brand;
@@ -211,12 +211,19 @@ const mapEmbedUrl = 'https://maps.google.com/maps?q=%C4%8Eablicka+553%2F2%2C+182
       // Update form title + subject prefill (UX hint)
       const titleEl = form.querySelector('h3');
       const subjectInput = form.querySelector('input[name="subject"]');
+      const messageTextarea = form.querySelector('textarea[name="message"]');
       if (formType === 'test_drive' && model) {
         if (titleEl) titleEl.textContent = `Testovací jízda — ${model.toUpperCase()}`;
         if (subjectInput instanceof HTMLInputElement) subjectInput.value = `Žádost o testovací jízdu (${model})`;
       } else if (formType === 'model_inquiry' && model) {
         if (titleEl) titleEl.textContent = `Poptávka — ${model.toUpperCase()}`;
         if (subjectInput instanceof HTMLInputElement) subjectInput.value = `Poptávka modelu ${model}`;
+      } else if (formType === 'akce' && model) {
+        if (titleEl) titleEl.textContent = `Poptávka — akce ${model.toUpperCase()}`;
+        if (subjectInput instanceof HTMLInputElement) subjectInput.value = `Poptávka — akce ${model}`;
+        if (messageTextarea instanceof HTMLTextAreaElement && !messageTextarea.value) {
+          messageTextarea.value = `Mám zájem o aktuální akci na vůz ${model}. Prosím o zaslání bližších informací.`;
+        }
       }
 
       // Když uživatel přišel s kontextem (z tlačítka na /model nebo /sklad),

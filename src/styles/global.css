@@ -3214,15 +3214,8 @@ a.promo-image-link:hover {
 .model-card--hev { --variant-color: #2A7A8F; }  /* hybrid — teal */
 .model-card--evx { --variant-color: #2F9B5C; }  /* elektro — green */
 
-.model-card[class*="model-card--"]::before {
-  content: "";
-  position: absolute;
-  top: 0; left: 0; right: 0;
-  height: 4px;
-  background: var(--variant-color);
-  z-index: 3;
-  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
-}
+/* Top color stripe — ODEBRÁNO 2026-05-27 (kamarád feedback). Variant accent
+   se zachoval jen pro hover (border-color), ale stripe nahoře pryč. */
 .model-card:hover {
   transform: translateY(-4px);
   box-shadow: 0 16px 40px -14px rgba(0,0,0,0.18);
@@ -3815,19 +3808,9 @@ a.promo-image-link:hover {
   .skladovka-grid[data-stock-shuffle] > .scard:nth-child(n+2) { display: none; }
 }
 
-/* ===== Top color stripe podle paliva — jako /model boxy =====
-   Tenký 3px proužek nahoře karty, signalizuje pohonný typ.
-   Chips zůstávají neutrální (cream pozadí) aby karty vypadaly konzistentně. */
-.scard[data-fuel]::before {
-  content: ""; position: absolute; top: 0; left: 0; right: 0; height: 3px;
-  z-index: 3; border-radius: var(--radius-lg) var(--radius-lg) 0 0;
-  background: transparent;
-}
-.scard[data-fuel="petrol"]::before { background: #B4762E; }   /* spalovací benzín */
-.scard[data-fuel="diesel"]::before { background: #5C5A52; }   /* diesel */
-.scard[data-fuel="hybrid"]::before { background: #2A7A8F; }   /* hybrid — teal */
-.scard[data-fuel="phev"]::before { background: #C76A30; }     /* PHEV — orange */
-.scard[data-fuel="ev"]::before { background: #2F9B5C; }       /* elektro — green */
+/* Top color stripe podle paliva — ODEBRÁNO 2026-05-27 (kamarád feedback).
+   Karty teď jen bílý card bez stripe nahoře. Palivo signalizováno přes
+   chip s ikonkou ve specs řádce. */
 .scard {
   background: #fff;
   border-radius: var(--radius-lg);
