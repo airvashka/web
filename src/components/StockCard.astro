@@ -49,13 +49,15 @@ else if (v.highlighted && customHighlight) actionPill = customHighlight;
 else if (v.highlighted) actionPill = 'Novinka';
 
 const baseList = v.list_price;
-const isNew = v.condition === 'new';
+// Modelová akce platí pro nová i předváděcí auta (oba jsou "skladovka", používají
+// stejný import s už-sníženou cenou). Použité ojetiny mají vlastní pricing — ven.
+const isPromoEligible = v.condition === 'new' || v.condition === 'demo';
 let displayPrice = v.promo_price ?? baseList;
 let priceBefore: number | null = null;
 if (v.promo_price && baseList && v.promo_price < baseList) {
   // Explicitní vehicle-level promo: list_price = "před", promo_price = "po"
   priceBefore = baseList;
-} else if (modelPromoActive && modelPromoDiscount > 0 && baseList && isNew) {
+} else if (modelPromoActive && modelPromoDiscount > 0 && baseList && isPromoEligible) {
   // Modelová akce: stock list_price je UŽ PO slevě (import ji od dodavatele zahrnul).
   // Cenu nesnížíme, jen dopočítáme "původní" zpět nahoru pro přeškrtnutí + úsporu.
   displayPrice = baseList;
