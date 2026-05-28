@@ -94,52 +94,7 @@ const year = new Date().getFullYear();
 </footer>
 
 <style is:global>
-  /* Brand strip — značky kterých jsme autorizovaný dealer */
-  .footer-brands {
-    margin-top: 40px;
-    padding-top: 28px;
-    border-top: 1px solid rgba(255, 255, 255, 0.08);
-    display: flex;
-    align-items: center;
-    gap: 32px;
-    flex-wrap: wrap;
-  }
-  .footer-brands-label {
-    font-size: 11px;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: rgba(255, 255, 255, 0.5);
-    font-weight: 500;
-  }
-  .footer-brands-row {
-    display: flex;
-    align-items: center;
-    gap: 36px;
-    flex-wrap: wrap;
-  }
-  .footer-brand {
-    opacity: 0.7;
-    transition: opacity .2s ease;
-    display: inline-flex;
-    align-items: center;
-  }
-  .footer-brand:hover { opacity: 1; }
-  /* Cap heights — IMG má width: auto, takže šířka se odvodí z height × aspect ratio.
-     OMODA & JAECOO logo je čtvercové (aspect 1.49), KGM a Farizon jsou wide
-     wordmarky — proto OMODA potřebuje vyšší height aby písmo bylo srovnatelné. */
-  .footer-brand .brand-logo--single {
-    height: 32px;
-  }
-  .footer-brand .brand-logo[src*="omoda-jaecoo"] {
-    height: 66px;
-  }
-
-  @media (max-width: 700px) {
-    .footer-brands { gap: 20px; }
-    .footer-brands-row { gap: 18px; }
-    .footer-brand .brand-logo--single { height: 24px; }
-    .footer-brand .brand-logo[src*="omoda-jaecoo"] { height: 48px; }
-  }
+  /* Footer brand strip CSS → global.css (řádky ~3044-3088) */
 
   .footer-disclaimer {
     margin-top: 28px;
