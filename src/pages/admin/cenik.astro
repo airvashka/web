@@ -1110,6 +1110,38 @@ function syncItemCategories() {
   }
 }
 
+// Propaguje matrix-level názvy sekcí (MATRIX_DECLARED) do features[].section
+// napříč všemi trims. Bez této normalizace se může stát, že Style trim
+// má sekci "MOTORIZACE", ale Elegant má "NOVÁ SEKCE" pro stejný řádek matrixu
+// — UI to skryje (zobrazí matrix-level název), ale v DB to zůstane rozdílné.
+function syncFeatureSectionsFromMatrix() {
+  // featureName -> matrix section (autoritativní zdroj)
+  const matrixSection = new Map();
+  for (const d of MATRIX_DECLARED) {
+    if (d.feature && d.section) matrixSection.set(featTrim(d.feature), featTrim(d.section));
+  }
+  if (matrixSection.size === 0) return;
+
+  for (const t of (CURRENT_DATA.trims || [])) {
+    if (!Array.isArray(t.features)) continue;
+    // Re-bucket items by matrix section
+    const itemsBySection = new Map();
+    const sectionOrder = [];
+    for (const sec of t.features) {
+      const oldSection = featTrim(sec.section);
+      for (const item of (sec.items || [])) {
+        const cleanItem = featTrim(item);
+        if (!cleanItem) continue;
+        const targetSection = matrixSection.get(cleanItem) || oldSection;
+        if (!targetSection) continue;
+        if (!itemsBySection.has(targetSection)) { itemsBySection.set(targetSection, []); sectionOrder.push(targetSection); }
+        itemsBySection.get(targetSection).push(item);
+      }
+    }
+    t.features = sectionOrder.map((s) => ({ section: s, items: itemsBySection.get(s) }));
+  }
+}
+
 function matrixRowCount() {
   return buildMatrixModel().reduce((a, s) => a + s.features.length, 0);
 }
@@ -1455,6 +1487,7 @@ $('save-btn').addEventListener('click', async () => {
   if (!confirm(`Uložit do "${$('year-select').selectedOptions[0]?.textContent}":\n${CURRENT_DATA.trims.length} výbavových stupňů, ${totalRows} řádků, ${CURRENT_DATA.packages.length} paketů.\n\nPokračovat?`)) return;
 
   syncItemCategories();
+  syncFeatureSectionsFromMatrix();
   $('save-btn').disabled = true;
   $('save-btn').textContent = '⏳ Ukládám...';
 
