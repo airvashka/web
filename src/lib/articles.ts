@@ -53,3 +53,48 @@ export function getReadTime(article: { read_time?: string | null; body?: string 
   if (explicit) return explicit;
   return computeReadTime(article.body);
 }
+
+
+/**
+ * Vrátí perex (excerpt) pro článek.
+ * - Pokud má `excerpt` field vyplněný, použije ho.
+ * - Jinak vezme prvních `maxLen` znaků z `body` (po stripu markdown/HTML),
+ *   ukončí na konec slova a přidá "…".
+ *
+ * @param article — objekt s `excerpt` a `body` fields
+ * @param maxLen — max délka auto-generovaného excerpt (default 160)
+ */
+export function getArticleExcerpt(
+  article: { excerpt?: string | null; body?: string | null },
+  maxLen: number = 160
+): string {
+  const ex = (article.excerpt ?? '').trim();
+  if (ex) return ex;
+
+  const body = (article.body ?? '').toString();
+  if (!body) return '';
+
+  const plain = body
+    // images
+    .replace(/!\[[^\]]*\]\([^)]+\)/g, '')
+    // links → text
+    .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
+    // code blocks
+    .replace(/```[\s\S]*?```/g, '')
+    .replace(/`[^`]+`/g, '')
+    // HTML tags
+    .replace(/<[^>]+>/g, ' ')
+    // markdown syntax
+    .replace(/[#*_>|~`]+/g, '')
+    // collapse whitespace
+    .replace(/\s+/g, ' ')
+    .trim();
+
+  if (plain.length <= maxLen) return plain;
+
+  // Ořež na konec slova v maxLen window
+  const sliced = plain.slice(0, maxLen);
+  const lastSpace = sliced.lastIndexOf(' ');
+  const cutoff = lastSpace > maxLen * 0.6 ? lastSpace : maxLen;
+  return plain.slice(0, cutoff).trimEnd() + '…';
+}

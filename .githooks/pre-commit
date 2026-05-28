@@ -9,7 +9,7 @@
 # Disable jednou: git config --unset core.hooksPath
 # Bypass jednorázově: git commit --no-verify
 # ============================================================================
-set -euo pipefail
+set -eo pipefail
 
 # Repo root (kde běží hook)
 REPO=$(git rev-parse --show-toplevel)
@@ -29,7 +29,7 @@ ERRORS=()
 
 echo "🔍 pre-commit: kontroluju ${#ASTRO_FILES[@]} .astro soubory..."
 
-while IFS= read -r FILE; do
+while IFS= read -r FILE || [ -n "$FILE" ]; do
   [ -z "$FILE" ] && continue
   [ ! -f "$FILE" ] && continue  # smazaný soubor → skip
 

@@ -3,7 +3,7 @@ import BaseLayout from '@layouts/BaseLayout.astro';
 import DirectusImage from '@components/DirectusImage.astro';
 import Breadcrumbs from '@components/Breadcrumbs.astro';
 import { directusGet } from '@lib/directus';
-import { getReadTime } from '@lib/articles';
+import { getReadTime, getArticleExcerpt } from '@lib/articles';
 
 /* ============================================================
    MAGAZÍN — listing článků (1:1 podle _design-draft-blog/magazin.jsx)
@@ -87,7 +87,7 @@ function formatDate(iso?: string): string {
               <span class="dot">·</span><span>{getReadTime(featured)}</span>
             </div>
             <h2>{featured.title}</h2>
-            {featured.excerpt && <p>{featured.excerpt}</p>}
+            {getArticleExcerpt(featured) && <p>{getArticleExcerpt(featured)}</p>}
             <div class="feat-author">
               <span class="ava"></span>
               <div>
@@ -137,7 +137,7 @@ function formatDate(iso?: string): string {
                     <span class="dot">·</span><span>{getReadTime(a)}</span>
                   </div>
                   <h3>{a.title}</h3>
-                  {a.excerpt && <p>{a.excerpt}</p>}
+                  {getArticleExcerpt(a) && <p>{getArticleExcerpt(a)}</p>}
                   <div class="acard-author">{a.author ?? 'SFR Motor'}</div>
                 </div>
               </a>

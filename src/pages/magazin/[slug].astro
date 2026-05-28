@@ -5,7 +5,7 @@ import Breadcrumbs from '@components/Breadcrumbs.astro';
 import JsonLd from '@components/JsonLd.astro';
 import { directusGet, directusAsset } from '@lib/directus';
 import { articleSchema } from '@lib/schemas';
-import { getReadTime } from '@lib/articles';
+import { getReadTime, getArticleExcerpt } from '@lib/articles';
 import { marked } from 'marked';
 
 /* ============================================================
@@ -124,7 +124,7 @@ const catLabel = article.category ? (CATEGORY_LABELS[article.category] ?? articl
         <span class="dot">·</span><span>{getReadTime(article)}</span>
       </div>
       <h1>{article.title}</h1>
-      {article.excerpt && <p class="lead">{article.excerpt}</p>}
+      {getArticleExcerpt(article) && <p class="lead">{getArticleExcerpt(article)}</p>}
       <div class="art-author">
         <span class="ava"></span>
         <div>
@@ -149,7 +149,7 @@ const catLabel = article.category ? (CATEGORY_LABELS[article.category] ?? articl
   <!-- ===== BODY ===== -->
   <article class="art-body">
     <div class="art-col">
-      {article.excerpt && <p class="art-intro">{article.excerpt}</p>}
+      {/* art-intro odstraněn — duplikoval .lead nad ním */}
       <div set:html={wrappedHtml}></div>
 
       <!-- Share -->
@@ -196,7 +196,7 @@ const catLabel = article.category ? (CATEGORY_LABELS[article.category] ?? articl
                     <span class="dot">·</span><span>{getReadTime(a)}</span>
                   </div>
                   <h3>{a.title}</h3>
-                  {a.excerpt && <p>{a.excerpt}</p>}
+                  {getArticleExcerpt(a) && <p>{getArticleExcerpt(a)}</p>}
                   <div class="acard-author">{a.author ?? 'SFR Motor'}</div>
                 </div>
               </a>
