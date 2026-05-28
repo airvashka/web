@@ -3020,6 +3020,26 @@ a.promo-image-link:hover {
 }
 .section-eyebrow-inline .muted { color: var(--text-muted); font-weight: 400; }
 
+/* ===== Brand Logo (KGM / OMODA-JAECOO / Farizon) ===== */
+/* Globální pravidla — předtím byly scope v BrandLogo.astro <style>, ale Astro
+   scoped CSS se občas nepředal child img elementu (chyběl data-astro-cid).
+   Globálně to platí všude bez výjimky. */
+.brand-logo {
+  display: inline-flex;
+  align-items: center;
+  line-height: 1;
+}
+.brand-logo--single {
+  width: auto;
+  object-fit: contain;
+}
+/* Tmavé (default) — logo má svojí původní barvu (černé) */
+.brand-logo.variant-dark { /* default barva */ }
+/* Světlé varianta — invertuje SVG na bílé (zachovává průhledné pozadí) */
+.brand-logo.variant-light {
+  filter: brightness(0) invert(1);
+}
+
 /* ============================================================
    BRAND LANDING PAGE
    ============================================================ */
