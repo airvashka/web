@@ -848,37 +848,6 @@ const salesPhoneLink = telLink(salesPhone);
       </section>
     )}
 
-    {/* ===== DOPLŇKOVÁ VÝBAVA — items navíc, NE už zahrnuté v konfiguraci vozu =====
-         Items co si zákazník může dokoupit nad rámec standardu + nad rámec UŽ vybrané
-         transmission/drivetrain. Pokud má vůz automat → "Automatická převodovka" už není
-         doplňková (je v ceně). Pokud má 4WD → "Pohon 4x4" už není doplňková.
-         Source: trim.optional_items (json), filtr matchuje v.transmission a v.drivetrain. */}
-    {optionalItemsForDisplay.length > 0 && (
-      <section class="section equip" style="background: var(--bg-soft);">
-        <div class="container">
-          <div class="section-eyebrow">Doplňková výbava</div>
-          <h2 class="section-title">Co si můžete dokoupit nad rámec konfigurace</h2>
-          <p style="color: var(--text-dim); margin-bottom: 16px; max-width: 720px;">
-            {isOnOrder
-              ? 'Standardní výbava a vámi zvolená konfigurace (převodovka, pohon) jsou v ceně. Tyto položky lze přidat jako příplatkovou výbavu:'
-              : 'Položky které jdou k tomuto trimu dokoupit (ceník výrobce). U skladového vozu se zeptejte, jestli je má — část už může být v ceně.'
-            }
-          </p>
-          <ul class="optional-items-list">
-            {optionalItemsForDisplay.map((oi) => (
-              <li class="optional-item">
-                <span class="optional-item-name">{oi.name}</span>
-                {oi.code && <span class="optional-item-code">{oi.code}</span>}
-                {Number(oi.price) > 0 && (
-                  <span class="optional-item-price">+{Number(oi.price).toLocaleString('cs-CZ')} Kč</span>
-                )}
-              </li>
-            ))}
-          </ul>
-        </div>
-      </section>
-    )}
-
     {/* ===== OPTION PACKAGES (volitelné balíčky tohoto vozu) ===== */}
     {vehiclePackages.length > 0 && (
       <section class="section equip" style="background: var(--bg-soft);">
