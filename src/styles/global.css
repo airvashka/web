@@ -5789,3 +5789,6 @@ body.drawer-open .chat-widget { display: none !important; }
   .input, .textarea, .select,
   .field input, .field textarea, .field select { font-size: 16px; }
 }
+
+/* Skrýt UCL disclaimery v vat-company mode (Jardův wish — disclaimer jen pro s DPH) */
+body.vat-company .ucl-legal { display: none !important; }
