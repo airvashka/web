@@ -3903,17 +3903,17 @@ a.promo-image-link:hover {
 }
 /* Shuffle pool — render 16, default zobrazí jen prvních 4. Client JS pak
    zamíchá DOM order tak že každý F5 vidí jinou náhodnou čtveřici. */
-.skladovka-grid[data-stock-shuffle] > .scard:nth-child(n+5) {
+.skladovka-grid[data-stock-shuffle] > .a-card:nth-child(n+5) {
   display: none;
 }
 @media (max-width: 1100px) {
-  .skladovka-grid[data-stock-shuffle] > .scard:nth-child(n+4) { display: initial; }
+  .skladovka-grid[data-stock-shuffle] > .a-card:nth-child(n+4) { display: initial; }
   .skladovka-grid { grid-template-columns: repeat(2, 1fr); }
-  .skladovka-grid[data-stock-shuffle] > .scard:nth-child(n+3) { display: none; }
+  .skladovka-grid[data-stock-shuffle] > .a-card:nth-child(n+3) { display: none; }
 }
 @media (max-width: 600px) {
   .skladovka-grid { grid-template-columns: 1fr; }
-  .skladovka-grid[data-stock-shuffle] > .scard:nth-child(n+2) { display: none; }
+  .skladovka-grid[data-stock-shuffle] > .a-card:nth-child(n+2) { display: none; }
 }
 
 /* Top color stripe podle paliva — ODEBRÁNO 2026-05-27 (kamarád feedback).
