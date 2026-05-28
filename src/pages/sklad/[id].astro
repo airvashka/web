@@ -373,21 +373,15 @@ const specFind = (re: RegExp): string | null => {
   }
   return null;
 };
-// Výkon: vždy zobrazit kW + k vedle sebe. Pokud chybí jedno, dopočítat (1 kW ≈ 1,36 k).
+// Výkon: vždy kW (jednotně napříč webem). Když máme jen koně, dopočítat kW (1 k = 0,7355 kW).
 const _motor = specFind(/motorizace|^motor/i) ?? String(snapshot.motorization ?? '');
 const _pwKwDirect = (specFind(/čist[ýy].*v[ýy]kon|max.*v[ýy]kon|v[ýy]kon.*kw|^kw$/i) ?? '').match(/\d+(?:[.,]\d+)?/)?.[0] ?? null;
 const _pwKwMotor = _motor.match(/(\d+(?:[.,]\d+)?)\s*kw/i)?.[1] ?? null;
 const _pwKsMotor = _motor.match(/(\d+)\s*k\b/i)?.[1] ?? null;
-let _kw = _pwKwDirect ?? _pwKwMotor;
-let _ks: string | null = _pwKsMotor;
 const HP_PER_KW = 1.35962;
-if (_kw && !_ks) _ks = String(Math.round(Number(String(_kw).replace(',', '.')) * HP_PER_KW));
-else if (!_kw && _ks) _kw = String(Math.round(Number(_ks) / HP_PER_KW));
-const heroPower: string | null = (_kw && _ks)
-  ? `${_kw} kW / ${_ks} k`
-  : _kw ? `${_kw} kW`
-  : _ks ? `${_ks} k`
-  : null;
+let _kw = _pwKwDirect ?? _pwKwMotor;
+if (!_kw && _pwKsMotor) _kw = String(Math.round(Number(_pwKsMotor) / HP_PER_KW));
+const heroPower: string | null = _kw ? `${_kw} kW` : null;
 // Počet míst / sedadel
 const heroSeats: string | null = specFind(/po[čc]et\s*(m[íi]st|sedadel)/i)
   ?? (snapshot.seats ? (String(snapshot.seats).replace(/[^0-9]/g, '') || null) : null);
