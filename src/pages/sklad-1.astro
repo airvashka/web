@@ -272,7 +272,8 @@ const cards = vehicles.map((v) => {
                 </div>
                 <div class="a-body">
                   <div class="a-brand">{c.brandName}{c.year ? ` · ${c.year}` : ''}</div>
-                  <h3 class="a-title">{c.modelName}{c.trimName ? ` ${c.trimName}` : ''}</h3>
+                  <h3 class="a-title">{c.modelName}</h3>
+                  {c.trimName && <div class="a-trim">{c.trimName}</div>}
 
                   <div class="a-specs">
                     <div class="a-spec">
@@ -335,8 +336,8 @@ const cards = vehicles.map((v) => {
                   <div class="a-price-row">
                     <div>
                       {c.hasDiscount && <div class="a-price-old">{fmtPrice(c.priceBefore)}</div>}
-                      <div class="a-price-val">{fmtPrice(c.displayPrice)}</div>
-                      <div class="a-price-vat">vč. DPH</div>
+                      <div class="a-price-line"><span class="a-price-val">{fmtPrice(c.displayPrice)}</span><span class="a-price-vat">vč. DPH</span></div>
+                      
                     </div>
                   </div>
 
@@ -549,6 +550,8 @@ const cards = vehicles.map((v) => {
 
     .a-body { padding: 16px; display: flex; flex-direction: column; gap: 10px; flex: 1; }
     .a-brand { font-size: 11px; color: #6B6B73; text-transform: uppercase; letter-spacing: 0.06em; font-weight: 600; }
+    .a-trim { font-size: 13px; color: #4A4A52; margin: -2px 0 0; font-weight: 500; }
+    .a-price-line { display: flex; align-items: baseline; gap: 6px; flex-wrap: wrap; }
     .a-title { font-size: 17px; font-weight: 700; margin: 0; line-height: 1.25; letter-spacing: -0.01em; color: #1A1A1F; font-family: var(--font-display, inherit); }
 
     .a-specs { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 12px; padding: 10px 0; border-top: 1px solid #F0F0F2; border-bottom: 1px solid #F0F0F2; }
