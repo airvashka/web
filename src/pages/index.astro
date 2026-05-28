@@ -42,6 +42,7 @@ const stockVehicles = await directusGet<any>('stock_vehicles', {
     'brand.id', 'brand.name', 'brand.slug',
     'trim_level.name',
     'model_year.year',
+    'first_registration',
   ],
   filter: { status: { _eq: 'published' }, availability: { _in: ['in_stock', 'on_the_way'] } },
 });

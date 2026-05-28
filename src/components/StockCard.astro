@@ -18,7 +18,16 @@ const brandSlug = v.brand?.slug ?? '';
 const modelName = v.model?.name ?? '';
 const modelSlug = v.model?.slug ?? '';
 const trimName: string = v.trim_level?.name ?? anyV.trim_level_snapshot?.name ?? anyV.trim_level_snapshot?.raw_name ?? '';
-const year = v.model_year?.year;
+// Rok — priorita stejná jako na detailu /sklad/[id]:
+//   1) trim_level_snapshot.year (PRIMARY — import ukládá z feedu pole "Rok výroby")
+//   2) model_year.year (FK z DB; resolveModelYear má fallback na nejnovější rok
+//      pokud exact nenajde → často mismatch, např. feed 2024 → DB 2026 záznam)
+//   3) first_registration (manuálně editováno, většinou null)
+const year =
+  anyV.trim_level_snapshot?.year ??
+  v.model_year?.year ??
+  (v.first_registration ? new Date(v.first_registration).getFullYear() : null) ??
+  null;
 const fuelType: string = v.model?.fuel_type ?? '';
 
 const fuelLabels: Record<string, string> = { petrol: 'Benzín', diesel: 'Diesel', hybrid: 'Hybrid', phev: 'PHEV', ev: 'Elektro' };
