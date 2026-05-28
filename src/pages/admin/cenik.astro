@@ -1115,8 +1115,6 @@ function syncItemCategories() {
 // řádek matrixu — UI to skryje (zobrazí matrix-level název přes buildMatrixModel,
 // kde první trim co má feature vyhraje), ale v DB to zůstane rozdílné.
 function syncFeatureSectionsFromMatrix() {
-  // Vezmi autoritativní section názvy z buildMatrixModel — projde všechny trims
-  // a první kdo má feature vyhraje (plus MATRIX_DECLARED overrides).
   const model = buildMatrixModel();
   const featureToSection = new Map();
   for (const sec of model) {
@@ -1125,10 +1123,13 @@ function syncFeatureSectionsFromMatrix() {
       if (cleanF) featureToSection.set(cleanF, sec.section);
     }
   }
-  if (featureToSection.size === 0) return;
+  console.log('[syncFeatureSections] map size:', featureToSection.size, 'entries (sample):', Array.from(featureToSection.entries()).slice(0, 3));
+  if (featureToSection.size === 0) { console.warn('[syncFeatureSections] EMPTY MAP — skipping'); return; }
 
+  let changedCount = 0;
   for (const t of (CURRENT_DATA.trims || [])) {
     if (!Array.isArray(t.features)) continue;
+    const beforeNames = t.features.map(s => s.section);
     const itemsBySection = new Map();
     const sectionOrder = [];
     for (const sec of t.features) {
@@ -1143,7 +1144,13 @@ function syncFeatureSectionsFromMatrix() {
       }
     }
     t.features = sectionOrder.map((s) => ({ section: s, items: itemsBySection.get(s) }));
+    const afterNames = t.features.map(s => s.section);
+    if (JSON.stringify(beforeNames) !== JSON.stringify(afterNames)) {
+      changedCount++;
+      console.log(`[syncFeatureSections] ${t.name}: ${JSON.stringify(beforeNames)} -> ${JSON.stringify(afterNames)}`);
+    }
   }
+  console.log('[syncFeatureSections] changed trims:', changedCount, '/', (CURRENT_DATA.trims || []).length);
 }
 
 function matrixRowCount() {
