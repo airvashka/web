@@ -1,42 +1,39 @@
 ---
 import BaseLayout from '@layouts/BaseLayout.astro';
-import FuelIcon from '@components/FuelIcon.astro';
 import DirectusImage from '@components/DirectusImage.astro';
+import FuelIcon from '@components/FuelIcon.astro';
 import Breadcrumbs from '@components/Breadcrumbs.astro';
 import { directusGet } from '@lib/directus';
 import { buildStockSlug } from '@lib/stockSlug';
 import type { Brand, StockVehicle } from '@lib/types';
 
-/* ============================================================
-   SKLAD LISTING — design extends Skladovka section z home.jsx
-   Sidebar filtrů (vlevo) + .scard grid (vpravo)
-   SSR (prerender=false) — skladovka je vždy živá, nový/prodaný vůz se
-   projeví hned bez rebuildu. Edge cache 60s drží výkon.
-   ============================================================ */
+/* /sklad — finální layout (Modern Authorized Dealer). Reálná data z Directusu,
+   filter sidebar (značka/model/palivo/stav/pohon/dostupnost) + sort + URL sync. */
 export const prerender = false;
-
 Astro.response.headers.set('Cache-Control', 'public, s-maxage=60, stale-while-revalidate=300');
 
-// forceLive (3. param) = vždy čerstvý fetch z Directusu, žádná build-time cache.
-const brands = await directusGet<Brand>('brands', { sort: ['sort'], fields: ['id', 'slug', 'name'] }, true);
-
-type VehicleListItem = StockVehicle & {
+type V = StockVehicle & {
   brand?: { name: string; slug: string };
-  model?: { name: string; slug: string; fuel_type?: string };
+  model?: { name: string; slug: string; fuel_type?: string;
+    promo_active?: boolean; promo_label?: string; promo_discount_amount?: number; promo_valid_to?: string };
   trim_level?: { name: string } | null;
   model_year?: { year: number } | null;
-  photos?: Array<{ directus_files_id: string }>;
+  photos?: Array<{ directus_files_id: string }> | string[];
   transmission?: string;
   drivetrain?: string;
-  color_category?: string;
+  highlighted?: boolean;
+  highlight_label?: string;
+  listed_at?: string;
 };
 
-const vehicles = await directusGet<VehicleListItem>('stock_vehicles', {
+const brands = await directusGet<Brand>('brands', { sort: ['sort'], fields: ['id', 'slug', 'name'] }, true);
+
+const vehicles = await directusGet<V>('stock_vehicles', {
   filter: { status: { _eq: 'published' }, availability: { _neq: 'sold' } },
   sort: ['-listed_at', 'sort'],
   fields: [
     'id', 'vin', 'list_price', 'promo_price', 'lowest_price_30d', 'km',
-    'condition', 'availability', 'color_code', 'color_category',
+    'condition', 'availability', 'color_code',
     'transmission', 'drivetrain',
     'highlighted', 'highlight_label', 'listed_at',
     'trim_level_snapshot',
@@ -49,34 +46,18 @@ const vehicles = await directusGet<VehicleListItem>('stock_vehicles', {
   ],
 }, true);
 
-function firstPhoto(v: VehicleListItem): string | null {
-  if (!Array.isArray(v.photos) || v.photos.length === 0) return null;
-  const f: any = v.photos[0];
-  return typeof f === 'string' ? f : (f?.directus_files_id ?? null);
-}
-
 const fuelLabels: Record<string, string> = { petrol: 'Benzín', diesel: 'Diesel', hybrid: 'Hybrid', phev: 'PHEV', ev: 'Elektro' };
-const conditionLabels: Record<string, string> = { new: 'Nové', demo: 'Předváděcí', used: 'Ojeté' };
-const colorCategoryLabels: Record<string, string> = {
-  white: 'Bílá', black: 'Černá', gray: 'Šedá', silver: 'Stříbrná',
-  blue: 'Modrá', red: 'Červená', green: 'Zelená', yellow: 'Žlutá',
-  orange: 'Oranžová', brown: 'Hnědá', other: 'Jiná',
-};
 
-// Unique values pro filtry
 const availableFuels = [...new Set(vehicles.map((v) => v.model?.fuel_type).filter(Boolean))] as string[];
 const availableConditions = [...new Set(vehicles.map((v) => v.condition).filter(Boolean))] as string[];
 const has4wd = vehicles.some((v) => v.drivetrain === '4wd' || v.drivetrain === 'awd');
 
-// Modely seskupené podle značky — pro <select> s <optgroup>
 type ModelOpt = { slug: string; name: string };
 const modelsByBrand = new Map<string, { brandName: string; models: ModelOpt[] }>();
 vehicles.forEach((v) => {
   if (!v.brand?.slug || !v.model?.slug) return;
   const bSlug = v.brand.slug;
-  if (!modelsByBrand.has(bSlug)) {
-    modelsByBrand.set(bSlug, { brandName: v.brand.name, models: [] });
-  }
+  if (!modelsByBrand.has(bSlug)) modelsByBrand.set(bSlug, { brandName: v.brand.name, models: [] });
   const group = modelsByBrand.get(bSlug)!;
   if (!group.models.find((m) => m.slug === v.model!.slug)) {
     group.models.push({ slug: v.model.slug, name: v.model.name });
@@ -86,448 +67,510 @@ const modelGroups = Array.from(modelsByBrand.entries())
   .sort((a, b) => a[1].brandName.localeCompare(b[1].brandName))
   .map(([slug, group]) => ({ brandSlug: slug, brandName: group.brandName, models: group.models.sort((a, b) => a.name.localeCompare(b.name)) }));
 
-// Non-breaking space mezi číslem a jednotkou — zabrání zalomení "849 900\nKč" v úzkých kartách.
-const NBSP = String.fromCharCode(160);
-const fmtPrice = (n?: number | null) => (n ? `${n.toLocaleString('cs-CZ')} Kč` : '—');
-const fmtKm = (n?: number | null) => (n === 0 || !n ? '0 km' : `${n.toLocaleString('cs-CZ')} km`);
+const stats = {
+  inStock: vehicles.filter(v => v.availability === 'in_stock').length,
+  onWay: vehicles.filter(v => v.availability === 'on_the_way').length,
+  onOrder: vehicles.filter(v => v.availability === 'on_order').length,
+};
+
+const fmtPrice = (n?: number | null) => n ? `${n.toLocaleString('cs-CZ')} Kč` : '—';
+const fmtKm = (n?: number | null) => (n === 0 || !n) ? '0 km' : `${n.toLocaleString('cs-CZ')} km`;
+
+function firstPhoto(v: V): string | null {
+  if (!Array.isArray(v.photos) || v.photos.length === 0) return null;
+  const f: any = v.photos[0];
+  return typeof f === 'string' ? f : (f?.directus_files_id ?? null);
+}
+
+const today = new Date().toISOString().slice(0, 10);
+const cards = vehicles.map((v) => {
+  const anyV = v as any;
+  const photoId = firstPhoto(v);
+  const brandName = v.brand?.name ?? '';
+  const modelName = v.model?.name ?? '';
+  const trimName: string = v.trim_level?.name ?? anyV.trim_level_snapshot?.name ?? anyV.trim_level_snapshot?.raw_name ?? '';
+  const year = v.model_year?.year;
+  const fuelType = v.model?.fuel_type ?? '';
+  const tx = v.transmission === 'manual' ? 'Manuál' : v.transmission === 'automatic' ? 'Automat' : (v.transmission ?? '');
+  const dt = (v.drivetrain === '4wd' || v.drivetrain === 'awd') ? '4×4' : v.drivetrain === 'rwd' ? 'RWD' : 'FWD';
+  const km = fmtKm(v.km);
+  const isOnOrder = v.availability === 'on_order';
+  const isOnWay = v.availability === 'on_the_way';
+
+  let conditionLabel = '';
+  let conditionCls = '';
+  if (isOnOrder) { conditionLabel = 'Na objednání'; conditionCls = 'st-order'; }
+  else if (v.condition === 'new') { conditionLabel = 'Nové'; conditionCls = 'st-new'; }
+  else if (v.condition === 'demo') { conditionLabel = 'Předváděcí'; conditionCls = 'st-demo'; }
+  else if (v.condition === 'used') { conditionLabel = 'Ojeté'; conditionCls = 'st-used'; }
+
+  const modelPromoActive = !!v.model?.promo_active
+    && (v.model?.promo_label || v.model?.promo_discount_amount)
+    && (!v.model?.promo_valid_to || String(v.model.promo_valid_to) >= today);
+  const modelPromoLabel = (v.model?.promo_label ?? '').toString().trim();
+  const modelPromoDiscount = Number(v.model?.promo_discount_amount ?? 0) || 0;
+  const customHighlight = (v.highlight_label ?? '').toString().trim();
+
+  let actionPill = '';
+  if (modelPromoActive && modelPromoLabel) actionPill = modelPromoLabel;
+  else if (v.highlighted && customHighlight) actionPill = customHighlight;
+  else if (v.highlighted) actionPill = 'Novinka';
+
+  const baseList = v.list_price;
+  const isNew = v.condition === 'new';
+  let displayPrice = v.promo_price ?? baseList;
+  let priceBefore: number | null = null;
+  if (v.promo_price && baseList && v.promo_price < baseList) {
+    priceBefore = baseList;
+  } else if (modelPromoActive && modelPromoDiscount > 0 && baseList && isNew) {
+    displayPrice = baseList - modelPromoDiscount;
+    priceBefore = baseList;
+  }
+  const hasDiscount = !!priceBefore;
+
+  const detailUrl = `/sklad/${buildStockSlug(anyV, v.brand as any, v.model as any, (v.trim_level ?? { name: trimName }) as any)}`;
+
+  return {
+    v, photoId, brandName, modelName, trimName, year, fuelType,
+    tx, dt, km, isOnOrder, isOnWay, conditionLabel, conditionCls,
+    actionPill, displayPrice, priceBefore, hasDiscount, detailUrl,
+  };
+});
 ---
 
 <BaseLayout title="Skladové vozy" description="Aktuální nabídka skladových vozů KGM, OMODA & JAECOO, Farizon u SFR Motor Praha-Ďáblice.">
   <Breadcrumbs items={[{ label: 'Skladové vozy' }]} />
-  <section class="sklad-page">
-    <div class="container">
 
-      <div class="sklad-head">
-        <div>
-          <div class="section-eyebrow">Skladovka</div>
-          <h1>Vozy ihned k odběru</h1>
-        </div>
-        <div class="sklad-count" data-result-count>
-          {vehicles.length > 0
-            ? `${vehicles.length} ${vehicles.length === 1 ? 'vůz' : vehicles.length < 5 ? 'vozy' : 'vozů'} skladem`
-            : 'Skladovka se právě plní'}
+  <section class="a-page">
+    <div class="a-container">
+      <div class="a-hero">
+        <h1>Skladové vozy</h1>
+        <p>Vyberte si z nabídky {vehicles.length} vozů KGM, OMODA &amp; JAECOO a Farizon.</p>
+        <div class="a-stats">
+          <div class="a-stat"><span class="a-stat-val">{stats.inStock}</span><span class="a-stat-lbl">Skladem</span></div>
+          <div class="a-stat"><span class="a-stat-val">{stats.onWay}</span><span class="a-stat-lbl">Na cestě</span></div>
+          <div class="a-stat"><span class="a-stat-val">{stats.onOrder}</span><span class="a-stat-lbl">Na objednání</span></div>
         </div>
       </div>
 
-      {vehicles.length === 0 ? (
-        <div class="sklad-empty">
-          <p>Žádné vozy v adminu zatím nejsou. Napište nám, najdeme tu pravou.</p>
-          <a href="/kontakt?form=stock_inquiry" class="btn btn-primary" style="margin-top: 16px;">Napište nám</a>
-        </div>
-      ) : (
-        <div class="sklad-layout">
-          <!-- ===== FILTERS SIDEBAR ===== -->
-          <aside class="sklad-filters" data-filters>
-            <h3>Filtry</h3>
+      <div class="a-layout">
+        <aside class="a-sidebar" data-filters>
+          <div class="a-sb-head">
+            <strong>Filtry</strong>
+            <button type="button" class="a-sb-clear" data-reset>Resetovat</button>
+          </div>
 
-            <div class="fblock">
-              <h4>Značka</h4>
-              <label><input type="radio" name="brand" value="all" checked /> Všechny</label>
-              {brands.map((b) => (
-                <label><input type="radio" name="brand" value={b.slug} /> {b.name}</label>
+          <div class="a-fblock">
+            <h4>Dostupnost</h4>
+            <label><input type="checkbox" value="in_stock" checked data-avail-cb /> Skladem v Praze <span class="a-cnt">{stats.inStock}</span></label>
+            <label><input type="checkbox" value="on_the_way" checked data-avail-cb /> Na cestě <span class="a-cnt">{stats.onWay}</span></label>
+            <label><input type="checkbox" value="on_order" data-avail-cb /> Na objednání <span class="a-cnt">{stats.onOrder}</span></label>
+          </div>
+
+          <div class="a-fblock">
+            <h4>Značka</h4>
+            <label><input type="radio" name="brand" value="all" checked /> Všechny</label>
+            {brands.map((b) => (
+              <label><input type="radio" name="brand" value={b.slug} /> {b.name}</label>
+            ))}
+          </div>
+
+          {modelGroups.length > 0 && (
+            <div class="a-fblock">
+              <h4>Model</h4>
+              <select class="a-select" data-filter-model>
+                <option value="all">Všechny modely</option>
+                {modelGroups.map((g) => (
+                  <optgroup label={g.brandName} data-brand={g.brandSlug}>
+                    {g.models.map((m) => (
+                      <option value={m.slug} data-brand={g.brandSlug}>{m.name}</option>
+                    ))}
+                  </optgroup>
+                ))}
+              </select>
+            </div>
+          )}
+
+          {availableFuels.length > 0 && (
+            <div class="a-fblock">
+              <h4>Palivo</h4>
+              <label><input type="radio" name="fuel" value="all" checked /> Vše</label>
+              {availableFuels.map((f) => (
+                <label><input type="radio" name="fuel" value={f} /> {fuelLabels[f] ?? f}</label>
               ))}
             </div>
+          )}
 
-            {modelGroups.length > 0 && (
-              <div class="fblock">
-                <h4>Model</h4>
-                <select name="model" class="filter-select" data-filter-model>
-                  <option value="all">Všechny modely</option>
-                  {modelGroups.map((g) => (
-                    <optgroup label={g.brandName} data-brand={g.brandSlug}>
-                      {g.models.map((m) => (
-                        <option value={m.slug} data-brand={g.brandSlug}>{m.name}</option>
-                      ))}
-                    </optgroup>
-                  ))}
-                </select>
-              </div>
-            )}
-
-            {availableFuels.length > 0 && (
-              <div class="fblock">
-                <h4>Palivo</h4>
-                <label><input type="radio" name="fuel" value="all" checked /> Vše</label>
-                {availableFuels.map((f) => (
-                  <label><input type="radio" name="fuel" value={f} /> {fuelLabels[f] ?? f}</label>
-                ))}
-              </div>
-            )}
-
-            {availableConditions.length > 0 && (
-              <div class="fblock">
-                <h4>Stav</h4>
-                <label><input type="radio" name="condition" value="all" checked /> Vše</label>
-                {availableConditions.map((c) => (
-                  <label><input type="radio" name="condition" value={c} /> {conditionLabels[c] ?? c}</label>
-                ))}
-              </div>
-            )}
-
-            {has4wd && (
-              <div class="fblock">
-                <h4>Pohon</h4>
-                <label><input type="radio" name="drivetrain" value="all" checked /> Vše</label>
-                <label><input type="radio" name="drivetrain" value="4wd" /> Pouze 4×4</label>
-              </div>
-            )}
-
-            <div class="fblock">
-              <h4>Dostupnost</h4>
-              <label><input type="checkbox" name="availability" value="in_stock" checked data-avail-cb /> Skladem</label>
-              <label><input type="checkbox" name="availability" value="on_the_way" checked data-avail-cb /> Na cestě</label>
-              <label><input type="checkbox" name="availability" value="on_order" data-avail-cb /> Na objednání</label>
+          {availableConditions.length > 0 && (
+            <div class="a-fblock">
+              <h4>Stav</h4>
+              <label><input type="radio" name="condition" value="all" checked /> Vše</label>
+              {availableConditions.includes('new') && <label><input type="radio" name="condition" value="new" /> Nové</label>}
+              {availableConditions.includes('demo') && <label><input type="radio" name="condition" value="demo" /> Předváděcí</label>}
+              {availableConditions.includes('used') && <label><input type="radio" name="condition" value="used" /> Ojeté</label>}
             </div>
+          )}
 
-            <button type="button" class="btn btn-outline" data-reset style="width:100%; margin-top:8px;">Resetovat</button>
-          </aside>
-
-          <!-- ===== GRID ===== -->
-          <div>
-            <!-- Sort bar nad gridem -->
-            <div class="sort-bar">
-              <label class="sort-label">
-                Seřadit:
-                <select data-sort class="filter-select">
-                  <option value="newest">Nejnovější</option>
-                  <option value="price-asc">Cena ↑</option>
-                  <option value="price-desc">Cena ↓</option>
-                </select>
-              </label>
+          {has4wd && (
+            <div class="a-fblock">
+              <h4>Pohon</h4>
+              <label><input type="radio" name="drivetrain" value="all" checked /> Vše</label>
+              <label><input type="radio" name="drivetrain" value="4wd" /> Pouze 4×4</label>
             </div>
-            <div class="skladovka-grid" data-grid>
-              {vehicles.map((v) => {
-                const isNew = v.condition === 'new';
-                const isHighlighted = v.highlighted;
-                const customLabel = ((v as any).highlight_label ?? '').toString().trim();
-                // Akce na úrovni modelu
-                const today = new Date().toISOString().slice(0, 10);
-                const modelPromoActive = !!(v.model as any)?.promo_active
-                  && ((v.model as any)?.promo_label || (v.model as any)?.promo_discount_amount)
-                  && (!(v.model as any)?.promo_valid_to || String((v.model as any).promo_valid_to) >= today);
-                const modelPromoLabel = ((v.model as any)?.promo_label ?? '').toString().trim();
-                const modelPromoDiscount = Number((v.model as any)?.promo_discount_amount ?? 0) || 0;
+          )}
+        </aside>
 
-                // Pill: POUZE pro reálný důvod (Akce nebo Highlight s vlastním labelem).
-                // "Skladem"/"Nové" se nezobrazuje — všechny vozy zde jsou skladem,
-                // stav (Nové/Předváděcí/Ojeté) je v info chips dole.
-                let pillLabel = '';
-                if (modelPromoActive && modelPromoLabel) pillLabel = modelPromoLabel;
-                else if (isHighlighted && customLabel) pillLabel = customLabel;
-                else if (isHighlighted) pillLabel = 'Novinka';
+        <div>
+          <div class="a-toolbar">
+            <div class="a-result" data-result-count>
+              <strong>{vehicles.length}</strong> vozů
+            </div>
+            <label class="a-sort">
+              Seřadit:
+              <select class="a-select" data-sort>
+                <option value="newest">Nejnovější</option>
+                <option value="price-asc">Cena ↑</option>
+                <option value="price-desc">Cena ↓</option>
+              </select>
+            </label>
+          </div>
 
-                const photoId = firstPhoto(v);
-                const trimName = v.trim_level?.name ?? (v.trim_level_snapshot as any)?.name ?? (v.trim_level_snapshot as any)?.raw_name ?? '';
-                const carYear = v.model_year?.year ?? '';
-                // Pro on_order vozy přepíšeme štítek "Nové" na "Na objednání"
-                const isOnOrder = v.availability === 'on_order';
-                const conditionLabel = isOnOrder ? 'Na objednání' : (conditionLabels[v.condition ?? ''] ?? '');
-                const fuelLabel = fuelLabels[v.model?.fuel_type ?? ''] ?? '';
-                const transmissionLabel = v.transmission === 'manual' ? 'Manuál' : v.transmission === 'automatic' ? 'Automat' : '';
-                const is4wd = v.drivetrain === '4wd' || v.drivetrain === 'awd';
-                const conditionCls = isOnOrder ? 'on-order' : (v.condition === 'new' ? 'new' : v.condition === 'demo' ? 'demo' : 'used');
-                // Cena: stock.promo > model promo (jen u nových vozů) > list
-                const baseList = v.list_price;
-                let displayPrice = v.promo_price ?? baseList;
-                let priceBefore: number | null = null;
-                if (v.promo_price && baseList && v.promo_price < baseList) {
-                  priceBefore = baseList;
-                } else if (modelPromoActive && modelPromoDiscount > 0 && baseList && isNew) {
-                  // Model-level promo se aplikuje JEN na nové vozy (ojeté a předváděcí mají vlastní cenu)
-                  displayPrice = baseList - modelPromoDiscount;
-                  priceBefore = baseList;
-                }
-                return (
-                  <a
-                    class="scard"
-                    href={`/sklad/${buildStockSlug(v, v.brand, v.model, v.trim_level ?? { name: trimName })}`}
-                    data-brand={v.brand?.slug ?? ''}
-                    data-model={v.model?.slug ?? ''}
-                    data-fuel={v.model?.fuel_type ?? ''}
-                    data-condition={v.condition ?? ''}
-                    data-drivetrain={v.drivetrain ?? ''}
-                    data-availability={v.availability ?? 'in_stock'}
-                    data-price={displayPrice ?? 0}
-                    data-listed-at={(v as any).listed_at ?? ''}
-                  >
-                    <div class="pic">
-                      {photoId && <DirectusImage src={photoId} alt={`${v.brand?.name ?? ''} ${v.model?.name ?? ''}`} aspectRatio="4/3" />}
-                      <div class="pill-stack">
-                        {pillLabel && <span class="pill pill--promo">{pillLabel}</span>}
-                        {conditionLabel && <span class={`pill pill--${conditionCls}`}>{conditionLabel}</span>}
-                      </div>
-                      <FuelIcon type={v.model?.fuel_type ?? ''} />
+          <div class="a-grid" data-grid>
+            {cards.map((c) => (
+              <a
+                class="a-card"
+                href={c.detailUrl}
+                data-brand={c.v.brand?.slug ?? ''}
+                data-model={c.v.model?.slug ?? ''}
+                data-fuel={c.fuelType}
+                data-condition={c.v.condition ?? ''}
+                data-drivetrain={c.v.drivetrain ?? ''}
+                data-availability={c.v.availability ?? 'in_stock'}
+                data-price={c.displayPrice ?? 0}
+                data-listed-at={c.v.listed_at ?? ''}
+              >
+                <div class="a-media">
+                  {c.photoId ? (
+                    <DirectusImage src={c.photoId} alt={`${c.brandName} ${c.modelName}`} widths={[400, 600, 800]} loading="lazy" />
+                  ) : (
+                    <div class="a-media-empty">Bez fotky</div>
+                  )}
+                  {c.actionPill && (
+                    <div class="a-badges">
+                      <span class="a-pill a-pill-promo">{c.actionPill}</span>
                     </div>
-                    <div class="body">
-                      <div class="brand">{v.brand?.name ?? ''}</div>
-                      <div class="nm">{v.model?.name ?? ''}</div>
-                      {trimName && <div class="var">{trimName}</div>}
-                      <div class="specs">
-                        {fuelLabel && <span class="fuel">{fuelLabel}</span>}
-                        {transmissionLabel && <span>{transmissionLabel}</span>}
-                        {is4wd && <span>4×4</span>}
-                      </div>
-                      <div class="foot">
-                        <span class="km">{fmtKm(v.km)}</span>
-                        <div class="price">
-                          {priceBefore && (
-                            <span class="price-before">{fmtPrice(priceBefore)}</span>
-                          )}
-                          <span>{fmtPrice(displayPrice)}</span>
-                        </div>
-                      </div>
-                      <div class="stock-state">
-                        {v.availability === 'on_order' ? 'Na objednání — 4–8 týdnů'
-                          : v.availability === 'on_the_way' ? 'Na cestě'
-                          : v.availability === 'reserved' ? 'Rezervováno'
-                          : 'Skladem v Praze'}
-                      </div>
+                  )}
+                  {c.fuelType && (
+                    <span class="a-fuel-overlay">
+                      <FuelIcon type={c.fuelType} />
+                    </span>
+                  )}
+                </div>
+                <div class="a-body">
+                  <div class="a-brand">{c.brandName}{c.year ? ` · ${c.year}` : ''}</div>
+                  <h3 class="a-title">{c.modelName}</h3>
+                  {c.trimName && <div class="a-trim">{c.trimName}</div>}
+
+                  <div class="a-specs">
+                    <div class="a-spec">
+                      <svg class="a-spec-ico" viewBox="0 0 64 64" fill="none" aria-hidden="true">
+                        <path d="M10 38 A22 22 0 0 1 54 38" stroke="currentColor" stroke-width="4" stroke-linecap="round"/>
+                        <line x1="14" y1="28" x2="17" y2="32" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+                        <line x1="22" y1="22" x2="24" y2="26" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+                        <line x1="32" y1="20" x2="32" y2="24" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+                        <line x1="42" y1="22" x2="40" y2="26" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+                        <line x1="50" y1="28" x2="47" y2="32" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+                        <path d="M32 39 L43 26" stroke="currentColor" stroke-width="3.5" stroke-linecap="round"/>
+                        <circle cx="32" cy="39" r="3" fill="currentColor"/>
+                        <rect x="20" y="46" width="24" height="8" rx="1.5" stroke="currentColor" stroke-width="2.5" fill="none"/>
+                      </svg>
+                      <span>{c.km}</span>
                     </div>
-                  </a>
-                );
-              })}
-            </div>
+                    <div class="a-spec">
+                      <svg class="a-spec-ico" viewBox="0 0 64 64" fill="none" aria-hidden="true">
+                        <circle cx="32" cy="32" r="22" stroke="currentColor" stroke-width="3"/>
+                        <line x1="22" y1="22" x2="22" y2="42" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+                        <line x1="32" y1="22" x2="32" y2="42" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+                        <line x1="42" y1="22" x2="42" y2="42" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+                        <line x1="22" y1="32" x2="42" y2="32" stroke="currentColor" stroke-width="3"/>
+                        <circle cx="22" cy="22" r="2.5" fill="currentColor"/>
+                        <circle cx="32" cy="22" r="2.5" fill="currentColor"/>
+                        <circle cx="42" cy="22" r="2.5" fill="currentColor"/>
+                        <circle cx="22" cy="42" r="2.5" fill="currentColor"/>
+                        <circle cx="32" cy="42" r="2.5" fill="currentColor"/>
+                        <circle cx="42" cy="42" r="2.5" fill="currentColor"/>
+                      </svg>
+                      <span>{c.tx}</span>
+                    </div>
+                    <div class="a-spec">
+                      <svg class="a-spec-ico" viewBox="0 0 64 64" fill="none" aria-hidden="true">
+                        <rect x="10" y="12" width="14" height="14" rx="2" stroke="currentColor" stroke-width="3"/>
+                        <rect x="40" y="12" width="14" height="14" rx="2" stroke="currentColor" stroke-width="3"/>
+                        <rect x="10" y="38" width="14" height="14" rx="2" stroke="currentColor" stroke-width="3"/>
+                        <rect x="40" y="38" width="14" height="14" rx="2" stroke="currentColor" stroke-width="3"/>
+                        <line x1="24" y1="19" x2="40" y2="19" stroke="currentColor" stroke-width="3"/>
+                        <line x1="24" y1="45" x2="40" y2="45" stroke="currentColor" stroke-width="3"/>
+                        <line x1="32" y1="19" x2="32" y2="45" stroke="currentColor" stroke-width="3"/>
+                        <rect x="28" y="28" width="8" height="8" rx="1" stroke="currentColor" stroke-width="2.5" fill="none"/>
+                      </svg>
+                      <span>{c.dt}</span>
+                    </div>
+                    {c.conditionLabel && (
+                      <div class={`a-spec a-spec-state ${c.conditionCls}`}>
+                        <svg class="a-spec-ico" viewBox="0 0 64 64" fill="none" aria-hidden="true">
+                          <path d="M8 36 L8 28 C8 26 9 24 11 23 L17 21 L23 14 C24 13 26 12 28 12 L40 12 C42 12 43 13 44 14 L50 21 L53 23 C55 24 56 26 56 28 L56 36" stroke="currentColor" stroke-width="3"/>
+                          <line x1="8" y1="36" x2="42" y2="36" stroke="currentColor" stroke-width="3"/>
+                          <circle cx="18" cy="40" r="4" stroke="currentColor" stroke-width="2.5"/>
+                          <circle cx="50" cy="48" r="8" stroke="currentColor" stroke-width="2.5" fill="none"/>
+                          <path d="M46 48 L49 51 L54 45" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        <span>{c.conditionLabel}</span>
+                      </div>
+                    )}
+                  </div>
+
+                  <div class="a-price-row">
+                    <div>
+                      {c.hasDiscount && <div class="a-price-old">{fmtPrice(c.priceBefore)}</div>}
+                      <div class="a-price-line"><span class="a-price-val">{fmtPrice(c.displayPrice)}</span><span class="a-price-vat">vč. DPH</span></div>
+                      
+                    </div>
+                  </div>
+
+                  <div class={`a-foot ${c.isOnOrder ? 'a-foot-order' : c.isOnWay ? 'a-foot-way' : 'a-foot-stock'}`}>
+                    <span class="a-dot"></span>
+                    {c.isOnOrder ? 'Na objednání' : c.isOnWay ? 'Na cestě' : 'Skladem v Praze'}
+                  </div>
+                </div>
+              </a>
+            ))}
           </div>
         </div>
-      )}
+      </div>
     </div>
   </section>
 
-  <script>
-    // ===== Klient-side multi-filtr + sort =====
-    const filters = {
-      brand: 'all', model: 'all', fuel: 'all', condition: 'all', drivetrain: 'all',
-    };
-    // Dostupnost je multi-select (checkboxy). Default: skladem + na cestě (NE na objednání).
-    // Set ⊂ ['in_stock', 'on_the_way', 'on_order'] — prázdná = ukáže VŠE.
-    const availabilitySet = new Set(['in_stock', 'on_the_way']);
-    let sortMode = 'newest';
+  <script is:inline>
+    (function () {
+      const filters = { brand: 'all', model: 'all', fuel: 'all', condition: 'all', drivetrain: 'all' };
+      const availabilitySet = new Set(['in_stock', 'on_the_way']);
+      let sortMode = 'newest';
 
-    // Zapíše aktuální stav filtrů do URL query parametrů (bookmarkable + sdílatelné)
-    function syncURL() {
-      const url = new URL(location.href);
-      const map = { brand: 'znacka', model: 'model', fuel: 'palivo', condition: 'stav', drivetrain: 'pohon' };
-      Object.entries(map).forEach(([key, q]) => {
-        const val = filters[key];
-        if (val && val !== 'all') url.searchParams.set(q, val);
-        else url.searchParams.delete(q);
-      });
-      if (sortMode && sortMode !== 'newest') url.searchParams.set('razeni', sortMode);
-      else url.searchParams.delete('razeni');
-      history.replaceState({}, '', url);
-    }
-
-    function applyFilters() {
-      const grid = document.querySelector('[data-grid]');
-      if (!grid) return;
-      const cards = Array.from(grid.querySelectorAll('.scard'));
-      let visible = 0;
-      cards.forEach((c) => {
-        const el = c;
-        const dt = el.dataset.drivetrain ?? '';
-        const drivetrainOk = filters.drivetrain === 'all' || (filters.drivetrain === '4wd' && (dt === '4wd' || dt === 'awd'));
-        // Availability: prázdný set = ukáže vše, jinak musí matchnout
-        const av = el.dataset.availability ?? 'in_stock';
-        const availabilityOk = availabilitySet.size === 0 || availabilitySet.has(av);
-        const ok =
-          (filters.brand === 'all' || el.dataset.brand === filters.brand) &&
-          (filters.model === 'all' || el.dataset.model === filters.model) &&
-          (filters.fuel === 'all' || el.dataset.fuel === filters.fuel) &&
-          (filters.condition === 'all' || el.dataset.condition === filters.condition) &&
-          drivetrainOk &&
-          availabilityOk;
-        if (ok) { el.style.display = ''; visible++; }
-        else { el.style.display = 'none'; }
-      });
-      // Sort — řazení DOM children podle data-price / data-listed-at
-      const visibleCards = cards.filter((c) => c.style.display !== 'none');
-      visibleCards.sort((a, b) => {
-        if (sortMode === 'price-asc') return Number(a.dataset.price ?? 0) - Number(b.dataset.price ?? 0);
-        if (sortMode === 'price-desc') return Number(b.dataset.price ?? 0) - Number(a.dataset.price ?? 0);
-        // 'newest' default: descending by listed_at
-        return (b.dataset.listedAt ?? '').localeCompare(a.dataset.listedAt ?? '');
-      });
-      visibleCards.forEach((c) => grid.appendChild(c));
-      syncURL();
-      // Update čítače
-      const count = document.querySelector('[data-result-count]');
-      if (count) {
-        const noun = visible === 1 ? 'vůz' : visible < 5 ? 'vozy' : 'vozů';
-        count.textContent = visible === 0 ? 'Žádné vozy nesplňují filtr' : `${visible} ${noun} skladem`;
-      }
-      // Model select — dynamicky skryj/ukaž optgroup podle vybrané značky
-      const modelSelect = document.querySelector('[data-filter-model]');
-      if (modelSelect) {
-        modelSelect.querySelectorAll('optgroup').forEach((og) => {
-          const ogBrand = og.dataset.brand ?? '';
-          og.hidden = !(filters.brand === 'all' || filters.brand === ogBrand);
+      function syncURL() {
+        const url = new URL(location.href);
+        const map = { brand: 'znacka', model: 'model', fuel: 'palivo', condition: 'stav', drivetrain: 'pohon' };
+        Object.entries(map).forEach(([key, q]) => {
+          const val = filters[key];
+          if (val && val !== 'all') url.searchParams.set(q, val);
+          else url.searchParams.delete(q);
         });
-        // Pokud aktuálně zvolený model nepatří k vybrané značce, reset model na "all"
-        if (filters.model !== 'all' && modelSelect.value) {
-          const opt = modelSelect.querySelector(`option[value="${modelSelect.value}"]`);
-          if (opt && opt.dataset.brand && filters.brand !== 'all' && opt.dataset.brand !== filters.brand) {
-            modelSelect.value = 'all';
-            filters.model = 'all';
-          }
+        if (sortMode && sortMode !== 'newest') url.searchParams.set('razeni', sortMode);
+        else url.searchParams.delete('razeni');
+        history.replaceState({}, '', url);
+      }
+
+      function applyFilters() {
+        const grid = document.querySelector('[data-grid]');
+        if (!grid) return;
+        const cards = Array.from(grid.querySelectorAll('.a-card'));
+        let visible = 0;
+        cards.forEach((c) => {
+          const el = c;
+          const dt = el.dataset.drivetrain || '';
+          const drivetrainOk = filters.drivetrain === 'all' || (filters.drivetrain === '4wd' && (dt === '4wd' || dt === 'awd'));
+          const av = el.dataset.availability || 'in_stock';
+          const availabilityOk = availabilitySet.size === 0 || availabilitySet.has(av);
+          const ok =
+            (filters.brand === 'all' || el.dataset.brand === filters.brand) &&
+            (filters.model === 'all' || el.dataset.model === filters.model) &&
+            (filters.fuel === 'all' || el.dataset.fuel === filters.fuel) &&
+            (filters.condition === 'all' || el.dataset.condition === filters.condition) &&
+            drivetrainOk && availabilityOk;
+          if (ok) { el.style.display = ''; visible++; } else { el.style.display = 'none'; }
+        });
+        const visibleCards = cards.filter((c) => c.style.display !== 'none');
+        visibleCards.sort((a, b) => {
+          if (sortMode === 'price-asc') return Number(a.dataset.price || 0) - Number(b.dataset.price || 0);
+          if (sortMode === 'price-desc') return Number(b.dataset.price || 0) - Number(a.dataset.price || 0);
+          return (b.dataset.listedAt || '').localeCompare(a.dataset.listedAt || '');
+        });
+        visibleCards.forEach((c) => grid.appendChild(c));
+        syncURL();
+        const count = document.querySelector('[data-result-count]');
+        if (count) {
+          const noun = visible === 1 ? 'vůz' : visible < 5 ? 'vozy' : 'vozů';
+          count.innerHTML = visible === 0 ? '<strong>Žádné vozy</strong> nesplňují filtr' : '<strong>' + visible + '</strong> ' + noun;
+        }
+        const modelSelect = document.querySelector('[data-filter-model]');
+        if (modelSelect) {
+          modelSelect.querySelectorAll('optgroup').forEach((og) => {
+            const ogBrand = og.dataset.brand || '';
+            og.hidden = !(filters.brand === 'all' || filters.brand === ogBrand);
+          });
         }
       }
-    }
 
-    // Radio button changes (brand, fuel, condition, drivetrain)
-    document.querySelectorAll('[data-filters] input[type=radio]').forEach((input) => {
-      input.addEventListener('change', (e) => {
-        const t = e.target;
-        if (t.name in filters) {
-          filters[t.name] = t.value;
-          applyFilters();
-        }
+      document.querySelectorAll('[data-filters] input[type=radio]').forEach((input) => {
+        input.addEventListener('change', (e) => {
+          const t = e.target;
+          if (t.name in filters) { filters[t.name] = t.value; applyFilters(); }
+        });
       });
-    });
-
-    // Availability checkboxy (multi-select)
-    document.querySelectorAll('[data-avail-cb]').forEach((input) => {
-      input.addEventListener('change', (e) => {
-        const t = e.target;
-        if (t.checked) availabilitySet.add(t.value);
-        else availabilitySet.delete(t.value);
+      document.querySelectorAll('[data-avail-cb]').forEach((input) => {
+        input.addEventListener('change', (e) => {
+          const t = e.target;
+          if (t.checked) availabilitySet.add(t.value); else availabilitySet.delete(t.value);
+          applyFilters();
+        });
+      });
+      document.querySelector('[data-filter-model]')?.addEventListener('change', (e) => {
+        filters.model = e.target.value;
+        const opt = e.target.selectedOptions[0];
+        const optBrand = opt && opt.dataset ? opt.dataset.brand : null;
+        if (optBrand && filters.brand !== optBrand && filters.model !== 'all') {
+          filters.brand = optBrand;
+          const radio = document.querySelector('[data-filters] input[name=brand][value="' + optBrand + '"]');
+          if (radio) radio.checked = true;
+        }
         applyFilters();
       });
-    });
-
-    // Model select change
-    document.querySelector('[data-filter-model]')?.addEventListener('change', (e) => {
-      filters.model = e.target.value;
-      // Pokud vybraný model patří k jiné značce, auto-set brand
-      const opt = e.target.selectedOptions[0];
-      const optBrand = opt?.dataset.brand;
-      if (optBrand && filters.brand !== optBrand && filters.model !== 'all') {
-        filters.brand = optBrand;
-        const radio = document.querySelector(`[data-filters] input[name=brand][value="${optBrand}"]`);
-        if (radio) radio.checked = true;
-      }
-      applyFilters();
-    });
-
-    // Sort select change
-    document.querySelector('[data-sort]')?.addEventListener('change', (e) => {
-      sortMode = e.target.value;
-      applyFilters();
-    });
-
-    // Reset
-    document.querySelector('[data-reset]')?.addEventListener('click', () => {
-      Object.keys(filters).forEach((k) => { filters[k] = 'all'; });
-      document.querySelectorAll('[data-filters] input[value=all]').forEach((i) => (i.checked = true));
-      // Availability — reset na default (skladem + na cestě, NE on_order)
-      availabilitySet.clear();
-      availabilitySet.add('in_stock');
-      availabilitySet.add('on_the_way');
-      document.querySelectorAll('[data-avail-cb]').forEach((cb) => {
-        cb.checked = ['in_stock', 'on_the_way'].includes(cb.value);
+      document.querySelector('[data-sort]')?.addEventListener('change', (e) => { sortMode = e.target.value; applyFilters(); });
+      document.querySelector('[data-reset]')?.addEventListener('click', () => {
+        Object.keys(filters).forEach((k) => { filters[k] = 'all'; });
+        document.querySelectorAll('[data-filters] input[value=all]').forEach((i) => (i.checked = true));
+        availabilitySet.clear();
+        availabilitySet.add('in_stock');
+        availabilitySet.add('on_the_way');
+        document.querySelectorAll('[data-avail-cb]').forEach((cb) => {
+          cb.checked = ['in_stock', 'on_the_way'].includes(cb.value);
+        });
+        const ms = document.querySelector('[data-filter-model]');
+        if (ms) ms.value = 'all';
+        const ss = document.querySelector('[data-sort]');
+        if (ss) ss.value = 'newest';
+        sortMode = 'newest';
+        applyFilters();
       });
-      const ms = document.querySelector('[data-filter-model]');
-      if (ms) ms.value = 'all';
-      applyFilters();
-    });
 
-    // URL query params — ?znacka=kgm&model=torres&palivo=elektro&stav=novy&pohon=4wd&razeni=price-asc
-    // Dostupnost je multi-value: ?dostupnost=on_order (přepne default filter)
-    const params = new URLSearchParams(window.location.search);
-    const URL_MAP = [
-      { qs: ['znacka', 'brand'], key: 'brand', radio: 'brand' },
-      { qs: ['palivo', 'fuel'], key: 'fuel', radio: 'fuel' },
-      { qs: ['stav', 'condition'], key: 'condition', radio: 'condition' },
-      { qs: ['pohon', 'drivetrain'], key: 'drivetrain', radio: 'drivetrain' },
-    ];
-    let hasAnyParam = false;
-    // Availability via ?dostupnost=on_order nebo CSV (?dostupnost=on_order,on_the_way)
-    const availParam = params.get('dostupnost') ?? params.get('availability');
-    if (availParam) {
-      const wanted = availParam.split(',').map((s) => s.trim()).filter(Boolean);
-      // Reset default checkboxy a aplikuj jen ty z URL
-      availabilitySet.clear();
-      document.querySelectorAll('[data-avail-cb]').forEach((cb) => {
-        const on = wanted.includes(cb.value);
-        cb.checked = on;
-        if (on) availabilitySet.add(cb.value);
+      const params = new URLSearchParams(window.location.search);
+      const availParam = params.get('dostupnost') || params.get('availability');
+      if (availParam) {
+        const wanted = availParam.split(',').map((s) => s.trim()).filter(Boolean);
+        availabilitySet.clear();
+        document.querySelectorAll('[data-avail-cb]').forEach((cb) => {
+          const on = wanted.includes(cb.value);
+          cb.checked = on;
+          if (on) availabilitySet.add(cb.value);
+        });
+      }
+      const URL_MAP = [
+        ['znacka', 'brand', 'brand'], ['palivo', 'fuel', 'fuel'],
+        ['stav', 'condition', 'condition'], ['pohon', 'drivetrain', 'drivetrain'],
+      ];
+      URL_MAP.forEach(([q, key, rname]) => {
+        const v = params.get(q);
+        if (!v) return;
+        const r = document.querySelector('[data-filters] input[name=' + rname + '][value="' + v + '"]');
+        if (r) { r.checked = true; filters[key] = v; }
       });
-      hasAnyParam = true;
-    }
-    URL_MAP.forEach(({ qs, key, radio: rname }) => {
-      const v = qs.map((q) => params.get(q)).find(Boolean);
-      if (!v) return;
-      const r = document.querySelector(`[data-filters] input[name=${rname}][value="${v}"]`);
-      if (r) { r.checked = true; filters[key] = v; hasAnyParam = true; }
-    });
-    const modelParam = params.get('model');
-    if (modelParam) {
-      const ms = document.querySelector('[data-filter-model]');
-      if (ms) {
-        const opt = ms.querySelector(`option[value="${modelParam}"]`);
-        if (opt) { ms.value = modelParam; filters.model = modelParam; hasAnyParam = true; }
+      const modelParam = params.get('model');
+      if (modelParam) {
+        const ms = document.querySelector('[data-filter-model]');
+        if (ms && ms.querySelector('option[value="' + modelParam + '"]')) { ms.value = modelParam; filters.model = modelParam; }
       }
-    }
-    const sortParam = params.get('razeni') ?? params.get('sort');
-    if (sortParam) {
-      const ss = document.querySelector('[data-sort]');
-      if (ss) {
-        const o = ss.querySelector(`option[value="${sortParam}"]`);
-        if (o) { ss.value = sortParam; sortMode = sortParam; hasAnyParam = true; }
+      const sortParam = params.get('razeni') || params.get('sort');
+      if (sortParam) {
+        const ss = document.querySelector('[data-sort]');
+        if (ss && ss.querySelector('option[value="' + sortParam + '"]')) { ss.value = sortParam; sortMode = sortParam; }
       }
-    }
-    // Vždy aplikuj filtry na initial load — i bez URL params se musí
-    // aplikovat default availabilitySet (jen in_stock + on_the_way).
-    // Bez tohoto by se on_order vozy zobrazily i když checkbox není zaškrtnutý.
-    applyFilters();
+      applyFilters();
+    })();
   </script>
 
-  <style>
-    .sklad-filters label {
-      display: flex; align-items: center; gap: 10px;
-      padding: 6px 0;
-      font-size: 14px;
-      cursor: pointer;
-      color: var(--text);
-    }
-    .sklad-filters label:hover { color: var(--accent); }
+  <style is:global>
+    .a-page { background: #FAFAFB; padding: 12px 0 80px; }
+    .a-container { max-width: 1320px; margin: 0 auto; padding: 0 24px; }
 
-    /* Filter select (Model + Sort) — konzistentní s designem */
-    .filter-select {
-      width: 100%;
-      padding: 8px 10px;
-      font-size: 14px;
-      font-family: inherit;
-      color: var(--text);
-      background: #fff;
-      border: 1px solid var(--line);
-      border-radius: 6px;
-      cursor: pointer;
-      transition: border-color .15s;
-    }
-    .filter-select:hover, .filter-select:focus {
-      border-color: var(--accent);
-      outline: none;
-    }
+    .a-hero { background: #fff; border-radius: 16px; padding: 28px 32px; margin-bottom: 20px; box-shadow: 0 1px 2px rgba(0,0,0,0.04); }
+    .a-hero h1 { font-size: clamp(24px, 3vw, 32px); font-weight: 700; letter-spacing: -0.02em; margin: 0 0 4px; color: #1A1A1F; font-family: var(--font-display, inherit); }
+    .a-hero p { color: #6B6B73; margin: 0 0 18px; font-size: 15px; }
+    .a-stats { display: flex; gap: 32px; flex-wrap: wrap; }
+    .a-stat { display: flex; flex-direction: column; gap: 2px; }
+    .a-stat-val { font-size: 22px; font-weight: 700; color: #1A1A1F; }
+    .a-stat-lbl { font-size: 11px; color: #6B6B73; text-transform: uppercase; letter-spacing: 0.06em; }
 
-    /* Sort bar nad gridem */
-    .sort-bar {
-      display: flex;
-      justify-content: flex-end;
-      margin-bottom: 16px;
-    }
-    .sort-label {
-      display: inline-flex;
-      align-items: center;
-      gap: 10px;
-      font-size: 13px;
-      color: var(--text-muted);
-      letter-spacing: 0.02em;
-    }
-    .sort-label .filter-select {
-      width: auto;
-      min-width: 140px;
-      font-size: 13px;
-      padding: 6px 8px;
-    }
+    .a-layout { display: grid; grid-template-columns: 260px 1fr; gap: 20px; }
+    @media (max-width: 920px) { .a-layout { grid-template-columns: 1fr; } .a-sidebar { position: static !important; } }
+
+    .a-sidebar { background: #fff; border-radius: 16px; padding: 18px 20px; box-shadow: 0 1px 2px rgba(0,0,0,0.04); position: sticky; top: 16px; height: max-content; max-height: calc(100vh - 32px); overflow-y: auto; }
+    .a-sb-head { display: flex; justify-content: space-between; align-items: center; padding-bottom: 12px; border-bottom: 1px solid #F0F0F2; margin-bottom: 12px; }
+    .a-sb-head strong { font-size: 15px; }
+    .a-sb-clear { background: none; border: 0; color: #E85D2C; font-size: 12.5px; cursor: pointer; padding: 4px 8px; border-radius: 6px; font-family: inherit; }
+    .a-sb-clear:hover { background: #FFF3EC; }
+
+    .a-fblock { padding: 12px 0; border-bottom: 1px solid #F0F0F2; }
+    .a-fblock:last-child { border-bottom: 0; }
+    .a-fblock h4 { font-size: 11px; font-weight: 700; color: #6B6B73; text-transform: uppercase; letter-spacing: 0.06em; margin: 0 0 10px; }
+    .a-fblock label { display: flex; align-items: center; gap: 8px; padding: 5px 0; cursor: pointer; font-size: 13.5px; color: #2A2A33; }
+    .a-fblock label:hover { color: #E85D2C; }
+    .a-fblock input { accent-color: #E85D2C; }
+    .a-cnt { margin-left: auto; font-size: 11.5px; color: #9B9BA3; }
+
+    .a-select { width: 100%; padding: 8px 10px; font-size: 13.5px; font-family: inherit; color: #1A1A1F; background: #fff; border: 1px solid #E5E5EA; border-radius: 6px; cursor: pointer; }
+    .a-select:hover, .a-select:focus { border-color: #E85D2C; outline: none; }
+
+    .a-toolbar { display: flex; justify-content: space-between; align-items: center; padding: 0 4px 14px; gap: 16px; }
+    .a-result { font-size: 14px; color: #4A4A52; }
+    .a-result strong { color: #1A1A1F; }
+    .a-sort { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; color: #6B6B73; }
+    .a-sort .a-select { width: auto; min-width: 150px; }
+
+    .a-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)); gap: 20px; }
+
+    .a-card { background: #fff; border-radius: 16px; overflow: hidden; box-shadow: 0 1px 2px rgba(0,0,0,0.04), 0 8px 24px rgba(0,0,0,0.06); transition: transform 0.2s, box-shadow 0.2s; position: relative; display: flex; flex-direction: column; cursor: pointer; text-decoration: none; color: inherit; }
+    .a-card:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.08), 0 16px 40px rgba(0,0,0,0.12); }
+    .a-media { position: relative; aspect-ratio: 4 / 3; background: #F2F2F4; overflow: hidden; }
+    .a-media img { width: 100% !important; height: 100% !important; object-fit: cover; display: block; }
+    .a-media-empty { width: 100%; height: 100%; display: grid; place-items: center; color: #ccc; font-size: 12px; }
+    .a-badges { position: absolute; top: 12px; left: 12px; display: flex; gap: 6px; z-index: 2; }
+    .a-pill { color: #fff; padding: 6px 12px; border-radius: 999px; font-size: 11.5px; font-weight: 700; letter-spacing: 0.02em; backdrop-filter: blur(8px); text-transform: uppercase; }
+    .a-pill-promo { background: #E85D2C; }
+    .a-fuel-overlay { position: absolute; bottom: 10px; right: 10px; width: 36px; height: 36px; border-radius: 999px; background: rgba(255,255,255,0.95); display: grid; place-items: center; color: #1A1A1F; backdrop-filter: blur(8px); z-index: 2; }
+    .a-fuel-overlay .fuel-icon { display: grid; place-items: center; }
+    .a-fuel-overlay svg { width: 18px; height: 18px; }
+    .a-fuel-overlay .fuel-icon--ev { color: #14855E; }
+    .a-fuel-overlay .fuel-icon--hev { color: #14855E; }
+    .a-fuel-overlay .fuel-icon--phev { color: #14855E; }
+    .a-fuel-overlay .fuel-icon--ice { color: #4A4A52; }
+
+    .a-body { padding: 16px; display: flex; flex-direction: column; gap: 10px; flex: 1; }
+    .a-brand { font-size: 11px; color: #6B6B73; text-transform: uppercase; letter-spacing: 0.06em; font-weight: 600; }
+    .a-trim { font-size: 13px; color: #4A4A52; margin: -2px 0 0; font-weight: 500; }
+    .a-price-line { display: flex; align-items: baseline; gap: 6px; flex-wrap: wrap; }
+    .a-title { font-size: 17px; font-weight: 700; margin: 0; line-height: 1.25; letter-spacing: -0.01em; color: #1A1A1F; font-family: var(--font-display, inherit); }
+
+    .a-specs { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 12px; padding: 10px 0; border-top: 1px solid #F0F0F2; border-bottom: 1px solid #F0F0F2; }
+    .a-spec { display: flex; align-items: center; gap: 7px; font-size: 12.5px; color: #2A2A33; }
+    .a-spec-ico { width: 18px; height: 18px; color: #6B6B73; flex-shrink: 0; }
+    .a-spec-state { font-weight: 700; padding: 4px 8px; border-radius: 6px; margin: -4px -2px; }
+    .a-spec-state.st-new { background: #E5F4ED; color: #14855E; }
+    .a-spec-state.st-new .a-spec-ico { color: #14855E; }
+    .a-spec-state.st-demo { background: #FFF4DB; color: #8D5C00; }
+    .a-spec-state.st-demo .a-spec-ico { color: #8D5C00; }
+    .a-spec-state.st-used { background: #EEF0F4; color: #41475B; }
+    .a-spec-state.st-used .a-spec-ico { color: #41475B; }
+    .a-spec-state.st-order { background: #E8F0FB; color: #1F5BB8; }
+    .a-spec-state.st-order .a-spec-ico { color: #1F5BB8; }
+
+    .a-price-row { display: flex; justify-content: space-between; align-items: flex-end; gap: 8px; }
+    .a-price-old { font-size: 13px; color: #9B9BA3; text-decoration: line-through; }
+    .a-price-val { font-size: 22px; font-weight: 800; letter-spacing: -0.015em; color: #1A1A1F; }
+    .a-price-vat { font-size: 11px; color: #6B6B73; margin-top: 1px; }
+
+    .a-foot { display: inline-flex; align-items: center; gap: 7px; padding: 6px 10px; border-radius: 999px; font-size: 11.5px; font-weight: 700; align-self: flex-start; }
+    .a-dot { width: 7px; height: 7px; border-radius: 999px; background: currentColor; }
+    .a-foot-stock { background: #E5F4ED; color: #14855E; }
+    .a-foot-way { background: #FFF4DB; color: #8D5C00; }
+    .a-foot-order { background: #E8F0FB; color: #1F5BB8; }
   </style>
 </BaseLayout>
