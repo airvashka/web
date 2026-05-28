@@ -21,7 +21,7 @@ const WORDS_PER_MINUTE = 200;
  * @returns string ve formátu "X min" (např. "5 min", "12 min")
  */
 export function computeReadTime(body: string | null | undefined): string {
-  if (!body || typeof body !== 'string') return '1 min';
+  if (!body || typeof body !== 'string') return '1 min čtení';
 
   const plain = body
     // strip image syntax: ![alt](url)
@@ -42,7 +42,7 @@ export function computeReadTime(body: string | null | undefined): string {
 
   const wordCount = plain.split(/\s+/).filter(Boolean).length;
   const minutes = Math.max(1, Math.round(wordCount / WORDS_PER_MINUTE));
-  return `${minutes} min`;
+  return `${minutes} min čtení`;
 }
 
 /**
