@@ -725,6 +725,8 @@ const salesPhoneLink = telLink(salesPhone);
             )}
           </div>
 
+          <div class="vehicle-id-line">ID vozu: <strong>{v.id}</strong></div>
+
           <div class="cta-stack">
             <a class="btn btn-primary" href="#poptavka" data-intent={v.availability === 'on_order' ? 'order' : 'interest'}>
               {v.availability === 'on_order' ? 'Nezávazně poptat' : 'Mám zájem'}
@@ -1259,6 +1261,7 @@ const salesPhoneLink = telLink(salesPhone);
       if (!titleEl || !form || !messageEl) return;
 
       const vehicleLabel = form.dataset.vehicleLabel || '';
+      const vehicleId = form.dataset.vehicleId || '';
       // Generický {title} bez ceny pro message body
       const labelShort = vehicleLabel.split(' — ')[0] || vehicleLabel;
 
@@ -1267,37 +1270,37 @@ const salesPhoneLink = telLink(salesPhone);
           eyebrow: 'Mám zájem',
           title: 'Mám zájem o tento vůz',
           lead: 'Rádi vám poskytneme více informací, připravíme nabídku na míru nebo domluvíme zkušební jízdu. Ozveme se vám co nejdříve.',
-          message: `Mám zájem o vůz ${labelShort}. Prosím o kontakt s detaily nabídky.`,
+          message: `Mám zájem o vůz ${labelShort} (ID: ${vehicleId}). Prosím o kontakt s detaily nabídky.`,
         },
         reserve: {
           eyebrow: 'Rezervace',
           title: 'Rezervovat tento vůz',
           lead: 'Rezervaci provedeme po krátkém telefonickém ověření. Ozveme se vám do 24 hodin s podmínkami a dalším postupem.',
-          message: `Rád/a bych si rezervoval/a vůz ${labelShort}. Prosím o kontakt s dalším postupem.`,
+          message: `Rád/a bych si rezervoval/a vůz ${labelShort} (ID: ${vehicleId}). Prosím o kontakt s dalším postupem.`,
         },
         watch: {
           eyebrow: 'Hlídání naskladnění',
           title: 'Hlídat naskladnění',
           lead: 'Až dorazí další vůz odpovídající této specifikaci, dáme vám vědět. Stačí kontaktní údaje a krátká zpráva.',
-          message: `Prosím dejte mi vědět, až bude na skladě další vůz typu ${labelShort}.`,
+          message: `Prosím dejte mi vědět, až bude na skladě další vůz typu ${labelShort} (ID: ${vehicleId}).`,
         },
         finance: {
           eyebrow: 'Financování',
           title: 'Žádost o financování',
           lead: 'Spočítáme vám konkrétní leasing nebo úvěr na míru. Stačí kontakt — ozveme se s návrhem podle vašich preferencí.',
-          message: `Mám zájem o financování vozu ${labelShort}. Prosím o kontakt s návrhem leasingu nebo úvěru.`,
+          message: `Mám zájem o financování vozu ${labelShort} (ID: ${vehicleId}). Prosím o kontakt s návrhem leasingu nebo úvěru.`,
         },
         company: {
           eyebrow: 'Firemní nabídka',
           title: 'Poptávka firemního financování',
           lead: 'Připravíme nabídku na míru — fleet ceny, firemní leasing nebo operativní leasing s plnou odpočitatelnou DPH.',
-          message: `Mám zájem o firemní nabídku na vůz ${labelShort} (fleet, operativní leasing s plnou odpočitatelnou DPH).`,
+          message: `Mám zájem o firemní nabídku na vůz ${labelShort} (ID: ${vehicleId}) (fleet, operativní leasing s plnou odpočitatelnou DPH).`,
         },
         order: {
           eyebrow: 'Nezávazná poptávka',
           title: 'Mám zájem o objednání',
           lead: 'Tento vůz není fyzicky skladem — vyrobíme jej na objednávku přesně podle vaší specifikace (barva, výbava). Termín dodání obvykle 4–8 týdnů. Ozveme se vám do 24 hodin s konkrétní nabídkou.',
-          message: `Mám zájem o objednání vozu ${labelShort} přesně podle mé specifikace. Prosím o kontakt s dalšími možnostmi (barva, výbava, termín dodání).`,
+          message: `Mám zájem o objednání vozu ${labelShort} (ID: ${vehicleId}) přesně podle mé specifikace. Prosím o kontakt s dalšími možnostmi (barva, výbava, termín dodání).`,
         },
       };
 
