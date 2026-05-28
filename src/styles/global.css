@@ -5792,3 +5792,7 @@ body.drawer-open .chat-widget { display: none !important; }
 
 /* Skrýt UCL disclaimery v vat-company mode (Jardův wish — disclaimer jen pro s DPH) */
 body.vat-company .ucl-legal { display: none !important; }
+
+/* Finance info pod cenou — variant podle vat mode */
+body.vat-private .info-finance--company { display: none; }
+body.vat-company .info-finance--private { display: none; }

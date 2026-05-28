@@ -590,10 +590,16 @@ const salesPhoneLink = telLink(salesPhone);
             </div>
           )}
           {monthlyPayment && brand.slug === 'kgm' && (
-            <div class="info-finance">
-              Financování od <strong style="color: var(--text);">{monthlyPayment.toLocaleString('cs-CZ')} Kč / měsíc</strong> &nbsp;—&nbsp;
-              <a href="#finance">kalkulačka →</a>
-            </div>
+            <Fragment>
+              <div class="info-finance info-finance--private">
+                Financování od <strong style="color: var(--text);">{monthlyPayment.toLocaleString('cs-CZ')} Kč / měsíc</strong> &nbsp;—&nbsp;
+                <a href="#finance">kalkulačka →</a>
+              </div>
+              <div class="info-finance info-finance--company">
+                Připravíme firemní financování &nbsp;—&nbsp;
+                <a href="#finance">financování ↓</a>
+              </div>
+            </Fragment>
           )}
           <div class="spec-grid">
             {year && (
