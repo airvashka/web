@@ -50,7 +50,10 @@ export function computeReadTime(body: string | null | undefined): string {
  */
 export function getReadTime(article: { read_time?: string | null; body?: string | null }): string {
   const explicit = (article.read_time ?? '').trim();
-  if (explicit) return explicit;
+  if (explicit) {
+    // Pokud user napsal jen '1 min' bez 'čtení', auto-doplnit suffix
+    return /\bčten[ií]/i.test(explicit) ? explicit : `${explicit} čtení`;
+  }
   return computeReadTime(article.body);
 }
 
