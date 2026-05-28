@@ -220,7 +220,7 @@ const navItems: Array<{ label: string; href: string; key: NonNullable<Props['act
         const lbl = label.replace(/&/g, '&amp;').replace(/</g, '&lt;');
         const txt = st.text.replace(/&/g, '&amp;').replace(/</g, '&lt;');
         parts.push('<span class="oh-branch"><span class="oh-dot ' + cls + '"></span>'
-          + lbl + ' ' + txt + '</span>');
+          + lbl + ': ' + txt + '</span>');
       }
       if (parts.length === 0) return; // nech staticky fallback
       const html = parts.join('<span class="oh-sep">·</span>');
