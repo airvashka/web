@@ -17,7 +17,7 @@
  *            --hidden             (zahrne i už skrytá pole)
  */
 
-import 'dotenv/config';
+
 import fs from 'node:fs';
 
 const DIRECTUS_URL = process.env.DIRECTUS_URL || process.env.PUBLIC_DIRECTUS_URL || 'https://admin.sfr-motor.cz';

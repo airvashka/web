@@ -18,7 +18,7 @@
  * Bez --apply jen reportuje, s --apply opravdu PATCHne.
  */
 
-import 'dotenv/config';
+
 
 const DIRECTUS_URL = process.env.DIRECTUS_URL || process.env.PUBLIC_DIRECTUS_URL || 'https://admin.sfr-motor.cz';
 const TOKEN = process.env.DIRECTUS_ADMIN_TOKEN || process.env.DIRECTUS_TOKEN;
