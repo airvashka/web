@@ -7,11 +7,7 @@ import { directusGet } from '@lib/directus';
 import { buildStockSlug } from '@lib/stockSlug';
 import type { Brand, StockVehicle } from '@lib/types';
 
-/* ============================================================
-   /sklad-1 — Design preview "Modern Authorized Dealer" v2
-   Reálná data z Directusu + plný filter sidebar + sort.
-   Cíl: posoudit jestli tenhle look nahradí /sklad.
-   ============================================================ */
+/* /sklad-1 — preview "Modern Authorized Dealer" v2. Reálná data + filter sidebar + sort. */
 export const prerender = false;
 Astro.response.headers.set('Cache-Control', 'public, s-maxage=60, stale-while-revalidate=300');
 Astro.response.headers.set('X-Robots-Tag', 'noindex, nofollow');
@@ -52,12 +48,10 @@ const vehicles = await directusGet<V>('stock_vehicles', {
 
 const fuelLabels: Record<string, string> = { petrol: 'Benzín', diesel: 'Diesel', hybrid: 'Hybrid', phev: 'PHEV', ev: 'Elektro' };
 
-// Unique values pro filtry
 const availableFuels = [...new Set(vehicles.map((v) => v.model?.fuel_type).filter(Boolean))] as string[];
 const availableConditions = [...new Set(vehicles.map((v) => v.condition).filter(Boolean))] as string[];
 const has4wd = vehicles.some((v) => v.drivetrain === '4wd' || v.drivetrain === 'awd');
 
-// Modely seskupené podle značky
 type ModelOpt = { slug: string; name: string };
 const modelsByBrand = new Map<string, { brandName: string; models: ModelOpt[] }>();
 vehicles.forEach((v) => {
@@ -87,6 +81,61 @@ function firstPhoto(v: V): string | null {
   const f: any = v.photos[0];
   return typeof f === 'string' ? f : (f?.directus_files_id ?? null);
 }
+
+const today = new Date().toISOString().slice(0, 10);
+const cards = vehicles.map((v) => {
+  const anyV = v as any;
+  const photoId = firstPhoto(v);
+  const brandName = v.brand?.name ?? '';
+  const modelName = v.model?.name ?? '';
+  const trimName: string = v.trim_level?.name ?? anyV.trim_level_snapshot?.name ?? '';
+  const year = v.model_year?.year;
+  const fuelType = v.model?.fuel_type ?? '';
+  const tx = v.transmission === 'manual' ? 'Manuál' : v.transmission === 'automatic' ? 'Automat' : (v.transmission ?? '');
+  const dt = (v.drivetrain === '4wd' || v.drivetrain === 'awd') ? '4×4' : v.drivetrain === 'rwd' ? 'RWD' : 'FWD';
+  const km = fmtKm(v.km);
+  const isOnOrder = v.availability === 'on_order';
+  const isOnWay = v.availability === 'on_the_way';
+
+  let conditionLabel = '';
+  let conditionCls = '';
+  if (isOnOrder) { conditionLabel = 'Na objednání'; conditionCls = 'st-order'; }
+  else if (v.condition === 'new') { conditionLabel = 'Nové'; conditionCls = 'st-new'; }
+  else if (v.condition === 'demo') { conditionLabel = 'Předváděcí'; conditionCls = 'st-demo'; }
+  else if (v.condition === 'used') { conditionLabel = 'Ojeté'; conditionCls = 'st-used'; }
+
+  const modelPromoActive = !!v.model?.promo_active
+    && (v.model?.promo_label || v.model?.promo_discount_amount)
+    && (!v.model?.promo_valid_to || String(v.model.promo_valid_to) >= today);
+  const modelPromoLabel = (v.model?.promo_label ?? '').toString().trim();
+  const modelPromoDiscount = Number(v.model?.promo_discount_amount ?? 0) || 0;
+  const customHighlight = (v.highlight_label ?? '').toString().trim();
+
+  let actionPill = '';
+  if (modelPromoActive && modelPromoLabel) actionPill = modelPromoLabel;
+  else if (v.highlighted && customHighlight) actionPill = customHighlight;
+  else if (v.highlighted) actionPill = 'Novinka';
+
+  const baseList = v.list_price;
+  const isNew = v.condition === 'new';
+  let displayPrice = v.promo_price ?? baseList;
+  let priceBefore: number | null = null;
+  if (v.promo_price && baseList && v.promo_price < baseList) {
+    priceBefore = baseList;
+  } else if (modelPromoActive && modelPromoDiscount > 0 && baseList && isNew) {
+    displayPrice = baseList - modelPromoDiscount;
+    priceBefore = baseList;
+  }
+  const hasDiscount = !!priceBefore;
+
+  const detailUrl = `/sklad/${buildStockSlug(anyV, v.brand as any, v.model as any, (v.trim_level ?? { name: trimName }) as any)}`;
+
+  return {
+    v, photoId, brandName, modelName, trimName, year, fuelType,
+    tx, dt, km, isOnOrder, isOnWay, conditionLabel, conditionCls,
+    actionPill, displayPrice, priceBefore, hasDiscount, detailUrl,
+  };
+});
 ---
 
 <BaseLayout title="Sklad — Design A v2" description="Preview design A v2">
@@ -109,7 +158,6 @@ function firstPhoto(v: V): string | null {
       </div>
 
       <div class="a-layout">
-        <!-- SIDEBAR -->
         <aside class="a-sidebar" data-filters>
           <div class="a-sb-head">
             <strong>Filtry</strong>
@@ -176,7 +224,6 @@ function firstPhoto(v: V): string | null {
           )}
         </aside>
 
-        <!-- MAIN -->
         <div>
           <div class="a-toolbar">
             <div class="a-result" data-result-count>
@@ -193,166 +240,113 @@ function firstPhoto(v: V): string | null {
           </div>
 
           <div class="a-grid" data-grid>
-            {vehicles.map((v) => {
-              const photoId = firstPhoto(v);
-              const brandName = v.brand?.name ?? '';
-              const modelName = v.model?.name ?? '';
-              const trimName = v.trim_level?.name ?? (v as any).trim_level_snapshot?.name ?? '';
-              const year = v.model_year?.year;
-              const fuelType = v.model?.fuel_type ?? '';
-              const fuelLabel = fuelLabels[fuelType] ?? '';
-              const tx = v.transmission === 'manual' ? 'Manuál' : v.transmission === 'automatic' ? 'Automat' : v.transmission ?? '';
-              const dt = (v.drivetrain === '4wd' || v.drivetrain === 'awd') ? '4×4' : v.drivetrain === 'rwd' ? 'RWD' : 'FWD';
-              const km = fmtKm(v.km);
-              const isOnOrder = v.availability === 'on_order';
-              const isOnWay = v.availability === 'on_the_way';
-              const isInStock = v.availability === 'in_stock';
+            {cards.map((c) => (
+              <a
+                class="a-card"
+                href={c.detailUrl}
+                data-brand={c.v.brand?.slug ?? ''}
+                data-model={c.v.model?.slug ?? ''}
+                data-fuel={c.fuelType}
+                data-condition={c.v.condition ?? ''}
+                data-drivetrain={c.v.drivetrain ?? ''}
+                data-availability={c.v.availability ?? 'in_stock'}
+                data-price={c.displayPrice ?? 0}
+                data-listed-at={c.v.listed_at ?? ''}
+              >
+                <div class="a-media">
+                  {c.photoId ? (
+                    <DirectusImage src={c.photoId} alt={`${c.brandName} ${c.modelName}`} widths={[400, 600, 800]} loading="lazy" />
+                  ) : (
+                    <div class="a-media-empty">Bez fotky</div>
+                  )}
+                  {c.actionPill && (
+                    <div class="a-badges">
+                      <span class="a-pill a-pill-promo">{c.actionPill}</span>
+                    </div>
+                  )}
+                  {c.fuelType && (
+                    <span class="a-fuel-overlay">
+                      <FuelIcon type={c.fuelType} />
+                    </span>
+                  )}
+                </div>
+                <div class="a-body">
+                  <div class="a-brand">{c.brandName}{c.year ? ` · ${c.year}` : ''}</div>
+                  <h3 class="a-title">{c.modelName}{c.trimName ? ` ${c.trimName}` : ''}</h3>
 
-              // Stav (4. spec) — barevně
-              let conditionLabel = '';
-              let conditionCls = '';
-              if (isOnOrder) { conditionLabel = 'Na objednání'; conditionCls = 'st-order'; }
-              else if (v.condition === 'new') { conditionLabel = 'Nové'; conditionCls = 'st-new'; }
-              else if (v.condition === 'demo') { conditionLabel = 'Předváděcí'; conditionCls = 'st-demo'; }
-              else if (v.condition === 'used') { conditionLabel = 'Ojeté'; conditionCls = 'st-used'; }
-
-              // Akce — model promo nebo highlight label
-              const today = new Date().toISOString().slice(0, 10);
-              const modelPromoActive = !!v.model?.promo_active
-                && (v.model?.promo_label || v.model?.promo_discount_amount)
-                && (!v.model?.promo_valid_to || String(v.model.promo_valid_to) >= today);
-              const modelPromoLabel = (v.model?.promo_label ?? '').toString().trim();
-              const modelPromoDiscount = Number(v.model?.promo_discount_amount ?? 0) || 0;
-              const customHighlight = (v.highlight_label ?? '').toString().trim();
-
-              let actionPill = '';
-              if (modelPromoActive && modelPromoLabel) actionPill = modelPromoLabel;
-              else if (v.highlighted && customHighlight) actionPill = customHighlight;
-              else if (v.highlighted) actionPill = 'Novinka';
-
-              // Cena: stock.promo > model promo (jen u nových vozů) > list
-              const baseList = v.list_price;
-              const isNew = v.condition === 'new';
-              let displayPrice = v.promo_price ?? baseList;
-              let priceBefore: number | null = null;
-              if (v.promo_price && baseList && v.promo_price < baseList) {
-                priceBefore = baseList;
-              } else if (modelPromoActive && modelPromoDiscount > 0 && baseList && isNew) {
-                displayPrice = baseList - modelPromoDiscount;
-                priceBefore = baseList;
-              }
-              const hasDiscount = !!priceBefore;
-
-              const detailUrl = `/sklad/${buildStockSlug(v as any, v.brand as any, v.model as any, v.trim_level ?? { name: trimName } as any)}`;
-
-              return (
-                <a
-                  class="a-card"
-                  href={detailUrl}
-                  data-brand={v.brand?.slug ?? ''}
-                  data-model={v.model?.slug ?? ''}
-                  data-fuel={fuelType}
-                  data-condition={v.condition ?? ''}
-                  data-drivetrain={v.drivetrain ?? ''}
-                  data-availability={v.availability ?? 'in_stock'}
-                  data-price={displayPrice ?? 0}
-                  data-listed-at={v.listed_at ?? ''}
-                >
-                  <div class="a-media">
-                    {photoId ? (
-                      <DirectusImage src={photoId} alt={`${brandName} ${modelName}`} widths={[400, 600, 800]} loading="lazy" />
-                    ) : (
-                      <div class="a-media-empty">Bez fotky</div>
-                    )}
-                    {actionPill && (
-                      <div class="a-badges">
-                        <span class="a-pill a-pill-promo">{actionPill}</span>
+                  <div class="a-specs">
+                    <div class="a-spec">
+                      <svg class="a-spec-ico" viewBox="0 0 64 64" fill="none" aria-hidden="true">
+                        <path d="M10 38 A22 22 0 0 1 54 38" stroke="currentColor" stroke-width="4" stroke-linecap="round"/>
+                        <line x1="14" y1="28" x2="17" y2="32" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+                        <line x1="22" y1="22" x2="24" y2="26" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+                        <line x1="32" y1="20" x2="32" y2="24" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+                        <line x1="42" y1="22" x2="40" y2="26" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+                        <line x1="50" y1="28" x2="47" y2="32" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+                        <path d="M32 39 L43 26" stroke="currentColor" stroke-width="3.5" stroke-linecap="round"/>
+                        <circle cx="32" cy="39" r="3" fill="currentColor"/>
+                        <rect x="20" y="46" width="24" height="8" rx="1.5" stroke="currentColor" stroke-width="2.5" fill="none"/>
+                      </svg>
+                      <span>{c.km}</span>
+                    </div>
+                    <div class="a-spec">
+                      <svg class="a-spec-ico" viewBox="0 0 64 64" fill="none" aria-hidden="true">
+                        <circle cx="32" cy="32" r="22" stroke="currentColor" stroke-width="3"/>
+                        <line x1="22" y1="22" x2="22" y2="42" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+                        <line x1="32" y1="22" x2="32" y2="42" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+                        <line x1="42" y1="22" x2="42" y2="42" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+                        <line x1="22" y1="32" x2="42" y2="32" stroke="currentColor" stroke-width="3"/>
+                        <circle cx="22" cy="22" r="2.5" fill="currentColor"/>
+                        <circle cx="32" cy="22" r="2.5" fill="currentColor"/>
+                        <circle cx="42" cy="22" r="2.5" fill="currentColor"/>
+                        <circle cx="22" cy="42" r="2.5" fill="currentColor"/>
+                        <circle cx="32" cy="42" r="2.5" fill="currentColor"/>
+                        <circle cx="42" cy="42" r="2.5" fill="currentColor"/>
+                      </svg>
+                      <span>{c.tx}</span>
+                    </div>
+                    <div class="a-spec">
+                      <svg class="a-spec-ico" viewBox="0 0 64 64" fill="none" aria-hidden="true">
+                        <rect x="10" y="12" width="14" height="14" rx="2" stroke="currentColor" stroke-width="3"/>
+                        <rect x="40" y="12" width="14" height="14" rx="2" stroke="currentColor" stroke-width="3"/>
+                        <rect x="10" y="38" width="14" height="14" rx="2" stroke="currentColor" stroke-width="3"/>
+                        <rect x="40" y="38" width="14" height="14" rx="2" stroke="currentColor" stroke-width="3"/>
+                        <line x1="24" y1="19" x2="40" y2="19" stroke="currentColor" stroke-width="3"/>
+                        <line x1="24" y1="45" x2="40" y2="45" stroke="currentColor" stroke-width="3"/>
+                        <line x1="32" y1="19" x2="32" y2="45" stroke="currentColor" stroke-width="3"/>
+                        <rect x="28" y="28" width="8" height="8" rx="1" stroke="currentColor" stroke-width="2.5" fill="none"/>
+                      </svg>
+                      <span>{c.dt}</span>
+                    </div>
+                    {c.conditionLabel && (
+                      <div class={`a-spec a-spec-state ${c.conditionCls}`}>
+                        <svg class="a-spec-ico" viewBox="0 0 64 64" fill="none" aria-hidden="true">
+                          <path d="M8 36 L8 28 C8 26 9 24 11 23 L17 21 L23 14 C24 13 26 12 28 12 L40 12 C42 12 43 13 44 14 L50 21 L53 23 C55 24 56 26 56 28 L56 36" stroke="currentColor" stroke-width="3"/>
+                          <line x1="8" y1="36" x2="42" y2="36" stroke="currentColor" stroke-width="3"/>
+                          <circle cx="18" cy="40" r="4" stroke="currentColor" stroke-width="2.5"/>
+                          <circle cx="50" cy="48" r="8" stroke="currentColor" stroke-width="2.5" fill="none"/>
+                          <path d="M46 48 L49 51 L54 45" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        <span>{c.conditionLabel}</span>
                       </div>
-                    )}
-                    {fuelType && (
-                      <span class="a-fuel-overlay">
-                        <FuelIcon type={fuelType} />
-                      </span>
                     )}
                   </div>
-                  <div class="a-body">
-                    <div class="a-brand">{brandName}{year ? ` · ${year}` : ''}</div>
-                    <h3 class="a-title">{modelName}{trimName ? ` ${trimName}` : ''}</h3>
 
-                    <div class="a-specs">
-                      <div class="a-spec">
-                        <svg class="a-spec-ico" viewBox="0 0 64 64" fill="none" aria-hidden="true">
-                          <path d="M10 38 A22 22 0 0 1 54 38" stroke="currentColor" stroke-width="4" stroke-linecap="round"/>
-                          <line x1="14" y1="28" x2="17" y2="32" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
-                          <line x1="22" y1="22" x2="24" y2="26" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
-                          <line x1="32" y1="20" x2="32" y2="24" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
-                          <line x1="42" y1="22" x2="40" y2="26" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
-                          <line x1="50" y1="28" x2="47" y2="32" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
-                          <path d="M32 39 L43 26" stroke="currentColor" stroke-width="3.5" stroke-linecap="round"/>
-                          <circle cx="32" cy="39" r="3" fill="currentColor"/>
-                          <rect x="20" y="46" width="24" height="8" rx="1.5" stroke="currentColor" stroke-width="2.5" fill="none"/>
-                        </svg>
-                        <span>{km}</span>
-                      </div>
-                      <div class="a-spec">
-                        <svg class="a-spec-ico" viewBox="0 0 64 64" fill="none" aria-hidden="true">
-                          <circle cx="32" cy="32" r="22" stroke="currentColor" stroke-width="3"/>
-                          <line x1="22" y1="22" x2="22" y2="42" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
-                          <line x1="32" y1="22" x2="32" y2="42" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
-                          <line x1="42" y1="22" x2="42" y2="42" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
-                          <line x1="22" y1="32" x2="42" y2="32" stroke="currentColor" stroke-width="3"/>
-                          <circle cx="22" cy="22" r="2.5" fill="currentColor"/>
-                          <circle cx="32" cy="22" r="2.5" fill="currentColor"/>
-                          <circle cx="42" cy="22" r="2.5" fill="currentColor"/>
-                          <circle cx="22" cy="42" r="2.5" fill="currentColor"/>
-                          <circle cx="32" cy="42" r="2.5" fill="currentColor"/>
-                          <circle cx="42" cy="42" r="2.5" fill="currentColor"/>
-                        </svg>
-                        <span>{tx}</span>
-                      </div>
-                      <div class="a-spec">
-                        <svg class="a-spec-ico" viewBox="0 0 64 64" fill="none" aria-hidden="true">
-                          <rect x="10" y="12" width="14" height="14" rx="2" stroke="currentColor" stroke-width="3"/>
-                          <rect x="40" y="12" width="14" height="14" rx="2" stroke="currentColor" stroke-width="3"/>
-                          <rect x="10" y="38" width="14" height="14" rx="2" stroke="currentColor" stroke-width="3"/>
-                          <rect x="40" y="38" width="14" height="14" rx="2" stroke="currentColor" stroke-width="3"/>
-                          <line x1="24" y1="19" x2="40" y2="19" stroke="currentColor" stroke-width="3"/>
-                          <line x1="24" y1="45" x2="40" y2="45" stroke="currentColor" stroke-width="3"/>
-                          <line x1="32" y1="19" x2="32" y2="45" stroke="currentColor" stroke-width="3"/>
-                          <rect x="28" y="28" width="8" height="8" rx="1" stroke="currentColor" stroke-width="2.5" fill="none"/>
-                        </svg>
-                        <span>{dt}</span>
-                      </div>
-                      {conditionLabel && (
-                        <div class={`a-spec a-spec-state ${conditionCls}`}>
-                          <svg class="a-spec-ico" viewBox="0 0 64 64" fill="none" aria-hidden="true">
-                            <path d="M8 36 L8 28 C8 26 9 24 11 23 L17 21 L23 14 C24 13 26 12 28 12 L40 12 C42 12 43 13 44 14 L50 21 L53 23 C55 24 56 26 56 28 L56 36" stroke="currentColor" stroke-width="3"/>
-                            <line x1="8" y1="36" x2="42" y2="36" stroke="currentColor" stroke-width="3"/>
-                            <circle cx="18" cy="40" r="4" stroke="currentColor" stroke-width="2.5"/>
-                            <circle cx="50" cy="48" r="8" stroke="currentColor" stroke-width="2.5" fill="none"/>
-                            <path d="M46 48 L49 51 L54 45" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-                          </svg>
-                          <span>{conditionLabel}</span>
-                        </div>
-                      )}
-                    </div>
-
-                    <div class="a-price-row">
-                      <div>
-                        {hasDiscount && <div class="a-price-old">{fmtPrice(priceBefore)}</div>}
-                        <div class="a-price-val">{fmtPrice(displayPrice)}</div>
-                        <div class="a-price-vat">vč. DPH</div>
-                      </div>
-                    </div>
-
-                    <div class={`a-foot ${isOnOrder ? 'a-foot-order' : isOnWay ? 'a-foot-way' : 'a-foot-stock'}`}>
-                      <span class="a-dot"></span>
-                      {isOnOrder ? 'Na objednání' : isOnWay ? 'Na cestě' : 'Skladem v Praze'}
+                  <div class="a-price-row">
+                    <div>
+                      {c.hasDiscount && <div class="a-price-old">{fmtPrice(c.priceBefore)}</div>}
+                      <div class="a-price-val">{fmtPrice(c.displayPrice)}</div>
+                      <div class="a-price-vat">vč. DPH</div>
                     </div>
                   </div>
-                </a>
-              );
-            })}
+
+                  <div class={`a-foot ${c.isOnOrder ? 'a-foot-order' : c.isOnWay ? 'a-foot-way' : 'a-foot-stock'}`}>
+                    <span class="a-dot"></span>
+                    {c.isOnOrder ? 'Na objednání' : c.isOnWay ? 'Na cestě' : 'Skladem v Praze'}
+                  </div>
+                </div>
+              </a>
+            ))}
           </div>
         </div>
       </div>
@@ -375,9 +369,6 @@ function firstPhoto(v: V): string | null {
         });
         if (sortMode && sortMode !== 'newest') url.searchParams.set('razeni', sortMode);
         else url.searchParams.delete('razeni');
-        if (availabilitySet.size && !(availabilitySet.has('in_stock') && availabilitySet.has('on_the_way') && availabilitySet.size === 2)) {
-          url.searchParams.set('dostupnost', Array.from(availabilitySet).join(','));
-        } else url.searchParams.delete('dostupnost');
         history.replaceState({}, '', url);
       }
 
@@ -411,7 +402,7 @@ function firstPhoto(v: V): string | null {
         const count = document.querySelector('[data-result-count]');
         if (count) {
           const noun = visible === 1 ? 'vůz' : visible < 5 ? 'vozy' : 'vozů';
-          count.innerHTML = visible === 0 ? '<strong>Žádné vozy</strong> nesplňují filtr' : `<strong>${visible}</strong> ${noun}`;
+          count.innerHTML = visible === 0 ? '<strong>Žádné vozy</strong> nesplňují filtr' : '<strong>' + visible + '</strong> ' + noun;
         }
         const modelSelect = document.querySelector('[data-filter-model]');
         if (modelSelect) {
@@ -438,10 +429,10 @@ function firstPhoto(v: V): string | null {
       document.querySelector('[data-filter-model]')?.addEventListener('change', (e) => {
         filters.model = e.target.value;
         const opt = e.target.selectedOptions[0];
-        const optBrand = opt?.dataset.brand;
+        const optBrand = opt && opt.dataset ? opt.dataset.brand : null;
         if (optBrand && filters.brand !== optBrand && filters.model !== 'all') {
           filters.brand = optBrand;
-          const radio = document.querySelector(`[data-filters] input[name=brand][value="${optBrand}"]`);
+          const radio = document.querySelector('[data-filters] input[name=brand][value="' + optBrand + '"]');
           if (radio) radio.checked = true;
         }
         applyFilters();
@@ -464,7 +455,6 @@ function firstPhoto(v: V): string | null {
         applyFilters();
       });
 
-      // URL params on load
       const params = new URLSearchParams(window.location.search);
       const availParam = params.get('dostupnost') || params.get('availability');
       if (availParam) {
@@ -483,18 +473,18 @@ function firstPhoto(v: V): string | null {
       URL_MAP.forEach(([q, key, rname]) => {
         const v = params.get(q);
         if (!v) return;
-        const r = document.querySelector(`[data-filters] input[name=${rname}][value="${v}"]`);
+        const r = document.querySelector('[data-filters] input[name=' + rname + '][value="' + v + '"]');
         if (r) { r.checked = true; filters[key] = v; }
       });
       const modelParam = params.get('model');
       if (modelParam) {
         const ms = document.querySelector('[data-filter-model]');
-        if (ms && ms.querySelector(`option[value="${modelParam}"]`)) { ms.value = modelParam; filters.model = modelParam; }
+        if (ms && ms.querySelector('option[value="' + modelParam + '"]')) { ms.value = modelParam; filters.model = modelParam; }
       }
       const sortParam = params.get('razeni') || params.get('sort');
       if (sortParam) {
         const ss = document.querySelector('[data-sort]');
-        if (ss && ss.querySelector(`option[value="${sortParam}"]`)) { ss.value = sortParam; sortMode = sortParam; }
+        if (ss && ss.querySelector('option[value="' + sortParam + '"]')) { ss.value = sortParam; sortMode = sortParam; }
       }
       applyFilters();
     })();
