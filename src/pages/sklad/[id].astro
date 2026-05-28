@@ -1269,7 +1269,7 @@ const salesPhoneLink = telLink(salesPhone);
           if (isCompanyVat) {
             extraLines.push('Zákazník: firma (poptávka bez DPH, plně odpočitatelná DPH)');
           }
-          if (calcUsed && (intent === 'finance' || intent === 'interest' || intent === 'reserve')) {
+          if (calcUsed && !isCompanyVat && (intent === 'finance' || intent === 'interest' || intent === 'reserve')) {
             const dp = dpPctEl2 ? dpPctEl2.textContent.trim() : '';
             const dur = durationChip ? durationChip.textContent.trim() : '';
             const dpAmt = dpAmountEl ? dpAmountEl.textContent.trim() : '';
