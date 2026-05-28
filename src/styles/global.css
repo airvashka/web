@@ -133,7 +133,7 @@ input, textarea, select { font: inherit; }
 }
 .nav-logo {
   display: flex; align-items: center;
-  height: 40px;
+  height: 52px;
 }
 .nav-logo img { height: 100%; width: auto; display: block; }
 
