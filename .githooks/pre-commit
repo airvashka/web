@@ -1,0 +1,104 @@
+#!/usr/bin/env bash
+# ============================================================================
+# pre-commit hook — chrání před Cowork mount truncation bugem
+# ============================================================================
+# Spouští se automaticky před každým `git commit`. Validuje staged .astro
+# soubory že nejsou ořezané (truncated). Pokud najde problém → abort commit.
+#
+# Enable jednou: git config core.hooksPath .githooks
+# Disable jednou: git config --unset core.hooksPath
+# Bypass jednorázově: git commit --no-verify
+# ============================================================================
+set -euo pipefail
+
+# Repo root (kde běží hook)
+REPO=$(git rev-parse --show-toplevel)
+cd "$REPO"
+
+# Smaž stale lock files (Cowork sandbox občas nechá viset)
+rm -f .git/index.lock .git/HEAD.lock .git/index.lock.* .git/HEAD.lock.* 2>/dev/null || true
+
+# Najdi staged .astro soubory (added/copied/modified)
+ASTRO_FILES=$(git diff --cached --name-only --diff-filter=ACM | grep -E '\.astro$' || true)
+
+if [ -z "$ASTRO_FILES" ]; then
+  exit 0
+fi
+
+ERRORS=()
+
+echo "🔍 pre-commit: kontroluju ${#ASTRO_FILES[@]} .astro soubory..."
+
+while IFS= read -r FILE; do
+  [ -z "$FILE" ] && continue
+  [ ! -f "$FILE" ] && continue  # smazaný soubor → skip
+
+  LINES=$(wc -l < "$FILE")
+  BYTES=$(wc -c < "$FILE")
+
+  # Empty / tiny file?
+  if [ "$BYTES" -lt 50 ]; then
+    ERRORS+=("$FILE: only $BYTES bytes — possibly truncated")
+    continue
+  fi
+
+  # Layouty/pages musí končit </BaseLayout>, </Layout>, </html>, </body>, </style>, </script>, atd.
+  # Komponenty co mají <style> nebo <script> musí ho mít uzavřený.
+  # Komponenty bez nich končí na "/>" nebo končí frontmatter "---"
+  LAST_3=$(tail -3 "$FILE" | tr -d '[:space:]')
+
+  HAS_CLOSE=false
+  case "$LAST_3" in
+    *"</BaseLayout>"*) HAS_CLOSE=true ;;
+    *"</Layout>"*)     HAS_CLOSE=true ;;
+    *"</style>"*)      HAS_CLOSE=true ;;
+    *"</script>"*)     HAS_CLOSE=true ;;
+    *"</html>"*)       HAS_CLOSE=true ;;
+    *"</body>"*)       HAS_CLOSE=true ;;
+    *"/>"*)            HAS_CLOSE=true ;;  # self-closing prvek na konci
+    *"}"*)             HAS_CLOSE=true ;;  # frontmatter-only komponenta
+    *">"*)             HAS_CLOSE=true ;;  # tag na konci
+  esac
+
+  # Count opening/closing <style> tags (musí sedět)
+  STYLE_OPEN=$(grep -c '<style' "$FILE" || true)
+  STYLE_CLOSE=$(grep -c '</style>' "$FILE" || true)
+  if [ "$STYLE_OPEN" -ne "$STYLE_CLOSE" ]; then
+    ERRORS+=("$FILE: <style> tags mismatch — open=$STYLE_OPEN close=$STYLE_CLOSE (TRUNCATED?)")
+    continue
+  fi
+
+  # Count opening/closing <script> tags
+  SCRIPT_OPEN=$(grep -c '<script' "$FILE" || true)
+  SCRIPT_CLOSE=$(grep -c '</script>' "$FILE" || true)
+  if [ "$SCRIPT_OPEN" -ne "$SCRIPT_CLOSE" ]; then
+    ERRORS+=("$FILE: <script> tags mismatch — open=$SCRIPT_OPEN close=$SCRIPT_CLOSE (TRUNCATED?)")
+    continue
+  fi
+
+  if [ "$HAS_CLOSE" = false ]; then
+    ERRORS+=("$FILE: $LINES lines, ends with '$LAST_3' — no recognized closing tag (TRUNCATED?)")
+  fi
+done <<< "$ASTRO_FILES"
+
+if [ ${#ERRORS[@]} -gt 0 ]; then
+  echo ""
+  echo "❌ pre-commit: našel jsem problémy v ${#ERRORS[@]} souborech:"
+  echo ""
+  for E in "${ERRORS[@]}"; do
+    echo "   • $E"
+  done
+  echo ""
+  echo "💡 Pravděpodobně Cowork mount truncation — soubor byl při zápisu ořezán."
+  echo "   Postup opravy:"
+  echo "   1) git checkout HEAD -- <soubor>  # vrátit z gitu"
+  echo "   2) ručně reaplikovat změny v editoru"
+  echo "   3) git add + commit znovu"
+  echo ""
+  echo "Pokud opravdu chceš commitnout, použij: git commit --no-verify"
+  echo ""
+  exit 1
+fi
+
+echo "✓ pre-commit: všechny soubory OK"
+exit 0
