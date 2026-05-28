@@ -205,14 +205,13 @@ const modelPromoDiscount: number = Number((model as any)?.promo_discount_amount 
 const modelPromoValidTo: string | null = (model as any)?.promo_valid_to ?? null;
 
 // Cena — priorita:
-//   1) stock.promo_price (specifická akce na konkrétním voze)
-//   2) stock.list_price − model.promo_discount_amount (modelová akce)
+//   1) stock.promo_price (specifická akce na konkrétním voze) → list_price je "před", promo_price je "po"
+//   2) model.promo_discount_amount (modelová akce) → POZOR: stock list_price je UŽ PO slevě
+//      (import od dodavatele tu slevu zahrnul). Cenu nesnížíme, jen dopočítáme "původní"
+//      jako list_price + promo_discount_amount pro přeškrtnutí.
 //   3) stock.list_price (běžná cena)
 const baseListPrice = v.list_price;
 const stockPromoApplied = v.promo_price ?? null;
-const modelDiscountApplied = modelPromoActive && modelPromoDiscount > 0 && baseListPrice
-  ? baseListPrice - modelPromoDiscount
-  : null;
 
 let finalPrice: number | null = baseListPrice ?? null;
 let priceBeforePromo: number | null = null;
@@ -224,9 +223,10 @@ if (stockPromoApplied && baseListPrice && stockPromoApplied < baseListPrice) {
   priceBeforePromo = baseListPrice;
   savings = baseListPrice - stockPromoApplied;
   promoSource = 'stock';
-} else if (modelDiscountApplied && baseListPrice) {
-  finalPrice = modelDiscountApplied;
-  priceBeforePromo = baseListPrice;
+} else if (modelPromoActive && modelPromoDiscount > 0 && baseListPrice) {
+  // list_price zůstává — to je co reálně platíte. "Původní" se jen dopočítá nahoru.
+  finalPrice = baseListPrice;
+  priceBeforePromo = baseListPrice + modelPromoDiscount;
   savings = modelPromoDiscount;
   promoSource = 'model';
 }

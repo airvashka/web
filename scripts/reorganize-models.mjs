@@ -179,12 +179,18 @@ if (MODE === 'revert') {
 if (MODE === 'apply' || MODE === 'dry-run') {
   const isDry = MODE === 'dry-run';
 
+  // Pre-fetch all fields (Directus 11 vrací 403 místo 404 pro neexistující field,
+  // proto nemůžeme jet single-field check — fetchneme všechno najednou a držíme v mapě)
+  const allFieldsResp = await api(`/fields/${COLLECTION}`);
+  const allFields = allFieldsResp?.data || [];
+  const fieldsByName = new Map(allFields.map(f => [f.field, f]));
+  console.log(`📋 Cache: ${fieldsByName.size} existujících polí v ${COLLECTION}\n`);
+
   // 1) Vytvořit group fields
-  console.log(`\n${isDry ? '👀 DRY' : '✏️  APPLY'}: Vytvořit ${GROUPS.length} group fields`);
+  console.log(`${isDry ? '👀 DRY' : '✏️  APPLY'}: Vytvořit ${GROUPS.length} group fields`);
   for (const g of GROUPS) {
-    // Check existence
-    const existing = await api(`/fields/${COLLECTION}/${g.field}`);
-    if (existing?.data) {
+    // Check existence (z mapy, ne API)
+    if (fieldsByName.has(g.field)) {
       console.log(`   ⊙ ${g.field} už existuje, skipping`);
       continue;
     }
@@ -206,12 +212,12 @@ if (MODE === 'apply' || MODE === 'dry-run') {
   // 2) Apply per-field layout
   console.log(`\n${isDry ? '👀 DRY' : '✏️  APPLY'}: Layout pro ${Object.keys(FIELD_LAYOUT).length} polí`);
   for (const [fieldName, cfg] of Object.entries(FIELD_LAYOUT)) {
-    const existing = await api(`/fields/${COLLECTION}/${fieldName}`);
-    if (!existing?.data) {
+    const existing = fieldsByName.get(fieldName);
+    if (!existing) {
       console.log(`   ⚠️  ${fieldName}: pole neexistuje, skipping`);
       continue;
     }
-    const meta = { ...(existing.data.meta || {}) };
+    const meta = { ...(existing.meta || {}) };
     meta.width = cfg.width;
     meta.sort = cfg.sort;
     if (cfg.group !== undefined) meta.group = cfg.group;

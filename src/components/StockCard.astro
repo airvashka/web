@@ -53,10 +53,13 @@ const isNew = v.condition === 'new';
 let displayPrice = v.promo_price ?? baseList;
 let priceBefore: number | null = null;
 if (v.promo_price && baseList && v.promo_price < baseList) {
+  // Explicitní vehicle-level promo: list_price = "před", promo_price = "po"
   priceBefore = baseList;
 } else if (modelPromoActive && modelPromoDiscount > 0 && baseList && isNew) {
-  displayPrice = baseList - modelPromoDiscount;
-  priceBefore = baseList;
+  // Modelová akce: stock list_price je UŽ PO slevě (import ji od dodavatele zahrnul).
+  // Cenu nesnížíme, jen dopočítáme "původní" zpět nahoru pro přeškrtnutí + úsporu.
+  displayPrice = baseList;
+  priceBefore = baseList + modelPromoDiscount;
 }
 const hasDiscount = !!priceBefore;
 

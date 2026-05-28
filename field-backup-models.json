@@ -1,0 +1,1343 @@
+[
+  {
+    "field": "id",
+    "type": "integer",
+    "meta": {
+      "id": 42,
+      "collection": "models",
+      "field": "id",
+      "special": null,
+      "interface": "numeric",
+      "options": null,
+      "display": null,
+      "display_options": null,
+      "readonly": true,
+      "hidden": true,
+      "sort": 1,
+      "width": "full",
+      "translations": null,
+      "note": null,
+      "conditions": null,
+      "required": false,
+      "group": null,
+      "validation": null,
+      "validation_message": null,
+      "searchable": true
+    }
+  },
+  {
+    "field": "slug",
+    "type": "string",
+    "meta": {
+      "id": 45,
+      "collection": "models",
+      "field": "slug",
+      "special": null,
+      "interface": "input",
+      "options": null,
+      "display": null,
+      "display_options": null,
+      "readonly": false,
+      "hidden": false,
+      "sort": 3,
+      "width": "half",
+      "translations": [
+        {
+          "language": "cs-CZ",
+          "translation": "URL slug"
+        }
+      ],
+      "note": "Část URL (např. \"torres-hev\" → /model/torres-hev). Bez mezer.",
+      "conditions": null,
+      "required": true,
+      "group": null,
+      "validation": null,
+      "validation_message": null,
+      "searchable": true
+    }
+  },
+  {
+    "field": "name",
+    "type": "string",
+    "meta": {
+      "id": 46,
+      "collection": "models",
+      "field": "name",
+      "special": null,
+      "interface": "input",
+      "options": null,
+      "display": null,
+      "display_options": null,
+      "readonly": false,
+      "hidden": false,
+      "sort": 4,
+      "width": "half",
+      "translations": [
+        {
+          "language": "cs-CZ",
+          "translation": "Název modelu"
+        }
+      ],
+      "note": "Přesný název modelu (např. \"Torres\", \"Torres HEV\", \"Korando\").",
+      "conditions": null,
+      "required": true,
+      "group": null,
+      "validation": null,
+      "validation_message": null,
+      "searchable": true
+    }
+  },
+  {
+    "field": "tagline",
+    "type": "string",
+    "meta": {
+      "id": 47,
+      "collection": "models",
+      "field": "tagline",
+      "special": null,
+      "interface": "input",
+      "options": null,
+      "display": null,
+      "display_options": null,
+      "readonly": false,
+      "hidden": false,
+      "sort": 5,
+      "width": "full",
+      "translations": [
+        {
+          "language": "cs-CZ",
+          "translation": "Tagline"
+        }
+      ],
+      "note": "Krátký claim modelu (např. \"Dobrodružství s moderním SUV\").",
+      "conditions": null,
+      "required": false,
+      "group": null,
+      "validation": null,
+      "validation_message": null,
+      "searchable": true
+    }
+  },
+  {
+    "field": "description",
+    "type": "text",
+    "meta": {
+      "id": 48,
+      "collection": "models",
+      "field": "description",
+      "special": null,
+      "interface": "input-rich-text-md",
+      "options": null,
+      "display": null,
+      "display_options": null,
+      "readonly": false,
+      "hidden": false,
+      "sort": 6,
+      "width": "full",
+      "translations": [
+        {
+          "language": "cs-CZ",
+          "translation": "Popis"
+        }
+      ],
+      "note": "Delší popis modelu — text pod sekcí Představení. Můžeš použít víc odstavců.",
+      "conditions": null,
+      "required": false,
+      "group": null,
+      "validation": null,
+      "validation_message": null,
+      "searchable": true
+    }
+  },
+  {
+    "field": "body_type",
+    "type": "string",
+    "meta": {
+      "id": 49,
+      "collection": "models",
+      "field": "body_type",
+      "special": null,
+      "interface": "select-dropdown",
+      "options": {
+        "choices": [
+          {
+            "text": "SUV",
+            "value": "suv"
+          },
+          {
+            "text": "Hatchback",
+            "value": "hatchback"
+          },
+          {
+            "text": "Sedan",
+            "value": "sedan"
+          },
+          {
+            "text": "Pickup",
+            "value": "pickup"
+          },
+          {
+            "text": "Dodávka",
+            "value": "van"
+          },
+          {
+            "text": "MPV",
+            "value": "mpv"
+          }
+        ]
+      },
+      "display": null,
+      "display_options": null,
+      "readonly": false,
+      "hidden": false,
+      "sort": 7,
+      "width": "half",
+      "translations": [
+        {
+          "language": "cs-CZ",
+          "translation": "Karoserie"
+        }
+      ],
+      "note": "suv / pickup / van...",
+      "conditions": null,
+      "required": false,
+      "group": null,
+      "validation": null,
+      "validation_message": null,
+      "searchable": true
+    }
+  },
+  {
+    "field": "fuel_type",
+    "type": "string",
+    "meta": {
+      "id": 50,
+      "collection": "models",
+      "field": "fuel_type",
+      "special": null,
+      "interface": "select-dropdown",
+      "options": {
+        "choices": [
+          {
+            "text": "Benzín",
+            "value": "petrol"
+          },
+          {
+            "text": "Diesel",
+            "value": "diesel"
+          },
+          {
+            "text": "Hybrid",
+            "value": "hybrid"
+          },
+          {
+            "text": "Plug-in Hybrid (PHEV)",
+            "value": "phev"
+          },
+          {
+            "text": "Elektro",
+            "value": "ev"
+          }
+        ]
+      },
+      "display": null,
+      "display_options": null,
+      "readonly": false,
+      "hidden": false,
+      "sort": 8,
+      "width": "half",
+      "translations": [
+        {
+          "language": "cs-CZ",
+          "translation": "Typ paliva"
+        }
+      ],
+      "note": "petrol / diesel / hybrid / phev / ev.",
+      "conditions": null,
+      "required": false,
+      "group": null,
+      "validation": null,
+      "validation_message": null,
+      "searchable": true
+    }
+  },
+  {
+    "field": "price_from",
+    "type": "integer",
+    "meta": {
+      "id": 51,
+      "collection": "models",
+      "field": "price_from",
+      "special": null,
+      "interface": "input",
+      "options": null,
+      "display": null,
+      "display_options": null,
+      "readonly": false,
+      "hidden": false,
+      "sort": 9,
+      "width": "half",
+      "translations": [
+        {
+          "language": "cs-CZ",
+          "translation": "Cena od (Kč)"
+        }
+      ],
+      "note": "Začínající cena modelu pro zobrazení na kartě.",
+      "conditions": null,
+      "required": false,
+      "group": null,
+      "validation": null,
+      "validation_message": null,
+      "searchable": true
+    }
+  },
+  {
+    "field": "hero_image",
+    "type": "uuid",
+    "meta": {
+      "id": 52,
+      "collection": "models",
+      "field": "hero_image",
+      "special": [
+        "file"
+      ],
+      "interface": "file-image",
+      "options": null,
+      "display": null,
+      "display_options": null,
+      "readonly": false,
+      "hidden": false,
+      "sort": 10,
+      "width": "full",
+      "translations": [
+        {
+          "language": "cs-CZ",
+          "translation": "Hero fotka (detail)"
+        }
+      ],
+      "note": "Velká fotka cinematic 21:9 pro Hero banner na /model/[slug]. Doporučeno 2400×1000.",
+      "conditions": null,
+      "required": false,
+      "group": null,
+      "validation": null,
+      "validation_message": null,
+      "searchable": true
+    }
+  },
+  {
+    "field": "status",
+    "type": "string",
+    "meta": {
+      "id": 54,
+      "collection": "models",
+      "field": "status",
+      "special": null,
+      "interface": "select-dropdown",
+      "options": {
+        "choices": [
+          {
+            "text": "Publikováno",
+            "value": "published"
+          },
+          {
+            "text": "Koncept",
+            "value": "draft"
+          },
+          {
+            "text": "Archivováno",
+            "value": "archived"
+          }
+        ]
+      },
+      "display": "labels",
+      "display_options": {
+        "choices": [
+          {
+            "text": "Publikováno",
+            "value": "published",
+            "foreground": "#FFFFFF",
+            "background": "#1E7B5F"
+          },
+          {
+            "text": "Koncept",
+            "value": "draft",
+            "foreground": "#FFFFFF",
+            "background": "#B27516"
+          },
+          {
+            "text": "Archivováno",
+            "value": "archived",
+            "foreground": "#FFFFFF",
+            "background": "#B43A2C"
+          }
+        ]
+      },
+      "readonly": false,
+      "hidden": false,
+      "sort": 12,
+      "width": "half",
+      "translations": [
+        {
+          "language": "cs-CZ",
+          "translation": "Stav publikace"
+        }
+      ],
+      "note": null,
+      "conditions": null,
+      "required": false,
+      "group": null,
+      "validation": null,
+      "validation_message": null,
+      "searchable": true
+    }
+  },
+  {
+    "field": "sort",
+    "type": "integer",
+    "meta": {
+      "id": 55,
+      "collection": "models",
+      "field": "sort",
+      "special": null,
+      "interface": "input",
+      "options": null,
+      "display": null,
+      "display_options": null,
+      "readonly": false,
+      "hidden": true,
+      "sort": 13,
+      "width": "full",
+      "translations": [
+        {
+          "language": "cs-CZ",
+          "translation": "Pořadí"
+        }
+      ],
+      "note": null,
+      "conditions": null,
+      "required": false,
+      "group": null,
+      "validation": null,
+      "validation_message": null,
+      "searchable": true
+    }
+  },
+  {
+    "field": "brand",
+    "type": "integer",
+    "meta": {
+      "id": 126,
+      "collection": "models",
+      "field": "brand",
+      "special": [
+        "m2o"
+      ],
+      "interface": "select-dropdown-m2o",
+      "options": {
+        "template": "{{name}}"
+      },
+      "display": "related-values",
+      "display_options": {
+        "template": "{{name}}"
+      },
+      "readonly": false,
+      "hidden": false,
+      "sort": 1,
+      "width": "half",
+      "translations": [
+        {
+          "language": "cs-CZ",
+          "translation": "Značka"
+        }
+      ],
+      "note": "Která značka (KGM / OMODA & JAECOO / Farizon).",
+      "conditions": null,
+      "required": true,
+      "group": null,
+      "validation": null,
+      "validation_message": null,
+      "searchable": true
+    }
+  },
+  {
+    "field": "sub_brand",
+    "type": "integer",
+    "meta": {
+      "id": 127,
+      "collection": "models",
+      "field": "sub_brand",
+      "special": [
+        "m2o"
+      ],
+      "interface": "select-dropdown-m2o",
+      "options": {
+        "template": "{{name}}"
+      },
+      "display": "related-values",
+      "display_options": {
+        "template": "{{name}}"
+      },
+      "readonly": false,
+      "hidden": false,
+      "sort": 2,
+      "width": "half",
+      "translations": [
+        {
+          "language": "cs-CZ",
+          "translation": "Pod-značka"
+        }
+      ],
+      "note": "Volitelné — pokud spadá do pod-značky (OMODA vs JAECOO).",
+      "conditions": null,
+      "required": false,
+      "group": null,
+      "validation": null,
+      "validation_message": null,
+      "searchable": true
+    }
+  },
+  {
+    "field": "youtube_video_ids",
+    "type": "json",
+    "meta": {
+      "id": 157,
+      "collection": "models",
+      "field": "youtube_video_ids",
+      "special": [
+        "cast-json"
+      ],
+      "interface": "tags",
+      "options": {
+        "placeholder": "Vlož ID a stiskni Enter (např. piG8UO24WUk)"
+      },
+      "display": null,
+      "display_options": null,
+      "readonly": false,
+      "hidden": false,
+      "sort": 15,
+      "width": "full",
+      "translations": [
+        {
+          "language": "cs-CZ",
+          "translation": "YouTube videa"
+        }
+      ],
+      "note": "Pole YouTube ID. Zobrazí se v sekci \"{model} v pohybu\" na detailu.",
+      "conditions": null,
+      "required": false,
+      "group": null,
+      "validation": null,
+      "validation_message": null,
+      "searchable": true
+    }
+  },
+  {
+    "field": "hero_stats",
+    "type": "json",
+    "meta": {
+      "id": 174,
+      "collection": "models",
+      "field": "hero_stats",
+      "special": [
+        "cast-json"
+      ],
+      "interface": "list",
+      "options": {
+        "template": "{{label}}: {{value}}",
+        "addLabel": "Přidat stat",
+        "fields": [
+          {
+            "field": "label",
+            "type": "string",
+            "name": "Popisek",
+            "meta": {
+              "interface": "input",
+              "width": "half",
+              "note": "Např. Výkon, Točivý moment, Záruka"
+            }
+          },
+          {
+            "field": "value",
+            "type": "string",
+            "name": "Hodnota",
+            "meta": {
+              "interface": "input",
+              "width": "half",
+              "note": "Včetně jednotky, např. \"120 kW\", \"5 let / 100 000 km\""
+            }
+          }
+        ]
+      },
+      "display": null,
+      "display_options": null,
+      "readonly": false,
+      "hidden": false,
+      "sort": 150,
+      "width": "full",
+      "translations": null,
+      "note": "Hlavní statistiky pod hero fotkou modelu (Výkon, Záruka, Točivý moment, …). Doporučeno 3–4 řádky.",
+      "conditions": null,
+      "required": false,
+      "group": null,
+      "validation": null,
+      "validation_message": null,
+      "searchable": true
+    }
+  },
+  {
+    "field": "promo_active",
+    "type": "boolean",
+    "meta": {
+      "id": 248,
+      "collection": "models",
+      "field": "promo_active",
+      "special": [
+        "cast-boolean"
+      ],
+      "interface": "boolean",
+      "options": {
+        "label": "Akce aktivní"
+      },
+      "display": null,
+      "display_options": null,
+      "readonly": false,
+      "hidden": false,
+      "sort": 410,
+      "width": "half",
+      "translations": [
+        {
+          "language": "cs-CZ",
+          "translation": "Akce aktivní"
+        }
+      ],
+      "note": "Když zaškrtnuto + máš slevu nebo label, na webu se na model kartě + skladovkách (jen u nových) zobrazí AKCE badge a akční cena.",
+      "conditions": null,
+      "required": false,
+      "group": null,
+      "validation": null,
+      "validation_message": null,
+      "searchable": true
+    }
+  },
+  {
+    "field": "promo_label",
+    "type": "string",
+    "meta": {
+      "id": 249,
+      "collection": "models",
+      "field": "promo_label",
+      "special": null,
+      "interface": "input",
+      "options": {
+        "placeholder": "JARNÍ AKCE"
+      },
+      "display": null,
+      "display_options": null,
+      "readonly": false,
+      "hidden": false,
+      "sort": 415,
+      "width": "half",
+      "translations": [
+        {
+          "language": "cs-CZ",
+          "translation": "Akce — text badge"
+        }
+      ],
+      "note": "Krátký text (např. \"Sleva 30 000 Kč\", \"Akce do června\"). Pokud prázdné, defaultně \"Akce\".",
+      "conditions": null,
+      "required": false,
+      "group": null,
+      "validation": null,
+      "validation_message": null,
+      "searchable": true
+    }
+  },
+  {
+    "field": "promo_discount_amount",
+    "type": "integer",
+    "meta": {
+      "id": 250,
+      "collection": "models",
+      "field": "promo_discount_amount",
+      "special": null,
+      "interface": "input",
+      "options": {
+        "placeholder": "50000"
+      },
+      "display": null,
+      "display_options": null,
+      "readonly": false,
+      "hidden": false,
+      "sort": 420,
+      "width": "half",
+      "translations": [
+        {
+          "language": "cs-CZ",
+          "translation": "Akce — sleva (Kč)"
+        }
+      ],
+      "note": "Odečte se od price_from a od list_price nových skladovek toho modelu.",
+      "conditions": null,
+      "required": false,
+      "group": null,
+      "validation": null,
+      "validation_message": null,
+      "searchable": true
+    }
+  },
+  {
+    "field": "promo_valid_to",
+    "type": "date",
+    "meta": {
+      "id": 251,
+      "collection": "models",
+      "field": "promo_valid_to",
+      "special": null,
+      "interface": "datetime",
+      "options": null,
+      "display": null,
+      "display_options": null,
+      "readonly": false,
+      "hidden": false,
+      "sort": 425,
+      "width": "half",
+      "translations": [
+        {
+          "language": "cs-CZ",
+          "translation": "Akce platí do"
+        }
+      ],
+      "note": "Po tomto datu se promo automaticky vypne (na webu se neukáže).",
+      "conditions": null,
+      "required": false,
+      "group": null,
+      "validation": null,
+      "validation_message": null,
+      "searchable": true
+    }
+  },
+  {
+    "field": "promo_description",
+    "type": "text",
+    "meta": {
+      "id": 252,
+      "collection": "models",
+      "field": "promo_description",
+      "special": null,
+      "interface": "input-rich-text-md",
+      "options": {
+        "toolbar": [
+          "bold",
+          "italic",
+          "link",
+          "heading",
+          "bullist",
+          "numlist"
+        ]
+      },
+      "display": null,
+      "display_options": null,
+      "readonly": false,
+      "hidden": false,
+      "sort": 430,
+      "width": "full",
+      "translations": [
+        {
+          "language": "cs-CZ",
+          "translation": "Akce — popis"
+        }
+      ],
+      "note": "Delší popis akce (volitelné).",
+      "conditions": null,
+      "required": false,
+      "group": null,
+      "validation": null,
+      "validation_message": null,
+      "searchable": true
+    }
+  },
+  {
+    "field": "highlights_panel",
+    "type": "json",
+    "meta": {
+      "id": 263,
+      "collection": "models",
+      "field": "highlights_panel",
+      "special": [
+        "cast-json"
+      ],
+      "interface": "list",
+      "options": {
+        "template": "{{lab}}: {{big}}",
+        "fields": [
+          {
+            "field": "icon_kind",
+            "name": "Ikona",
+            "type": "string",
+            "meta": {
+              "interface": "select-dropdown",
+              "width": "half",
+              "required": true,
+              "options": {
+                "choices": [
+                  {
+                    "text": "Dojezd / Range (hodiny)",
+                    "value": "range"
+                  },
+                  {
+                    "text": "Nabíjení / Charge (zástrčka)",
+                    "value": "charge"
+                  },
+                  {
+                    "text": "Tepelná pumpa (zvlnění)",
+                    "value": "heatpump"
+                  },
+                  {
+                    "text": "Self-charging hybrid (cyklus)",
+                    "value": "selfcharge"
+                  },
+                  {
+                    "text": "Spotřeba paliva (kanystr)",
+                    "value": "fuel"
+                  },
+                  {
+                    "text": "Pohon 4x4 (4 kola)",
+                    "value": "awd"
+                  },
+                  {
+                    "text": "Tažné zařízení / Přívěs",
+                    "value": "tow"
+                  },
+                  {
+                    "text": "Převodovka (řadicí páka)",
+                    "value": "transmission"
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "field": "big",
+            "name": "Velká hodnota",
+            "type": "string",
+            "meta": {
+              "interface": "input",
+              "width": "half",
+              "required": true,
+              "options": {
+                "placeholder": "např. 462 km"
+              }
+            }
+          },
+          {
+            "field": "lab",
+            "name": "Popisek (uppercase)",
+            "type": "string",
+            "meta": {
+              "interface": "input",
+              "width": "half",
+              "required": true,
+              "options": {
+                "placeholder": "např. Dojezd WLTP"
+              }
+            }
+          },
+          {
+            "field": "note",
+            "name": "Krátká nota",
+            "type": "string",
+            "meta": {
+              "interface": "input",
+              "width": "full",
+              "options": {
+                "placeholder": "Klidně až na hory — a zpět na jedno nabití."
+              }
+            }
+          }
+        ]
+      },
+      "display": null,
+      "display_options": null,
+      "readonly": false,
+      "hidden": false,
+      "sort": 60,
+      "width": "full",
+      "translations": [
+        {
+          "language": "cs-CZ",
+          "translation": "Lákadlový panel"
+        }
+      ],
+      "note": "3 karty s ikonou pod Představením (např. \"Dojezd WLTP 462 km\"). Vyber icon kind + napiš velkou hodnotu + label + krátkou notu.",
+      "conditions": null,
+      "required": false,
+      "group": null,
+      "validation": null,
+      "validation_message": null,
+      "searchable": true
+    }
+  },
+  {
+    "field": "variant_badge_kind",
+    "type": "string",
+    "meta": {
+      "id": 264,
+      "collection": "models",
+      "field": "variant_badge_kind",
+      "special": null,
+      "interface": "select-dropdown",
+      "options": {
+        "choices": [
+          {
+            "text": "Žádný badge",
+            "value": ""
+          },
+          {
+            "text": "ICE — spalovací motor",
+            "value": "ICE"
+          },
+          {
+            "text": "HEV — hybrid",
+            "value": "HEV"
+          },
+          {
+            "text": "EVX — elektromobil",
+            "value": "EVX"
+          }
+        ]
+      },
+      "display": null,
+      "display_options": null,
+      "readonly": false,
+      "hidden": false,
+      "sort": 61,
+      "width": "half",
+      "translations": [
+        {
+          "language": "cs-CZ",
+          "translation": "Typ pohonu badge"
+        }
+      ],
+      "note": "Pro Torres ICE/HEV/EVX, Actyon ICE/HEV atd. — určuje barvu strip na kartě + ikonu ve variant switcheru.",
+      "conditions": null,
+      "required": false,
+      "group": null,
+      "validation": null,
+      "validation_message": null,
+      "searchable": true
+    }
+  },
+  {
+    "field": "hero_image_card",
+    "type": "uuid",
+    "meta": {
+      "id": 274,
+      "collection": "models",
+      "field": "hero_image_card",
+      "special": [
+        "file"
+      ],
+      "interface": "file-image",
+      "options": null,
+      "display": null,
+      "display_options": null,
+      "readonly": false,
+      "hidden": false,
+      "sort": 12,
+      "width": "half",
+      "translations": [
+        {
+          "language": "cs-CZ",
+          "translation": "Hero fotka (karta)"
+        }
+      ],
+      "note": "Fotka 4:3 nebo square pro kartu na brand listingu. Doporučeno 1200×900. Když chybí, použije se Hero detail fotka.",
+      "conditions": null,
+      "required": false,
+      "group": null,
+      "validation": null,
+      "validation_message": null,
+      "searchable": true
+    }
+  },
+  {
+    "field": "hero_video",
+    "type": "uuid",
+    "meta": {
+      "id": 275,
+      "collection": "models",
+      "field": "hero_video",
+      "special": [
+        "file"
+      ],
+      "interface": "file",
+      "options": null,
+      "display": null,
+      "display_options": null,
+      "readonly": false,
+      "hidden": false,
+      "sort": 13,
+      "width": "half",
+      "translations": [
+        {
+          "language": "cs-CZ",
+          "translation": "Hero video"
+        }
+      ],
+      "note": "Volitelné background video na Hero (autoplay, mute, loop). MP4 doporučeno, krátké 5-15s, max 5 MB.",
+      "conditions": null,
+      "required": false,
+      "group": null,
+      "validation": null,
+      "validation_message": null,
+      "searchable": true
+    }
+  },
+  {
+    "field": "logo",
+    "type": "uuid",
+    "meta": {
+      "id": 319,
+      "collection": "models",
+      "field": "logo",
+      "special": [
+        "file"
+      ],
+      "interface": "file-image",
+      "options": null,
+      "display": null,
+      "display_options": null,
+      "readonly": false,
+      "hidden": false,
+      "sort": 14,
+      "width": "half",
+      "translations": null,
+      "note": "Logo / wordmark modelu. Zobrazi se v hero na /model/{slug} MISTO textoveho nazvu. Doporuceno PNG/SVG s pruhlednym pozadim, svetla varianta (hero je tmavy). Kdyz prazdne, ukaze se text.",
+      "conditions": null,
+      "required": false,
+      "group": null,
+      "validation": null,
+      "validation_message": null,
+      "searchable": true
+    }
+  },
+  {
+    "field": "promo_image",
+    "type": "uuid",
+    "meta": {
+      "id": 324,
+      "collection": "models",
+      "field": "promo_image",
+      "special": [
+        "file"
+      ],
+      "interface": "file-image",
+      "options": null,
+      "display": null,
+      "display_options": null,
+      "readonly": false,
+      "hidden": false,
+      "sort": 432,
+      "width": "half",
+      "translations": null,
+      "note": "Obrazek pro akcni banner (zobrazi se vpravo, kde je jinak SLEVA -X Kc badge). Doporuceny pomer 4:3, velikost min 800x600. Funguje s libovolne velkym zdrojem - Directus transformuje na pozadovanou sirku.",
+      "conditions": null,
+      "required": false,
+      "group": null,
+      "validation": null,
+      "validation_message": null,
+      "searchable": true
+    }
+  },
+  {
+    "field": "promo_image_transparent",
+    "type": "boolean",
+    "meta": {
+      "id": 325,
+      "collection": "models",
+      "field": "promo_image_transparent",
+      "special": [
+        "cast-boolean"
+      ],
+      "interface": "boolean",
+      "options": {
+        "label": "Promo image je transparentni PNG"
+      },
+      "display": null,
+      "display_options": null,
+      "readonly": false,
+      "hidden": false,
+      "sort": 434,
+      "width": "half",
+      "translations": null,
+      "note": "Zaskrtni, kdyz je promo_image transparentni PNG (nalepka, logo akce). Pak se v banneru pouzije object-fit: contain + 10px bile okoli. Kdyz necheckle, pouzije se cover (fotka vyplni cely ramecek).",
+      "conditions": null,
+      "required": false,
+      "group": null,
+      "validation": null,
+      "validation_message": null,
+      "searchable": true
+    }
+  },
+  {
+    "field": "gallery",
+    "type": "alias",
+    "meta": {
+      "id": 148,
+      "collection": "models",
+      "field": "gallery",
+      "special": [
+        "files"
+      ],
+      "interface": "files",
+      "options": {
+        "enableCreate": true,
+        "enableSelect": true,
+        "folder": null
+      },
+      "display": null,
+      "display_options": null,
+      "readonly": false,
+      "hidden": false,
+      "sort": 14,
+      "width": "full",
+      "translations": [
+        {
+          "language": "cs-CZ",
+          "translation": "Galerie"
+        }
+      ],
+      "note": "Fotky pro galerie sekci. Doporučeno 8-20 fotek.",
+      "conditions": null,
+      "required": false,
+      "group": null,
+      "validation": null,
+      "validation_message": null,
+      "searchable": true
+    }
+  },
+  {
+    "field": "color_interior",
+    "type": "alias",
+    "meta": {
+      "id": 195,
+      "collection": "models",
+      "field": "color_interior",
+      "special": [
+        "o2m"
+      ],
+      "interface": "list-o2m",
+      "options": {
+        "enableCreate": true,
+        "enableSelect": false,
+        "layout": "list",
+        "template": "{{name}}"
+      },
+      "display": null,
+      "display_options": null,
+      "readonly": false,
+      "hidden": false,
+      "sort": 302,
+      "width": "full",
+      "translations": [
+        {
+          "language": "cs-CZ",
+          "translation": "Čalounění (showroom)"
+        }
+      ],
+      "note": "Interiér galerie.",
+      "conditions": null,
+      "required": false,
+      "group": null,
+      "validation": null,
+      "validation_message": null,
+      "searchable": true
+    }
+  },
+  {
+    "field": "documents",
+    "type": "alias",
+    "meta": {
+      "id": 239,
+      "collection": "models",
+      "field": "documents",
+      "special": [
+        "o2m"
+      ],
+      "interface": "list-o2m",
+      "options": {
+        "enableCreate": true,
+        "enableSelect": false,
+        "layout": "list",
+        "template": "{{title}}"
+      },
+      "display": null,
+      "display_options": null,
+      "readonly": false,
+      "hidden": false,
+      "sort": 310,
+      "width": "full",
+      "translations": [
+        {
+          "language": "cs-CZ",
+          "translation": "Dokumenty ke stažení"
+        }
+      ],
+      "note": "Brožury, ceníky a další PDF — typ určuje kategorii.",
+      "conditions": null,
+      "required": false,
+      "group": null,
+      "validation": null,
+      "validation_message": null,
+      "searchable": true
+    }
+  },
+  {
+    "field": "_promo_divider",
+    "type": "alias",
+    "meta": {
+      "id": 247,
+      "collection": "models",
+      "field": "_promo_divider",
+      "special": [
+        "alias",
+        "no-data"
+      ],
+      "interface": "presentation-divider",
+      "options": {
+        "title": "Akční nabídka",
+        "icon": "local_offer",
+        "color": "#F25C1B"
+      },
+      "display": null,
+      "display_options": null,
+      "readonly": false,
+      "hidden": false,
+      "sort": 400,
+      "width": "full",
+      "translations": null,
+      "note": null,
+      "conditions": null,
+      "required": false,
+      "group": null,
+      "validation": null,
+      "validation_message": null,
+      "searchable": true
+    }
+  },
+  {
+    "field": "model_years",
+    "type": "alias",
+    "meta": {
+      "id": 258,
+      "collection": "models",
+      "field": "model_years",
+      "special": [
+        "o2m"
+      ],
+      "interface": "list-o2m",
+      "options": {
+        "enableCreate": true,
+        "enableSelect": false,
+        "template": "{{year}}{{version}}",
+        "layout": "list"
+      },
+      "display": null,
+      "display_options": null,
+      "readonly": false,
+      "hidden": false,
+      "sort": 431,
+      "width": "full",
+      "translations": [
+        {
+          "language": "cs-CZ",
+          "translation": "Modelové roky"
+        }
+      ],
+      "note": "Modelové roky tohoto modelu. Klikni \"+ Create New\" pro přidání 2024/2025/2026... Kopírovat lze přes scripts/duplicate-model-year.mjs.",
+      "conditions": null,
+      "required": false,
+      "group": null,
+      "validation": null,
+      "validation_message": null,
+      "searchable": true
+    }
+  },
+  {
+    "field": "highlights",
+    "type": "alias",
+    "meta": {
+      "id": 202,
+      "collection": "models",
+      "field": "highlights",
+      "special": [
+        "o2m"
+      ],
+      "interface": "list-o2m",
+      "options": {
+        "enableCreate": true,
+        "enableSelect": false,
+        "layout": "list",
+        "template": "{{title}}"
+      },
+      "display": null,
+      "display_options": null,
+      "readonly": false,
+      "hidden": false,
+      "sort": 200,
+      "width": "full",
+      "translations": [
+        {
+          "language": "cs-CZ",
+          "translation": "Technologie (cards)"
+        }
+      ],
+      "note": "4-card grid \"Co umí {model}\" — každá karta má eyebrow + title + subtitle + fotka. Kategorie: Technologie / Bezpečnost / Komfort.",
+      "conditions": null,
+      "required": false,
+      "group": null,
+      "validation": null,
+      "validation_message": null,
+      "searchable": true
+    }
+  },
+  {
+    "field": "color_exterior",
+    "type": "alias",
+    "meta": {
+      "id": 194,
+      "collection": "models",
+      "field": "color_exterior",
+      "special": [
+        "o2m"
+      ],
+      "interface": "list-o2m",
+      "options": {
+        "enableCreate": true,
+        "enableSelect": false,
+        "layout": "list",
+        "template": "{{name}} ({{hex}})"
+      },
+      "display": null,
+      "display_options": null,
+      "readonly": false,
+      "hidden": false,
+      "sort": 301,
+      "width": "full",
+      "translations": [
+        {
+          "language": "cs-CZ",
+          "translation": "Barvy karoserie (showroom)"
+        }
+      ],
+      "note": "Showroom barvy s fotkama — pro Hero galerii na /model/[slug]#barvy.",
+      "conditions": null,
+      "required": false,
+      "group": null,
+      "validation": null,
+      "validation_message": null,
+      "searchable": true
+    }
+  }
+]
