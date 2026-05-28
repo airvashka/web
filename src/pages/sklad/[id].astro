@@ -293,13 +293,14 @@ const statusBadge = v.availability === 'in_stock' ? { cls: 'dark', label: 'Sklad
 
 // Equipment grouped — funguje pro nové groupy ({category, items}) i legacy flat array
 const rawFeatures = (trim as any)?.features ?? [];
-// Standardní výbava: PRIMÁRNĚ z feedu/scrapu konkrétního vozu, jinak z napojeného trimu.
-//   OMODA/JAECOO feed → snapshot.equip   = [{ title, items: [{ title }] }]
-//   KGM scrape        → snapshot.features = { kategorie: [string] }
-//   ruční / legacy    → trim.features (getGroupedFeatures)
+// Standardní výbava — priorita:
+//   1) snapshot.equip — OMODA/JAECOO per-VIN feed (specifické pro konkrétní auto)
+//   2) trim.features — čerstvé z trim_levels (matrix save tady aktualizuje)
+//   3) snapshot.features — KGM scrape snapshot (FALLBACK; tato je 'zamrzlá' v okamžiku importu)
 const _snap = (v.trim_level_snapshot as any) ?? {};
 let feedGrouped: Array<{ label: string; items: string[] }> = [];
-if (Array.isArray(_snap.equip)) {
+if (Array.isArray(_snap.equip) && _snap.equip.length > 0) {
+  // OMODA/JAECOO per-VIN feed
   feedGrouped = _snap.equip
     .map((g: any) => ({
       label: g?.title ?? g?.category ?? 'Výbava',
@@ -308,12 +309,20 @@ if (Array.isArray(_snap.equip)) {
         : [],
     }))
     .filter((g: any) => g.items.length > 0);
-} else if (_snap.features && typeof _snap.features === 'object' && !Array.isArray(_snap.features)) {
-  feedGrouped = Object.entries(_snap.features)
+}
+// trim.features má přednost nad snapshot.features (z KGM scrape), aby admin matrix
+// změny se propsaly. snapshot.features se použije jen pokud trim nemá nic.
+const trimGrouped = rawFeatures && (Array.isArray(rawFeatures) ? rawFeatures.length > 0 : true)
+  ? getGroupedFeatures(rawFeatures) : [];
+let snapGrouped: Array<{ label: string; items: string[] }> = [];
+if (_snap.features && typeof _snap.features === 'object' && !Array.isArray(_snap.features)) {
+  snapGrouped = Object.entries(_snap.features)
     .map(([label, items]) => ({ label, items: Array.isArray(items) ? (items as any[]).map(String).filter(Boolean) : [] }))
     .filter((g) => g.items.length > 0);
 }
-let grouped = feedGrouped.length > 0 ? feedGrouped : getGroupedFeatures(rawFeatures);
+let grouped = feedGrouped.length > 0 ? feedGrouped
+            : trimGrouped.length > 0 ? trimGrouped
+            : snapGrouped;
 // Flat seznam pro highlights heuristiku (čte se napříč skupinami)
 const features: string[] = grouped.flatMap((g) => g.items);
 

@@ -15,10 +15,14 @@ import type { Brand, Model, ModelYear, TrimLevel } from '@lib/types';
 
    ============================================================ */
 
-export async function getStaticPaths() {
-  const models = await directusGet<Model>('models', { fields: ['slug'] });
-  return models.map((m) => ({ params: { slug: m.slug } }));
-}
+// SSR (prerender=false) — data čerstvě z Directusu při každém requestu,
+// 60s edge cache pro výkon. Bez tohoto by frontend ukazoval stale data
+// dokud admin nezdřejmí Vercel rebuild.
+export const prerender = false;
+Astro.response.headers.set('Cache-Control', 'public, s-maxage=60, stale-while-revalidate=300');
+
+// (getStaticPaths smazán — SSR režim, viz git historie)
+
 
 const { slug } = Astro.params;
 
