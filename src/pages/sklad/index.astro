@@ -47,7 +47,7 @@ const vehicles = await directusGet<V>('stock_vehicles', {
   ],
 }, true);
 
-const fuelLabels: Record<string, string> = { petrol: 'Benzín', diesel: 'Diesel', hybrid: 'Hybrid', phev: 'PHEV', ev: 'Elektro' };
+const fuelLabels: Record<string, string> = { petrol: 'Benzín', diesel: 'Diesel', hybrid: 'HEV', phev: 'PHEV', ev: 'Elektro' };
 
 const availableFuels = [...new Set(vehicles.map((v) => v.model?.fuel_type).filter(Boolean))] as string[];
 const availableConditions = [...new Set(vehicles.map((v) => v.condition).filter(Boolean))] as string[];

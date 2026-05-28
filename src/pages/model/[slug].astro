@@ -114,9 +114,12 @@ const stockOfModel = await directusGet<any>('stock_vehicles', {
   limit: 16,
   fields: [
     'id', 'condition', 'availability', 'km', 'list_price', 'promo_price', 'trim_level_snapshot',
-    'highlighted', 'highlight_label', 'transmission', 'drivetrain',
+    'highlighted', 'highlight_label', 'transmission', 'drivetrain', 'listed_at',
     'photos.directus_files_id', 'model_year.year', 'color_code', 'color_category',
     'trim_level.name',
+    'brand.name', 'brand.slug',
+    'model.name', 'model.slug', 'model.fuel_type',
+    'model.promo_active', 'model.promo_label', 'model.promo_discount_amount', 'model.promo_valid_to',
   ],
 });
 

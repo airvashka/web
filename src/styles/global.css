@@ -3070,7 +3070,7 @@ a.promo-image-link:hover {
 .a-spec-state.st-order .a-spec-ico { color: #1F5BB8; }
 
 .a-price-row { display: flex; justify-content: space-between; align-items: flex-end; gap: 8px; }
-.a-price-old { font-size: 13px; color: #9B9BA3; text-decoration: line-through; }
+.a-price-old { font-size: 13px; color: #9B9BA3; text-decoration: line-through; min-height: 18px; display: block; }
 .a-price-line { display: flex; align-items: baseline; gap: 6px; flex-wrap: wrap; }
 .a-price-val { font-size: 22px; font-weight: 800; letter-spacing: -0.015em; color: #1A1A1F; }
 .a-price-vat { font-size: 11px; color: #6B6B73; }

@@ -1,7 +1,8 @@
 ---
 /**
  * FuelIcon — barevný kruhový badge (fuel-type overlay v rohu stock card fotky).
- * Varianty: ICE (hnědý), HEV (modrý + modrý blesk), PHEV (modrý + zelený blesk + zástrčka), EV (zelený).
+ * Používá PNG ikony z /public/fuel-icons/ (kreslené Jardou, nahradily SVG).
+ * Varianty: ICE (petrol/diesel) | HEV (hybrid) | PHEV (plug-in) | EV (elektro).
  */
 type FuelType = 'petrol' | 'diesel' | 'hybrid' | 'phev' | 'ev' | string;
 interface Props {
@@ -10,68 +11,36 @@ interface Props {
 }
 const { type = '', class: className = '' } = Astro.props;
 
-const isICE = type === 'petrol' || type === 'diesel';
-const isHEV = type === 'hybrid';
-const isPHEV = type === 'phev';
-const isEV = type === 'ev';
+const TYPE_MAP: Record<string, { file: string; label: string }> = {
+  petrol:  { file: 'ice.png',  label: 'Benzín' },
+  diesel:  { file: 'ice.png',  label: 'Diesel' },
+  hybrid:  { file: 'hev.png',  label: 'Hybrid (HEV)' },
+  phev:    { file: 'phev.png', label: 'Plug-in hybrid (PHEV)' },
+  ev:      { file: 'ev.png',   label: 'Elektro (EV)' },
+};
 
-const label = isICE ? (type === 'diesel' ? 'Diesel' : 'Benzín')
-            : isHEV ? 'Hybrid'
-            : isPHEV ? 'Plug-in hybrid'
-            : isEV ? 'Elektro' : '';
+const cfg = TYPE_MAP[type as string];
 ---
 
-{isICE && (
-  <span class={`fuel-icon fuel-icon--ice ${className}`} title={label} aria-label={label}>
-    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-      <path d="M6 2h7a2 2 0 0 1 2 2v17H4V4a2 2 0 0 1 2-2zm0 2v5h7V4H6z" fill="#fff"/>
-      <path d="M16 8h2l3 3v6a1 1 0 0 0 1 1 1 1 0 0 0 1-1V11l-3-3" stroke="#fff" stroke-width="1.8" fill="none" stroke-linecap="round"/>
-      <line x1="3" y1="22" x2="16" y2="22" stroke="#fff" stroke-width="2" stroke-linecap="round"/>
-    </svg>
-  </span>
-)}
-{isHEV && (
-  <span class={`fuel-icon fuel-icon--hev ${className}`} title={label} aria-label={label}>
-    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-      <path d="M6 2h7a2 2 0 0 1 2 2v17H4V4a2 2 0 0 1 2-2z" fill="#fff"/>
-      <path d="M16 8h2l3 3v6a1 1 0 0 0 1 1 1 1 0 0 0 1-1V11l-3-3" stroke="#fff" stroke-width="1.8" fill="none" stroke-linecap="round"/>
-      <line x1="3" y1="22" x2="16" y2="22" stroke="#fff" stroke-width="2" stroke-linecap="round"/>
-      <polygon points="10.5,5.5 7,12 9.5,12 8.5,17 12.5,10 10,10 11,5.5" fill="#1F6FEB"/>
-    </svg>
-  </span>
-)}
-{isPHEV && (
-  <span class={`fuel-icon fuel-icon--phev ${className}`} title={label} aria-label={label}>
-    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-      <path d="M4 2h6a2 2 0 0 1 2 2v17H2V4a2 2 0 0 1 2-2z" fill="#fff"/>
-      <line x1="1" y1="22" x2="13" y2="22" stroke="#fff" stroke-width="2" stroke-linecap="round"/>
-      <polygon points="16,4 11,12 14,12 12,21 19,11 15,11 17,4" fill="#5BC23A"/>
-      <rect x="18" y="6" width="5" height="4" rx="1" fill="#fff"/>
-      <rect x="18.8" y="4.5" width="1" height="2" fill="#fff"/>
-      <rect x="21.2" y="4.5" width="1" height="2" fill="#fff"/>
-    </svg>
-  </span>
-)}
-{isEV && (
-  <span class={`fuel-icon fuel-icon--ev ${className}`} title={label} aria-label={label}>
-    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-      <polygon points="14,2 5,13 11,13 9,22 19,10 13,10 15,2" fill="#fff"/>
-    </svg>
-  </span>
+{cfg && (
+  <img
+    src={`/fuel-icons/${cfg.file}`}
+    alt={cfg.label}
+    title={cfg.label}
+    class={`fuel-icon ${className}`}
+    loading="lazy"
+    width="44"
+    height="44"
+  />
 )}
 
 <style is:global>
   .fuel-icon {
-    display: inline-grid;
-    place-items: center;
     width: 44px;
     height: 44px;
     border-radius: 50%;
+    display: inline-block;
+    object-fit: cover;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.20);
   }
-  .fuel-icon svg { width: 64%; height: 64%; display: block; }
-  .fuel-icon--ice  { background: #8B6F5C; }
-  .fuel-icon--hev  { background: #1F6FEB; }
-  .fuel-icon--phev { background: #1F6FEB; }
-  .fuel-icon--ev   { background: #5BC23A; }
 </style>

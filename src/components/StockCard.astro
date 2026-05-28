@@ -159,7 +159,7 @@ const fmtPrice = (n?: number | null) => n ? `${Number(n).toLocaleString('cs-CZ')
 
     <div class="a-price-row">
       <div>
-        {hasDiscount && <div class="a-price-old">{fmtPrice(priceBefore)}</div>}
+        <div class="a-price-old" aria-hidden={!hasDiscount}>{hasDiscount ? fmtPrice(priceBefore) : '\u00A0'}</div>
         <div class="a-price-line">
           <span class="a-price-val">{fmtPrice(displayPrice)}</span>
           <span class="a-price-vat">vč. DPH</span>
