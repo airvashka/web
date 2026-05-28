@@ -48,30 +48,30 @@ try {
 const heightStyle = height ? `height: ${height}px;` : '';
 ---
 
-<!-- Mask-based logo — funguje s libovolným SVG/PNG bez ohledu na transparency.
-     Logo slouží jako stencil, barva přijde z `background-color`. -->
-<span
+<img
+  src={logoSrc}
+  alt={label}
   class={`brand-logo brand-logo--single brand-logo--${slug} ${className} variant-${variant}`}
-  style={`${heightStyle} -webkit-mask-image: url('${logoSrc}'); mask-image: url('${logoSrc}');`}
-  role="img"
-  aria-label={label}
-></span>
+  style={heightStyle}
+/>
 
-<style is:global>
+<style>
   .brand-logo {
-    display: inline-block;
+    display: inline-flex;
+    align-items: center;
     line-height: 1;
-    -webkit-mask-repeat: no-repeat;
-    mask-repeat: no-repeat;
-    -webkit-mask-position: center;
-    mask-position: center;
-    -webkit-mask-size: contain;
-    mask-size: contain;
   }
   .brand-logo--single {
-    width: 100%;
-    max-width: 100%;
+    width: auto;
+    object-fit: contain;
   }
-  .brand-logo.variant-dark { background-color: #0B0B0C; }
-  .brand-logo.variant-light { background-color: #FFFFFF; }
+  /* Tmavé (default) — logo má svojí původní barvu (černé) */
+  .variant-dark {
+    /* nothing — defaultní barva */
+  }
+
+  /* Světlé varianta — invertuje SVG na bílé (zachovává průhledné pozadí) */
+  .variant-light.brand-logo--single {
+    filter: brightness(0) invert(1);
+  }
 </style>
