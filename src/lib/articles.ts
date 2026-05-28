@@ -71,7 +71,13 @@ export function getArticleExcerpt(
   article: { excerpt?: string | null; body?: string | null },
   maxLen: number = 160
 ): string {
-  const ex = (article.excerpt ?? '').trim();
+  // Strip HTML/script tagy z excerptu (čistí test XSS payloady jako '<script>alert()</script>')
+  const exRaw = (article.excerpt ?? '').trim();
+  const ex = exRaw
+    .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
+    .replace(/<[^>]+>/g, '')
+    .replace(/\s+/g, ' ')
+    .trim();
   if (ex) return ex;
 
   const body = (article.body ?? '').toString();
