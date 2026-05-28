@@ -3040,6 +3040,48 @@ a.promo-image-link:hover {
   filter: brightness(0) invert(1);
 }
 
+/* ===== Stock Card (.a-*) — používá StockCard.astro komponenta ===== */
+.a-card { background: #fff; border-radius: 16px; overflow: hidden; box-shadow: 0 1px 2px rgba(0,0,0,0.04), 0 8px 24px rgba(0,0,0,0.06); transition: transform 0.2s, box-shadow 0.2s; position: relative; display: flex; flex-direction: column; cursor: pointer; text-decoration: none; color: inherit; }
+.a-card:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.08), 0 16px 40px rgba(0,0,0,0.12); }
+.a-media { position: relative; aspect-ratio: 4 / 3; background: #F2F2F4; overflow: hidden; }
+.a-media img { width: 100% !important; height: 100% !important; object-fit: cover; display: block; }
+.a-media-empty { width: 100%; height: 100%; display: grid; place-items: center; color: #ccc; font-size: 12px; }
+.a-badges { position: absolute; top: 12px; left: 12px; display: flex; gap: 6px; z-index: 2; }
+.a-pill { color: #fff; padding: 6px 12px; border-radius: 999px; font-size: 11.5px; font-weight: 700; letter-spacing: 0.02em; backdrop-filter: blur(8px); text-transform: uppercase; }
+.a-pill-promo { background: var(--accent, #E85D2C); }
+.a-fuel-overlay { position: absolute; bottom: 10px; right: 10px; z-index: 2; }
+
+.a-body { padding: 16px; display: flex; flex-direction: column; gap: 10px; flex: 1; }
+.a-brand { font-size: 11px; color: #6B6B73; text-transform: uppercase; letter-spacing: 0.06em; font-weight: 600; }
+.a-title { font-size: 17px; font-weight: 700; margin: 0; line-height: 1.25; letter-spacing: -0.01em; color: #1A1A1F; font-family: var(--font-display, inherit); }
+.a-trim { font-size: 13px; color: #4A4A52; margin: -2px 0 0; font-weight: 500; }
+
+.a-specs { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 12px; padding: 10px 0; border-top: 1px solid #F0F0F2; border-bottom: 1px solid #F0F0F2; }
+.a-spec { display: flex; align-items: center; gap: 7px; font-size: 12.5px; color: #2A2A33; }
+.a-spec-ico { width: 18px; height: 18px; color: #6B6B73; flex-shrink: 0; }
+.a-spec-state { font-weight: 700; padding: 4px 8px; border-radius: 6px; margin: -4px -2px; }
+.a-spec-state.st-new { background: #E5F4ED; color: #14855E; }
+.a-spec-state.st-new .a-spec-ico { color: #14855E; }
+.a-spec-state.st-demo { background: #FFF4DB; color: #8D5C00; }
+.a-spec-state.st-demo .a-spec-ico { color: #8D5C00; }
+.a-spec-state.st-used { background: #EEF0F4; color: #41475B; }
+.a-spec-state.st-used .a-spec-ico { color: #41475B; }
+.a-spec-state.st-order { background: #E8F0FB; color: #1F5BB8; }
+.a-spec-state.st-order .a-spec-ico { color: #1F5BB8; }
+
+.a-price-row { display: flex; justify-content: space-between; align-items: flex-end; gap: 8px; }
+.a-price-old { font-size: 13px; color: #9B9BA3; text-decoration: line-through; }
+.a-price-line { display: flex; align-items: baseline; gap: 6px; flex-wrap: wrap; }
+.a-price-val { font-size: 22px; font-weight: 800; letter-spacing: -0.015em; color: #1A1A1F; }
+.a-price-vat { font-size: 11px; color: #6B6B73; }
+
+.a-foot { display: inline-flex; align-items: center; gap: 7px; padding: 6px 10px; border-radius: 999px; font-size: 11.5px; font-weight: 700; align-self: flex-start; }
+.a-dot { width: 7px; height: 7px; border-radius: 999px; background: currentColor; }
+.a-foot-stock { background: #E5F4ED; color: #14855E; }
+.a-foot-way { background: #FFF4DB; color: #8D5C00; }
+.a-foot-order { background: #E8F0FB; color: #1F5BB8; }
+
+
 /* ===== Footer brand strip — autorizovaný dealer KGM / OMODA / Farizon ===== */
 .footer-brands {
   margin-top: 40px;

@@ -1,6 +1,7 @@
 ---
 import BaseLayout from '@layouts/BaseLayout.astro';
 import FuelIcon from '@components/FuelIcon.astro';
+import StockCard from '@components/StockCard.astro';
 import DirectusImage from '@components/DirectusImage.astro';
 import Breadcrumbs from '@components/Breadcrumbs.astro';
 import JsonLd from '@components/JsonLd.astro';
@@ -1064,74 +1065,7 @@ const salesPhoneLink = telLink(salesPhone);
             </a>
           </div>
           <div class="skladovka-grid">
-            {similar.map((s: any) => {
-              const photoId = s.photos?.[0]?.directus_files_id;
-              const trimName = s.trim_level?.name ?? s.trim_level_snapshot?.name ?? s.trim_level_snapshot?.raw_name ?? '';
-              const carYear = s.model_year?.year ?? '';
-              const conditionLabel = s.condition === 'new' ? 'Nové' : s.condition === 'demo' ? 'Předváděcí' : 'Ojeté';
-              const conditionCls = s.condition === 'new' ? 'new' : s.condition === 'demo' ? 'demo' : 'used';
-              const fuelType = s.model?.fuel_type ?? '';
-              const fuelLabelMap = { petrol: 'Benzín', diesel: 'Diesel', hybrid: 'Hybrid', phev: 'PHEV', ev: 'Elektro' };
-              const fuelLabel = fuelLabelMap[fuelType] ?? '';
-              const transmissionLabel = s.transmission === 'manual' ? 'Manuál' : s.transmission === 'automatic' ? 'Automat' : '';
-              const is4wd = s.drivetrain === '4wd' || s.drivetrain === 'awd';
-              // Pill: promo akce z modelu (jen pro nové)
-              const today = new Date().toISOString().slice(0, 10);
-              const modelPromoActive = !!s.model?.promo_active
-                && (s.model.promo_label || s.model.promo_discount_amount)
-                && (!s.model.promo_valid_to || String(s.model.promo_valid_to) >= today);
-              const modelPromoLabel = (s.model?.promo_label ?? '').toString().trim();
-              const modelPromoDiscount = Number(s.model?.promo_discount_amount ?? 0) || 0;
-              const pillLabel = modelPromoActive && modelPromoLabel ? modelPromoLabel : '';
-              // Cena
-              const baseList = s.list_price;
-              let price = s.promo_price ?? baseList;
-              let priceBefore: number | null = null;
-              if (s.promo_price && baseList && s.promo_price < baseList) priceBefore = baseList;
-              else if (modelPromoActive && modelPromoDiscount > 0 && baseList && s.condition === 'new') {
-                price = baseList - modelPromoDiscount;
-                priceBefore = baseList;
-              }
-              const fmtP = (n?: number | null) => (n ? `${n.toLocaleString('cs-CZ')} Kč` : '—');
-              const fmtK = (n?: number | null) => (n === 0 || !n ? `0 km` : `${n.toLocaleString('cs-CZ')} km`);
-              const brandName = brand?.name ?? s.brand?.name ?? '';
-              const modelName = model?.name ?? s.model?.name ?? '';
-              return (
-                <a class="scard" href={`/sklad/${buildStockSlug(s, brand, model, s.trim_level ?? { name: trimName })}`} data-fuel={fuelType}>
-                  <div class="pic">
-                    {photoId && <DirectusImage src={photoId} alt={`${modelName} ${trimName}`} aspectRatio="4/3" />}
-                    <div class="pill-stack">
-                      {pillLabel && <span class="pill pill--promo">{pillLabel}</span>}
-                      <span class={`pill pill--${conditionCls}`}>{conditionLabel}</span>
-                    </div>
-                    <FuelIcon type={fuelType} />
-                  </div>
-                  <div class="body">
-                    <div class="brand">{brandName}</div>
-                    <div class="nm">{modelName}</div>
-                    {trimName && <div class="var">{trimName}</div>}
-                    <div class="specs">
-                      {fuelLabel && <span class="fuel">{fuelLabel}</span>}
-                      {transmissionLabel && <span>{transmissionLabel}</span>}
-                      {is4wd && <span>4×4</span>}
-                    </div>
-                    <div class="foot">
-                      <span class="km">{fmtK(s.km)}</span>
-                      <div class="price">
-                        {priceBefore && <span class="price-before">{fmtP(priceBefore)}</span>}
-                        <span>{fmtP(price)}</span>
-                      </div>
-                    </div>
-                    <div class="stock-state">
-                      {s.availability === 'on_order' ? 'Na objednání — 4–8 týdnů'
-                        : s.availability === 'on_the_way' ? 'Na cestě'
-                        : s.availability === 'reserved' ? 'Rezervováno'
-                        : 'Skladem v Praze'}
-                    </div>
-                  </div>
-                </a>
-              );
-            })}
+            {similar.map((s: any) => <StockCard v={s} />)}
           </div>
         </div>
       </section>

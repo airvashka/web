@@ -1,6 +1,7 @@
 ---
 import BaseLayout from '@layouts/BaseLayout.astro';
 import FuelIcon from '@components/FuelIcon.astro';
+import StockCard from '@components/StockCard.astro';
 import DirectusImage from '@components/DirectusImage.astro';
 import VideoStrip from '@components/VideoStrip.astro';
 import InstagramStrip from '@components/InstagramStrip.astro';
@@ -255,83 +256,7 @@ const articles = articlesRaw.map((a) => {
         <div class="sklad-empty">Skladovka se právě plní — koukněte se za chvíli, nebo nám zavolejte +420 771 235 458.</div>
       ) : (
         <div class="skladovka-grid" data-stock-shuffle data-visible-count="4">
-          {stockVehicles.map((v: any) => {
-            const isNew = v.condition === 'new';
-            const isHighlighted = v.highlighted;
-            const customLabel = (v.highlight_label ?? '').toString().trim();
-            const today = new Date().toISOString().slice(0, 10);
-            const modelPromoActive = !!v.model?.promo_active
-              && (v.model.promo_label || v.model.promo_discount_amount)
-              && (!v.model.promo_valid_to || String(v.model.promo_valid_to) >= today);
-            const modelPromoLabel = (v.model?.promo_label ?? '').toString().trim();
-            const modelPromoDiscount = Number(v.model?.promo_discount_amount ?? 0) || 0;
-            // Pill: POUZE pro Akci / Highlight. Stav (Nové/Ojeté) je v specs chips dole.
-            let pillLabel = '';
-            if (modelPromoActive && modelPromoLabel) pillLabel = modelPromoLabel;
-            else if (isHighlighted && customLabel) pillLabel = customLabel;
-            else if (isHighlighted) pillLabel = 'Novinka';
-
-            const photoId = v.photos?.[0]?.directus_files_id;
-            const trim = v.trim_level_snapshot?.name ?? v.trim_level_snapshot?.raw_name ?? '';
-            const modelName = v.model?.name ?? 'Vůz';
-            const brandName = v.brand?.name ?? '';
-            const carYear = v.model_year?.year ?? '';
-            const conditionLabel = v.condition === 'new' ? 'Nové' : v.condition === 'demo' ? 'Předváděcí' : 'Ojeté';
-            const conditionCls = v.condition === 'new' ? 'new' : v.condition === 'demo' ? 'demo' : 'used';
-            const fuelTypeRaw = v.model?.fuel_type ?? '';
-            const fuelLabelMap = { petrol: 'Benzín', diesel: 'Diesel', hybrid: 'Hybrid', phev: 'PHEV', ev: 'Elektro' };
-            const fuelLabel = fuelLabelMap[fuelTypeRaw] ?? '';
-            const fuelType = fuelTypeRaw;
-            const transmissionLabel = v.transmission === 'manual' ? 'Manuál' : v.transmission === 'automatic' ? 'Automat' : '';
-            const is4wd = v.drivetrain === '4wd' || v.drivetrain === 'awd';
-            // Cena s ohledem na model promo (jen u nových vozů)
-            const baseList = v.list_price;
-            let price = v.promo_price ?? baseList;
-            let priceBefore: number | null = null;
-            if (v.promo_price && baseList && v.promo_price < baseList) {
-              priceBefore = baseList;
-            } else if (modelPromoActive && modelPromoDiscount > 0 && baseList && isNew) {
-              price = baseList - modelPromoDiscount;
-              priceBefore = baseList;
-            }
-            return (
-              <a class="scard" href={`/sklad/${buildStockSlug(v, v.brand, v.model, v.trim_level ?? { name: trim })}`} data-fuel={fuelType}>
-                <div class="pic">
-                  {photoId && <DirectusImage src={photoId} alt={`${brandName} ${modelName}`} aspectRatio="4/3" />}
-                  <div class="pill-stack">
-                    {pillLabel && <span class="pill pill--promo">{pillLabel}</span>}
-                    <span class={`pill pill--${conditionCls}`}>{conditionLabel}</span>
-                  </div>
-                  <FuelIcon type={fuelType} />
-                </div>
-                <div class="body">
-                  <div class="brand">{brandName}</div>
-                  <div class="nm">{modelName}</div>
-                  {trim && <div class="var">{trim}</div>}
-                  <div class="specs">
-                    {fuelLabel && <span class="fuel">{fuelLabel}</span>}
-                    {transmissionLabel && <span>{transmissionLabel}</span>}
-                    {is4wd && <span>4×4</span>}
-                  </div>
-                  <div class="foot">
-                    <span class="km">{fmtKm(v.km)}</span>
-                    <div class="price">
-                      {priceBefore && (
-                        <span class="price-before">{fmtPrice(priceBefore)}</span>
-                      )}
-                      <span>{fmtPrice(price)}</span>
-                    </div>
-                  </div>
-                  <div class="stock-state">
-                    {v.availability === 'on_order' ? 'Na objednání — 4–8 týdnů'
-                      : v.availability === 'on_the_way' ? 'Na cestě'
-                      : v.availability === 'reserved' ? 'Rezervováno'
-                      : 'Skladem v Praze'}
-                  </div>
-                </div>
-              </a>
-            );
-          })}
+          {stockVehicles.map((v: any) => <StockCard v={v} />)}
         </div>
       )}
     </div>
