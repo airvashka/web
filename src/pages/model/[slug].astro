@@ -70,13 +70,13 @@ const rawModels = await directusGet<ModelRaw>('models', {
   ],
 });
 const rawModel = rawModels[0];
-if (!rawModel) return Astro.redirect('/404');
+if (!rawModel) return Astro.rewrite('/404');
 
 const brands = rawModel.brand
   ? await directusGet<Brand>('brands', { filter: { id: { _eq: rawModel.brand } }, limit: 1 })
   : [];
 const brand = brands[0];
-if (!brand) return Astro.redirect('/404');
+if (!brand) return Astro.rewrite('/404');
 
 const modelYears = await directusGet<ModelYear>('model_years', {
   filter: { model: { _eq: rawModel.id }, status: { _eq: 'published' } },

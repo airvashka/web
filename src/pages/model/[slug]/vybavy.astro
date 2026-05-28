@@ -31,14 +31,14 @@ const models = await directusGet<Model>('models', {
   limit: 1,
 });
 const rawModel = models[0];
-if (!rawModel) return Astro.redirect('/404');
+if (!rawModel) return Astro.rewrite('/404');
 
 const brands = await directusGet<Brand>('brands', {
   filter: { id: { _eq: Number(rawModel.brand) } },
   limit: 1,
 });
 const brand = brands[0];
-if (!brand) return Astro.redirect('/404');
+if (!brand) return Astro.rewrite('/404');
 
 // Nejnovější model_year (s pricelist_colors)
 const modelYears = await directusGet<ModelYear & { pricelist_colors?: any }>('model_years', {

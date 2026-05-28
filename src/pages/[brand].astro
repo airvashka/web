@@ -34,7 +34,7 @@ const brands = await directusGet<Brand>('brands', {
 const brand = brands[0];
 
 if (!brand) {
-  return Astro.redirect('/404');
+  return Astro.rewrite('/404');
 }
 
 // Modely této značky

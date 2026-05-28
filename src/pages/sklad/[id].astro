@@ -38,7 +38,7 @@ export const prerender = false;
 // (např. "kgm-tivoli-style-bila-3"). Skutečné numerické ID parsujeme z konce.
 const { id: slug } = Astro.params;
 const numericId = parseStockId(slug ?? '');
-if (Number.isNaN(numericId)) return Astro.redirect('/404');
+if (Number.isNaN(numericId)) return Astro.rewrite('/404');
 const id = String(numericId);
 
 // Vercel Edge cache — 60s pro CDN, stale-while-revalidate 300s.
@@ -78,7 +78,7 @@ const vehicles = await directusGet<VehicleFull>('stock_vehicles', {
   ],
 });
 const v = vehicles[0];
-if (!v) return Astro.redirect('/404');
+if (!v) return Astro.rewrite('/404');
 
 // Vybrané option packages (M2M junction → unwrap)
 const vehiclePackages: any[] = Array.isArray((v as any).option_packages)

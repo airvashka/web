@@ -28,13 +28,13 @@ const models = await directusGet<Model>('models', {
   fields: ['*'],
 });
 const rawModel = models[0];
-if (!rawModel) return Astro.redirect('/404');
+if (!rawModel) return Astro.rewrite('/404');
 
 const brands = rawModel.brand
   ? await directusGet<Brand>('brands', { filter: { id: { _eq: rawModel.brand } }, limit: 1 })
   : [];
 const brand = brands[0];
-if (!brand) return Astro.redirect('/404');
+if (!brand) return Astro.rewrite('/404');
 
 const todayDate = new Date().toISOString().slice(0, 10);
 const promoActive: boolean = !!(rawModel as any).promo_active

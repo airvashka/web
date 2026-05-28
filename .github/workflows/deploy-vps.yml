@@ -7,6 +7,10 @@ on:
     branches: [main]
     paths:
       - 'vps-setup/**'
+      - 'scripts/**'                # stock-sync skripty běží na VPS (cron + manuál)
+      - 'package.json'              # deps pro stock-sync container
+      - 'package-lock.json'
+      - 'Dockerfile'                # build stock-sync image
       - '.github/workflows/deploy-vps.yml'
 
   # Manuální spuštění z GitHub UI (Actions → Deploy VPS → Run workflow)
@@ -32,7 +36,7 @@ jobs:
           if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
             CHANGED="ALL"   # manuální trigger = rebuild všechno
           else
-            CHANGED=$(git diff --name-only HEAD^ HEAD | grep '^vps-setup/' || true)
+            CHANGED=$(git diff --name-only HEAD^ HEAD | grep -E '^(vps-setup/|scripts/|package(-lock)?\.json|Dockerfile)' || true)
           fi
           echo "changed_files<<EOF" >> $GITHUB_OUTPUT
           echo "$CHANGED" >> $GITHUB_OUTPUT
@@ -41,19 +45,26 @@ jobs:
           # Které služby potřebují rebuild?
           REBUILD_UCL=false
           REBUILD_NGINX=false
+          REBUILD_STOCK=false
           if [[ "$CHANGED" == "ALL" ]] || echo "$CHANGED" | grep -q "vps-setup/ucl-proxy/"; then
             REBUILD_UCL=true
           fi
           if [[ "$CHANGED" == "ALL" ]] || echo "$CHANGED" | grep -q "vps-setup/nginx/"; then
             REBUILD_NGINX=true
           fi
+          # stock-sync image baked-in build — rebuilt když se mění scripts/, package*, Dockerfile
+          if [[ "$CHANGED" == "ALL" ]] || echo "$CHANGED" | grep -qE "^(scripts/|package(-lock)?\.json|Dockerfile)"; then
+            REBUILD_STOCK=true
+          fi
           echo "rebuild_ucl=$REBUILD_UCL" >> $GITHUB_OUTPUT
           echo "rebuild_nginx=$REBUILD_NGINX" >> $GITHUB_OUTPUT
+          echo "rebuild_stock=$REBUILD_STOCK" >> $GITHUB_OUTPUT
 
           echo "── Change summary ─────────"
           echo "Files: $CHANGED"
           echo "Rebuild ucl-proxy: $REBUILD_UCL"
           echo "Reload nginx: $REBUILD_NGINX"
+          echo "Rebuild stock-sync: $REBUILD_STOCK"
 
       - name: Deploy přes SSH
         uses: appleboy/ssh-action@v1
@@ -68,6 +79,7 @@ jobs:
 
             REBUILD_UCL="${{ steps.changes.outputs.rebuild_ucl }}"
             RELOAD_NGINX="${{ steps.changes.outputs.rebuild_nginx }}"
+            REBUILD_STOCK="${{ steps.changes.outputs.rebuild_stock }}"
 
             echo "▶ git pull"
             cd /opt/sfr-motor
@@ -86,6 +98,13 @@ jobs:
               curl -fsS http://127.0.0.1:3001/health
             else
               echo "▶ ucl-proxy beze změn, skip rebuild"
+            fi
+
+            if [[ "$REBUILD_STOCK" == "true" ]]; then
+              echo "▶ rebuild stock-sync image (cron + manuál si pak vezmou novou verzi)"
+              docker compose --profile cron build stock-sync
+            else
+              echo "▶ stock-sync beze změn, skip rebuild"
             fi
 
             if [[ "$RELOAD_NGINX" == "true" ]]; then
