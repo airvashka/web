@@ -1252,9 +1252,41 @@ const salesPhoneLink = telLink(salesPhone);
           if (eyebrowEl) eyebrowEl.textContent = preset.eyebrow;
           if (titleEl) titleEl.textContent = preset.title;
           if (leadEl) leadEl.textContent = preset.lead;
+
+          // Detekuj kontext: vat-company mode + UCL kalkulačka hodnoty
+          const isCompanyVat = document.body.classList.contains('vat-company');
+          const monthlyEl = document.querySelector('[data-monthly]');
+          const dpAmountEl = document.querySelector('[data-dp-amount]');
+          const financedSubEl = document.querySelector('[data-financed]');
+          const dpPctEl2 = document.querySelector('[data-dp-percent]');
+          const durationChip = document.querySelector('[data-duration-chips] .chip.active');
+
+          const monthlyText = monthlyEl ? monthlyEl.textContent.trim() : '';
+          const calcUsed = monthlyText && monthlyText !== '—' && monthlyText !== '…' && !monthlyText.includes('nedostupný');
+
+          // Build extra context block (firma + kalkulačka data)
+          const extraLines = [];
+          if (isCompanyVat) {
+            extraLines.push('Zákazník: firma (poptávka bez DPH, plně odpočitatelná DPH)');
+          }
+          if (calcUsed && (intent === 'finance' || intent === 'interest' || intent === 'reserve')) {
+            const dp = dpPctEl2 ? dpPctEl2.textContent.trim() : '';
+            const dur = durationChip ? durationChip.textContent.trim() : '';
+            const dpAmt = dpAmountEl ? dpAmountEl.textContent.trim() : '';
+            const fin = financedSubEl ? financedSubEl.textContent.trim() : '';
+            const parts = [];
+            if (dp) parts.push('akontace ' + dp + (dpAmt ? ' (' + dpAmt + ')' : ''));
+            if (dur) parts.push('doba ' + dur);
+            if (fin) parts.push('financovaná částka ' + fin);
+            parts.push('měsíční splátka ' + monthlyText);
+            extraLines.push('Mám předběžně spočítáno z kalkulačky: ' + parts.join(', ') + '.');
+          }
+
           // Message: pre-fill jen pokud je textarea prázdná (klient si svůj text nesmaze)
           if (messageEl instanceof HTMLTextAreaElement && !messageEl.value.trim()) {
-            messageEl.value = preset.message;
+            let msg = preset.message;
+            if (extraLines.length) msg += '\n\n' + extraLines.join('\n');
+            messageEl.value = msg;
           }
           // form-type pro lead API (pro analytics + email routing)
           form.dataset.formType = intent === 'company' ? 'company_inquiry'
