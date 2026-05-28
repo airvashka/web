@@ -1110,21 +1110,25 @@ function syncItemCategories() {
   }
 }
 
-// Propaguje matrix-level názvy sekcí (MATRIX_DECLARED) do features[].section
-// napříč všemi trims. Bez této normalizace se může stát, že Style trim
-// má sekci "MOTORIZACE", ale Elegant má "NOVÁ SEKCE" pro stejný řádek matrixu
-// — UI to skryje (zobrazí matrix-level název), ale v DB to zůstane rozdílné.
+// Propaguje matrix-level názvy sekcí do features[].section napříč všemi trims.
+// Bez normalizace: Style trim má "MOTORIZACE", Elegant má "NOVÁ SEKCE" pro stejný
+// řádek matrixu — UI to skryje (zobrazí matrix-level název přes buildMatrixModel,
+// kde první trim co má feature vyhraje), ale v DB to zůstane rozdílné.
 function syncFeatureSectionsFromMatrix() {
-  // featureName -> matrix section (autoritativní zdroj)
-  const matrixSection = new Map();
-  for (const d of MATRIX_DECLARED) {
-    if (d.feature && d.section) matrixSection.set(featTrim(d.feature), featTrim(d.section));
+  // Vezmi autoritativní section názvy z buildMatrixModel — projde všechny trims
+  // a první kdo má feature vyhraje (plus MATRIX_DECLARED overrides).
+  const model = buildMatrixModel();
+  const featureToSection = new Map();
+  for (const sec of model) {
+    for (const f of sec.features) {
+      const cleanF = featTrim(f);
+      if (cleanF) featureToSection.set(cleanF, sec.section);
+    }
   }
-  if (matrixSection.size === 0) return;
+  if (featureToSection.size === 0) return;
 
   for (const t of (CURRENT_DATA.trims || [])) {
     if (!Array.isArray(t.features)) continue;
-    // Re-bucket items by matrix section
     const itemsBySection = new Map();
     const sectionOrder = [];
     for (const sec of t.features) {
@@ -1132,7 +1136,7 @@ function syncFeatureSectionsFromMatrix() {
       for (const item of (sec.items || [])) {
         const cleanItem = featTrim(item);
         if (!cleanItem) continue;
-        const targetSection = matrixSection.get(cleanItem) || oldSection;
+        const targetSection = featureToSection.get(cleanItem) || oldSection;
         if (!targetSection) continue;
         if (!itemsBySection.has(targetSection)) { itemsBySection.set(targetSection, []); sectionOrder.push(targetSection); }
         itemsBySection.get(targetSection).push(item);
