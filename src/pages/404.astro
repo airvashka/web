@@ -1,4 +1,10 @@
 ---
+// SSR (prerender=false) — aby Astro.rewrite('/404') z dynamických [brand]/[slug]
+// SSR stránek mohlo načíst 404 obsah za runtime. Při output:'static' + Vercel adaptéru
+// se prerendrované stránky nedají rewrite-ovat z SSR funkce.
+export const prerender = false;
+// SEO correct status code — vyhledávače vidí 404 pro neexistující URL
+Astro.response.status = 404;
 import BaseLayout from '@layouts/BaseLayout.astro';
 ---
 
