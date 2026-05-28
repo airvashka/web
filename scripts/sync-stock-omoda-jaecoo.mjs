@@ -207,6 +207,23 @@ async function uploadPhoto(url, label, idx, _retried = false) {
   return (await up.json()).data?.id ?? null;
 }
 
+// ─── VIN year decoder — 10. znak VIN je mezinárodní kód roku výroby ───
+// Y=2000, 1-9=2001-2009, A=2010..., R=2024, S=2025, T=2026, V=2027, W=2028, X=2029
+// Skip: I, O, Q, U, Z (vyhrazené, nepoužívají se aby se nepletly s 1, 0, 0, V, 2)
+const VIN_YEAR_MAP = {
+  Y: 2000, '1': 2001, '2': 2002, '3': 2003, '4': 2004, '5': 2005,
+  '6': 2006, '7': 2007, '8': 2008, '9': 2009,
+  A: 2010, B: 2011, C: 2012, D: 2013, E: 2014, F: 2015,
+  G: 2016, H: 2017, J: 2018, K: 2019,
+  L: 2020, M: 2021, N: 2022, P: 2023, R: 2024,
+  S: 2025, T: 2026, V: 2027, W: 2028, X: 2029,
+};
+function decodeVinYear(vin) {
+  if (!vin || typeof vin !== 'string' || vin.length < 10) return null;
+  const c = vin[9].toUpperCase();
+  return VIN_YEAR_MAP[c] ?? null;
+}
+
 // ─── Mapování jednoho vozu z feedu ───
 function mapVehicle(v) {
   const code = String(v.model ?? '').toLowerCase();
@@ -215,6 +232,7 @@ function mapVehicle(v) {
   const list = v.book_price ?? null;
   const price = v.price ?? null;
   const promo = (price && list && price < list) ? price : null;
+  const yearFromVin = decodeVinYear(v.vin);
   return {
     code, modelSlug: mm?.slug ?? null, fuel: mm?.fuel ?? null,
     vin: v.vin,
@@ -229,6 +247,7 @@ function mapVehicle(v) {
       color_category: colorCategory(colorName),
       trim_level_snapshot: {
         raw_name: v.model_version_value ?? null,
+        year: yearFromVin,    // OMODA/JAECOO feed nemá rok — derivujem z 10. znaku VIN
         powertrain: code, fuel_guess: mm?.fuel ?? null,
         color: colorName, color_type: v.color_type_value ?? null, color_tone: v.color_tone_value ?? null,
         motorization: specVal(v.specs, 'Pohon'),
