@@ -55,7 +55,9 @@ const heightStyle = height ? `height: ${height}px;` : '';
   style={heightStyle}
 />
 
-<style>
+<style is:global>
+  /* is:global aby specificita projela přes Astro scoped CSS — některé tiles
+     (btile-logo overrides) jinak filter neaplikují kvůli scope nebo specificity. */
   .brand-logo {
     display: inline-flex;
     align-items: center;
@@ -65,13 +67,10 @@ const heightStyle = height ? `height: ${height}px;` : '';
     width: auto;
     object-fit: contain;
   }
-  /* Tmavé (default) — logo má svojí původní barvu (černé) */
-  .variant-dark {
-    /* nothing — defaultní barva */
+  .brand-logo.variant-dark {
+    filter: none;
   }
-
-  /* Světlé varianta — invertuje SVG na bílé (zachovává průhledné pozadí) */
-  .variant-light.brand-logo--single {
-    filter: brightness(0) invert(1);
+  .brand-logo.variant-light {
+    filter: brightness(0) invert(1) !important;
   }
 </style>
