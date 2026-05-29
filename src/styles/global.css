@@ -1139,16 +1139,19 @@ button.thumb-more {
 
 /* === Finance section: calc-info-tile (info bloky pod chips/sliderem) === */
 .calc-info-grid {
-  grid-column: 1 / -1;            /* plná šířka pod oběma panely (desktop) */
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: 1fr;
   gap: 12px;
-  margin-top: 4px;
+  margin-top: 24px;
+  padding-top: 22px;
+  border-top: 1px solid rgba(255,255,255,0.08);
 }
+/* Argumenty jsou v markupu 2×: --desktop uvnitř .calc (pod sliderem),
+   --mobile za .calc-summary (ať je splátka hned vidět). Přepínáme viditelnost. */
+.calc-info-grid--mobile { display: none; }
 @media (max-width: 960px) {
-  /* Mobil: info bloky jsou v DOM AŽ za .calc-summary → splátka je vidět hned
-     pod sliderem; tady jen stack do 1 sloupce. */
-  .calc-info-grid { grid-template-columns: 1fr; }
+  .calc-info-grid--desktop { display: none; }
+  .calc-info-grid--mobile { display: grid; }
 }
 .calc-info-tile {
   display: flex;
