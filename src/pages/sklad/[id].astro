@@ -508,10 +508,10 @@ const salesPhoneLink = telLink(salesPhone);
             {isOnOrder && colorOptions.length > 0 ? (
               <img
                 data-hero-color-img
-                src={directusAsset(heroPhoto ?? colorOptions[0].photo, { width: 1600, format: 'jpg', quality: 85 })}
+                src={directusAsset(heroPhoto ?? colorOptions[0].photo, { width: 1600, format: 'webp', quality: 85 })}
                 data-default-photo={heroPhoto ?? colorOptions[0].photo}
                 alt={title}
-                style="width:100%;height:auto;object-fit:contain;background:#f3f3f5"
+                style="width:100%;height:auto;object-fit:contain;background:#fff"
               />
             ) : heroPhoto ? (
               <DirectusImage src={heroPhoto} alt={title} aspectRatio="auto" widths={[800, 1600]} loading="eager" fetchpriority="high" />
@@ -1351,7 +1351,7 @@ const salesPhoneLink = telLink(salesPhone);
           const colorName = sw.dataset.colorName || '';
           // Swap hero foto jen když element existuje (vůz bez vlastních fotek). Jinak jen výběr barvy.
           if (heroImg && photoId && DIRECTUS_URL) {
-            heroImg.src = `${DIRECTUS_URL}/assets/${photoId}?width=1600&format=jpg&quality=85`;
+            heroImg.src = `${DIRECTUS_URL}/assets/${photoId}?width=1600&format=webp&quality=85`;
             heroImg.alt = colorName;
           }
           // Toggle aktivní swatch

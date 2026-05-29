@@ -377,7 +377,7 @@ input, textarea, select { font: inherit; }
 }
 .badge.dark { background: var(--ink); color: #fff; }
 .badge.accent { background: var(--accent); color: #fff; }
-.badge.outline { background: rgba(255,255,255,0.92); color: var(--ink); }
+.badge.outline { background: rgba(255,255,255,0.92); color: var(--ink); border: 1px solid var(--line); }
 
 .gallery-nav {
   position: absolute; top: 50%; transform: translateY(-50%);
