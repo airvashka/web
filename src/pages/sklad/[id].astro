@@ -541,7 +541,7 @@ const salesPhoneLink = telLink(salesPhone);
                       class="swatch-dot"
                       style={c.hex
                         ? (c.hex2
-                            ? `background: linear-gradient(to bottom, ${c.hex} 0 50%, ${c.hex2} 50% 100%);`
+                            ? `background: linear-gradient(135deg, ${c.hex} 0 calc(50% - 0.5px), ${c.hex2} calc(50% + 0.5px) 100%);`
                             : `background-color: ${c.hex};`)
                         : (c.swatch
                             ? `background-image: url('${directusAsset(c.swatch, { width: 120, format: 'jpg', quality: 85 })}'); background-size: cover; background-position: center;`

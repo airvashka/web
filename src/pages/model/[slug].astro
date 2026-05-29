@@ -819,8 +819,11 @@ if (promoActive && promoDescription) {
                 <h3 class="cs-name" data-cs-name>{colorOptions[0]?.name ?? ''}</h3>
                 <div class="cs-swatches" role="radiogroup" aria-label="Vyberte barvu">
                   {colorOptions.map((c, i) => {
-                    const swatchId = (c as any).swatch ?? null;
                     const hex = (c.hex ?? '').trim();
+                    const hex2 = ((c as any).hex2 ?? '').trim();
+                    const swatchStyle = hex2
+                      ? `background: linear-gradient(135deg, ${hex} 0 calc(50% - 0.5px), ${hex2} calc(50% + 0.5px) 100%);`
+                      : hex ? `background:${hex};` : '';
                     return (
                       <button
                         type="button"
@@ -832,11 +835,7 @@ if (promoActive && promoDescription) {
                         aria-label={c.name ?? ''}
                         title={c.name ?? ''}
                       >
-                        {swatchId ? (
-                          <DirectusImage src={swatchId} alt="" aspectRatio="1/1" widths={[60, 120]} />
-                        ) : (
-                          <span class="cs-swatch-fallback" style={hex ? `background:${hex}` : ''}></span>
-                        )}
+                        <span class="cs-swatch-fallback" style={swatchStyle}></span>
                       </button>
                     );
                   })}
