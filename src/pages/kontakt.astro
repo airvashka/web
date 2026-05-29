@@ -441,7 +441,7 @@ const COMPANIES = [
     }
 
     /* ===== Hero foto (kontakt) ===== */
-    .phero-photo { background-size: cover; background-position: center; padding: 120px 0 130px; }
+    .phero-photo { background-size: cover; background-position: center; min-height: 580px; display: flex; flex-direction: column; justify-content: center; padding: 64px 0; }
     .phero-photo h1 { color: #fff; }
     .phero-photo .lead { color: rgba(255,255,255,0.92); }
     .phero-photo .section-eyebrow.light { color: rgba(255,255,255,0.85); }
@@ -470,7 +470,7 @@ const COMPANIES = [
     .legal-dl dt { font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-muted); margin: 0; }
     .legal-dl dd { margin: 0; font-family: var(--font-display); font-weight: 500; font-size: 15px; color: var(--ink); line-height: 1.45; }
     @media (max-width: 640px) {
-      .phero-photo { padding: 72px 0 84px; }
+      .phero-photo { min-height: auto; padding: 72px 0 84px; }
       .legal-dl > div { grid-template-columns: 84px 1fr; gap: 10px; }
     }
   </style>

@@ -396,10 +396,10 @@ const servisMapUrl = (GMAPS_KEY && GMAPS_PLACE_SERVIS)
     }
 
     /* ===== Hero foto (servis) ===== */
-    .phero-photo { background-size: cover; background-position: center; padding: 120px 0 130px; }
+    .phero-photo { background-size: cover; background-position: center; min-height: 580px; display: flex; flex-direction: column; justify-content: center; padding: 64px 0; }
     .phero-photo h1 { color: #fff; }
     .phero-photo .lead { color: rgba(255,255,255,0.92); }
     .phero-photo .section-eyebrow.light { color: rgba(255,255,255,0.85); }
-    @media (max-width: 640px) { .phero-photo { padding: 72px 0 84px; } }
+    @media (max-width: 640px) { .phero-photo { min-height: auto; padding: 72px 0 84px; } }
   </style>
 </BaseLayout>
