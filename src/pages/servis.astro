@@ -54,6 +54,13 @@ const SERVIS_TEAM_BLOCKS = [
   { title: 'Nehody a pojistné události', tag: 'Pojistné',  tagClass: 'tag-service', people: TEAM_NEHODY },
   { title: 'Náhradní díly',       tag: 'Díly',           tagClass: 'tag-parts',   people: TEAM_DILY },
 ].filter((b) => b.people.length > 0);
+
+// Mapa servisu: přesný business pin (place_id z env) přes Embed API, fallback na adresu.
+const GMAPS_KEY = import.meta.env.PUBLIC_GOOGLE_MAPS_API_KEY ?? '';
+const GMAPS_PLACE_SERVIS = import.meta.env.GOOGLE_PLACE_ID_SERVIS ?? '';
+const servisMapUrl = (GMAPS_KEY && GMAPS_PLACE_SERVIS)
+  ? `https://www.google.com/maps/embed/v1/place?key=${GMAPS_KEY}&q=place_id:${GMAPS_PLACE_SERVIS}&zoom=16&language=cs&region=CZ`
+  : 'https://maps.google.com/maps?q=%C4%8Eablicka+553%2F2%2C+182+00+Praha+8&output=embed';
 ---
 
 <BaseLayout title="Servis" description="Autorizovaný servis pro KGM, OMODA & JAECOO, Farizon, Dacia, Renault. Praha-Ďáblice.">
@@ -165,6 +172,26 @@ const SERVIS_TEAM_BLOCKS = [
   )}
 
   <!-- ===== GOOGLE RECENZE SERVIS ===== -->
+  <!-- ===== KDE NÁS NAJDETE (mapa servisu) ===== -->
+  <section data-screen-label="Mapa" style="padding: 64px 0;">
+    <div class="container">
+      <div class="section-eyebrow">Kde nás najdete</div>
+      <h2 style="font-family: var(--font-display); font-weight: 600; font-size: clamp(24px, 2.4vw, 32px); letter-spacing: -0.02em; margin: 8px 0 24px;">SFR Motor Servis — Praha-Ďáblice</h2>
+      <div style="border-radius: var(--radius-lg); overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.06);">
+        <iframe
+          src={servisMapUrl}
+          width="100%"
+          height="100%"
+          style="border:0; min-height:420px; display:block;"
+          allowfullscreen=""
+          loading="lazy"
+          referrerpolicy="no-referrer-when-downgrade"
+          title="Mapa SFR Motor Servis"
+        ></iframe>
+      </div>
+    </div>
+  </section>
+
   <section class="reviews-section" data-screen-label="04 Recenze">
     <div class="container">
       <div class="section-eyebrow">⭐ Hodnocení servisu</div>
