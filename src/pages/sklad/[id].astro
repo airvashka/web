@@ -196,6 +196,8 @@ const photoIds: string[] = Array.isArray(v.photos)
 const heroPhoto = photoIds[0] ?? null;
 const thumbIds = photoIds.slice(1, 5);
 const extraPhotos = Math.max(0, photoIds.length - 5);
+// Default barva pro on_order hero: náhodná z dostupných (když není nahraná fotka) — admin nemusí nic nahrávat
+const defaultColorIdx = (!heroPhoto && colorOptions.length > 0) ? Math.floor(Math.random() * colorOptions.length) : 0;
 
 // Akce na modelu (manuální, z admin)
 const todayDate = new Date().toISOString().slice(0, 10);
@@ -508,8 +510,8 @@ const salesPhoneLink = telLink(salesPhone);
             {isOnOrder && colorOptions.length > 0 ? (
               <img
                 data-hero-color-img
-                src={directusAsset(heroPhoto ?? colorOptions[0].photo, { width: 1600, format: 'webp', quality: 85 })}
-                data-default-photo={heroPhoto ?? colorOptions[0].photo}
+                src={directusAsset(heroPhoto ?? colorOptions[defaultColorIdx].photo, { width: 1600, format: 'webp', quality: 85 })}
+                data-default-photo={heroPhoto ?? colorOptions[defaultColorIdx].photo}
                 alt={title}
                 style="width:100%;height:auto;object-fit:contain;background:#fff"
               />
@@ -528,7 +530,7 @@ const salesPhoneLink = telLink(salesPhone);
                 {colorOptions.map((c, idx) => (
                   <button
                     type="button"
-                    class={`color-swatch ${idx === 0 ? 'is-active' : ''}`}
+                    class={`color-swatch ${idx === defaultColorIdx ? 'is-active' : ''}`}
                     data-color-id={c.id}
                     data-color-photo={c.photo}
                     data-color-name={c.name}
