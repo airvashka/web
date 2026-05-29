@@ -5,7 +5,7 @@ import JsonLd from '@components/JsonLd.astro';
 import GoogleReviews from '@components/GoogleReviews.astro';
 import TeamCard from '@components/TeamCard.astro';
 import TurnstileWidget from '@components/TurnstileWidget.astro';
-import { directusGet } from '@lib/directus';
+import { directusGet, directusAsset } from '@lib/directus';
 import { autoDealerSchema, autoRepairSchema } from '@lib/schemas';
 import googleReviews from '../data/google-reviews.json';
 import type { Branch, Employee } from '@lib/types';
@@ -44,61 +44,43 @@ const GMAPS_PLACE_PRODEJ = import.meta.env.GOOGLE_PLACE_ID_PRODEJ ?? '';
 const mapEmbedUrl = (GMAPS_KEY && GMAPS_PLACE_PRODEJ)
   ? `https://www.google.com/maps/embed/v1/place?key=${GMAPS_KEY}&q=place_id:${GMAPS_PLACE_PRODEJ}&zoom=16&language=cs&region=CZ`
   : 'https://maps.google.com/maps?q=%C4%8Eablicka+553%2F2%2C+182+00+Praha+8&output=embed';
+
+// ── Hero z nastavení webu (site_settings) — foto + nadpis + podnadpis, s fallbackem ──
+const settingsList = await directusGet<any>('site_settings', { limit: 1, fields: ['*'] }).catch(() => []);
+const settings = (settingsList && settingsList[0]) ? settingsList[0] : {};
+const heroImg = settings.kontakt_hero_image
+  ? directusAsset(settings.kontakt_hero_image, { width: 2000, format: 'webp', quality: 80 })
+  : '';
+const heroTitle = settings.kontakt_hero_title || 'Najdete nás v Praze-Ďáblicích';
+const heroSubtitle = settings.kontakt_hero_subtitle || 'Prodej, servis i příslušenství pod jednou střechou. Stavte se osobně, nebo nám napište — odpovídáme do 24 hodin.';
+
+// ── Fakturační údaje — obě firmy (výpis z OR, Městský soud v Praze) ──
+const COMPANIES = [
+  { name: 'SFR Motor s.r.o.', role: 'Prodej vozů', ico: '08263523', spis: 'C 315925, Městský soud v Praze', seat: 'Petrská 1426/1, Nové Město, 110 00 Praha 1' },
+  { name: 'SFR Motor servis s.r.o.', role: 'Servis a náhradní díly', ico: '08263370', spis: 'C 315922, Městský soud v Praze', seat: 'Petrská 1426/1, Nové Město, 110 00 Praha 1' },
+];
 ---
 
 <BaseLayout title="Kontakt" description="Kontaktujte SFR Motor — autorizovaný dealer v Praze-Ďáblicích. Prodej, servis, doplňkové služby.">
   <JsonLd data={[autoDealerSchema(googleReviews.prodej), autoRepairSchema(googleReviews.servis)]} />
   <Breadcrumbs items={[{ label: 'Kontakt' }]} />
-  <section class="phero" data-screen-label="01 Hero">
-    <div class="container">
-      <div class="section-eyebrow">Kontakt</div>
-      <h1>Najdete nás v Praze-Ďáblicích</h1>
-      <p class="lead">Prodej, servis i e-shop pod jednou střechou. Stavte se osobně, nebo nám rovnou napište — odpovídáme do 24 hodin.</p>
-    </div>
-  </section>
-
-  <section class="formpanel" id="poptavka" data-screen-label="05 Form">
-    <div class="container formpanel-grid">
-      <div>
-        <div class="section-eyebrow">Napište nám</div>
-        <h2>Máte dotaz nebo poptávku?</h2>
-        <p class="lead">Vyplňte krátký formulář — ozveme se do 24 hodin. Nebo zvolte konkrétního prodejce / technika výše a napište mu přímo.</p>
+  {heroImg ? (
+    <section class="phero phero-photo" style={`background-image: linear-gradient(rgba(15,15,18,0.55), rgba(15,15,18,0.45)), url('${heroImg}')`} data-screen-label="01 Hero">
+      <div class="container">
+        <div class="section-eyebrow light">Kontakt</div>
+        <h1>{heroTitle}</h1>
+        <p class="lead">{heroSubtitle}</p>
       </div>
-      <form class="fcard" data-lead-form data-form-type="contact" data-context-aware>
-        <h3>Kontaktní formulář</h3>
-        <div class="fgrid">
-          <div class="field full">
-            <label>Vaše jméno <span class="req">*</span></label>
-            <input type="text" name="customer_name" required minlength="2" maxlength="200" />
-          </div>
-          <div class="field">
-            <label>E-mail <span class="req">*</span></label>
-            <input type="email" name="customer_email" required maxlength="200" />
-          </div>
-          <div class="field">
-            <label>Telefon</label>
-            <input type="tel" name="customer_phone" maxlength="50" pattern="[+0-9\s\-()]+" />
-          </div>
-          <div class="field full">
-            <label>Téma zprávy</label>
-            <input type="text" name="subject" placeholder="Např. zájem o Torres EVX" maxlength="200" />
-          </div>
-          <div class="field full">
-            <label>Zpráva (nepovinné)</label>
-            <textarea name="message" maxlength="2000"></textarea>
-          </div>
-        </div>
-        <input type="text" name="_hp_website" tabindex="-1" autocomplete="off" class="honeypot" />
-        <TurnstileWidget />
-        <label class="check">
-          <input type="checkbox" required />
-          Souhlasím se zpracováním osobních údajů dle <a href="/informace/ochrana-udaju">GDPR</a>
-        </label>
-        <button class="btn btn-primary" type="submit">Odeslat zprávu</button>
-        <div class="lead-status" data-lead-status></div>
-      </form>
-    </div>
-  </section>
+    </section>
+  ) : (
+    <section class="phero" data-screen-label="01 Hero">
+      <div class="container">
+        <div class="section-eyebrow">Kontakt</div>
+        <h1>{heroTitle}</h1>
+        <p class="lead">{heroSubtitle}</p>
+      </div>
+    </section>
+  )}
 
   <section class="kinfo" data-screen-label="02 Adresa">
     <div class="container kinfo-grid">
@@ -155,6 +137,70 @@ const mapEmbedUrl = (GMAPS_KEY && GMAPS_PLACE_PRODEJ)
             <div class="val">Prodej: Po–Pá 8:00–18:00 (Čt do 20:00) · So–Ne zavřeno<br />Servis: Po–Pá 8:00–17:00 · So–Ne zavřeno</div>
           </div>
         </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="formpanel" id="poptavka" data-screen-label="05 Form">
+    <div class="container formpanel-grid">
+      <div>
+        <div class="section-eyebrow">Napište nám</div>
+        <h2>Máte dotaz nebo poptávku?</h2>
+        <p class="lead">Vyplňte krátký formulář — ozveme se do 24 hodin. Nebo zvolte konkrétního prodejce / technika výše a napište mu přímo.</p>
+      </div>
+      <form class="fcard" data-lead-form data-form-type="contact" data-context-aware>
+        <h3>Kontaktní formulář</h3>
+        <div class="fgrid">
+          <div class="field full">
+            <label>Vaše jméno <span class="req">*</span></label>
+            <input type="text" name="customer_name" required minlength="2" maxlength="200" />
+          </div>
+          <div class="field">
+            <label>E-mail <span class="req">*</span></label>
+            <input type="email" name="customer_email" required maxlength="200" />
+          </div>
+          <div class="field">
+            <label>Telefon</label>
+            <input type="tel" name="customer_phone" maxlength="50" pattern="[+0-9\s\-()]+" />
+          </div>
+          <div class="field full">
+            <label>Téma zprávy</label>
+            <input type="text" name="subject" placeholder="Např. zájem o Torres EVX" maxlength="200" />
+          </div>
+          <div class="field full">
+            <label>Zpráva (nepovinné)</label>
+            <textarea name="message" maxlength="2000"></textarea>
+          </div>
+        </div>
+        <input type="text" name="_hp_website" tabindex="-1" autocomplete="off" class="honeypot" />
+        <TurnstileWidget />
+        <label class="check">
+          <input type="checkbox" required />
+          Souhlasím se zpracováním osobních údajů dle <a href="/informace/ochrana-udaju">GDPR</a>
+        </label>
+        <button class="btn btn-primary" type="submit">Odeslat zprávu</button>
+        <div class="lead-status" data-lead-status></div>
+      </form>
+    </div>
+  </section>
+
+  <!-- ===== FAKTURAČNÍ ÚDAJE (obě firmy) ===== -->
+  <section class="legal-panel" data-screen-label="06 Firmy">
+    <div class="container">
+      <div class="section-eyebrow">Fakturační údaje</div>
+      <h2>Naše společnosti</h2>
+      <div class="legal-grid">
+        {COMPANIES.map((c) => (
+          <div class="legal-card">
+            <div class="legal-role">{c.role}</div>
+            <h3>{c.name}</h3>
+            <dl class="legal-dl">
+              <div><dt>IČO</dt><dd>{c.ico}</dd></div>
+              <div><dt>Sídlo</dt><dd>{c.seat}</dd></div>
+              <div><dt>Zápis v OR</dt><dd>{c.spis}</dd></div>
+            </dl>
+          </div>
+        ))}
       </div>
     </div>
   </section>
@@ -392,6 +438,40 @@ const mapEmbedUrl = (GMAPS_KEY && GMAPS_PLACE_PRODEJ)
     @media (max-width: 640px) {
       .team-v2 { padding: 56px 0 72px; }
       .team-grid-v2 { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 10px; }
+    }
+
+    /* ===== Hero foto (kontakt) ===== */
+    .phero-photo { background-size: cover; background-position: center; padding: 120px 0 130px; }
+    .phero-photo h1 { color: #fff; }
+    .phero-photo .lead { color: rgba(255,255,255,0.92); }
+    .phero-photo .section-eyebrow.light { color: rgba(255,255,255,0.85); }
+
+    /* ===== Fakturační údaje (obě firmy) ===== */
+    .legal-panel { padding: var(--section-pad) 0; background: var(--bg); }
+    .legal-panel h2 {
+      font-family: var(--font-display); font-weight: 600;
+      font-size: clamp(26px, 3vw, 38px); letter-spacing: -0.02em; margin: 6px 0 28px;
+    }
+    .legal-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
+    .legal-card {
+      background: #fff; border: 1px solid var(--line);
+      border-radius: var(--radius-lg); padding: 28px 30px;
+    }
+    .legal-role {
+      font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase;
+      color: var(--accent); font-weight: 700; margin-bottom: 6px;
+    }
+    .legal-card h3 {
+      font-family: var(--font-display); font-weight: 600; font-size: 20px;
+      letter-spacing: -0.01em; margin: 0 0 18px;
+    }
+    .legal-dl { margin: 0; display: flex; flex-direction: column; gap: 12px; }
+    .legal-dl > div { display: grid; grid-template-columns: 96px 1fr; gap: 12px; align-items: baseline; }
+    .legal-dl dt { font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-muted); margin: 0; }
+    .legal-dl dd { margin: 0; font-family: var(--font-display); font-weight: 500; font-size: 15px; color: var(--ink); line-height: 1.45; }
+    @media (max-width: 640px) {
+      .phero-photo { padding: 72px 0 84px; }
+      .legal-dl > div { grid-template-columns: 84px 1fr; gap: 10px; }
     }
   </style>
 </BaseLayout>
