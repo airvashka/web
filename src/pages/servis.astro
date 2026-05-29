@@ -32,6 +32,29 @@ const SERVICES = [
   { t: 'Geometrie', s: 'čištění klimatizace, čištění automatické převodovky' },
 ];
 
+// ── Manuály ke stažení — všechny modely s dokumenty typu 'manual', seskupeno podle modelu ──
+const DIRECTUS_BASE_M = import.meta.env.PUBLIC_DIRECTUS_URL ?? '';
+const todayManual = new Date().toISOString().slice(0, 10);
+const manualModelsRaw = await directusGet<any>('models', {
+  sort: ['name'],
+  limit: 100,
+  fields: ['id','name','slug','documents.title','documents.type','documents.file','documents.valid_from','documents.valid_to','documents.sort'],
+}).catch(() => []);
+const manualGroups = (manualModelsRaw ?? [])
+  .map((m: any) => {
+    const docs = (Array.isArray(m.documents) ? m.documents : [])
+      .filter((d: any) => d?.file && d?.type === 'manual')
+      .filter((d: any) => {
+        if (d.valid_from && d.valid_from > todayManual) return false;
+        if (d.valid_to && d.valid_to < todayManual) return false;
+        return true;
+      })
+      .sort((a: any, b: any) => (a.sort ?? 0) - (b.sort ?? 0))
+      .map((d: any) => ({ title: d.title ?? 'Manuál', url: `${DIRECTUS_BASE_M}/assets/${d.file}?download` }));
+    return { name: m.name, anchor: `manualy-${m.slug}`, docs };
+  })
+  .filter((g: any) => g.docs.length > 0);
+
 // ── Servis tým — fetch z Directus, mapování per kategorie podle emailu ──
 const allEmployees = await directusGet<Employee>('employees', {
   sort: ['sort', 'full_name'],
@@ -188,6 +211,32 @@ const servisMapUrl = (GMAPS_KEY && GMAPS_PLACE_SERVIS)
   )}
 
   <!-- ===== GOOGLE RECENZE SERVIS ===== -->
+  <!-- ===== MANUÁLY KE STAŽENÍ ===== -->
+  {manualGroups.length > 0 && (
+    <section class="serv-manuals" data-screen-label="05 Manuály">
+      <div class="container">
+        <div class="section-eyebrow">Ke stažení</div>
+        <h2>Manuály k modelům</h2>
+        <p class="serv-manuals-lead">Návody k obsluze a údržbě podle modelu vozu.</p>
+        <div class="manuals-models">
+          {manualGroups.map((g) => (
+            <div class="manuals-model" id={g.anchor}>
+              <h3>{g.name}</h3>
+              <div class="manuals-list">
+                {g.docs.map((d) => (
+                  <a class="manual-link" href={d.url} target="_blank" rel="noopener">
+                    <span class="manual-ico" aria-hidden="true">↓</span>
+                    <span>{d.title}</span>
+                  </a>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  )}
+
   <section class="reviews-section" data-screen-label="04 Recenze">
     <div class="container">
       <div class="section-eyebrow">⭐ Hodnocení servisu</div>
@@ -289,6 +338,42 @@ const servisMapUrl = (GMAPS_KEY && GMAPS_PLACE_SERVIS)
     @media (max-width: 640px) {
       .serv-team { padding: 48px 0 64px; }
       .serv-team-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 10px; }
+    }
+
+    /* ===== Manuály k modelům ===== */
+    .serv-manuals { padding: 64px 0 88px; }
+    .serv-manuals h2 {
+      font-family: var(--font-display); font-weight: 600;
+      font-size: clamp(26px, 3vw, 36px); letter-spacing: -0.02em; margin: 6px 0 8px;
+    }
+    .serv-manuals-lead { color: var(--text-muted); font-size: 15px; margin: 0 0 32px; max-width: 60ch; }
+    .manuals-models {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px;
+    }
+    .manuals-model {
+      background: #fff; border: 1px solid var(--line);
+      border-radius: var(--radius-lg); padding: 22px 24px;
+    }
+    .manuals-model h3 {
+      font-family: var(--font-display); font-weight: 600; font-size: 18px;
+      letter-spacing: -0.01em; margin: 0 0 12px;
+    }
+    .manuals-list { display: flex; flex-direction: column; }
+    .manual-link {
+      display: flex; align-items: center; gap: 10px;
+      font-family: var(--font-display); font-size: 15px; color: var(--ink);
+      text-decoration: none; padding: 10px 0; border-top: 1px dashed var(--line);
+    }
+    .manuals-list .manual-link:first-child { border-top: 0; }
+    .manual-link:hover { color: var(--accent); }
+    .manual-ico {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 26px; height: 26px; border-radius: 50%; background: #f4f4f5;
+      font-size: 13px; font-weight: 700; flex: 0 0 auto;
+    }
+    @media (max-width: 640px) {
+      .serv-manuals { padding: 48px 0 64px; }
+      .manuals-models { grid-template-columns: 1fr; gap: 14px; }
     }
   </style>
 </BaseLayout>
