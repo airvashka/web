@@ -83,12 +83,14 @@ const youtubeIds: string[] = Array.isArray(settings.homepage_youtube_video_ids)
 const youtubeChannelUrl = settings.youtube_channel_url ?? 'https://www.youtube.com/@sfrmotor';
 const instagramUrl = settings.instagram_url ?? 'https://www.instagram.com/sfr_motor/';
 
-// Servis split — TODO: load from a "service_pricing" collection in Directus
+// Servis split — hlavní služby (popisky, ne ceny)
 const services = [
-  { nm: 'Servis klimatizace', price: '1 590 Kč' },
-  { nm: 'Výměna oleje vč. filtru', price: '2 490 Kč' },
-  { nm: 'Geometrie náprav', price: '1 190 Kč' },
-  { nm: 'Přezutí a uskladnění', price: '1 490 Kč' },
+  { nm: 'Pravidelný servis', desc: 'výměna oleje, filtry, brzdy, kapaliny' },
+  { nm: 'Roční prohlídka', desc: 'kontrola dle servisního plánu' },
+  { nm: 'STK + emise', desc: 'připravíme a zajistíme' },
+  { nm: 'Pneuservis', desc: 'sezónní přezutí, uskladnění, opravy' },
+  { nm: 'Karosárna a lakovna', desc: 'od drobných oprav po havárie' },
+  { nm: 'Automyčka', desc: 'lux, tepování, mytí' },
 ];
 
 // Magazín — 4 nejnovější published články z Directusu
@@ -272,16 +274,16 @@ const articles = articlesRaw.map((a) => {
         </div>
         <div class="split-card-content">
           <div class="split-card-top">
-            <div class="eyebrow">Autorizovaný servis · KGM · OMODA &amp; JAECOO · Farizon · Dacia · Renault</div>
-            <h3>Objednejte se do servisu</h3>
+            <div class="eyebrow">Autorizovaný a specializovaný servis</div>
+            <h3>Péče pro váš vůz</h3>
             <div class="svc-list">
               {services.map((s) => (
                 <div class="svc-row">
                   <span class="svc-name">{s.nm}</span>
-                  <span class="dots"></span>
-                  <span class="svc-price">{s.price}</span>
+                  <span class="svc-desc">{s.desc}</span>
                 </div>
               ))}
+              <div class="svc-more">+ geometrie, klimatizace a další služby</div>
             </div>
           </div>
           <a class="btn btn-primary" href="/servis">Objednat servis</a>

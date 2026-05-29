@@ -4452,13 +4452,16 @@ body.vat-company #finance .finance-company-info {
   padding-bottom: 32px;
 }
 .svc-row {
-  display: grid;
-  grid-template-columns: auto 1fr auto;
-  gap: 16px;
+  display: flex;
+  flex-wrap: wrap;
   align-items: baseline;
+  gap: 4px 8px;
   font-family: var(--font-display);
   font-size: 15px;
 }
+.svc-row .svc-name::after { content: '—'; margin-left: 4px; opacity: 0.5; }
+.svc-row .svc-desc { font-size: 13.5px; color: rgba(255,255,255,0.6); }
+.svc-more { font-family: var(--font-display); font-size: 13px; color: rgba(255,255,255,0.5); margin-top: 6px; }
 .svc-row .svc-name { color: rgba(255,255,255,0.9); }
 .svc-row .dots {
   border-bottom: 1px dotted rgba(255,255,255,0.3);
