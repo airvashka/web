@@ -1,5 +1,5 @@
 ---
-import { FALLBACK_SALES_PHONE, telLink, getDealerContacts } from '@lib/contacts';
+import { FALLBACK_SALES_PHONE, FALLBACK_SERVICE_PHONE, telLink, getDealerContacts } from '@lib/contacts';
 import googleData from '../data/google-reviews.json';
 import VatToggle from './VatToggle.astro';
 
@@ -18,6 +18,8 @@ const salesPhonesJson = JSON.stringify(contacts.sales.map((c) => c.phone));
 // Server-side default (zobrazí se před tím než JS rotuje)
 const defaultPhone = contacts.sales[0]?.phone ?? FALLBACK_SALES_PHONE;
 const defaultPhoneLink = telLink(defaultPhone);
+const servisPhone = contacts.service[0]?.phone ?? FALLBACK_SERVICE_PHONE;
+const servisPhoneLink = telLink(servisPhone);
 
 // Oteviraci doba pro topbar - strukturovane periody obou pobocek (Prodejna + Servis).
 // Stav otevreno/zavreno se pocita client-side v case Evropa/Praha; svatky a vyjimecne
@@ -102,10 +104,19 @@ const navItems: Array<{ label: string; href: string; key: NonNullable<Props['act
     ))}
   </nav>
   <div class="mobile-drawer-cta">
-    <a class="btn btn-primary" href="/servis">Objednat servis</a>
-    <a class="btn btn-outline" href={`tel:${defaultPhoneLink}`} data-sales-phone>
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.86 19.86 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.86 19.86 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-      <span data-sales-phone-text>{defaultPhone}</span>
+    <a class="btn btn-primary" href="/kontakt#poptavka">Mám zájem o vůz</a>
+    <a class="btn btn-outline" href="/servis#objednat">Objednat servis</a>
+  </div>
+  <div class="mobile-drawer-phones">
+    <a class="mobile-drawer-phone" href={`tel:${defaultPhoneLink}`} data-sales-phone>
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.86 19.86 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.86 19.86 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+      <span class="mdp-label">Prodej</span>
+      <span class="mdp-num" data-sales-phone-text>{defaultPhone}</span>
+    </a>
+    <a class="mobile-drawer-phone" href={`tel:${servisPhoneLink}`}>
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.86 19.86 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.86 19.86 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+      <span class="mdp-label">Servis</span>
+      <span class="mdp-num">{servisPhone}</span>
     </a>
   </div>
   <div class="mobile-drawer-info">
