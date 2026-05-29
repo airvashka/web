@@ -12,7 +12,7 @@ const anyV = v as any;
 const photos = Array.isArray(v.photos) ? v.photos : [];
 const photoId = photos.length > 0
   ? (typeof photos[0] === 'string' ? photos[0] : photos[0]?.directus_files_id)
-  : null;
+  : (v.availability === 'on_order' ? ((v.model as any)?.hero_image_card ?? (v.model as any)?.hero_image ?? null) : null);
 const brandName = v.brand?.name ?? '';
 const brandSlug = v.brand?.slug ?? '';
 const modelName = v.model?.name ?? '';
