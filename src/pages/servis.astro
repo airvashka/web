@@ -5,7 +5,7 @@ import JsonLd from '@components/JsonLd.astro';
 import GoogleReviews from '@components/GoogleReviews.astro';
 import TeamCard from '@components/TeamCard.astro';
 import TurnstileWidget from '@components/TurnstileWidget.astro';
-import { directusGet } from '@lib/directus';
+import { directusGet, directusAsset } from '@lib/directus';
 import { FALLBACK_SERVICE_PHONE, telLink } from '@lib/contacts';
 import { autoRepairSchema } from '@lib/schemas';
 import googleReviews from '../data/google-reviews.json';
@@ -20,6 +20,15 @@ import type { Employee } from '@lib/types';
 const serviceContact = (Astro.locals as any).serviceContact;
 const servicePhone = serviceContact?.phone ?? FALLBACK_SERVICE_PHONE;
 const servicePhoneLink = telLink(servicePhone);
+
+// ── Hero z nastavení webu (site_settings) — foto + nadpis + podnadpis, fallback na výchozí ──
+const servisSettingsList = await directusGet<any>('site_settings', { limit: 1, fields: ['*'] }).catch(() => []);
+const servisSettings = (servisSettingsList && servisSettingsList[0]) ? servisSettingsList[0] : {};
+const servisHeroImg = servisSettings.servis_hero_image
+  ? directusAsset(servisSettings.servis_hero_image, { width: 2000, format: 'webp', quality: 80 })
+  : '';
+const servisHeroTitle = servisSettings.servis_hero_title || 'Servis pro všechny značky';
+const servisHeroSubtitle = servisSettings.servis_hero_subtitle || 'Autorizovaný servis KGM, OMODA & JAECOO a Farizon. Navíc specializovaný servis Dacia a Renault (dříve AUTOAVANT). Pneuservis, karosárna, lakovna, originální díly — všechno na jednom místě v Praze-Ďáblicích.';
 
 const SERVICES = [
   { t: 'Pravidelný servis', s: 'výměna oleje, filtry, brzdy, kapaliny' },
@@ -91,13 +100,23 @@ const servisMapUrl = (GMAPS_KEY && GMAPS_PLACE_SERVIS)
   <Breadcrumbs items={[{ label: 'Servis' }]} />
 
   <!-- ===== HERO ===== -->
-  <section class="phero" data-screen-label="01 Hero">
-    <div class="container">
-      <div class="section-eyebrow">Autorizovaný servis</div>
-      <h1>Servis pro všechny značky</h1>
-      <p class="lead">Autorizovaný servis KGM, OMODA &amp; JAECOO a Farizon. Navíc specializovaný servis Dacia a Renault (dříve AUTOAVANT). Pneuservis, karosárna, lakovna, originální díly — všechno na jednom místě v Praze-Ďáblicích.</p>
-    </div>
-  </section>
+  {servisHeroImg ? (
+    <section class="phero phero-photo" style={`background-image: linear-gradient(rgba(15,15,18,0.55), rgba(15,15,18,0.45)), url('${servisHeroImg}')`} data-screen-label="01 Hero">
+      <div class="container">
+        <div class="section-eyebrow light">Autorizovaný servis</div>
+        <h1>{servisHeroTitle}</h1>
+        <p class="lead">{servisHeroSubtitle}</p>
+      </div>
+    </section>
+  ) : (
+    <section class="phero" data-screen-label="01 Hero">
+      <div class="container">
+        <div class="section-eyebrow">Autorizovaný servis</div>
+        <h1>{servisHeroTitle}</h1>
+        <p class="lead">{servisHeroSubtitle}</p>
+      </div>
+    </section>
+  )}
 
   <!-- ===== SERVICES + FORM ===== -->
   <section class="serv-services" data-screen-label="02 Co umíme">
@@ -375,5 +394,12 @@ const servisMapUrl = (GMAPS_KEY && GMAPS_PLACE_SERVIS)
       .serv-manuals { padding: 48px 0 64px; }
       .manuals-models { grid-template-columns: 1fr; gap: 14px; }
     }
+
+    /* ===== Hero foto (servis) ===== */
+    .phero-photo { background-size: cover; background-position: center; padding: 120px 0 130px; }
+    .phero-photo h1 { color: #fff; }
+    .phero-photo .lead { color: rgba(255,255,255,0.92); }
+    .phero-photo .section-eyebrow.light { color: rgba(255,255,255,0.85); }
+    @media (max-width: 640px) { .phero-photo { padding: 72px 0 84px; } }
   </style>
 </BaseLayout>
