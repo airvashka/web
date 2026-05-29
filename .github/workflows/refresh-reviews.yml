@@ -1,0 +1,43 @@
+name: Refresh Google reviews (weekly)
+
+on:
+  schedule:
+    - cron: '0 5 * * 1'   # kazde pondeli 05:00 UTC
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Fetch Google reviews
+        env:
+          GOOGLE_PLACES_API_KEY: ${{ secrets.GOOGLE_PLACES_API_KEY }}
+          GOOGLE_PLACE_ID_PRODEJ: ${{ secrets.GOOGLE_PLACE_ID_PRODEJ }}
+          GOOGLE_PLACE_ID_SERVIS: ${{ secrets.GOOGLE_PLACE_ID_SERVIS }}
+        run: |
+          if [ -z "$GOOGLE_PLACES_API_KEY" ]; then
+            echo "GOOGLE_PLACES_API_KEY secret neni nastaveny - preskakuji (recenze nemenim)."
+            exit 0
+          fi
+          node scripts/fetch-google-reviews.mjs
+      - name: Commit & push pokud se zmenilo (a obsahuje recenze)
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          if git diff --quiet src/data/google-reviews.json; then
+            echo "Beze zmeny."
+          elif grep -q '"rating"' src/data/google-reviews.json; then
+            git add src/data/google-reviews.json
+            git commit -m "chore: weekly Google reviews refresh"
+            git push
+          else
+            echo "Vystup bez recenzi - necommituji, vracim predchozi."
+            git checkout -- src/data/google-reviews.json
+          fi
