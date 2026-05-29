@@ -4406,7 +4406,7 @@ body.vat-company #finance .finance-company-info {
 
 /* Servis + E-shop split */
 .split {
-  padding: 0 0 120px;
+  padding: var(--section-pad) 0 120px;
 }
 .split-grid {
   display: grid;

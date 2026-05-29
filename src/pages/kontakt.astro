@@ -202,7 +202,7 @@ const mapEmbedUrl = 'https://maps.google.com/maps?q=%C4%8Eablicka+553%2F2%2C+182
       const form = document.querySelector('[data-context-aware]');
       if (!form) return;
 
-      const ALLOWED = ['contact', 'test_drive', 'service', 'stock_inquiry', 'model_inquiry', 'akce'];
+      const ALLOWED = ['contact', 'test_drive', 'service', 'stock_inquiry', 'model_inquiry', 'akce', 'prislusenstvi'];
       if (formType && ALLOWED.includes(formType)) form.dataset.formType = formType;
       if (model) form.dataset.modelSlug = model;
       if (brand) form.dataset.brandSlug = brand;
@@ -248,6 +248,11 @@ const mapEmbedUrl = 'https://maps.google.com/maps?q=%C4%8Eablicka+553%2F2%2C+182
           title: 'Objednávka servisu',
           subject: 'Objednávka servisu',
           message: 'Chtěl/a bych objednat servis. Prosím o kontakt pro domluvení termínu.',
+        },
+        prislusenstvi: {
+          title: 'Originální příslušenství',
+          subject: 'Mám zájem o originální příslušenství',
+          message: 'Mám zájem o originální příslušenství (střešní boxy, nosiče kol, koberce, alu kola apod.). Prosím o nabídku a dostupnost.',
         },
       };
       const preset = PRESETS[formType];
