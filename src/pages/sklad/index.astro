@@ -210,6 +210,12 @@ function firstPhoto(v: V): string | null {
         });
         if (sortMode && sortMode !== 'newest') url.searchParams.set('razeni', sortMode);
         else url.searchParams.delete('razeni');
+        // Dostupnost → URL: zapiš jen když se liší od defaultu (skladem + na cestě),
+        // aby kampaně mohly linkovat na „na objednání" apod.
+        const availArr = Array.from(availabilitySet).sort();
+        const isDefaultAvail = availArr.length === 2 && availArr.includes('in_stock') && availArr.includes('on_the_way');
+        if (availabilitySet.size > 0 && !isDefaultAvail) url.searchParams.set('dostupnost', availArr.join(','));
+        else url.searchParams.delete('dostupnost');
         history.replaceState({}, '', url);
       }
 

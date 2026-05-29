@@ -53,14 +53,14 @@ const modelPromoDiscount = Number(v.model?.promo_discount_amount ?? 0) || 0;
 const customHighlight = (v.highlight_label ?? '').toString().trim();
 
 let actionPill = '';
-if (modelPromoActive && modelPromoLabel) actionPill = modelPromoLabel;
+if (modelPromoActive && modelPromoLabel && !isOnOrder) actionPill = modelPromoLabel;
 else if (v.highlighted && customHighlight) actionPill = customHighlight;
 else if (v.highlighted) actionPill = 'Novinka';
 
 const baseList = v.list_price;
 // Modelová akce platí pro nová i předváděcí auta (oba jsou "skladovka", používají
 // stejný import s už-sníženou cenou). Použité ojetiny mají vlastní pricing — ven.
-const isPromoEligible = v.condition === 'new' || v.condition === 'demo';
+const isPromoEligible = (v.condition === 'new' || v.condition === 'demo') && !isOnOrder;
 let displayPrice = v.promo_price ?? baseList;
 let priceBefore: number | null = null;
 if (v.promo_price && baseList && v.promo_price < baseList) {

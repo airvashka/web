@@ -224,7 +224,7 @@ if (stockPromoApplied && baseListPrice && stockPromoApplied < baseListPrice) {
   priceBeforePromo = baseListPrice;
   savings = baseListPrice - stockPromoApplied;
   promoSource = 'stock';
-} else if (modelPromoActive && modelPromoDiscount > 0 && baseListPrice) {
+} else if (modelPromoActive && modelPromoDiscount > 0 && baseListPrice && !isOnOrder) {
   // list_price zůstává — to je co reálně platíte. "Původní" se jen dopočítá nahoru.
   finalPrice = baseListPrice;
   priceBeforePromo = baseListPrice + modelPromoDiscount;
@@ -488,7 +488,7 @@ const salesPhoneLink = telLink(salesPhone);
             <div class="badges">
               <span class={`badge ${statusBadge.cls}`}>{statusBadge.label}</span>
               {/* Model promo má prioritu (např. "JARNÍ AKCE -50K") */}
-              {modelPromoActive && modelPromoLabel && (
+              {modelPromoActive && modelPromoLabel && !isOnOrder && (
                 <span class="badge accent">{modelPromoLabel}</span>
               )}
               {/* Stock highlight jen pokud není model promo nebo má jiný text */}
