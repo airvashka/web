@@ -590,6 +590,7 @@ const salesPhoneLink = telLink(salesPhone);
           {model?.tagline && <p class="info-tagline">{model.tagline}</p>}
 
           <div class="info-price">
+            {isOnOrder && <span class="info-price-od">Cena od</span>}
             {finalPrice ? (
               <span class="amount">{finalPrice.toLocaleString('cs-CZ')} Kč</span>
             ) : (
@@ -771,9 +772,14 @@ const salesPhoneLink = telLink(salesPhone);
         <div class="about-grid" data-screen-label="About">
           <div>
             <div class="section-eyebrow">O tomto voze</div>
-            <h2 class="section-title">Připravený k převzetí</h2>
+            <h2 class="section-title">{isOnOrder ? 'Vůz na objednání' : 'Připravený k převzetí'}</h2>
             <div class="about-copy">
-              {description.length > 0 ? (
+              {isOnOrder ? (
+                <>
+                  <p>{title} — vůz na objednání{year ? ` (modelový rok ${year})` : ''}. Uvedená cena je orientační („cena od“) pro základní konfiguraci.</p>
+                  <p>Konečná cena i měsíční splátka se mohou lišit podle zvolené barvy, výbavy a paketů — výpočet financování je proto orientační. Přesnou nabídku na míru a dodací termín potvrdíme v nezávazné poptávce.</p>
+                </>
+              ) : description.length > 0 ? (
                 description.map((p) => <p>{p}</p>)
               ) : (
                 <>
