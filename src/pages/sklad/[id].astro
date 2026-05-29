@@ -505,16 +505,16 @@ const salesPhoneLink = telLink(salesPhone);
                 360° pohled
               </a>
             )}
-            {heroPhoto ? (
-              <DirectusImage src={heroPhoto} alt={title} aspectRatio="auto" widths={[800, 1600]} loading="eager" fetchpriority="high" />
-            ) : isOnOrder && colorOptions.length > 0 ? (
+            {isOnOrder && colorOptions.length > 0 ? (
               <img
                 data-hero-color-img
-                src={directusAsset(colorOptions[0].photo, { width: 1600, format: 'jpg', quality: 85 })}
-                data-default-photo={colorOptions[0].photo}
+                src={directusAsset(heroPhoto ?? colorOptions[0].photo, { width: 1600, format: 'jpg', quality: 85 })}
+                data-default-photo={heroPhoto ?? colorOptions[0].photo}
                 alt={title}
                 style="width:100%;height:auto;object-fit:contain;background:#f3f3f5"
               />
+            ) : heroPhoto ? (
+              <DirectusImage src={heroPhoto} alt={title} aspectRatio="auto" widths={[800, 1600]} loading="eager" fetchpriority="high" />
             ) : (
               <div style="padding: 40px; text-align: center; color: var(--text-dim);">Foto bude doplněno</div>
             )}
