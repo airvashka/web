@@ -2079,11 +2079,13 @@ html.scrolled-down .subnav {
 .colors-block { margin-bottom: 56px; }
 .colors-block:last-child { margin-bottom: 0; }
 /* 2-sloupcový layout barev: exteriér vlevo (větší), interiér vpravo pod sebou; bílé, vzdušné */
-.colors-layout { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); gap: 40px; align-items: start; }
+.colors-layout { display: grid; grid-template-columns: minmax(0, 2.2fr) minmax(0, 1fr); gap: 36px; align-items: start; }
 .colors-layout .colors-block { margin-bottom: 0; }
 .colors-layout .int-grid,
 .colors-layout .int-grid[data-count="2"],
-.colors-layout .int-grid[data-count="3"] { grid-template-columns: 1fr; }
+.colors-layout .int-grid[data-count="3"] { grid-template-columns: 1fr; gap: 12px; }
+.colors-layout .int-pic { aspect-ratio: auto; height: 130px; }
+.colors-layout .int-pic img { height: 130px !important; aspect-ratio: auto !important; object-fit: cover; }
 @media (max-width: 920px) {
   .colors-layout { grid-template-columns: 1fr; gap: 28px; }
 }
@@ -2116,7 +2118,7 @@ html.scrolled-down .subnav {
 .cs-stage {
   position: relative;
   width: 100%;
-  aspect-ratio: 21 / 9;
+  aspect-ratio: 16 / 9;
   border-radius: var(--radius-lg);
   overflow: hidden;
   background: #fff;
