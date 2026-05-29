@@ -53,6 +53,9 @@ const fuelLabels: Record<string, string> = { petrol: 'Benzín', diesel: 'Diesel'
 const availableFuels = [...new Set(vehicles.map((v) => v.model?.fuel_type).filter(Boolean))] as string[];
 const availableConditions = [...new Set(vehicles.map((v) => v.condition).filter(Boolean))] as string[];
 const has4wd = vehicles.some((v) => v.drivetrain === '4wd' || v.drivetrain === 'awd');
+const hasManualTx = vehicles.some((v) => v.transmission === 'manual');
+const hasAutoTx = vehicles.some((v) => v.transmission && v.transmission !== 'manual');
+const showTransmission = hasManualTx && hasAutoTx;
 
 type ModelOpt = { slug: string; name: string };
 const modelsByBrand = new Map<string, { brandName: string; models: ModelOpt[] }>();
@@ -169,6 +172,15 @@ function firstPhoto(v: V): string | null {
               <label><input type="radio" name="drivetrain" value="4wd" /> Pouze 4×4</label>
             </div>
           )}
+
+          {showTransmission && (
+            <div class="a-fblock">
+              <h4>Převodovka</h4>
+              <label><input type="radio" name="transmission" value="all" checked /> Vše</label>
+              <label><input type="radio" name="transmission" value="manual" /> Manuál</label>
+              <label><input type="radio" name="transmission" value="automat" /> Automat</label>
+            </div>
+          )}
         </aside>
 
         <div>
@@ -196,13 +208,13 @@ function firstPhoto(v: V): string | null {
 
   <script is:inline>
     (function () {
-      const filters = { brand: 'all', model: 'all', fuel: 'all', condition: 'all', drivetrain: 'all' };
+      const filters = { brand: 'all', model: 'all', fuel: 'all', condition: 'all', drivetrain: 'all', transmission: 'all' };
       const availabilitySet = new Set(['in_stock', 'on_the_way']);
       let sortMode = 'newest';
 
       function syncURL() {
         const url = new URL(location.href);
-        const map = { brand: 'znacka', model: 'model', fuel: 'palivo', condition: 'stav', drivetrain: 'pohon' };
+        const map = { brand: 'znacka', model: 'model', fuel: 'palivo', condition: 'stav', drivetrain: 'pohon', transmission: 'prevodovka' };
         Object.entries(map).forEach(([key, q]) => {
           const val = filters[key];
           if (val && val !== 'all') url.searchParams.set(q, val);
@@ -228,6 +240,8 @@ function firstPhoto(v: V): string | null {
           const el = c;
           const dt = el.dataset.drivetrain || '';
           const drivetrainOk = filters.drivetrain === 'all' || (filters.drivetrain === '4wd' && (dt === '4wd' || dt === 'awd'));
+          const tr = el.dataset.transmission || '';
+          const transmissionOk = filters.transmission === 'all' || (filters.transmission === 'manual' && tr === 'manual') || (filters.transmission === 'automat' && !!tr && tr !== 'manual');
           const av = el.dataset.availability || 'in_stock';
           const availabilityOk = availabilitySet.size === 0 || availabilitySet.has(av);
           const ok =
@@ -235,7 +249,7 @@ function firstPhoto(v: V): string | null {
             (filters.model === 'all' || el.dataset.model === filters.model) &&
             (filters.fuel === 'all' || el.dataset.fuel === filters.fuel) &&
             (filters.condition === 'all' || el.dataset.condition === filters.condition) &&
-            drivetrainOk && availabilityOk;
+            drivetrainOk && transmissionOk && availabilityOk;
           if (ok) { el.style.display = ''; visible++; } else { el.style.display = 'none'; }
         });
         const visibleCards = cards.filter((c) => c.style.display !== 'none');
@@ -324,6 +338,7 @@ function firstPhoto(v: V): string | null {
       const URL_MAP = [
         ['znacka', 'brand', 'brand'], ['palivo', 'fuel', 'fuel'],
         ['stav', 'condition', 'condition'], ['pohon', 'drivetrain', 'drivetrain'],
+        ['prevodovka', 'transmission', 'transmission'],
       ];
       URL_MAP.forEach(([q, key, rname]) => {
         const v = params.get(q);

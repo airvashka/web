@@ -87,6 +87,7 @@ const fmtPrice = (n?: number | null) => n ? `${Number(n).toLocaleString('cs-CZ')
   data-fuel={fuelType}
   data-condition={v.condition ?? ''}
   data-drivetrain={v.drivetrain ?? ''}
+  data-transmission={v.transmission ?? ''}
   data-availability={v.availability ?? 'in_stock'}
   data-price={displayPrice ?? 0}
   data-listed-at={v.listed_at ?? ''}
