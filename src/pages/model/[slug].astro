@@ -378,6 +378,27 @@ const docsList: DocItem[] = docsRaw
   // Sort: featured první, pak podle type group
   .sort((a: DocItem, b: DocItem) => (b.featured ? 1 : 0) - (a.featured ? 1 : 0));
 
+// Seskupení dokumentů podle typu → sekce s malým nadpisem (Brožury / Ceníky / Manuály…)
+const DOC_GROUPS: { type: string; label: string }[] = [
+  { type: 'brochure', label: 'Brožury' },
+  { type: 'price_list', label: 'Ceníky' },
+  { type: 'price_list_promo', label: 'Akční ceníky' },
+  { type: 'datasheet', label: 'Technické listy' },
+  { type: 'manual', label: 'Manuály' },
+  { type: 'other', label: 'Ostatní' },
+];
+const knownDocTypes = new Set(DOC_GROUPS.map((g) => g.type));
+const docGroups = DOC_GROUPS
+  .map((g) => ({ ...g, items: docsList.filter((d) => d.type === g.type) }))
+  .filter((g) => g.items.length > 0);
+// Neznámý typ (kdyby přibyl nový) → spadne do "Ostatní"
+const extraDocs = docsList.filter((d) => !knownDocTypes.has(d.type));
+if (extraDocs.length) {
+  const other = docGroups.find((g) => g.type === 'other');
+  if (other) other.items.push(...extraDocs);
+  else docGroups.push({ type: 'other', label: 'Ostatní', items: extraDocs });
+}
+
 // Legacy fallback odstraněn — staré single-file fieldy brochure_file/price_list_file
 // jsou pryč, vše jde přes model_documents O2M collection.
 
@@ -1119,34 +1140,37 @@ if (promoActive && promoDescription) {
           <div class="section-eyebrow">Ke stažení</div>
           <h2 class="downloads-title">Brožura, ceník a další dokumenty</h2>
         </div>
-        <div class="downloads-grid">
-          {docsList.map((d) => (
-            <a class={`dl-card dl-card--${d.type.replace('_', '-')}`} href={d.url} target="_blank" rel="noopener">
-              <span class="dl-card-icon">
-                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-                  <polyline points="14 2 14 8 20 8"/>
-                  <line x1="12" y1="18" x2="12" y2="12"/>
-                  <polyline points="9 15 12 18 15 15"/>
-                </svg>
-              </span>
-              <span class="dl-card-body">
-                <span class="dl-card-type">
-                  {TYPE_LABELS[d.type] ?? 'Dokument'}
-                  {d.type === 'price_list_promo' && <span class="dl-badge">Akce</span>}
-                </span>
-                <span class="dl-card-title">{d.title}</span>
-                {(d.valid_from || d.valid_to) && (
-                  <span class="dl-card-validity">
-                    Platí{d.valid_from ? ` od ${new Date(d.valid_from).toLocaleDateString('cs-CZ')}` : ''}
-                    {d.valid_to ? ` do ${new Date(d.valid_to).toLocaleDateString('cs-CZ')}` : ''}
-                  </span>
-                )}
-              </span>
-              <span class="dl-card-action">Stáhnout
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
-              </span>
-            </a>
+        <div class="downloads-groups">
+          {docGroups.map((g) => (
+            <div class="dl-group">
+              <h3 class="dl-group-title">{g.label}</h3>
+              <div class="dl-rows">
+                {g.items.map((d) => (
+                  <a class={`dl-row dl-row--${d.type.replace(/_/g, '-')}`} href={d.url} target="_blank" rel="noopener">
+                    <span class="dl-row-icon">
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                        <polyline points="14 2 14 8 20 8"/>
+                        <line x1="12" y1="18" x2="12" y2="12"/>
+                        <polyline points="9 15 12 18 15 15"/>
+                      </svg>
+                    </span>
+                    <span class="dl-row-main">
+                      <span class="dl-row-title">{d.title}{d.type === 'price_list_promo' && <span class="dl-badge">Akce</span>}</span>
+                      {(d.valid_from || d.valid_to) && (
+                        <span class="dl-row-validity">
+                          Platí{d.valid_from ? ` od ${new Date(d.valid_from).toLocaleDateString('cs-CZ')}` : ''}
+                          {d.valid_to ? ` do ${new Date(d.valid_to).toLocaleDateString('cs-CZ')}` : ''}
+                        </span>
+                      )}
+                    </span>
+                    <span class="dl-row-action"><span>Stáhnout</span>
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                    </span>
+                  </a>
+                ))}
+              </div>
+            </div>
           ))}
         </div>
       </div>
