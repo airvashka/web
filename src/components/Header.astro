@@ -55,6 +55,7 @@ const navItems: Array<{ label: string; href: string; key: NonNullable<Props['act
       <span data-sales-phone-text>{defaultPhone}</span>
     </a>
     <span class="topbar-spacer"></span>
+    <VatToggle />
   </div>
 </div>
 
@@ -100,10 +101,6 @@ const navItems: Array<{ label: string; href: string; key: NonNullable<Props['act
       >{item.label}</a>
     ))}
   </nav>
-  <div class="mobile-drawer-vat">
-    <span class="mobile-drawer-vat-label">Zobrazení cen</span>
-    <VatToggle />
-  </div>
   <div class="mobile-drawer-cta">
     <a class="btn btn-primary" href="/servis">Objednat servis</a>
     <a class="btn btn-outline" href={`tel:${defaultPhoneLink}`} data-sales-phone>
@@ -363,9 +360,16 @@ const navItems: Array<{ label: string; href: string; key: NonNullable<Props['act
     }
   }
 
-  /* DPH přepínač: header instance schovat na úzkém mobilu (je v draweru). */
-  @media (max-width: 480px) {
+  /* DPH přepínač: desktop = v nav; mobil (≤960) = v topbaru vedle otevírací doby. */
+  @media (max-width: 960px) {
     .nav .vat-toggle { display: none; }
+  }
+  /* Topbar varianta přepínače (tmavý pruh) — jen mobil */
+  .topbar .vat-toggle { display: none; background: rgba(255,255,255,0.14) !important; }
+  .topbar .vat-toggle-btn { color: #DCDCDC !important; }
+  .topbar .vat-toggle-btn.is-active { background: #fff !important; color: var(--ink) !important; }
+  @media (max-width: 960px) {
+    .topbar .vat-toggle { display: inline-flex; margin-left: auto; flex-shrink: 0; }
   }
   /* DPH přepínač v mobile draweru */
   .mobile-drawer-vat {

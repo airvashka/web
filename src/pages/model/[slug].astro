@@ -176,16 +176,22 @@ function shortenStat(raw: string, preferUnit?: string): string {
 
 function findStat(aliases: string[], unit?: string): string | null {
   const lowerAliases = aliases.map((a) => a.toLowerCase());
-  for (const [k, v] of tdataRows) {
-    const lk = k.toLowerCase();
-    if (lowerAliases.some((a) => lk.includes(a))) {
+  // Alias PRIORITA: zkoušíme aliasy v pořadí napříč všemi řádky (ne první řádek
+  // ve feedu) — aby „celkový výkon" vyhrál nad „výkon elektromotoru" u hybridů/EV.
+  for (const alias of lowerAliases) {
+    for (const [k, v] of tdataRows) {
+      if (!k.toLowerCase().includes(alias)) continue;
       const val = String(v).trim();
-      // Přidat jednotku, pokud zatím není v hodnotě a hodnota je čistě číselná
+      // Hodnota čistě číselná → přidej jednotku
       if (unit && val && !val.includes(unit) && /^[0-9.,\s]+$/.test(val)) {
         return `${val} ${unit}`;
       }
-      // Jinak zkrátit (oříznout závorky, vzít před lomítkem)
-      return shortenStat(val, unit);
+      // Jinak zkrátit (závorky/lomítko) + případně dolepit jednotku k čistě číselnému výsledku
+      const short = shortenStat(val, unit);
+      if (unit && !short.includes(unit) && /^[0-9.,\s]+$/.test(short)) {
+        return `${short} ${unit}`;
+      }
+      return short;
     }
   }
   return null;
@@ -214,20 +220,20 @@ const STAT_SETS: Record<string, StatDef[]> = {
     { label: 'Záruka', aliases: ['záruka'] },
   ],
   hybrid: [
-    { label: 'Systémový výkon', aliases: ['systémový výkon', 'výkon'], unit: 'kW' },
+    { label: 'Systémový výkon', aliases: ['celkový (systémový) výkon', 'celkový výkon', 'systémový výkon', 'výkon'], unit: 'kW' },
     { label: 'Spotřeba (komb.)', aliases: ['průměrná spotřeba paliva', 'spotřeba (komb.)', 'spotřeba'], unit: 'l/100 km' },
     { label: 'Emise CO₂', aliases: ['emise co₂', 'emise co2'], unit: 'g/km' },
     { label: 'Záruka', aliases: ['záruka'] },
   ],
   phev: [
-    { label: 'Systémový výkon', aliases: ['systémový výkon', 'výkon'], unit: 'kW' },
+    { label: 'Systémový výkon', aliases: ['celkový (systémový) výkon', 'celkový výkon', 'systémový výkon', 'výkon'], unit: 'kW' },
     { label: 'Dojezd EV', aliases: ['dojezd ev', 'dojezd elektro', 'elektrický dojezd'], unit: 'km' },
     { label: 'Spotřeba (komb.)', aliases: ['průměrná spotřeba paliva', 'spotřeba'], unit: 'l/100 km' },
     { label: 'Záruka', aliases: ['záruka'] },
   ],
   ev: [
     { label: 'Dojezd WLTP', aliases: ['dojezd wltp', 'dojezd'], unit: 'km' },
-    { label: 'Výkon', aliases: ['čistý výkon motoru', 'výkon'], unit: 'kW' },
+    { label: 'Výkon', aliases: ['celkový výkon', 'celkový (systémový) výkon', 'systémový výkon', 'maximální výkon', 'výkon'], unit: 'kW' },
     { label: 'Zrychlení 0–100', aliases: ['zrychlení 0-100', 'zrychlení 0–100', 'zrychlení'], unit: 's' },
     { label: 'Záruka', aliases: ['záruka'] },
   ],
