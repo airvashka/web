@@ -182,7 +182,7 @@ const activeBrand = Astro.params.brand;
 ---
 
 <BaseLayout
-  title={`${brand.name} | SFR Motor`}
+  title={brand.name}
   description={brand.description ?? brand.tagline ?? `${brand.name} — modely a skladové vozy u SFR Motor.`}
 >
   <Breadcrumbs items={[{ label: brand.name }]} />

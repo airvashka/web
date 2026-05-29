@@ -973,30 +973,8 @@ const salesPhoneLink = telLink(salesPhone);
               </div>
             </div>
 
-            <!-- Info bloky pod nastavením -->
-            <div class="calc-info-grid">
-              <div class="calc-info-tile">
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-                <div>
-                  <div class="calc-info-title">Bez navýšení</div>
-                  <div class="calc-info-desc">Akontace 10–60 %, doba 24–72 měs. Standardní úroková sazba dle ceníku UCL.</div>
-                </div>
-              </div>
-              <div class="calc-info-tile">
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-                <div>
-                  <div class="calc-info-title">UniCredit Leasing</div>
-                  <div class="calc-info-desc">Naše partnerská leasingovka. Schválení do 24 h, splátky beze srážek.</div>
-                </div>
-              </div>
-              <div class="calc-info-tile">
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-                <div>
-                  <div class="calc-info-title">Orientační výpočet</div>
-                  <div class="calc-info-desc">Konečnou nabídku připraví naši specialisté podle bonity klienta.</div>
-                </div>
-              </div>
-            </div>
+            <!-- Info bloky (Bez navýšení / UCL / Orientační) přesunuty POD .calc-summary
+                 kvůli mobilnímu pořadí — na mobilu byla splátka schovaná až za argumenty. -->
           </div>
 
           <div class="calc-summary">
@@ -1029,6 +1007,31 @@ const salesPhoneLink = telLink(salesPhone);
               Požádat o financování
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
             </a>
+          </div>
+
+          <!-- Argumenty: na mobilu AŽ za splátkou, na desktopu plnošířkový pruh pod kalkulačkou -->
+          <div class="calc-info-grid">
+            <div class="calc-info-tile">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+              <div>
+                <div class="calc-info-title">Bez navýšení</div>
+                <div class="calc-info-desc">Akontace 10–60 %, doba 24–72 měs. Standardní úroková sazba dle ceníku UCL.</div>
+              </div>
+            </div>
+            <div class="calc-info-tile">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+              <div>
+                <div class="calc-info-title">UniCredit Leasing</div>
+                <div class="calc-info-desc">Naše partnerská leasingovka. Schválení do 24 h, splátky beze srážek.</div>
+              </div>
+            </div>
+            <div class="calc-info-tile">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+              <div>
+                <div class="calc-info-title">Orientační výpočet</div>
+                <div class="calc-info-desc">Konečnou nabídku připraví naši specialisté podle bonity klienta.</div>
+              </div>
+            </div>
           </div>
         </div>
         <div class="ucl-legal" data-ucl-legal>

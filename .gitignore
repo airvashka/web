@@ -30,3 +30,7 @@ Thumbs.db
 .idea/
 *.swp
 package-lock.json
+
+# build output (obsahuje zapeèené secrety)
+.vercel/
+dist/

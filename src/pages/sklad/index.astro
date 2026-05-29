@@ -104,7 +104,10 @@ function firstPhoto(v: V): string | null {
       <div class="a-layout">
         <aside class="a-sidebar" data-filters>
           <div class="a-sb-head">
-            <strong>Filtry</strong>
+            <button type="button" class="a-sb-toggle" data-filter-toggle aria-expanded="false">
+              <strong>Filtry</strong>
+              <svg class="a-sb-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+            </button>
             <button type="button" class="a-sb-clear" data-reset>Resetovat</button>
           </div>
 
@@ -291,6 +294,14 @@ function firstPhoto(v: V): string | null {
         if (ss) ss.value = 'newest';
         sortMode = 'newest';
         applyFilters();
+      });
+
+      // Mobilní akordeon filtru — toggle .is-open na sidebaru (na desktopu bez efektu)
+      document.querySelector('[data-filter-toggle]')?.addEventListener('click', function () {
+        const sb = document.querySelector('[data-filters]');
+        if (!sb) return;
+        const open = sb.classList.toggle('is-open');
+        this.setAttribute('aria-expanded', String(open));
       });
 
       const params = new URLSearchParams(window.location.search);

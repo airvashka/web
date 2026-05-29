@@ -1139,12 +1139,16 @@ button.thumb-more {
 
 /* === Finance section: calc-info-tile (info bloky pod chips/sliderem) === */
 .calc-info-grid {
+  grid-column: 1 / -1;            /* plná šířka pod oběma panely (desktop) */
   display: grid;
-  grid-template-columns: 1fr;
+  grid-template-columns: repeat(3, 1fr);
   gap: 12px;
-  margin-top: 24px;
-  padding-top: 22px;
-  border-top: 1px solid rgba(255,255,255,0.08);
+  margin-top: 4px;
+}
+@media (max-width: 960px) {
+  /* Mobil: info bloky jsou v DOM AŽ za .calc-summary → splátka je vidět hned
+     pod sliderem; tady jen stack do 1 sloupce. */
+  .calc-info-grid { grid-template-columns: 1fr; }
 }
 .calc-info-tile {
   display: flex;
@@ -3101,6 +3105,17 @@ a.promo-image-link:hover {
 .a-sidebar { background: #fff; border-radius: 16px; padding: 18px 20px; box-shadow: 0 1px 2px rgba(0,0,0,0.04); position: sticky; top: 16px; height: max-content; max-height: calc(100vh - 32px); overflow-y: auto; }
 .a-sb-head { display: flex; justify-content: space-between; align-items: center; padding-bottom: 12px; border-bottom: 1px solid #F0F0F2; margin-bottom: 12px; }
 .a-sb-head strong { font-size: 15px; }
+.a-sb-toggle { display: inline-flex; align-items: center; gap: 8px; background: none; border: 0; padding: 0; font: inherit; color: inherit; cursor: default; }
+.a-sb-chevron { display: none; color: #6B6B73; transition: transform .2s ease; flex: none; }
+/* Mobil (≤920): filtr defaultně sbalený za tlačítkem „Filtry" → auta jsou hned vidět. */
+@media (max-width: 920px) {
+  .a-sb-toggle { cursor: pointer; }
+  .a-sb-chevron { display: block; }
+  .a-sidebar.is-open .a-sb-chevron { transform: rotate(180deg); }
+  .a-sidebar:not(.is-open) .a-fblock,
+  .a-sidebar:not(.is-open) .a-sb-clear { display: none; }
+  .a-sidebar:not(.is-open) .a-sb-head { padding-bottom: 0; border-bottom: 0; margin-bottom: 0; }
+}
 .a-sb-clear { background: none; border: 0; color: #E85D2C; font-size: 12.5px; cursor: pointer; padding: 4px 8px; border-radius: 6px; font-family: inherit; }
 .a-sb-clear:hover { background: #FFF3EC; }
 
@@ -3730,7 +3745,7 @@ a.promo-image-link:hover {
 .btile-bg::after {
   content: "";
   position: absolute; inset: 0;
-  background: linear-gradient(180deg, rgba(11,11,12,0) 30%, rgba(11,11,12,0.75) 100%);
+  background: linear-gradient(180deg, rgba(11,11,12,0) 35%, rgba(11,11,12,0.62) 100%);
   pointer-events: none;
 }
 .btile-body {
@@ -4436,6 +4451,8 @@ body.vat-company #finance .finance-company-info {
   font-weight: 600;
   color: #fff;
   font-variant-numeric: tabular-nums;
+  white-space: nowrap;   /* cena „1 590 Kč" se nezalomí (Kč nepadá na druhý řádek) */
+  flex-shrink: 0;
 }
 .split-card.is-dark .btn-primary { align-self: flex-start; }
 .split-card.is-cream .eshop-pic {
@@ -5174,9 +5191,13 @@ body.vat-company #finance .finance-company-info {
   .topbar-inner { gap: 14px; font-size: 11.5px; overflow: hidden; }
   .topbar-right { display: none; }
   .topbar-item:not(.topbar-hours) { display: none; }   /* na mobilu jen otevírací doba */
-  .topbar-hours { display: inline-flex; }
-  .topbar-hours [data-opening-text] { flex-direction: column; align-items: flex-start; gap: 2px; }
-  .topbar-hours .oh-sep { display: none; }
+  .topbar-inner .topbar-hours { display: inline-flex; align-items: flex-start; }
+  /* Vyšší specificita (.topbar-inner) — přebije base rule v Header.astro
+     (.topbar-hours [data-opening-text]{align-items:center}), který jinak kvůli
+     pořadí v cascade vyhrával a centroval řádky Prodejna/Servis. */
+  .topbar-inner .topbar-hours [data-opening-text] { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; }
+  .topbar-inner .topbar-hours .oh-sep { display: none; }
+  .topbar-inner .topbar-hours svg { margin-top: 1px; }
   .nav-inner { height: 64px; gap: 16px; }
   .nav-links { display: none; }
   .nav-cta { display: none; }
@@ -5207,8 +5228,13 @@ body.vat-company #finance .finance-company-info {
   .spec-grid { grid-template-columns: 1fr 1fr; }
   .cta-row { grid-template-columns: 1fr; }
   .mhero-inner { padding: 40px 0 200px; }
-  .mhero-stats-inner { grid-template-columns: 1fr 1fr; gap: 14px; }
+  /* display:grid bylo dřív vynechané → grid-template-columns se ignoroval (flex-wrap
+     dělal ragged zalamování). Teď reálně 2 sloupce. */
+  .mhero-stats-inner { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; align-items: start; }
   .mhero-price, .mhero-stats .btn { grid-column: span 2; justify-self: stretch; }
+  /* Menší font + povolené zalomení → dlouhá hodnota (Záruka) se nezlomí ragged ani nepřeteče. */
+  .mstat .val { font-size: 19px; white-space: normal; }
+  .mstat { border-left: 0; padding-left: 0; }
   .subnav { top: var(--nav-height-mobile); }
   .subnav-inner { justify-content: flex-start; padding: 0 var(--pad); gap: 0; }
   .subnav-link { padding: 18px 14px; font-size: 13px; }
@@ -5777,6 +5803,11 @@ body.drawer-open .chat-widget { display: none !important; }
 @media (max-width: 700px) {
   .brand-tiles-head, .skladovka-head { grid-template-columns: 1fr; gap: 14px; }
   .btile { aspect-ratio: auto; min-height: 200px; }
+  /* Kompaktnější obsah + menší tlačítka → KGM 3 tlačítka tvoří úhlednější řádky
+     a tmavá plocha pod fotkou je menší (řeší „černý pruh"). */
+  .btile-body { padding: 22px 22px 24px; }
+  .btile-actions { gap: 8px; }
+  .btile-actions a { padding: 9px 14px; font-size: 11px; letter-spacing: 0.06em; }
   .btile.is-promo .btile-body { padding: 26px 24px 28px; }
   .btile-watermark { display: none; }
 }

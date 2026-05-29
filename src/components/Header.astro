@@ -100,6 +100,10 @@ const navItems: Array<{ label: string; href: string; key: NonNullable<Props['act
       >{item.label}</a>
     ))}
   </nav>
+  <div class="mobile-drawer-vat">
+    <span class="mobile-drawer-vat-label">Zobrazení cen</span>
+    <VatToggle />
+  </div>
   <div class="mobile-drawer-cta">
     <a class="btn btn-primary" href="/servis">Objednat servis</a>
     <a class="btn btn-outline" href={`tel:${defaultPhoneLink}`} data-sales-phone>
@@ -359,6 +363,26 @@ const navItems: Array<{ label: string; href: string; key: NonNullable<Props['act
     }
   }
 
+  /* DPH přepínač: header instance schovat na úzkém mobilu (je v draweru). */
+  @media (max-width: 480px) {
+    .nav .vat-toggle { display: none; }
+  }
+  /* DPH přepínač v mobile draweru */
+  .mobile-drawer-vat {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 4px 20px 12px;
+  }
+  .mobile-drawer-vat-label {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 13px;
+    color: var(--text-muted, #6b7280);
+  }
+  .mobile-drawer .vat-toggle { display: inline-flex; }
+
   /* DESKTOP headroom — sticky + transform při scroll-down */
   @media (min-width: 961px) {
     html.scrolled-down .nav {
@@ -370,4 +394,10 @@ const navItems: Array<{ label: string; href: string; key: NonNullable<Props['act
     }
   }
 
-  @media (prefers-reduced-motion: redu
+  @media (prefers-reduced-motion: reduce) {
+    .nav,
+    .mobile-drawer,
+    .mobile-drawer-backdrop { transition: none !important; }
+    html.scrolled-down .nav { transform: none; }
+  }
+</style>
