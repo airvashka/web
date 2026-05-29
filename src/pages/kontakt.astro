@@ -38,7 +38,12 @@ const branchAddress = branch?.address ?? 'Ďáblická 553/2';
 const branchPostal = branch?.postal_code ?? '182 00';
 const branchCity = branch?.city ?? 'Praha 8';
 
-const mapEmbedUrl = 'https://maps.google.com/maps?q=%C4%8Eablicka+553%2F2%2C+182+00+Praha+8&output=embed';
+// Mapa: přes Maps Embed API přesný business pin (place_id z env), fallback na adresu když klíč chybí.
+const GMAPS_KEY = import.meta.env.PUBLIC_GOOGLE_MAPS_API_KEY ?? '';
+const GMAPS_PLACE_PRODEJ = import.meta.env.GOOGLE_PLACE_ID_PRODEJ ?? '';
+const mapEmbedUrl = (GMAPS_KEY && GMAPS_PLACE_PRODEJ)
+  ? `https://www.google.com/maps/embed/v1/place?key=${GMAPS_KEY}&q=place_id:${GMAPS_PLACE_PRODEJ}&zoom=16&language=cs&region=CZ`
+  : 'https://maps.google.com/maps?q=%C4%8Eablicka+553%2F2%2C+182+00+Praha+8&output=embed';
 ---
 
 <BaseLayout title="Kontakt" description="Kontaktujte SFR Motor — autorizovaný dealer v Praze-Ďáblicích. Prodej, servis, doplňkové služby.">
