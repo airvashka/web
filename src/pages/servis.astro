@@ -96,10 +96,6 @@ const servisMapUrl = (GMAPS_KEY && GMAPS_PLACE_SERVIS)
           <div class="hours-row"><span class="d">Pondělí – Pátek</span><span class="h">8:00 – 17:00</span></div>
           <div class="hours-row"><span class="d">Sobota</span><span class="h closed">zavřeno</span></div>
           <div class="hours-row"><span class="d">Neděle</span><span class="h closed">zavřeno</span></div>
-          <div class="hours-foot">
-            <span>Telefon: <a href={`tel:${servicePhoneLink}`}>{servicePhone}</a></span>
-            <span>Email: <a href="mailto:servis@sfr-motor.cz">servis@sfr-motor.cz</a></span>
-          </div>
         </div>
       </div>
 
@@ -147,6 +143,26 @@ const servisMapUrl = (GMAPS_KEY && GMAPS_PLACE_SERVIS)
     </div>
   </section>
 
+  <!-- ===== KDE NÁS NAJDETE (mapa servisu) ===== -->
+  <section data-screen-label="Mapa" style="padding: 64px 0;">
+    <div class="container">
+      <div class="section-eyebrow">Kde nás najdete</div>
+      <h2 style="font-family: var(--font-display); font-weight: 600; font-size: clamp(24px, 2.4vw, 32px); letter-spacing: -0.02em; margin: 8px 0 24px;">SFR Motor Servis — Praha-Ďáblice</h2>
+      <div style="border-radius: var(--radius-lg); overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.06);">
+        <iframe
+          src={servisMapUrl}
+          width="100%"
+          height="100%"
+          style="border:0; min-height:420px; display:block;"
+          allowfullscreen=""
+          loading="lazy"
+          referrerpolicy="no-referrer-when-downgrade"
+          title="Mapa SFR Motor Servis"
+        ></iframe>
+      </div>
+    </div>
+  </section>
+
   <!-- ===== SERVIS TÝM ===== -->
   {SERVIS_TEAM_BLOCKS.length > 0 && (
     <section class="serv-team" data-screen-label="03 Tym">
@@ -172,30 +188,10 @@ const servisMapUrl = (GMAPS_KEY && GMAPS_PLACE_SERVIS)
   )}
 
   <!-- ===== GOOGLE RECENZE SERVIS ===== -->
-  <!-- ===== KDE NÁS NAJDETE (mapa servisu) ===== -->
-  <section data-screen-label="Mapa" style="padding: 64px 0;">
-    <div class="container">
-      <div class="section-eyebrow">Kde nás najdete</div>
-      <h2 style="font-family: var(--font-display); font-weight: 600; font-size: clamp(24px, 2.4vw, 32px); letter-spacing: -0.02em; margin: 8px 0 24px;">SFR Motor Servis — Praha-Ďáblice</h2>
-      <div style="border-radius: var(--radius-lg); overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.06);">
-        <iframe
-          src={servisMapUrl}
-          width="100%"
-          height="100%"
-          style="border:0; min-height:420px; display:block;"
-          allowfullscreen=""
-          loading="lazy"
-          referrerpolicy="no-referrer-when-downgrade"
-          title="Mapa SFR Motor Servis"
-        ></iframe>
-      </div>
-    </div>
-  </section>
-
   <section class="reviews-section" data-screen-label="04 Recenze">
     <div class="container">
       <div class="section-eyebrow">⭐ Hodnocení servisu</div>
-      <GoogleReviews business="servis" layout="cards" limit={5} headingText="Co o servisu říkají zákazníci" />
+      <GoogleReviews business="servis" layout="full" headingText="Co o servisu říkají zákazníci" />
     </div>
   </section>
 
