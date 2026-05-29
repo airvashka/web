@@ -139,7 +139,7 @@ const [brands, models, trims, modelYears, siteSettingsResult, similarResult, mod
     ? directusGet<any>('model_color_exterior', {
         filter: { model: { _eq: Number(v.model) } },
         sort: ['sort'],
-        fields: ['id', 'name', 'hex', 'code', 'photo', 'swatch', 'price_type', 'pricing_per_trim'],
+        fields: ['id', 'name', 'hex', 'hex2', 'code', 'photo', 'swatch', 'price_type', 'pricing_per_trim'],
         limit: 50,
       }).catch(() => [] as any[])
     : Promise.resolve([]),
@@ -179,7 +179,8 @@ const colorOptions = isOnOrder && Array.isArray(modelColorsResult)
         return {
           id: c.id,
           name: c.name,
-          hex: c.hex || '#888',
+          hex: c.hex || null,
+          hex2: c.hex2 || null,
           photo: c.photo,
           swatch: c.swatch || c.photo,
           surcharge: Number(trimPricing?.price ?? 0) || 0,
@@ -538,9 +539,13 @@ const salesPhoneLink = telLink(salesPhone);
                   >
                     <span
                       class="swatch-dot"
-                      style={c.swatch
-                        ? `background-image: url('${directusAsset(c.swatch, { width: 120, format: 'jpg', quality: 85 })}'); background-size: cover; background-position: center;`
-                        : ''
+                      style={c.hex
+                        ? (c.hex2
+                            ? `background: linear-gradient(135deg, ${c.hex} 0 50%, ${c.hex2} 50% 100%);`
+                            : `background-color: ${c.hex};`)
+                        : (c.swatch
+                            ? `background-image: url('${directusAsset(c.swatch, { width: 120, format: 'jpg', quality: 85 })}'); background-size: cover; background-position: center;`
+                            : '')
                       }
                     ></span>
                   </button>
