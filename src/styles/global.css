@@ -2071,13 +2071,22 @@ html.scrolled-down .subnav {
 
 /* ===== Barvy — read-only gallery (exterior + interior) ===== */
 .config {
-  background: var(--bg-cream);
+  background: #fff;
   padding: var(--section-pad) 0;
 }
 .config-head { margin-bottom: 48px; }
 
 .colors-block { margin-bottom: 56px; }
 .colors-block:last-child { margin-bottom: 0; }
+/* 2-sloupcový layout barev: exteriér vlevo (větší), interiér vpravo pod sebou; bílé, vzdušné */
+.colors-layout { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); gap: 40px; align-items: start; }
+.colors-layout .colors-block { margin-bottom: 0; }
+.colors-layout .int-grid,
+.colors-layout .int-grid[data-count="2"],
+.colors-layout .int-grid[data-count="3"] { grid-template-columns: 1fr; }
+@media (max-width: 920px) {
+  .colors-layout { grid-template-columns: 1fr; gap: 28px; }
+}
 .colors-block-head {
   display: flex; align-items: baseline; gap: 16px;
   margin-bottom: 22px;
@@ -2110,7 +2119,8 @@ html.scrolled-down .subnav {
   aspect-ratio: 21 / 9;
   border-radius: var(--radius-lg);
   overflow: hidden;
-  background: var(--bg-soft, #fafaf7);
+  background: #fff;
+  border: 1px solid var(--line);
   isolation: isolate;
 }
 .cs-photo {
