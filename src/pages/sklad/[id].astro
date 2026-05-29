@@ -1338,16 +1338,17 @@ const salesPhoneLink = telLink(salesPhone);
     (function initColorPicker() {
       const picker = document.querySelector('[data-color-picker]');
       const heroImg = document.querySelector('[data-hero-color-img]');
-      if (!picker || !heroImg) return;
+      if (!picker) return;   // 3A: heroImg nemusí existovat (vůz má vlastní fotky) — výběr barvy musí fungovat i tak
       const swatches = picker.querySelectorAll('.color-swatch');
       swatches.forEach((sw) => {
         sw.addEventListener('click', () => {
           const photoId = sw.dataset.colorPhoto;
           const colorName = sw.dataset.colorName || '';
-          if (!photoId || !DIRECTUS_URL) return;
-          // Sestavujem URL stejnou strukturou jako directusAsset() v frontmatter
-          heroImg.src = `${DIRECTUS_URL}/assets/${photoId}?width=1600&format=jpg&quality=85`;
-          heroImg.alt = colorName;
+          // Swap hero foto jen když element existuje (vůz bez vlastních fotek). Jinak jen výběr barvy.
+          if (heroImg && photoId && DIRECTUS_URL) {
+            heroImg.src = `${DIRECTUS_URL}/assets/${photoId}?width=1600&format=jpg&quality=85`;
+            heroImg.alt = colorName;
+          }
           // Toggle aktivní swatch
           swatches.forEach((s) => s.classList.remove('is-active'));
           sw.classList.add('is-active');
