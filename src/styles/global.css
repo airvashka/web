@@ -4187,9 +4187,9 @@ body.vat-company #finance .finance-company-info {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 4px;
-  background: #fff;
-  border: 2px solid #e0e0e4;
+  padding: 2px;
+  background: transparent;
+  border: 2px solid transparent;
   border-radius: 50%;
   cursor: pointer;
   transition: border-color 0.15s, box-shadow 0.15s, transform 0.15s;
