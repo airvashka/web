@@ -114,6 +114,24 @@ const stockSample = await directusGet<any>('stock_vehicles', {
   ],
 });
 
+// Servisní akce této značky — aktivní = published + v platnosti (dle data).
+// .catch → [] aby stránka nespadla, kdyby kolekce ještě neexistovala.
+const todayISO = todayDate.toISOString().slice(0, 10);
+const serviceCampaigns = await directusGet<any>('service_campaigns', {
+  filter: {
+    brand: { _eq: brand.id },
+    status: { _eq: 'published' },
+    _and: [
+      { _or: [{ valid_from: { _null: true } }, { valid_from: { _lte: todayISO } }] },
+      { _or: [{ valid_until: { _null: true } }, { valid_until: { _gte: todayISO } }] },
+    ],
+  },
+  sort: ['sort', '-id'],
+  fields: ['id', 'title', 'price_label', 'perex', 'image', 'cta_label'],
+  limit: 1,
+}).catch(() => []);
+const serviceCampaign = serviceCampaigns[0] ?? null;
+
 // Brand videa (z brand.youtube_video_ids field — pokud existuje)
 const brandVideoIds: string[] = Array.isArray((brand as any).youtube_video_ids)
   ? (brand as any).youtube_video_ids
@@ -249,6 +267,28 @@ const activeBrand = Astro.params.brand;
       </div>
     </div>
   </section>
+
+  <!-- ===== SERVISNÍ AKCE (per značka) ===== -->
+  {serviceCampaign && (
+    <section class="svc-promo" data-screen-label="Servisní akce">
+      <div class="container">
+        <a class="svc-promo-card" href={`/${brand.slug}/servisni-akce`}>
+          {serviceCampaign.image && (
+            <div class="svc-promo-media">
+              <DirectusImage src={serviceCampaign.image} alt={serviceCampaign.title} fill widths={[600, 900, 1200]} sizes="(max-width: 780px) 100vw, 420px" loading="lazy" />
+            </div>
+          )}
+          <div class="svc-promo-body">
+            <div class="svc-promo-eyebrow">Servisní akce</div>
+            <h2 class="svc-promo-title">{serviceCampaign.title}</h2>
+            {serviceCampaign.price_label && <div class="svc-promo-price">{serviceCampaign.price_label}</div>}
+            {serviceCampaign.perex && <p class="svc-promo-perex">{serviceCampaign.perex}</p>}
+            <span class="btn btn-primary svc-promo-cta">{serviceCampaign.cta_label || 'Více o akci'}</span>
+          </div>
+        </a>
+      </div>
+    </section>
+  )}
 
   <!-- ===== MODELS GRID ===== -->
   <section class="models" id="modely" data-screen-label="03 Modely">

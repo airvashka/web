@@ -1,0 +1,104 @@
+---
+import BaseLayout from '@layouts/BaseLayout.astro';
+import Breadcrumbs from '@components/Breadcrumbs.astro';
+import DirectusImage from '@components/DirectusImage.astro';
+import { directusGet } from '@lib/directus';
+import type { Brand } from '@lib/types';
+
+/* ============================================================
+   Servisní akce značky — detail / výpis.
+
+   URL: /[brand]/servisni-akce
+   Vypíše všechny AKTIVNÍ servisní akce dané značky s plným popisem.
+   Aktivní = status=published + v platnosti (valid_from/valid_until).
+   ============================================================ */
+
+// SSR — čerstvá data, 60s edge cache.
+export const prerender = false;
+Astro.response.headers.set('Cache-Control', 'public, s-maxage=60, stale-while-revalidate=300');
+
+const { brand: brandSlug } = Astro.params;
+
+const brands = await directusGet<Brand>('brands', {
+  filter: { slug: { _eq: brandSlug } },
+  limit: 1,
+});
+const brand = brands[0];
+if (!brand) return Astro.rewrite('/404');
+
+const todayISO = new Date().toISOString().slice(0, 10);
+const campaigns = await directusGet<any>('service_campaigns', {
+  filter: {
+    brand: { _eq: brand.id },
+    status: { _eq: 'published' },
+    _and: [
+      { _or: [{ valid_from: { _null: true } }, { valid_from: { _lte: todayISO } }] },
+      { _or: [{ valid_until: { _null: true } }, { valid_until: { _gte: todayISO } }] },
+    ],
+  },
+  sort: ['sort', '-id'],
+  fields: ['id', 'title', 'price_label', 'perex', 'image', 'description', 'valid_from', 'valid_until', 'cta_label'],
+  limit: 20,
+}).catch(() => []);
+
+// Žádná aktivní akce → zpět na stránku značky.
+if (!campaigns || campaigns.length === 0) return Astro.rewrite(`/${brand.slug}`);
+
+// Render markdown popisů.
+const { marked } = await import('marked');
+const { sanitizeHtml, fixLooseEmphasis } = await import('@lib/sanitize');
+const items = campaigns.map((c: any) => {
+  let html = '';
+  if (c.description) {
+    try {
+      html = sanitizeHtml(marked.parse(fixLooseEmphasis(c.description)) as string);
+    } catch {
+      html = `<p>${String(c.description).replace(/[<>&]/g, '')}</p>`;
+    }
+  }
+  return { ...c, html };
+});
+
+const fmtDate = (d?: string | null) => (d ? new Date(d).toLocaleDateString('cs-CZ') : null);
+const validText = (c: any) => {
+  const from = fmtDate(c.valid_from);
+  const to = fmtDate(c.valid_until);
+  if (from && to) return `Platí ${from} – ${to}`;
+  if (to) return `Platí do ${to}`;
+  if (from) return `Platí od ${from}`;
+  return null;
+};
+---
+
+<BaseLayout
+  title={`Servisní akce — ${brand.name}`}
+  description={`Aktuální servisní akce ${brand.name} u SFR Motor.`}
+>
+  <Breadcrumbs items={[
+    { label: brand.name, href: `/${brand.slug}` },
+    { label: 'Servisní akce' },
+  ]} />
+
+  <section class="svc-detail">
+    <div class="container">
+      {items.map((c: any) => (
+        <article class="svc-detail-item">
+          {c.image && (
+            <div class="svc-detail-media">
+              <DirectusImage src={c.image} alt={c.title} fill widths={[600, 900, 1200, 1600]} sizes="(max-width: 860px) 100vw, 820px" loading="eager" />
+            </div>
+          )}
+          <div class="svc-detail-eyebrow">Servisní akce {brand.name}</div>
+          <h1 class="svc-detail-title">{c.title}</h1>
+          {c.price_label && <div class="svc-detail-price">{c.price_label}</div>}
+          {validText(c) && <div class="svc-detail-valid">{validText(c)}</div>}
+          {c.html && <div class="svc-detail-body" set:html={c.html} />}
+          <div class="svc-detail-cta">
+            <a class="btn btn-primary" href="/servis#objednat">Objednat servis</a>
+            <a class="btn btn-outline" href={`/${brand.slug}`}>Zpět na {brand.name}</a>
+          </div>
+        </article>
+      ))}
+    </div>
+  </section>
+</BaseLayout>

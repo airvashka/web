@@ -93,6 +93,21 @@ const GMAPS_PLACE_SERVIS = import.meta.env.GOOGLE_PLACE_ID_SERVIS ?? '';
 const servisMapUrl = (GMAPS_KEY && GMAPS_PLACE_SERVIS)
   ? `https://www.google.com/maps/embed/v1/place?key=${GMAPS_KEY}&q=place_id:${GMAPS_PLACE_SERVIS}&zoom=16&language=cs&region=CZ`
   : 'https://maps.google.com/maps?q=%C4%8Eablicka+553%2F2%2C+182+00+Praha+8&output=embed';
+
+// Aktivní servisní akce (všechny značky) — výpis nad mapou.
+const todayServiceISO = new Date().toISOString().slice(0, 10);
+const serviceCampaigns = await directusGet<any>('service_campaigns', {
+  filter: {
+    status: { _eq: 'published' },
+    _and: [
+      { _or: [{ valid_from: { _null: true } }, { valid_from: { _lte: todayServiceISO } }] },
+      { _or: [{ valid_until: { _null: true } }, { valid_until: { _gte: todayServiceISO } }] },
+    ],
+  },
+  sort: ['sort', '-id'],
+  fields: ['id', 'title', 'price_label', 'perex', 'image', 'cta_label', 'brand.slug', 'brand.name'],
+  limit: 12,
+}).catch(() => []);
 ---
 
 <BaseLayout title="Servis" description="Autorizovaný servis pro KGM, OMODA & JAECOO, Farizon, Dacia, Renault. Praha-Ďáblice.">
@@ -184,6 +199,34 @@ const servisMapUrl = (GMAPS_KEY && GMAPS_PLACE_SERVIS)
       </form>
     </div>
   </section>
+
+  <!-- ===== SERVISNÍ AKCE ===== -->
+  {serviceCampaigns.length > 0 && (
+    <section data-screen-label="Servisní akce" style="padding: 56px 0; scroll-margin-top: 90px;">
+      <div class="container">
+        <div class="section-eyebrow">Akce</div>
+        <h2 style="font-family: var(--font-display); font-weight: 600; font-size: clamp(24px, 2.4vw, 32px); letter-spacing: -0.02em; margin: 8px 0 24px;">Aktuální servisní akce</h2>
+        <div class="svc-list">
+          {serviceCampaigns.map((c: any) => (
+            <a class="svc-list-card" href={c.brand?.slug ? `/${c.brand.slug}/servisni-akce` : '/servis'}>
+              {c.image && (
+                <div class="svc-list-media">
+                  <img src={directusAsset(c.image, { width: 600, format: 'webp', quality: 80 })} alt={c.title} loading="lazy" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;" />
+                </div>
+              )}
+              <div class="svc-list-body">
+                {c.brand?.name && <div class="svc-list-brand">{c.brand.name}</div>}
+                <h3 class="svc-list-title">{c.title}</h3>
+                {c.price_label && <div class="svc-list-price">{c.price_label}</div>}
+                {c.perex && <p class="svc-list-perex">{c.perex}</p>}
+                <span class="svc-list-cta">{c.cta_label || 'Více o akci'} →</span>
+              </div>
+            </a>
+          ))}
+        </div>
+      </div>
+    </section>
+  )}
 
   <!-- ===== KDE NÁS NAJDETE (mapa servisu) ===== -->
   <section id="kde-nas-najdete" data-screen-label="Mapa" style="padding: 64px 0; scroll-margin-top: 90px;">
