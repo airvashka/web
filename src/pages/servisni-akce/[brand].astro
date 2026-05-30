@@ -7,13 +7,12 @@ import type { Brand } from '@lib/types';
 
 /* ============================================================
    Servisní akce značky — detail / výpis.
-
    URL: /servisni-akce/[brand]
-   Vypíše všechny AKTIVNÍ servisní akce dané značky s plným popisem.
-   Aktivní = status=published + v platnosti (valid_from/valid_until).
+   SSR. forceLive (3. param directusGet) obchází prefetch/cache,
+   která za běhu vracela prázdná data. Žádný Astro.rewrite na
+   dynamickou routu (to házelo 404) — stránka vždy něco vykreslí.
    ============================================================ */
 
-// SSR — čerstvá data, 60s edge cache.
 export const prerender = false;
 Astro.response.headers.set('Cache-Control', 'public, s-maxage=60, stale-while-revalidate=300');
 
@@ -22,32 +21,29 @@ const { brand: brandSlug } = Astro.params;
 const brands = await directusGet<Brand>('brands', {
   filter: { slug: { _eq: brandSlug } },
   limit: 1,
-});
-const brand = brands[0];
-if (!brand) return Astro.rewrite('/404');
+}, true).catch(() => []);
+const brand = brands[0] ?? null;
 
 const todayISO = new Date().toISOString().slice(0, 10);
-const campaigns = await directusGet<any>('service_campaigns', {
-  filter: {
-    brand: { _eq: brand.id },
-    status: { _eq: 'published' },
-    _and: [
-      { _or: [{ valid_from: { _null: true } }, { valid_from: { _lte: todayISO } }] },
-      { _or: [{ valid_until: { _null: true } }, { valid_until: { _gte: todayISO } }] },
-    ],
-  },
-  sort: ['sort', '-id'],
-  fields: ['id', 'title', 'price_label', 'perex', 'image', 'description', 'valid_from', 'valid_until', 'cta_label'],
-  limit: 20,
-}).catch(() => []);
+const campaigns = brand
+  ? await directusGet<any>('service_campaigns', {
+      filter: {
+        brand: { _eq: brand.id },
+        status: { _eq: 'published' },
+        _and: [
+          { _or: [{ valid_from: { _null: true } }, { valid_from: { _lte: todayISO } }] },
+          { _or: [{ valid_until: { _null: true } }, { valid_until: { _gte: todayISO } }] },
+        ],
+      },
+      sort: ['sort', '-id'],
+      fields: ['id', 'title', 'price_label', 'perex', 'image', 'description', 'valid_from', 'valid_until', 'cta_label'],
+      limit: 20,
+    }, true).catch(() => [])
+  : [];
 
-// Žádná aktivní akce → zpět na stránku značky.
-if (!campaigns || campaigns.length === 0) return Astro.rewrite(`/${brand.slug}`);
-
-// Render markdown popisů.
 const { marked } = await import('marked');
 const { sanitizeHtml, fixLooseEmphasis } = await import('@lib/sanitize');
-const items = campaigns.map((c: any) => {
+const items = (campaigns ?? []).map((c: any) => {
   let html = '';
   if (c.description) {
     try {
@@ -68,19 +64,32 @@ const validText = (c: any) => {
   if (from) return `Platí od ${from}`;
   return null;
 };
+
+const brandName = brand?.name ?? 'Servis';
+if (!brand) Astro.response.status = 404;
 ---
 
 <BaseLayout
-  title={`Servisní akce — ${brand.name}`}
-  description={`Aktuální servisní akce ${brand.name} u SFR Motor.`}
+  title={`Servisní akce — ${brandName}`}
+  description={`Aktuální servisní akce ${brandName} u SFR Motor.`}
 >
-  <Breadcrumbs items={[
-    { label: brand.name, href: `/${brand.slug}` },
-    { label: 'Servisní akce' },
-  ]} />
+  <Breadcrumbs items={brand
+    ? [{ label: brand.name, href: `/${brand.slug}` }, { label: 'Servisní akce' }]
+    : [{ label: 'Servisní akce' }]} />
 
   <section class="svc-detail">
     <div class="container">
+      {items.length === 0 && (
+        <div class="svc-detail-item" style="text-align: center;">
+          <div class="svc-detail-eyebrow">Servisní akce {brand?.name ?? ''}</div>
+          <h1 class="svc-detail-title">Aktuálně žádné servisní akce</h1>
+          <p style="color: #666; margin: 14px 0 26px;">Momentálně tu nejsou žádné aktivní servisní akce. Rádi se o váš vůz postaráme v servisu.</p>
+          <div class="svc-detail-cta">
+            <a class="btn btn-primary" href="/servis#objednat">Objednat servis</a>
+            {brand && <a class="btn btn-outline" href={`/${brand.slug}`}>Zpět na {brand.name}</a>}
+          </div>
+        </div>
+      )}
       {items.map((c: any) => (
         <article class="svc-detail-item">
           {c.image && (
@@ -88,14 +97,14 @@ const validText = (c: any) => {
               <DirectusImage src={c.image} alt={c.title} fill widths={[600, 900, 1200, 1600]} sizes="(max-width: 860px) 100vw, 820px" loading="eager" />
             </div>
           )}
-          <div class="svc-detail-eyebrow">Servisní akce {brand.name}</div>
+          <div class="svc-detail-eyebrow">Servisní akce {brand?.name ?? ''}</div>
           <h1 class="svc-detail-title">{c.title}</h1>
           {c.price_label && <div class="svc-detail-price">{c.price_label}</div>}
           {validText(c) && <div class="svc-detail-valid">{validText(c)}</div>}
           {c.html && <div class="svc-detail-body" set:html={c.html} />}
           <div class="svc-detail-cta">
             <a class="btn btn-primary" href="/servis#objednat">Objednat servis</a>
-            <a class="btn btn-outline" href={`/${brand.slug}`}>Zpět na {brand.name}</a>
+            {brand && <a class="btn btn-outline" href={`/${brand.slug}`}>Zpět na {brand.name}</a>}
           </div>
         </article>
       ))}
