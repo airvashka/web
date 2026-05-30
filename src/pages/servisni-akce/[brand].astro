@@ -13,18 +13,14 @@ import type { Brand } from '@lib/types';
    dynamickou routu (to házelo 404) — stránka vždy něco vykreslí.
    ============================================================ */
 
-// PRERENDER (statická stránka) — pro každou značku se při buildu vygeneruje
-// /servisni-akce/[brand]. Statické stránky Vercel servíruje jako soubory →
-// spolehlivé. (SSR routa téhle vnořené cesty se na Vercelu nedařila odbavit →
-// 404.) Nové/změněné akce naskočí po dalším buildu, stejně jako na /servis.
-export async function getStaticPaths() {
-  const list = await directusGet<Brand>('brands', { fields: ['slug'] }).catch(() => []);
-  return (list ?? [])
-    .filter((b: any) => b && b.slug)
-    .map((b: any) => ({ params: { brand: b.slug } }));
-}
+// SSR (prerender=false) — živé, čerstvé z Directusu.
+// EXPERIMENT (ověřujeme příčinu 404 nových SSR rout): po pushi udělat ve Vercelu
+// "Redeploy" BEZ zaškrtnutého "Use existing Build Cache". Když pak detail pojede
+// živě, příčina = build cache. Když pořád 404 → vrátíme zpět na statiku.
+export const prerender = false;
+Astro.response.headers.set('Cache-Control', 'public, s-maxage=60, stale-while-revalidate=300');
 
-const brandSlug = Astro.params.brand ?? '';
+const brandSlug = Astro.params.brand || Astro.url.pathname.split('/').filter(Boolean).pop() || '';
 
 const brands = await directusGet<Brand>('brands', {
   filter: { slug: { _eq: brandSlug } },
