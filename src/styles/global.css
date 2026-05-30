@@ -1624,11 +1624,10 @@ button.thumb-more {
 .mhero-bg img,
 .mhero-bg .mhero-video { width: 100%; height: 100%; object-fit: cover; display: block; }
 
-/* Hero na mobilu: nižší (ne přes celou obrazovku) + text ukotvený dolů, ne plovoucí. */
+/* Model hero (.mhero) na mobilu nižší. Brand hero (.bhero) je řešený níž v souboru,
+   AŽ ZA svým základem (jinak ho min-height:720px přebije). */
 @media (max-width: 640px) {
-  .bhero, .mhero { min-height: 62vh; }
-  .bhero { align-items: end; }
-  .bhero-inner { padding-top: 28px; padding-bottom: 30px; }
+  .mhero { min-height: 62vh; }
 }
 .mhero-bg::after {
   content: "";
@@ -3316,6 +3315,12 @@ a.promo-image-link:hover {
   border: 1px solid rgba(255,255,255,0.5);
 }
 .bhero-actions .btn-outline:hover { border-color: #fff; }
+
+/* Brand hero na mobilu — musí být ZA základem .bhero (jinak ho 720px přebije). */
+@media (max-width: 640px) {
+  .bhero { min-height: 62vh; align-items: end; }
+  .bhero-inner { padding-top: 28px; padding-bottom: 30px; }
+}
 
 .why { padding: var(--section-pad) 0; }
 .why-grid {
