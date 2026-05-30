@@ -16,7 +16,9 @@ import type { Brand } from '@lib/types';
 export const prerender = false;
 Astro.response.headers.set('Cache-Control', 'public, s-maxage=60, stale-while-revalidate=300');
 
-const { brand: brandSlug } = Astro.params;
+// Slug bereme primárně z parametru routy; fallback z URL cesty (kdyby se param
+// za běhu nepředal — to byla příčina 404: brand vycházel null).
+const brandSlug = Astro.params.brand || Astro.url.pathname.split('/').filter(Boolean).pop() || '';
 
 const brands = await directusGet<Brand>('brands', {
   filter: { slug: { _eq: brandSlug } },
