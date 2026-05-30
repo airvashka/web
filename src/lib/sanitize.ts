@@ -34,6 +34,9 @@ const DEFAULT_CONFIG = {
     'src', 'alt', 'width', 'height', 'loading',
     'class', 'id',
     'colspan', 'rowspan',
+    // `style` povolen kvůli formátování z WYSIWYG/Wordu (font-weight, font-style…).
+    // DOMPurify hodnoty stylu sanitizuje (vyhodí nebezpečné CSS), takže je to bezpečné.
+    'style',
   ],
   // Blokuje `javascript:`, `data:` (vyjma image), `vbscript:` URL schemes
   ALLOWED_URI_REGEXP: /^(?:(?:https?|mailto|tel|ftp):|[^a-z]|[a-z+.-]+(?:[^a-z+.\-:]|$))/i,
