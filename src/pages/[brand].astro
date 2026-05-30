@@ -7,6 +7,7 @@ import VideoStrip from '@components/VideoStrip.astro';
 import Breadcrumbs from '@components/Breadcrumbs.astro';
 import BrandLogo from '@components/BrandLogo.astro';
 import ModelChatWidget from '@components/ModelChatWidget.astro';
+const CHAT_ENABLED = false; // chatbot dočasně vypnutý (30.5.2026) — pro zapnutí přepni na true
 import { directusGet } from '@lib/directus';
 import { buildStockSlug } from '@lib/stockSlug';
 import type { Brand, Model } from '@lib/types';
@@ -476,7 +477,7 @@ const activeBrand = Astro.params.brand;
   </section>
 
   <!-- ===== AI ASISTENT (floating widget) — JEN PRO KGM brand ===== -->
-  {brand.slug === 'kgm' && (
+  {CHAT_ENABLED && brand.slug === 'kgm' && (
     <ModelChatWidget brandSlug={brand.slug} brandName={brand.name} />
   )}
 </BaseLayout>

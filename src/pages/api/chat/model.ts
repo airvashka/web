@@ -668,7 +668,16 @@ ${knowledgeBlock}
 
 /* ──────────── HANDLER ──────────── */
 
+// Chatbot dočasně vypnutý (30.5.2026) — endpoint neaktivní, ať negeneruje náklady na AI.
+// Pro zapnutí: smaž tenhle guard + přepni CHAT_ENABLED na true v model/[slug].astro a [brand].astro.
+const CHAT_ENABLED = false;
+
 export const POST: APIRoute = async ({ request }) => {
+  if (!CHAT_ENABLED) {
+    return new Response(JSON.stringify({ error: 'Chat je dočasně nedostupný.' }), {
+      status: 503, headers: { 'Content-Type': 'application/json' },
+    });
+  }
   try {
     // ── Rate limit ──
     const ip = getClientIp(request);

@@ -10,6 +10,7 @@ import HighlightsPanel from '@components/HighlightsPanel.astro';
 import VariantBadge from '@components/VariantBadge.astro';
 import Disclaimer from '@components/Disclaimer.astro';
 import ModelChatWidget from '@components/ModelChatWidget.astro';
+const CHAT_ENABLED = false; // chatbot dočasně vypnutý (30.5.2026) — pro zapnutí přepni na true
 import { directusGet, directusAsset } from '@lib/directus';
 import { buildStockSlug } from '@lib/stockSlug';
 import { getGroupedFeatures, countFeatures } from '@lib/features';
@@ -1300,7 +1301,7 @@ if (promoActive && promoDescription) {
   </script>
 
   <!-- ===== AI ASISTENT (floating widget) — JEN PRO KGM MODELY ===== -->
-  {brand.slug === 'kgm' && (
+  {CHAT_ENABLED && brand.slug === 'kgm' && (
     <ModelChatWidget
       brandSlug={brand.slug}
       brandName={brand.name}

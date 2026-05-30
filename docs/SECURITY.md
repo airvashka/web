@@ -24,10 +24,13 @@ Základ je solidní: žádné committed secrety, tajné klíče jen server-side,
 
 ## 🟠 P1 — řešit brzy
 
-### P1-1 — rate limiting je na serverless neúčinný
-`/api/lead`, `/api/newsletter`, `/api/chat/model` používají **in-memory `Map`** rate limit. Na Vercelu se funkce škálují a studeně startují → každá instance má vlastní (prázdné) počítadlo. Limit „10/den/IP" se v praxi snadno obejde.
-- **Riziko:** spam poptávek/newsletteru; u `/api/chat/model` **náklady na Anthropic API** (LLM volání).
-- **Fix:** přesunout rate limit do sdíleného úložiště — **Vercel KV** nebo **Upstash Redis** (`@upstash/ratelimit`). Kód `chat/model.ts` to sám v komentáři doporučuje.
+### P1-1 — rate limiting je na serverless neúčinný — ✅ VYŘEŠENO JINAK (30.5.)
+`/api/lead`, `/api/newsletter`, `/api/chat/model` používaly **in-memory `Map`** rate limit, který na Vercelu (škálování + cold start) nedrží. Místo zavádění sdíleného úložiště (Upstash/Vercel KV = nový účet) jsme riziko uzavřeli levněji:
+- **Formuláře** (lead + newsletter) chrání **Turnstile** → bot spam pokrytý.
+- **AI chat** (hlavní nákladové riziko) je **dočasně vypnutý** — widget skrytý (`CHAT_ENABLED=false`) + endpoint `/api/chat/model` vrací 503. Bez volání = bez nákladů.
+- Měkký in-memory limit ponechán jako zpomalovač.
+- **Backstop:** nastavit měsíční spend limit v Anthropic Console (Jardův úkol).
+- *Pokud se chat někdy zapne natrvalo + poroste provoz → zvážit sdílený rate-limit (Upstash zdarma, nebo malá služba na VPS vedle UCL proxy).*
 
 ### P1-2 — `/api/newsletter` bez Turnstile — ✅ HOTOVO (30.5.)
 Přidána Turnstile verifikace (widget v newsletter formu v `magazin/index.astro` + `verifyTurnstile` v `newsletter.ts`, stejný graceful pattern jako `lead.ts`). Čeká push.
