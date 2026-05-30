@@ -1623,6 +1623,13 @@ button.thumb-more {
 .mhero-bg { position: absolute; inset: 0; z-index: 0; }
 .mhero-bg img,
 .mhero-bg .mhero-video { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+/* Hero na mobilu: nižší (ne přes celou obrazovku) + text ukotvený dolů, ne plovoucí. */
+@media (max-width: 640px) {
+  .bhero, .mhero { min-height: 62vh; }
+  .bhero { align-items: end; }
+  .bhero-inner { padding-top: 28px; padding-bottom: 30px; }
+}
 .mhero-bg::after {
   content: "";
   position: absolute; inset: 0;
@@ -3770,7 +3777,7 @@ a.promo-image-link:hover {
 .btile-bg::after {
   content: "";
   position: absolute; inset: 0;
-  background: linear-gradient(180deg, rgba(11,11,12,0) 35%, rgba(11,11,12,0.62) 100%);
+  background: linear-gradient(180deg, rgba(11,11,12,0) 18%, rgba(11,11,12,0.5) 58%, rgba(11,11,12,0.86) 100%);
   pointer-events: none;
 }
 .btile-body {
@@ -3804,7 +3811,7 @@ a.promo-image-link:hover {
 .btile-tag {
   font-family: var(--font-display);
   font-size: 15px;
-  color: rgba(255,255,255,0.78);
+  color: rgba(255,255,255,0.92);
   margin: 0 0 22px;
 }
 .btile-actions { display: flex; gap: 10px; flex-wrap: wrap; }
@@ -3816,7 +3823,10 @@ a.promo-image-link:hover {
   text-transform: uppercase;
   padding: 12px 18px;
   border-radius: 999px;
-  border: 1px solid rgba(255,255,255,0.5);
+  border: 1px solid rgba(255,255,255,0.65);
+  background: rgba(0,0,0,0.30);
+  -webkit-backdrop-filter: blur(3px);
+  backdrop-filter: blur(3px);
   color: #fff;
   display: inline-flex; align-items: center; gap: 8px;
   white-space: nowrap;
@@ -5235,7 +5245,7 @@ body.vat-company #finance .finance-company-info {
      pořadí v cascade vyhrával a centroval řádky Prodejna/Servis. */
   .topbar-inner .topbar-hours [data-opening-text] { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; }
   .topbar-inner .topbar-hours .oh-sep { display: none; }
-  .topbar-inner .topbar-hours svg { margin-top: 1px; }
+  .topbar-inner .topbar-hours svg { display: none; }   /* ikona hodin na mobilu pryc */
   .nav-inner { height: 64px; gap: 16px; }
   .nav-links { display: none; }
   .nav-cta { display: none; }
@@ -5848,6 +5858,8 @@ body.drawer-open .chat-widget { display: none !important; }
   .btile-actions a { padding: 7px 11px; font-size: 10px; letter-spacing: 0.03em; gap: 5px; }
   .btile.is-promo .btile-body { padding: 26px 24px 28px; }
   .btile-watermark { display: none; }
+  /* Trust strip na mobilu jen nadpisy (popis je zbytečný) — 700px chytne i 430px Pro Max */
+  .highlight-subtitle { display: none; }
 }
 @media (max-width: 429px) {
   .about-highlights { grid-template-columns: 1fr; }

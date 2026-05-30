@@ -245,6 +245,7 @@ function trimPrice(t: TrimLevel): string {
         <p style="color: var(--text-muted);">Pro tento model zatím nejsou definované výbavové stupně.</p>
       ) : (
         <div class="compare-wrapper">
+          <p class="scroll-hint">Posuňte tabulku do stran pro další stupně →</p>
           <div class="compare-scroll">
             <table class="compare-table" style={`--trim-count: ${trims.length}`}>
               <thead>
@@ -429,6 +430,7 @@ function trimPrice(t: TrimLevel): string {
             {pricelistColors.exterior.length > 0 && (
               <div class="colors-table-wrap">
                 <h3 class="colors-table-title">Exteriér</h3>
+                <p class="scroll-hint">Posuňte tabulku do stran →</p>
                 <div class="table-scroll">
                   <table class="colors-table">
                     <thead>
@@ -460,6 +462,7 @@ function trimPrice(t: TrimLevel): string {
             {pricelistColors.interior.length > 0 && (
               <div class="colors-table-wrap" style="margin-top: 24px;">
                 <h3 class="colors-table-title">Interiér</h3>
+                <p class="scroll-hint">Posuňte tabulku do stran →</p>
                 <div class="table-scroll">
                   <table class="colors-table">
                     <thead>
@@ -599,6 +602,10 @@ function trimPrice(t: TrimLevel): string {
     border-radius: var(--radius-lg);
     overflow: hidden;
     background: #fff;
+  }
+  .scroll-hint { display: none; }
+  @media (max-width: 700px) {
+    .scroll-hint { display: block; font-size: 12px; font-style: italic; color: var(--text-muted); text-align: right; margin: 0 0 6px; }
   }
   .compare-scroll {
     overflow-x: auto;
