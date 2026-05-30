@@ -1,5 +1,6 @@
 User-agent: *
 Allow: /
 Disallow: /api/
+Disallow: /admin/
 
-Sitemap: https://sfr-motor.cz/sitemap-index.xml
+Sitemap: https://sfr-motor.cz/sitemap.xml

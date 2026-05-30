@@ -455,7 +455,7 @@ const salesPhone = salesContact?.phone ?? FALLBACK_SALES_PHONE;
 const salesPhoneLink = telLink(salesPhone);
 ---
 
-<BaseLayout title={title || 'Skladový vůz'} description={`${title} — skladový vůz u SFR Motor Praha-Ďáblice.`}>
+<BaseLayout title={title || 'Skladový vůz'} description={`${title} — skladový vůz u SFR Motor Praha-Ďáblice.`} ogImage={photoIds[0] ? directusAsset(photoIds[0], { width: 1200, format: 'jpg', quality: 85 }) : undefined}>
   <JsonLd data={vehicleSchema({
     url: `https://sfr-motor.cz${Astro.url.pathname}`,
     brand: brand?.name ?? 'KGM',

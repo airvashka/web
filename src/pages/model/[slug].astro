@@ -473,6 +473,7 @@ if (promoActive && promoDescription) {
 <BaseLayout
   title={`${brand.name} ${rawModel.name}`}
   description={rawModel.tagline ?? `${brand.name} ${rawModel.name} u SFR Motor — autorizovaný dealer v Praze-Ďáblicích.`}
+  ogImage={rawModel.hero_image ? directusAsset(rawModel.hero_image, { width: 1200, format: 'jpg', quality: 85 }) : undefined}
 >
   <JsonLd data={modelSchema({
     url: `https://sfr-motor.cz${Astro.url.pathname}`,

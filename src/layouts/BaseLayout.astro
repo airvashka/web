@@ -31,6 +31,9 @@ const siteBase = Astro.site ?? new URL('https://sfr-motor.cz');
 const canonicalPath = Astro.url.pathname.replace(/\/+$/, '') || '/';
 const canonicalUrl = canonical ?? new URL(canonicalPath, siteBase).href;
 
+/* OG image — default branded fallback (fotka prodejny), když stránka nepošle vlastní. */
+const ogImageUrl = ogImage ?? new URL('/og-default.jpg', siteBase).href;
+
 /* Favicon — UUID z site_settings.favicon, fallback /favicon.svg.
    - Fetcheme jen UUID (žádný .type expand) — bezpečné v prefetch cache
    - V <link> ne uvádíme type → browser auto-detect z Directus Content-Type response */
@@ -66,7 +69,8 @@ try {
   <meta property="og:description" content={description} />
   <meta property="og:locale" content="cs_CZ" />
   <meta property="og:site_name" content={siteName} />
-  {ogImage && <meta property="og:image" content={ogImage} />}
+  <meta property="og:image" content={ogImageUrl} />
+  <meta property="og:image:alt" content={fullTitle} />
 
   <!-- Fonts —
        Noto Sans (universal Latin) místo Noto Sans KR — má plnou českou podporu
