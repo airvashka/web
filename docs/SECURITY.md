@@ -29,9 +29,8 @@ Základ je solidní: žádné committed secrety, tajné klíče jen server-side,
 - **Riziko:** spam poptávek/newsletteru; u `/api/chat/model` **náklady na Anthropic API** (LLM volání).
 - **Fix:** přesunout rate limit do sdíleného úložiště — **Vercel KV** nebo **Upstash Redis** (`@upstash/ratelimit`). Kód `chat/model.ts` to sám v komentáři doporučuje.
 
-### P1-2 — `/api/newsletter` bez Turnstile
-Newsletter má jen honeypot + (neúčinný) rate limit, kdežto `/api/lead` má i Turnstile. Náchylnější na bot spam do Ecomailu.
-- **Fix:** přidat Turnstile verifikaci jako u `lead.ts`.
+### P1-2 — `/api/newsletter` bez Turnstile — ✅ HOTOVO (30.5.)
+Přidána Turnstile verifikace (widget v newsletter formu v `magazin/index.astro` + `verifyTurnstile` v `newsletter.ts`, stejný graceful pattern jako `lead.ts`). Čeká push.
 
 ### P1-3 — SSH/VPS hardening
 Dle poznámek je **root heslo VPS zapomenuté**. Doporučení:
@@ -44,10 +43,10 @@ Dle poznámek je **root heslo VPS zapomenuté**. Doporučení:
 
 ## 🟡 P2 — až bude čas
 
-- **P2-1 `/admin/cenik`** je veřejně dostupná stránka (přihlášení řeší až client-side Directus login; API endpointy token ověřují). Doporučení: `<meta name="robots" content="noindex">`, zvážit nešířit do prod buildu nebo gateovat.
+- **P2-1 `/admin/cenik`** — ✅ `noindex,nofollow` už v page je. (Login client-side, API ověřuje token.) OK.
 - **P2-2 Google Maps API klíč** je `PUBLIC_*` (musí být na klientovi). **Nutně omezit** v Google Cloud na HTTP referrer (`*.sfr-motor.cz`) + jen Maps Embed API, ať ho nikdo nezneužije na vlastní účet.
 - **P2-3 `yaml` moderate vuln** — jen dev tooling (`@astrojs/check`), nejde do produkce. Aktualizovat při příští údržbě.
-- **P2-4 `.env.example` neúplný** — riziko, že se při setupu zapomene proměnná (např. `CRON_SECRET` → nechráněná záloha). Doplnit (viz CODE-AUDIT.md).
+- **P2-4 `.env.example`** — ✅ HOTOVO (30.5.): doplněn na úplný seznam (bez hodnot).
 
 ---
 
@@ -69,6 +68,3 @@ Dle poznámek je **root heslo VPS zapomenuté**. Doporučení:
 1. P0-1 undici update + P0-2 smazat/chránit `leasing/test.ts` (rychlé).
 2. P1-3 SSH hardening + obnova root hesla (provozní bezpečnost).
 3. P1-1 sdílený rate limit (Vercel KV/Upstash) + P1-2 Turnstile na newsletter.
-4. P2 položky při příští údržbě.
-
-> Žádné z těchto doporučení jsem neimplementoval — čeká na tvé rozhodnutí (viz zadání „jen analýza").

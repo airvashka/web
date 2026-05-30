@@ -11,11 +11,9 @@ Kód je funkční a relativně čistý. Hlavní „dluh": **mrtvé komponenty**,
 
 ## 🟠 P1 — vyplatí se uklidit
 
-### Mrtvé komponenty (0 referencí)
-- `src/components/LeasingCalculator.astro` — **nikde se neimportuje**. Kalkulačka na `/sklad/[id]` je implementovaná inline (sekce `#finance`). → ověřit a smazat.
-- `src/components/YouTubeSection.astro` — označená `@deprecated` (nahrazena `VideoStrip`), 0 referencí. → smazat.
-
-> Ověření: `grep -rn "LeasingCalculator\|YouTubeSection" src`. Pokud nic mimo definici → bezpečné smazat.
+### Mrtvé komponenty (0 referencí) — ✅ SMAZÁNO (30.5.)
+- `src/components/LeasingCalculator.astro` — smazáno (kalkulačka na `/sklad/[id]` je inline `#finance`).
+- `src/components/YouTubeSection.astro` — smazáno (`@deprecated`, nahrazeno `VideoStrip`).
 
 ### Duplicitní rate-limit logika (3×)
 Skoro identický in-memory rate-limit kód je v `api/lead.ts`, `api/newsletter.ts`, `api/chat/model.ts`. → vytáhnout do `src/lib/rateLimit.ts`. (Pozn.: stejně se má nahradit sdíleným úložištěm — viz SECURITY.md P1-1, takže refaktor + oprava v jednom.)
@@ -43,8 +41,8 @@ Je to dokumentovaný placeholder (no-op). OK nechat, jen vědět, že nic neděl
 ### `/api/leasing/test.ts` — ✅ SMAZÁNO (30.5.)
 Debug endpoint (UCL test runner) bez auth → odstraněn. Frontend ho nikde nevolal.
 
-### `.env.example` neúplný
-Chybí ~½ reálně používaných proměnných (CRON_SECRET, DIRECTUS_*_TOKEN, ECOMAIL_*, TURNSTILE_*, UNICREDIT_*, PUBLIC_UCL_PROXY_URL…). → doplnit (bez hodnot). Plný seznam v HANDOVER.md.
+### `.env.example` — ✅ DOPLNĚNO (30.5.)
+Přepsán na úplný seznam všech používaných proměnných (bez hodnot), členěný po službách.
 
 ---
 
@@ -66,4 +64,4 @@ Chybí ~½ reálně používaných proměnných (CRON_SECRET, DIRECTUS_*_TOKEN, 
 4. Doplnit `.env.example`.
 5. P2 dluh při větší údržbě.
 
-> Nic z výše uvedeného jsem neprovedl — čeká na tvé rozhodnutí.
+> Nic z výše uvedeného jsem neprovedl — čeká na tvé rozhodnu

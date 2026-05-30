@@ -26,6 +26,26 @@ const ECOMAIL_PUBLIC_URL = `https://sfr.ecomailapp.cz/public/subscribe/${ECOMAIL
 
 const EMAIL_RE = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
+// ===== Turnstile (stejný pattern jako /api/lead) =====
+const TURNSTILE_SECRET = import.meta.env.TURNSTILE_SECRET;
+const TURNSTILE_ENABLED = !!TURNSTILE_SECRET;
+async function verifyTurnstile(token: string, ip: string): Promise<boolean> {
+  if (!TURNSTILE_ENABLED) return true; // bez secretu → skip (dev)
+  if (!token) return false;
+  try {
+    const res = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams({ secret: TURNSTILE_SECRET!, response: token, remoteip: ip }),
+    });
+    const data = await res.json();
+    return !!data.success;
+  } catch (err) {
+    console.error('[newsletter] Turnstile verify failed:', err);
+    return false;
+  }
+}
+
 // Sdílíme rate limit pattern s /api/lead — ale samostatný store
 type RLEntry = { count: number; resetAt: number };
 const rateLimitStore = new Map<string, RLEntry>();
@@ -70,6 +90,17 @@ export const POST: APIRoute = async ({ request }) => {
       status: 200,
       headers: { 'Content-Type': 'application/json' },
     });
+  }
+
+  // Turnstile — graceful: pokud token přijde, ověř; když chybí, nech projít (honeypot+rate limit chrání).
+  const turnstileToken = String(body.turnstile_token ?? '');
+  if (TURNSTILE_ENABLED && turnstileToken) {
+    const ok = await verifyTurnstile(turnstileToken, ip);
+    if (!ok && import.meta.env.TURNSTILE_STRICT === 'true') {
+      return new Response(JSON.stringify({ ok: false, error: 'Ověření selhalo. Zkuste znovu.' }), {
+        status: 400, headers: { 'Content-Type': 'application/json' },
+      });
+    }
   }
 
   const email = String(body.email ?? '').trim().slice(0, 200);

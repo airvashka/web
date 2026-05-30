@@ -4,6 +4,7 @@ import DirectusImage from '@components/DirectusImage.astro';
 import Breadcrumbs from '@components/Breadcrumbs.astro';
 import { directusGet } from '@lib/directus';
 import { getReadTime, getArticleExcerpt } from '@lib/articles';
+import TurnstileWidget from '@components/TurnstileWidget.astro';
 
 /* ============================================================
    MAGAZÍN — listing článků (1:1 podle _design-draft-blog/magazin.jsx)
@@ -159,6 +160,7 @@ function formatDate(iso?: string): string {
       <form class="news-form" data-newsletter-form>
         <input type="email" name="email" placeholder="vas@email.cz" required maxlength="200" />
         <input type="text" name="_hp_website" tabindex="-1" autocomplete="off" class="honeypot" />
+        <TurnstileWidget />
         <button type="submit" class="btn btn-primary">Přihlásit</button>
         <div class="news-form-status" data-newsletter-status></div>
       </form>
@@ -194,6 +196,7 @@ function formatDate(iso?: string): string {
         const statusEl = newsForm.querySelector('[data-newsletter-status]');
         const submitBtn = newsForm.querySelector('button[type=submit]');
         const data = new FormData(newsForm);
+        const turnstileInput = newsForm.querySelector('input[name="cf-turnstile-response"]');
         if (statusEl) statusEl.textContent = 'Odesílám...';
         try {
           const res = await fetch('/api/newsletter', {
@@ -202,6 +205,7 @@ function formatDate(iso?: string): string {
             body: JSON.stringify({
               email: data.get('email'),
               _hp_website: data.get('_hp_website') || '',
+              turnstile_token: turnstileInput ? turnstileInput.value : '',
             }),
           });
           const result = await res.json().catch(() => ({ ok: false, error: 'Network error' }));
