@@ -186,7 +186,7 @@ const year = new Date().getFullYear();
   .svc-promo-card:hover { box-shadow: 0 8px 26px rgba(0,0,0,0.10); transform: translateY(-2px); }
   .svc-promo-logo {
     display: flex; align-items: center; justify-content: center;
-    background: var(--accent-soft, #FFF1EA); padding: 18px 26px;
+    background: #16181c; padding: 18px 26px;
     border-right: 1px solid var(--line, #E7E6E2);
   }
   .svc-promo-logo img { max-height: 44px; width: auto; max-width: 150px; }
@@ -197,9 +197,10 @@ const year = new Date().getFullYear();
   .svc-promo-price { font-size: 18px; font-weight: 700; color: var(--accent, #F25C1B); }
   .svc-promo-perex { font-size: 14px; line-height: 1.5; color: #555; margin: 0; }
   .svc-promo-cta { margin-top: 6px; pointer-events: none; padding: 8px 16px; font-size: 13px; }
+  .svc-promo-stack { display: flex; flex-direction: column; gap: 16px; }
   @media (max-width: 680px) {
     .svc-promo-card { grid-template-columns: 1fr; }
-    .svc-promo-logo { padding: 16px; border-right: none; border-bottom: 1px solid var(--line, #E7E6E2); }
+    .svc-promo-logo { padding: 16px; border-right: none; border-bottom: 1px solid rgba(0,0,0,0.08); }
     .svc-promo-body { padding: 15px 18px 18px; }
   }
 

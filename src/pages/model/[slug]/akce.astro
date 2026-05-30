@@ -17,7 +17,9 @@ import type { Brand, Model } from '@lib/types';
 
 export async function getStaticPaths() {
   const models = await directusGet<Model>('models', { fields: ['slug'] });
-  return models.map((m) => ({ params: { slug: m.slug } }));
+  return models
+    .filter((m) => typeof m.slug === 'string' && m.slug.trim() !== '')
+    .map((m) => ({ params: { slug: m.slug } }));
 }
 
 const { slug } = Astro.params;

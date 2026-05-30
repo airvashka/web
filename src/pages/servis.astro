@@ -6,6 +6,7 @@ import GoogleReviews from '@components/GoogleReviews.astro';
 import TeamCard from '@components/TeamCard.astro';
 import TurnstileWidget from '@components/TurnstileWidget.astro';
 import { directusGet, directusAsset } from '@lib/directus';
+import BrandLogo from '@components/BrandLogo.astro';
 import { FALLBACK_SERVICE_PHONE, telLink } from '@lib/contacts';
 import { autoRepairSchema } from '@lib/schemas';
 import googleReviews from '../data/google-reviews.json';
@@ -206,20 +207,20 @@ const serviceCampaigns = await directusGet<any>('service_campaigns', {
       <div class="container">
         <div class="section-eyebrow">Akce</div>
         <h2 style="font-family: var(--font-display); font-weight: 600; font-size: clamp(24px, 2.4vw, 32px); letter-spacing: -0.02em; margin: 8px 0 24px;">Aktuální servisní akce</h2>
-        <div class="svc-list">
+        <div class="svc-promo-stack">
           {serviceCampaigns.map((c: any) => (
-            <a class="svc-list-card" href={c.brand?.slug ? `/${c.brand.slug}/servisni-akce` : '/servis'}>
-              {c.image && (
-                <div class="svc-list-media">
-                  <img src={directusAsset(c.image, { width: 600, format: 'webp', quality: 80 })} alt={c.title} loading="lazy" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;" />
+            <a class="svc-promo-card" href={`/servisni-akce/${c.brand?.slug ?? ''}`}>
+              <div class="svc-promo-logo">
+                {c.brand?.slug && <BrandLogo slug={c.brand.slug} variant="light" />}
+              </div>
+              <div class="svc-promo-body">
+                <div class="svc-promo-eyebrow">Servisní akce{c.brand?.name ? ` · ${c.brand.name}` : ''}</div>
+                <div class="svc-promo-head">
+                  <h3 class="svc-promo-title">{c.title}</h3>
+                  {c.price_label && <span class="svc-promo-price">{c.price_label}</span>}
                 </div>
-              )}
-              <div class="svc-list-body">
-                {c.brand?.name && <div class="svc-list-brand">{c.brand.name}</div>}
-                <h3 class="svc-list-title">{c.title}</h3>
-                {c.price_label && <div class="svc-list-price">{c.price_label}</div>}
-                {c.perex && <p class="svc-list-perex">{c.perex}</p>}
-                <span class="svc-list-cta">{c.cta_label || 'Více o akci'} →</span>
+                {c.perex && <p class="svc-promo-perex">{c.perex}</p>}
+                <span class="btn btn-primary svc-promo-cta">{c.cta_label || 'Více o akci'}</span>
               </div>
             </a>
           ))}

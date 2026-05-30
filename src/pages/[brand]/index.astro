@@ -272,9 +272,9 @@ const activeBrand = Astro.params.brand;
   {serviceCampaign && (
     <section class="svc-promo" data-screen-label="Servisní akce">
       <div class="container">
-        <a class="svc-promo-card" href={`/${brand.slug}/servisni-akce`}>
+        <a class="svc-promo-card" href={`/servisni-akce/${brand.slug}`}>
           <div class="svc-promo-logo">
-            <BrandLogo slug={brand.slug} variant="dark" />
+            <BrandLogo slug={brand.slug} variant="light" />
           </div>
           <div class="svc-promo-body">
             <div class="svc-promo-eyebrow">Servisní akce</div>

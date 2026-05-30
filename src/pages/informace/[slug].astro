@@ -13,7 +13,9 @@ export async function getStaticPaths() {
     fields: ['slug'],
     limit: 100,
   });
-  return pages.map((p) => ({ params: { slug: p.slug } }));
+  return pages
+    .filter((p) => typeof p.slug === 'string' && p.slug.trim() !== '')
+    .map((p) => ({ params: { slug: p.slug } }));
 }
 
 const { slug } = Astro.params;
