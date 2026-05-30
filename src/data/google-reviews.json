@@ -1,15 +1,15 @@
 {
-  "generated_at": "2026-05-15T09:15:04.924Z",
+  "generated_at": "2026-05-29T14:56:20.379Z",
   "prodej": {
     "name": "SFR MOTOR - autorizovaný dealer KGM (dříve SsangYong)",
     "rating": 4.7,
-    "total_ratings": 95,
+    "total_ratings": 96,
     "reviews": [
       {
         "author_name": "Jitka Broďáková - Bernardová",
         "author_photo": "https://lh3.googleusercontent.com/a-/ALV-UjVMSjHq4WDxcsFz4VRz2rpkuz9UcgfegEIDeT2mbK2EBWgnnaihKA=s128-c0x00000000-cc-rp-mo-ba5",
         "rating": 5,
-        "relative_time": "před 6 měsíci",
+        "relative_time": "před 7 měsíci",
         "time": 1760976337,
         "text": "Máme z tohoto salonu už druhé auto a opět naprostá spokojenost.",
         "lang": "cs"
@@ -36,7 +36,7 @@
         "author_name": "Majky Majky",
         "author_photo": "https://lh3.googleusercontent.com/a-/ALV-UjWhmlZ_T47GlUmMtLuHYUhEllH9W7gPNhOjGec4KCqVTWowaJgz=s128-c0x00000000-cc-rp-mo",
         "rating": 5,
-        "relative_time": "před 10 měsíci",
+        "relative_time": "před 11 měsíci",
         "time": 1751306330,
         "text": "Dobrý den, stále se najdou fajn lidi a tady to potvrzují, všemi deseti! Super přístup na prodeji i servisu na Praze 8, mohu všem jen doporučit!",
         "lang": "cs"
@@ -65,53 +65,63 @@
     ],
     "hours_periods": [
       {
-        "open": {
-          "day": 1,
-          "time": "0800"
-        },
         "close": {
+          "date": "2026-06-01",
           "day": 1,
           "time": "1800"
+        },
+        "open": {
+          "date": "2026-06-01",
+          "day": 1,
+          "time": "0800"
         }
       },
       {
-        "open": {
-          "day": 2,
-          "time": "0800"
-        },
         "close": {
+          "date": "2026-06-02",
           "day": 2,
           "time": "1800"
+        },
+        "open": {
+          "date": "2026-06-02",
+          "day": 2,
+          "time": "0800"
         }
       },
       {
-        "open": {
-          "day": 3,
-          "time": "0800"
-        },
         "close": {
+          "date": "2026-06-03",
           "day": 3,
           "time": "1800"
+        },
+        "open": {
+          "date": "2026-06-03",
+          "day": 3,
+          "time": "0800"
         }
       },
       {
-        "open": {
-          "day": 4,
-          "time": "0800"
-        },
         "close": {
+          "date": "2026-06-04",
           "day": 4,
           "time": "2000"
+        },
+        "open": {
+          "date": "2026-06-04",
+          "day": 4,
+          "time": "0800"
         }
       },
       {
-        "open": {
-          "day": 5,
-          "time": "0800"
-        },
         "close": {
+          "date": "2026-05-29",
           "day": 5,
           "time": "1800"
+        },
+        "open": {
+          "date": "2026-05-29",
+          "day": 5,
+          "time": "0800"
         }
       }
     ]
@@ -181,53 +191,63 @@
     ],
     "hours_periods": [
       {
-        "open": {
-          "day": 1,
-          "time": "0800"
-        },
         "close": {
+          "date": "2026-06-01",
           "day": 1,
           "time": "1700"
+        },
+        "open": {
+          "date": "2026-06-01",
+          "day": 1,
+          "time": "0800"
         }
       },
       {
+        "close": {
+          "date": "2026-06-02",
+          "day": 2,
+          "time": "1700"
+        },
         "open": {
+          "date": "2026-06-02",
           "day": 2,
           "time": "0800"
-        },
-        "close": {
-          "day": 2,
-          "time": "1700"
         }
       },
       {
-        "open": {
-          "day": 3,
-          "time": "0800"
-        },
         "close": {
+          "date": "2026-06-03",
           "day": 3,
           "time": "1700"
+        },
+        "open": {
+          "date": "2026-06-03",
+          "day": 3,
+          "time": "0800"
         }
       },
       {
-        "open": {
-          "day": 4,
-          "time": "0800"
-        },
         "close": {
+          "date": "2026-06-04",
           "day": 4,
           "time": "1700"
+        },
+        "open": {
+          "date": "2026-06-04",
+          "day": 4,
+          "time": "0800"
         }
       },
       {
-        "open": {
-          "day": 5,
-          "time": "0800"
-        },
         "close": {
+          "date": "2026-05-29",
           "day": 5,
           "time": "1700"
+        },
+        "open": {
+          "date": "2026-05-29",
+          "day": 5,
+          "time": "0800"
         }
       }
     ]
