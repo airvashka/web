@@ -14,6 +14,7 @@
  */
 
 import type { APIRoute } from 'astro';
+import { createRateLimiter } from '@lib/rateLimit';
 
 export const prerender = false;
 
@@ -46,28 +47,13 @@ async function verifyTurnstile(token: string, ip: string): Promise<boolean> {
   }
 }
 
-// Sdílíme rate limit pattern s /api/lead — ale samostatný store
-type RLEntry = { count: number; resetAt: number };
-const rateLimitStore = new Map<string, RLEntry>();
-const RATE_LIMIT_MAX = 5; // newsletter méně častý než lead
-const RATE_LIMIT_WINDOW_MS = 24 * 60 * 60 * 1000;
-
-function checkRateLimit(ip: string): boolean {
-  const now = Date.now();
-  const entry = rateLimitStore.get(ip);
-  if (!entry || now > entry.resetAt) {
-    rateLimitStore.set(ip, { count: 1, resetAt: now + RATE_LIMIT_WINDOW_MS });
-    return true;
-  }
-  if (entry.count >= RATE_LIMIT_MAX) return false;
-  entry.count++;
-  return true;
-}
+// Rate limit (sdílený helper) — 5 / 24h (newsletter méně častý)
+const checkRateLimit = createRateLimiter(5, 24 * 60 * 60 * 1000);
 
 export const POST: APIRoute = async ({ request }) => {
   const ip = request.headers.get('x-forwarded-for')?.split(',')[0].trim() ?? 'unknown';
 
-  if (!checkRateLimit(ip)) {
+  if (!checkRateLimit(ip).allowed) {
     return new Response(JSON.stringify({ ok: false, error: 'Příliš mnoho požadavků.' }), {
       status: 429,
       headers: { 'Content-Type': 'application/json' },

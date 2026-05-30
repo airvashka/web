@@ -15,6 +15,7 @@
  */
 
 import type { APIRoute } from 'astro';
+import { createRateLimiter } from '@lib/rateLimit';
 
 export const prerender = false;
 
@@ -26,34 +27,8 @@ const DIRECTUS_TOKEN = import.meta.env.DIRECTUS_LEAD_TOKEN ?? import.meta.env.DI
 const TURNSTILE_SECRET = import.meta.env.TURNSTILE_SECRET;
 const TURNSTILE_ENABLED = !!TURNSTILE_SECRET;
 
-// ===== Rate limit (in-memory, per-IP, per-day) =====
-type RateLimitEntry = { count: number; resetAt: number };
-const rateLimitStore = new Map<string, RateLimitEntry>();
-const RATE_LIMIT_MAX = 10; // 10 leadů za den
-const RATE_LIMIT_WINDOW_MS = 24 * 60 * 60 * 1000; // 24h
-
-function checkRateLimit(ip: string): { ok: boolean; remaining: number } {
-  const now = Date.now();
-  const entry = rateLimitStore.get(ip);
-  if (!entry || now > entry.resetAt) {
-    rateLimitStore.set(ip, { count: 1, resetAt: now + RATE_LIMIT_WINDOW_MS });
-    return { ok: true, remaining: RATE_LIMIT_MAX - 1 };
-  }
-  if (entry.count >= RATE_LIMIT_MAX) return { ok: false, remaining: 0 };
-  entry.count++;
-  return { ok: true, remaining: RATE_LIMIT_MAX - entry.count };
-}
-
-// Garbage collect old entries každých 100 requestů (jednoduchá strategie)
-let gcCounter = 0;
-function maybeGc() {
-  if (++gcCounter < 100) return;
-  gcCounter = 0;
-  const now = Date.now();
-  for (const [k, v] of rateLimitStore.entries()) {
-    if (now > v.resetAt) rateLimitStore.delete(k);
-  }
-}
+// ===== Rate limit (sdílený helper) — 10 leadů / 24h =====
+const checkRateLimit = createRateLimiter(10, 24 * 60 * 60 * 1000);
 
 // ===== Validace =====
 const EMAIL_RE = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
@@ -170,8 +145,6 @@ async function createLeadInDirectus(payload: any): Promise<{ ok: true; id?: numb
 
 // ===== POST handler =====
 export const POST: APIRoute = async ({ request }) => {
-  maybeGc();
-
   // IP detection (Vercel)
   const ip =
     request.headers.get('x-forwarded-for')?.split(',')[0].trim() ??
@@ -180,7 +153,7 @@ export const POST: APIRoute = async ({ request }) => {
 
   // Rate limit check
   const rl = checkRateLimit(ip);
-  if (!rl.ok) {
+  if (!rl.allowed) {
     return new Response(JSON.stringify({ ok: false, error: 'Příliš mnoho požadavků. Zkus to zítra nebo zavolej +420 771 235 458.' }), {
       status: 429,
       headers: { 'Content-Type': 'application/json' },

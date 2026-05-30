@@ -15,12 +15,12 @@ Kód je funkční a relativně čistý. Hlavní „dluh": **mrtvé komponenty**,
 - `src/components/LeasingCalculator.astro` — smazáno (kalkulačka na `/sklad/[id]` je inline `#finance`).
 - `src/components/YouTubeSection.astro` — smazáno (`@deprecated`, nahrazeno `VideoStrip`).
 
-### Duplicitní rate-limit logika (3×)
-Skoro identický in-memory rate-limit kód je v `api/lead.ts`, `api/newsletter.ts`, `api/chat/model.ts`. → vytáhnout do `src/lib/rateLimit.ts`. (Pozn.: stejně se má nahradit sdíleným úložištěm — viz SECURITY.md P1-1, takže refaktor + oprava v jednom.)
+### Duplicitní rate-limit logika (3×) — ✅ HOTOVO (30.5.)
+Vytaženo do `src/lib/rateLimit.ts` (`createRateLimiter(max, windowMs)` + `getClientIp`). `lead.ts`, `newsletter.ts` i `chat/model.ts` ho teď používají. (Stále in-memory = měkký limit; tvrdý sdílený by chtěl Upstash/KV — viz SECURITY.md P1-1, neděláme.)
 
 ### `scripts/` — 148 souborů, živých 6
 Reálně používané (package.json / GitHub Action): `sync-stock-kgm`, `sync-stock-omoda-jaecoo`, `generate-build-to-order`, `compute-teaser-payments`, `trigger-deploy`, `fetch-google-reviews`. Zbytek jsou jednorázové migrační/setup/seed skripty (add-* 31, fix-* 17, seed-* 14, setup-* 9…).
-- **Návrh:** přesunout jednorázové do `scripts/archive/` a do `scripts/README.md` napsat, které jsou „živé". Nemazat (historická hodnota), ale oddělit od provozních.
+- **✅ HOTOVO (30.5.):** přidán `scripts/README.md` — dokumentuje 6 živých skriptů vs jednorázové + označuje destruktivní. Fyzický přesun do `scripts/archive/` zatím odložen (riziko relativních importů, churn 140 souborů).
 - Jasně explorativní/jednorázové: `probe-mobile-de*.mjs`, `sniff-mobile-de-api.mjs`, `recover-bad-clone.mjs`, `recreate-webhook-flow.mjs`, `reorganize-models.mjs` (dle poznámek revertnuto), `test-build-request.mjs`, `import-articles-old-site.mjs`, `wipe-stock.mjs` (destruktivní — pozor).
 
 ---

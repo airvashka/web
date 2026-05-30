@@ -20,6 +20,7 @@
  */
 import type { APIRoute } from 'astro';
 import Anthropic from '@anthropic-ai/sdk';
+import { createRateLimiter, getClientIp } from '@lib/rateLimit';
 import { directusGet } from '@lib/directus';
 import { getGroupedFeatures } from '@lib/features';
 
@@ -37,31 +38,8 @@ const DIRECTUS_URL = import.meta.env.PUBLIC_DIRECTUS_URL || import.meta.env.DIRE
  * 100% efektivní, ale stačí na běžné script-kiddie attacky.
  * Pro vážnější ochranu použít @upstash/ratelimit (Redis-based, sdílený).
  */
-const RATE_LIMIT_REQUESTS = 20;
-const RATE_LIMIT_WINDOW_MS = 60 * 60 * 1000; // 1 hod
-const rateLimitStore = new Map<string, { count: number; resetAt: number }>();
-
-function checkRateLimit(ip: string): { allowed: boolean; remaining: number; resetIn: number } {
-  const now = Date.now();
-  const entry = rateLimitStore.get(ip);
-  if (!entry || now > entry.resetAt) {
-    rateLimitStore.set(ip, { count: 1, resetAt: now + RATE_LIMIT_WINDOW_MS });
-    return { allowed: true, remaining: RATE_LIMIT_REQUESTS - 1, resetIn: RATE_LIMIT_WINDOW_MS };
-  }
-  if (entry.count >= RATE_LIMIT_REQUESTS) {
-    return { allowed: false, remaining: 0, resetIn: entry.resetAt - now };
-  }
-  entry.count++;
-  return { allowed: true, remaining: RATE_LIMIT_REQUESTS - entry.count, resetIn: entry.resetAt - now };
-}
-
-function getClientIp(request: Request): string {
-  return (
-    request.headers.get('x-forwarded-for')?.split(',')[0].trim() ||
-    request.headers.get('x-real-ip') ||
-    'unknown'
-  );
-}
+// Rate limit (sdílený helper) — 20 / hod
+const checkRateLimit = createRateLimiter(20, 60 * 60 * 1000);
 
 /* ──────────── RAG: KNOWLEDGE SEARCH ──────────── */
 
