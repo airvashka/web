@@ -1,7 +1,7 @@
 # Audit kódu — SFR Motor web
 
 > Stav k 30. 5. 2026. Hledání mrtvého/starého/duplicitního kódu a code smells. 
-> **Nic jsem neměnil** — jen seznam nálezů + priorita. Před smazáním vždy ověřit, že věc opravdu nikde není použitá.
+> 📌 **Aktuální souhrn stavu je v [README](./README.md).** Část úklidu už proběhla (✅ značky níže), zbytek je vědomě odložený.
 
 ## Shrnutí
 
@@ -64,4 +64,4 @@ Přepsán na úplný seznam všech používaných proměnných (bez hodnot), čl
 4. Doplnit `.env.example`.
 5. P2 dluh při větší údržbě.
 
-> Nic z výše uvedeného jsem neprovedl — čeká na tvé rozhodnu
+> 📌 Aktuální stav po bodech viz [README](./README.md). Hotovo: mrtvé komponenty, rate-limit do lib/, scripts README, .env.example. Odloženo: scripts archiv, global.css split, legacy fallbacky.

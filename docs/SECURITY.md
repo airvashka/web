@@ -1,24 +1,24 @@
 # Bezpečnostní analýza — SFR Motor web
 
 > Stav k 30. 5. 2026. Analýza kódu + závislostí. Priority: 🔴 P0 (hned), 🟠 P1 (brzy), 🟡 P2 (až bude čas). 
-> Tohle je **analýza a doporučení** — žádná změna v kódu nebyla provedena.
+> 📌 **Aktuální souhrn stavu VŠECH bodů je v [README](./README.md).** Většina je už hotová (✅ značky níže), zbytek je vědomě odložený nebo čeká na upstream.
 
 ## Shrnutí
 
-Základ je solidní: žádné committed secrety, tajné klíče jen server-side, antispam na hlavním formuláři, zálohy běží. Hlavní slabiny: **rate-limiting nefunguje spolehlivě na Vercel serverless**, jeden **odkrytý debug endpoint**, a **HIGH zranitelnost v závislosti `undici`**.
+**Stav: hlavní slabiny vyřešeny.** Debug endpoint smazán, Astro 6 upgrade opravil astro XSS + x-astro-path, undici dořešen, rate-limit/AI náklady ošetřeny (chatbot vypnut + Turnstile). Základ byl solidní (žádné committed secrety, tajné klíče jen server-side, zálohy běží) a teď je doladěný. Detail po bodech níže, souhrn v README.
 
 ---
 
 ## 🔴 P0 — řešit hned
 
-### P0-1 — zranitelnosti v závislostech — 🔄 ČÁSTEČNĚ (30.5.)
-`npm audit` hlásí chyby přes Astro/Vercel řetězec + undici.
-- **Provedeno:** Astro stack aktualizován v rámci major 5/8; `devalue` HIGH opraven přes `npm audit fix` (non-breaking).
-- **Zrušeno:** `overrides: undici` — vynucené `undici` rozbilo `jsdom` (build padal na `undici/lib/handler/wrap-handler.js`) → revertováno.
-- **Zbývá (větší úkol):** hlavní HIGH (`path-to-regexp` ReDoS, `@astrojs/vercel` **x-astro-path** unauthenticated path override, `astro` XSS v `define:vars`) jsou opravené až v **Astro 6 + @astrojs/vercel 10** = MAJOR upgrade (breaking). Naplánovat zvlášť s plným testem webu. Pro veřejný web nejde o únik dat → není akutní. Detail v `DEPENDENCIES.md`.
+### P0-1 — zranitelnosti v závislostech — ✅ HOTOVO (30.5.)
+- **Astro 6 + @astrojs/vercel 10** nasazeno → opraveno `astro` XSS (define:vars), `@astrojs/vercel` **x-astro-path** auth override, `devalue` DoS.
+- `undici` HIGH dořešen updatem `@vercel/blob`.
+- **Zbývá jen** `path-to-regexp` (uvnitř vercel adapteru) + `yaml` (jen dev) — low risk, čeká na upstream fix → doporučení: Dependabot.
+- Pozn.: `overrides: undici` NEFUNGUJE (rozbíjí jsdom build) — nezkoušet.
 
 ### P0-2 — odkrytý debug endpoint `GET /api/leasing/test` — ✅ HOTOVO (30.5.)
-`src/pages/api/leasing/test.ts` byl debug runner bez auth → **smazán** (frontend ho nikde nevolal). Čeká jen push.
+`src/pages/api/leasing/test.ts` byl debug runner bez auth → **smazán** (frontend ho nikde nevolal).
 
 ---
 
@@ -33,21 +33,18 @@ Základ je solidní: žádné committed secrety, tajné klíče jen server-side,
 - *Pokud se chat někdy zapne natrvalo + poroste provoz → zvážit sdílený rate-limit (Upstash zdarma, nebo malá služba na VPS vedle UCL proxy).*
 
 ### P1-2 — `/api/newsletter` bez Turnstile — ✅ HOTOVO (30.5.)
-Přidána Turnstile verifikace (widget v newsletter formu v `magazin/index.astro` + `verifyTurnstile` v `newsletter.ts`, stejný graceful pattern jako `lead.ts`). Čeká push.
+Přidána Turnstile verifikace (widget v newsletter formu v `magazin/index.astro` + `verifyTurnstile` v `newsletter.ts`, stejný graceful pattern jako `lead.ts`).
 
-### P1-3 — SSH/VPS hardening
-Dle poznámek je **root heslo VPS zapomenuté**. Doporučení:
-- Obnovit root přes KVM a uložit do trezoru.
-- SSH jen přes klíče (`PasswordAuthentication no`), zakázat root login (`PermitRootLogin no`).
-- `ufw` firewall (povolit jen 22/80/443 + interní porty zavřít zvenčí), `fail2ban` na SSH.
-- Ověřit, že Postgres/Redis/MinIO **nejsou** dostupné z internetu (jen v Docker síti / loopback).
+### P1-3 — SSH/VPS hardening — ✅ OVĚŘENO, dobré (30.5.)
+Stav VPS prověřen a je solidní: root **zamčený** (bez hesla, `passwd -S` = L), admin přes sudo uživatele `sfr`, **ufw** běží (jen 22/80/443), **fail2ban** běží, Postgres/Redis/MinIO/UCL **nevystavené** ven (jen localhost/docker síť), root login jen na klíč.
+- **Odloženo (volitelné):** key-only SSH (vypnout `PasswordAuthentication`) — s běžícím fail2banem zatím stačí, lze dodělat kdykoli.
 
 ---
 
 ## 🟡 P2 — až bude čas
 
 - **P2-1 `/admin/cenik`** — ✅ `noindex,nofollow` už v page je. (Login client-side, API ověřuje token.) OK.
-- **P2-2 Google Maps API klíč** je `PUBLIC_*` (musí být na klientovi). **Nutně omezit** v Google Cloud na HTTP referrer (`*.sfr-motor.cz`) + jen Maps Embed API, ať ho nikdo nezneužije na vlastní účet.
+- **P2-2 Google klíče** — ✅ HOTOVO (30.5.): Maps klíč omezen na referrer `*.sfr-motor.cz` + Maps Embed API; Places (recenze) klíč omezen na Places API.
 - **P2-3 `yaml` moderate vuln** — jen dev tooling (`@astrojs/check`), nejde do produkce. Aktualizovat při příští údržbě.
 - **P2-4 `.env.example`** — ✅ HOTOVO (30.5.): doplněn na úplný seznam (bez hodnot).
 
@@ -66,8 +63,8 @@ Dle poznámek je **root heslo VPS zapomenuté**. Doporučení:
 
 ---
 
-## Doporučené pořadí
+## Co zbývá (vše nízké riziko)
 
-1. P0-1 undici update + P0-2 smazat/chránit `leasing/test.ts` (rychlé).
-2. P1-3 SSH hardening + obnova root hesla (provozní bezpečnost).
-3. P1-1 sdílený rate limit (Vercel KV/Upstash) + P1-2 Turnstile na newsletter.
+1. `path-to-regexp` + `yaml` vulns — čekají na upstream fix (Dependabot to ohlídá).
+2. key-only SSH — volitelné, odloženo (fail2ban stačí).
+3. *Vše ostatní z této analýzy je hotové — viz [README](./README.md) souhrn.*

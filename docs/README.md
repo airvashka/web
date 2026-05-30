@@ -19,23 +19,46 @@ Kompletní dokumentace projektu. Vytvořeno 30. 5. 2026.
 | [DISASTER-RECOVERY.md](./DISASTER-RECOVERY.md) | Zálohy a obnova — co dělat, když něco spadne |
 | [MONITORING.md](./MONITORING.md) | Co hlídat (uptime, sync, zálohy, náklady) a čím |
 
-## Nejdůležitější zjištění (TL;DR)
+---
 
-**Bezpečnost:**
-- ✅ **Hotovo (30.5., čeká push):** smazán debug endpoint `/api/leasing/test`; Astro stack updatován v rámci major 5/8; `devalue` HIGH opraven (`npm audit fix`).
-- ❌ `overrides: undici` zkoušeno → rozbilo build (jsdom) → revertováno.
-- 🔄 **Plánovaný úkol:** MAJOR upgrade Astro 6 + Vercel adapter 10 (opraví zbylé HIGH: path-to-regexp, x-astro-path, astro XSS). Breaking → testovat. Není akutní.
-- 🟠 Rate-limiting je na Vercel serverless neúčinný (in-memory) → přesunout na Vercel KV / Upstash.
-- 🟠 SSH/VPS hardening + obnova zapomenutého root hesla.
+# 📌 STAV — bezpečnost & kód (aktualizováno 30. 5. 2026)
 
-**Kód (úklid):**
-- 2 mrtvé komponenty (`LeasingCalculator.astro`, `YouTubeSection.astro`).
-- Duplicitní rate-limit logika ve 3 endpointech.
-- `scripts/` má 148 souborů, živých 6 → archivovat zbytek.
-- `.env.example` neúplný → doplnit.
+Jeden přehled na jednom místě. Detaily k jednotlivým bodům jsou v příslušných dokumentech.
 
-**Provoz:**
-- Zálohy běží (snapshoty 7 dní + pg_dump 14 dní + Vercel Blob 30 dní), ale **chybí off-site pg záloha**.
-- **Chybí externí uptime monitoring** a **heartbeaty cron jobů** → doporučeno doplnit.
+## ✅ Hotovo a nasazeno (na betě OK)
 
-> Všechno výše je **analýza/doporučení** — v kódu nebylo nic změněno (dle zadání). Implementace čeká na rozhodnutí majitele.
+| Co | Kde |
+|---|---|
+| Smazaný debug endpoint `/api/leasing/test` | SECURITY P0-2 |
+| Upgrade na **Astro 6 + Vercel adapter 10** → opraveno astro XSS, x-astro-path auth override, devalue | DEPENDENCIES |
+| `undici` HIGH dořešen (update `@vercel/blob`) | DEPENDENCIES |
+| Smazané 2 mrtvé komponenty (`LeasingCalculator`, `YouTubeSection`) | CODE-AUDIT |
+| **Turnstile** přidán i na newsletter | SECURITY P1-2 |
+| Rate-limit sjednocen do `lib/rateLimit.ts` | CODE-AUDIT |
+| **Chatbot vypnutý** (widget skrytý + endpoint 503) → uzavřené riziko nákladů na AI | SECURITY P1-1 |
+| `.env.example` doplněn na úplný seznam | SECURITY P2-4 |
+| `scripts/README.md` (živé vs jednorázové skripty) | CODE-AUDIT |
+| `/admin/cenik` má `noindex` (už bylo) | SECURITY P2-1 |
+
+## ✅ Zajištěno na straně majitele
+
+- Anthropic Console — měsíční spend limit ($100, notifikace na $50).
+- Google Maps klíč — omezen na referrer `*.sfr-motor.cz` + Maps Embed API.
+- Google Places (recenze) klíč — omezen na Places API.
+- VPS — ověřeno: root zamčený, admin přes sudo `sfr`, ufw (jen 22/80/443), fail2ban běží, DB/Redis/MinIO/UCL nevystavené ven.
+
+## ⏳ Odloženo / vědomé rozhodnutí (není akutní)
+
+- **key-only SSH** (vypnout heslo) — necháno na fail2banu; lze dodělat kdykoli.
+- **Legacy fallbacky** v kódu (features/technicalData/vybavy) — nechat; nejde bezpečně ověřit, že jsou data zmigrovaná.
+- **scripts/** fyzický přesun do `archive/` — zatím jen README (přesun = zbytečný churn 140 souborů).
+- **`global.css`** (5 869 řádků) rozdělit — nízká priorita, kosmetika.
+- **Off-site záloha DB + uptime monitoring + heartbeaty** — vyžaduje účty (Backblaze/Healthchecks/UptimeRobot), odloženo.
+
+## ⛔ Mimo naše ruce (čekáme na upstream)
+
+- `path-to-regexp` (HIGH, uvnitř `@astrojs/vercel`) a `yaml` (moderate, jen dev) — fix musí vydat Astro/Vercel. Nízké riziko. **Doporučení: zapnout Dependabot na GitHubu** → automatický PR, až oprava vyjde.
+
+---
+
+> Pozn.: značky „✅ HOTOVO (30.5.)" uvnitř jednotlivých dokumentů jsou detail k tomuto souhrnu.

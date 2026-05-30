@@ -1,10 +1,12 @@
 # Závislosti & aktualizace — SFR Motor web
 
-> `npm audit` k 30. 5. 2026. **Žádný update jsem neprovedl** — jen analýza a plán. Po každém updatu: `npm run build` + test na betě.
+> 📌 **Aktuální stav v [README](./README.md).** Provedeno: upgrade na **Astro 6 + Vercel adapter 10** + `@vercel/blob` (undici) + `devalue`. Zbývají jen low-risk vulns čekající na upstream (path-to-regexp, yaml).
 
 ## 1. npm audit — souhrn
 
-**12 zranitelností: 5 HIGH, 7 moderate, 0 critical.** Většina jsou **tranzitivní** (přes Astro a Vercel balíčky), ne přímé.
+> ⚠️ Tabulka je **snímek PŘED upgradem** (historie). Po Astro 6 zbývají jen `path-to-regexp` (HIGH, ve vercel adapteru) + `yaml` (mod, dev).
+
+**Tehdy: 12 zranitelností (5 HIGH, 7 moderate, 0 critical)**, většinou tranzitivní přes Astro/Vercel.
 
 | Závažnost | Balíček | Přes | Problém |
 |---|---|---|---|
@@ -21,14 +23,10 @@
 ### Krok 1 — Astro stack v rámci major 5/8 — ✅ HOTOVO, ale NESTAČÍ (30.5.)
 Provedeno `npm install astro@^5 @astrojs/vercel@^8 @astrojs/sitemap@^3` (build prošel). **Zjištění:** zůstání v major 5/8 **neopravilo** hlavní HIGH — `npm audit` je pořád hlásí, protože fix je až v majorech (viz Krok 3). Tenhle krok tedy přinesl jen drobné záplaty + udržení aktuálnosti.
 
-### Krok 3 — 🔴 MAJOR upgrade Astro 6 + Vercel adapter 10 (skutečný fix)
-Teprve tohle opraví zbývající HIGH/MOD: `astro` XSS (`define:vars`) + server-island replay, `@astrojs/vercel` **x-astro-path** unauthenticated path override, `path-to-regexp` ReDoS.
-```bash
-npm install astro@6 @astrojs/vercel@10 @astrojs/check@latest
-npm run build      # MUSÍ projít — Astro 5→6 může mít breaking změny
-```
-- **Riziko: vyšší (major).** Astro 5→6 může změnit chování image/SSR/content. Po updatu projít CELÝ web na `npm run dev` i po pushi na betě (hero, sklad, model, leasing, formuláře, články).
-- **Není akutní** pro veřejný web (nejde o únik dat) → naplánovat jako samostatný úkol s časem na testování.
+### Krok 3 — MAJOR upgrade Astro 6 + Vercel adapter 10 — ✅ HOTOVO (30.5.)
+Provedeno přes `npx @astrojs/upgrade` (astro 6.4.2 + @astrojs/vercel 10.0.8 + @astrojs/check). **Build prošel bez zásahu do kódu, na betě ověřeno** (obrázky/video, sklad+filtry, model, leasing, 404, sitemap).
+- Opravilo: `astro` XSS (define:vars) + island replay, `@astrojs/vercel` **x-astro-path** auth override, `devalue` DoS.
+- **Zbývá jen** `path-to-regexp` (pořád uvnitř `@astrojs/vercel` 10) + `yaml` (dev) — čeká na upstream. Low risk → Dependabot.
 
 ### Krok 2 — `undici` override — ❌ NEFUNGUJE, REVERTOVÁNO (30.5.)
 Pokus o `overrides: { "undici": "^6.23.1" }` **rozbil build**: `jsdom` (přes `isomorphic-dompurify`) potřebuje jinou verzi undici a padalo `Cannot find module 'undici/lib/handler/wrap-handler.js'`. → override odebrán.
@@ -73,7 +71,7 @@ npm run build      # ověřit, že to staví
 > Všechny přímé závislosti se reálně používají (žádná nepoužitá k odstranění).
 
 ## 4. Strategie do budoucna
-- **Kvartálně** spustit `npm audit` + `npm outdated` a vyřešit HIGH/critical.
-- Držet se v rámci major verzí (`^`), major upgrady (Astro 5→6 apod.) plánovat zvlášť s testem.
-- Zapnout **Dependabot** / GitHub security alerts na obou repech (automatické PR na zranitelnosti).
-- `package-lock.json` je v `.gitignore` — zvážit jeho **commit** pro reprodukovatelné buildy (jinak se verze můžou lišit deploy od deploye).
+- **Kvartálně** spustit `npm audit` + `npm outdated`, vyřešit HIGH/critical.
+- Držet se v rámci major verzí (`^`); major upgrady (např. Astro 6→7) plánovat zvlášť s testem.
+- **Zapnout Dependabot** / GitHub security alerts na obou repech → automatické PR na zranitelnosti (ohlídá i ten path-to-regexp).
+- Zvážit **commit `package-lock.json`** (teď v `.gitignore`) pro reprodukovatelné buildy lokál vs Vercel.
