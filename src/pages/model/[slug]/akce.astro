@@ -54,8 +54,8 @@ let promoDescriptionHtml = '';
 if (promoDescription) {
   try {
     const { marked } = await import('marked');
-    const { sanitizeHtml } = await import('@lib/sanitize');
-    promoDescriptionHtml = sanitizeHtml(marked.parse(promoDescription) as string);
+    const { sanitizeHtml, fixLooseEmphasis } = await import('@lib/sanitize');
+    promoDescriptionHtml = sanitizeHtml(marked.parse(fixLooseEmphasis(promoDescription)) as string);
   } catch {
     promoDescriptionHtml = `<p>${String(promoDescription).replace(/[<>&]/g, '')}</p>`;
   }

@@ -456,8 +456,8 @@ let promoDescriptionHtml: string = '';
 if (promoActive && promoDescription) {
   try {
     const { marked } = await import('marked');
-    const { sanitizeHtml } = await import('@lib/sanitize');
-    const raw = marked.parse(promoDescription) as string;
+    const { sanitizeHtml, fixLooseEmphasis } = await import('@lib/sanitize');
+    const raw = marked.parse(fixLooseEmphasis(promoDescription)) as string;
     promoDescriptionHtml = sanitizeHtml(raw);
   } catch {
     // Plain text fallback — escape HTML entities přes textContent simulation
