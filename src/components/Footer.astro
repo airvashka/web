@@ -175,26 +175,32 @@ const year = new Date().getFullYear();
   }
 
   /* ===== Servisni akce (service_campaigns) — globalni, nacita se pres footer ===== */
-  .svc-promo { padding: 8px 0 0; }
+  /* Karta na /[brand]: slim pruh, logo vlevo (fotka az v detailu). */
+  .svc-promo { padding: 8px 0 40px; }
   .svc-promo-card {
-    display: grid; grid-template-columns: 420px 1fr; background: #fff;
-    border: 1px solid var(--line, #E7E6E2); border-radius: 16px; overflow: hidden;
-    text-decoration: none; color: inherit; box-shadow: 0 6px 24px rgba(0,0,0,0.06);
+    display: grid; grid-template-columns: 220px 1fr; align-items: stretch; background: #fff;
+    border: 1px solid var(--line, #E7E6E2); border-radius: 14px; overflow: hidden;
+    text-decoration: none; color: inherit; box-shadow: 0 4px 18px rgba(0,0,0,0.05);
     transition: box-shadow .2s, transform .2s;
   }
-  .svc-promo-card:hover { box-shadow: 0 10px 32px rgba(0,0,0,0.12); transform: translateY(-2px); }
-  .svc-promo-media { position: relative; min-height: 220px; background: #f2f2f2; }
-  .svc-promo-body { padding: 28px 32px; display: flex; flex-direction: column; align-items: flex-start; gap: 10px; }
-  .svc-promo-eyebrow { font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--accent, #F25C1B); font-weight: 700; }
-  .svc-promo-title { font-family: var(--font-display); font-size: 26px; line-height: 1.15; margin: 0; }
-  .svc-promo-price { font-size: 20px; font-weight: 700; color: var(--accent, #F25C1B); }
-  .svc-promo-perex { font-size: 15px; line-height: 1.55; color: #555; margin: 0; }
-  .svc-promo-cta { margin-top: 8px; pointer-events: none; }
-  @media (max-width: 780px) {
+  .svc-promo-card:hover { box-shadow: 0 8px 26px rgba(0,0,0,0.10); transform: translateY(-2px); }
+  .svc-promo-logo {
+    display: flex; align-items: center; justify-content: center;
+    background: var(--accent-soft, #FFF1EA); padding: 18px 26px;
+    border-right: 1px solid var(--line, #E7E6E2);
+  }
+  .svc-promo-logo img { max-height: 44px; width: auto; max-width: 150px; }
+  .svc-promo-body { padding: 16px 26px; display: flex; flex-direction: column; align-items: flex-start; gap: 6px; }
+  .svc-promo-eyebrow { font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--accent, #F25C1B); font-weight: 700; }
+  .svc-promo-head { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+  .svc-promo-title { font-family: var(--font-display); font-size: 21px; line-height: 1.15; margin: 0; }
+  .svc-promo-price { font-size: 18px; font-weight: 700; color: var(--accent, #F25C1B); }
+  .svc-promo-perex { font-size: 14px; line-height: 1.5; color: #555; margin: 0; }
+  .svc-promo-cta { margin-top: 6px; pointer-events: none; padding: 8px 16px; font-size: 13px; }
+  @media (max-width: 680px) {
     .svc-promo-card { grid-template-columns: 1fr; }
-    .svc-promo-media { min-height: 180px; }
-    .svc-promo-body { padding: 22px 20px; }
-    .svc-promo-title { font-size: 22px; }
+    .svc-promo-logo { padding: 16px; border-right: none; border-bottom: 1px solid var(--line, #E7E6E2); }
+    .svc-promo-body { padding: 15px 18px 18px; }
   }
 
   .svc-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 18px; }

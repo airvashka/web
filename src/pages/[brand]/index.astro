@@ -273,15 +273,15 @@ const activeBrand = Astro.params.brand;
     <section class="svc-promo" data-screen-label="Servisní akce">
       <div class="container">
         <a class="svc-promo-card" href={`/${brand.slug}/servisni-akce`}>
-          {serviceCampaign.image && (
-            <div class="svc-promo-media">
-              <DirectusImage src={serviceCampaign.image} alt={serviceCampaign.title} fill widths={[600, 900, 1200]} sizes="(max-width: 780px) 100vw, 420px" loading="lazy" />
-            </div>
-          )}
+          <div class="svc-promo-logo">
+            <BrandLogo slug={brand.slug} variant="dark" />
+          </div>
           <div class="svc-promo-body">
             <div class="svc-promo-eyebrow">Servisní akce</div>
-            <h2 class="svc-promo-title">{serviceCampaign.title}</h2>
-            {serviceCampaign.price_label && <div class="svc-promo-price">{serviceCampaign.price_label}</div>}
+            <div class="svc-promo-head">
+              <h2 class="svc-promo-title">{serviceCampaign.title}</h2>
+              {serviceCampaign.price_label && <span class="svc-promo-price">{serviceCampaign.price_label}</span>}
+            </div>
             {serviceCampaign.perex && <p class="svc-promo-perex">{serviceCampaign.perex}</p>}
             <span class="btn btn-primary svc-promo-cta">{serviceCampaign.cta_label || 'Více o akci'}</span>
           </div>
