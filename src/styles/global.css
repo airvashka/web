@@ -3862,7 +3862,7 @@ a.promo-image-link:hover {
 }
 
 .btile.is-promo .btile-body {
-  padding: 36px 44px 40px;
+  padding: 30px 44px 34px;
   position: relative;
   z-index: 1;
 }
@@ -3882,7 +3882,7 @@ a.promo-image-link:hover {
   font-weight: 600;
   letter-spacing: 0.04em;
   text-transform: uppercase;
-  margin-bottom: 16px;
+  margin-bottom: 12px;
   color: #fff;
 }
 .btile.is-promo .live-dot {
@@ -3919,18 +3919,18 @@ a.promo-image-link:hover {
 }
 
 .btile.is-promo .btile-name {
-  font-size: clamp(36px, 3.6vw, 52px);
-  margin-bottom: 12px;
+  font-size: clamp(32px, 3.2vw, 46px);
+  margin-bottom: 8px;
   margin-top: 4px;
   letter-spacing: -0.02em;
   line-height: 1.05;
 }
 .btile.is-promo .btile-lead {
   font-family: var(--font-display);
-  font-size: 16px;
-  line-height: 1.5;
+  font-size: 15.5px;
+  line-height: 1.45;
   max-width: 38ch;
-  margin: 0 0 28px;
+  margin: 0 0 18px;
   color: rgba(255, 255, 255, 0.92);
 }
 
@@ -3939,12 +3939,12 @@ a.promo-image-link:hover {
   display: flex;
   align-items: center;
   gap: 24px;
-  margin-bottom: 26px;
+  margin-bottom: 18px;
 }
 .btile.is-promo .btile-stat .v {
   font-family: var(--font-display);
   font-weight: 800;
-  font-size: clamp(40px, 4vw, 52px);
+  font-size: clamp(38px, 3.8vw, 48px);
   letter-spacing: -0.03em;
   line-height: 1;
 }
