@@ -149,24 +149,6 @@ function formatDate(iso?: string): string {
     </div>
   </section>
 
-  <!-- ===== NEWSLETTER CTA ===== -->
-  <section class="mag-cta" data-screen-label="04 Newsletter">
-    <div class="container mag-cta-inner">
-      <div>
-        <div class="section-eyebrow light">Newsletter</div>
-        <h2>Novinky rovnou do schránky</h2>
-        <p>Jednou měsíčně shrneme novinky ze showroomu, akce a tipy. Žádný spam, kdykoli odhlásíte.</p>
-      </div>
-      <form class="news-form" data-newsletter-form>
-        <input type="email" name="email" placeholder="vas@email.cz" required maxlength="200" />
-        <input type="text" name="_hp_website" tabindex="-1" autocomplete="off" class="honeypot" />
-        <TurnstileWidget />
-        <button type="submit" class="btn btn-primary">Přihlásit</button>
-        <div class="news-form-status" data-newsletter-status></div>
-      </form>
-    </div>
-  </section>
-
   <script>
     // Klient-side filtr chips
     let active = 'all';
@@ -187,35 +169,5 @@ function formatDate(iso?: string): string {
         apply();
       });
     });
-
-    // Newsletter subscribe → /api/newsletter (server-side proxy na Ecomail)
-    const newsForm = document.querySelector('[data-newsletter-form]');
-    if (newsForm) {
-      newsForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const statusEl = newsForm.querySelector('[data-newsletter-status]');
-        const submitBtn = newsForm.querySelector('button[type=submit]');
-        const data = new FormData(newsForm);
-        const turnstileInput = newsForm.querySelector('input[name="cf-turnstile-response"]');
-        if (statusEl) statusEl.textContent = 'Odesílám...';
-        try {
-          const res = await fetch('/api/newsletter', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              email: data.get('email'),
-              _hp_website: data.get('_hp_website') || '',
-              turnstile_token: turnstileInput ? turnstileInput.value : '',
-            }),
-          });
-          const result = await res.json().catch(() => ({ ok: false, error: 'Network error' }));
-          if (!res.ok || !result.ok) throw new Error(result.error || ('HTTP ' + res.status));
-          if (statusEl) statusEl.textContent = '✓ Děkujeme! Podívejte se do schránky pro potvrzení.';
-          if (submitBtn) { submitBtn.textContent = 'Přihlášeno'; submitBtn.disabled = true; }
-        } catch (err) {
-          if (statusEl) statusEl.textContent = err.message ? '✗ ' + err.message : '✗ Něco se nepodařilo. Zkuste znovu.';
-        }
-      });
-    }
   </script>
 </BaseLayout>

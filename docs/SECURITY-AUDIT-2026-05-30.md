@@ -9,6 +9,22 @@
 
 ## TL;DR — co opravit hned
 
+> ## ✅ STAV OPRAV (aktualizováno 2026-05-31)
+> Většina nálezů už VYŘEŠENA (commit „Security: cron backup…" + skript + Vercel/Directus).
+>
+> | # | Nález | Stav |
+> |---|---|---|
+> | F1 | cron backup fail-open + veřejný Blob | ✅ **Vyřešeno** — `CRON_SECRET` byl už nastavený (záloha byla chráněná); kód navíc fail-closed + náhodný název souboru zálohy |
+> | F2 | UCL credentials v kódu | ✅ **Z kódu pryč**; ⏳ rotace u UniCreditu až s prod daty (preprod, malá citlivost) |
+> | F3 | leasing bez rate limitu | ✅ **Vyřešeno** — rate limit 30/hod/IP |
+> | F4 | chybějící bezpečnostní hlavičky | ✅ **Vyřešeno** — X-Frame-Options, X-Content-Type-Options, Referrer-Policy, Permissions-Policy v `vercel.json` (HSTS už byl). ⏳ CSP záměrně později (musí se ladit) |
+> | F5 | Directus public read | ✅ **`knowledge_documents` → 403** (ověřeno); `employees`/`site_settings` ponechány záměrně (jen veřejné kontakty/zobrazovací config); ⏳ `server/info` verze = LOW, neřešeno |
+> | L1 | upovídané chybové hlášky (leasing) | ✅ **Vyřešeno** — detail jen do server logu |
+>
+> **Zbývá (tvoje akce, ne kód):** rotace UCL přístupů (s prod daty) · změnit Directus admin heslo (uniklo do chatu) · CSP hlavička (samostatně, opatrně).
+>
+> ---
+
 | # | Závažnost | Nález | Akce |
 |---|---|---|---|
 | F1 | 🔴 **HIGH** | `/api/cron/backup` má fail-open autentizaci + zálohy (vč. `leads` = osobní údaje) se ukládají do **veřejného** Blobu s předvídatelným názvem | Nastavit `CRON_SECRET`, autentizaci udělat povinnou (fail-closed), Blob na `access: 'private'` / random suffix |

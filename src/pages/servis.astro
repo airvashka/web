@@ -441,6 +441,7 @@ const serviceCampaigns = await directusGet<any>('service_campaigns', {
 
     /* ===== Hero foto (servis) ===== */
     .phero-photo { background-size: cover; background-position: center; min-height: 580px; display: flex; flex-direction: column; justify-content: center; padding: 64px 0; }
+    .phero-photo .container { width: 100%; }  /* aby text seděl vlevo jako ostatní hero (ne vycentrovaný flexem) */
     .phero-photo h1 { color: #fff; }
     .phero-photo .lead { color: rgba(255,255,255,0.92); }
     .phero-photo .section-eyebrow.light { color: rgba(255,255,255,0.85); }
