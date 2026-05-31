@@ -65,15 +65,13 @@ async function fetchCollection(collection: string): Promise<any[]> {
 }
 
 export const GET: APIRoute = async ({ request }) => {
-  // ── Auth: pouze Vercel Cron s CRON_SECRET ──
-  if (CRON_SECRET) {
-    const auth = request.headers.get('Authorization');
-    if (auth !== `Bearer ${CRON_SECRET}`) {
-      return new Response(JSON.stringify({ error: 'Unauthorized' }), {
-        status: 401,
-        headers: { 'Content-Type': 'application/json' },
-      });
-    }
+  // ── Auth: pouze Vercel Cron s CRON_SECRET (FAIL-CLOSED — bez secretu zamítni) ──
+  const auth = request.headers.get('Authorization');
+  if (!CRON_SECRET || auth !== `Bearer ${CRON_SECRET}`) {
+    return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+      status: 401,
+      headers: { 'Content-Type': 'application/json' },
+    });
   }
 
   if (!DIRECTUS_TOKEN) {
@@ -108,10 +106,10 @@ export const GET: APIRoute = async ({ request }) => {
   });
 
   const blob = await put(`directus-backup-${today}.json`, json, {
-    access: 'public', // (Blob URL je secret; pouze ten kdo má URL může stáhnout)
+    access: 'public', // @vercel/blob nepodporuje 'private' → URL chráníme náhodným suffixem
     contentType: 'application/json',
-    addRandomSuffix: false, // konzistentní filename
-    allowOverwrite: true,
+    addRandomSuffix: true, // BEZPEČNOST: neuhodnutelný název (záloha obsahuje PII z leads)
+    allowOverwrite: false,
   });
 
   // ── Cleanup: smaž backupy starší než RETENTION_DAYS ──

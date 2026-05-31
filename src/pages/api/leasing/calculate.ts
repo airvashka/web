@@ -9,18 +9,18 @@
  *  - Token cache šetří 1 auth volání na každý request kalkulačky
  *  - Můžeme tlumit / logovat na vlastní straně
  *
- * PREPROD ENV (default v kódu):
- *  - UNICREDIT_AUTH_URL = https://kalkulator-prep.unicreditleasing.sk/keycloak/...
- *  - UNICREDIT_CALC_URL = https://kalkulator-prep.unicreditleasing.sk/api/v1/calculation/calculation/
- *  - UNICREDIT_USERNAME = sfr_test
- *  - UNICREDIT_PASSWORD = SFR_tst_2026
- *  - UNICREDIT_CLIENT_SECRET = NREaypamuCMq1iPaEYyxw21HHDNBqvS5
- *
- * PROD: stejné env s prod URL bez '-prep' a real credentials.
+ * ENV (Vercel) — hodnoty NIKDY do kódu, jen do ENV:
+ *   UNICREDIT_AUTH_URL, UNICREDIT_CALC_URL, UNICREDIT_USERNAME,
+ *   UNICREDIT_PASSWORD, UNICREDIT_CLIENT_SECRET
+ * PROD: stejné proměnné s prod URL (bez '-prep') a ostrými credentials.
  */
 import type { APIRoute } from 'astro';
+import { createRateLimiter, getClientIp } from '@lib/rateLimit';
 
 export const prerender = false;
+
+// Rate limit — kalkulačka volá UCL API pod našimi credentials, chraň před zneužitím.
+const checkRateLimit = createRateLimiter(30, 60 * 60 * 1000); // 30/hod/IP
 
 const AUTH_URL = import.meta.env.UNICREDIT_AUTH_URL
   ?? 'https://kalkulator-prep.unicreditleasing.sk/keycloak/realms/uclkalk/protocol/openid-connect/token';
@@ -93,6 +93,14 @@ export const POST: APIRoute = async ({ request }) => {
   if (!ok) {
     return new Response(JSON.stringify({ error: 'Forbidden origin' }), {
       status: 403,
+      headers: { 'Content-Type': 'application/json' },
+    });
+  }
+
+  // Rate limit
+  if (!checkRateLimit(getClientIp(request)).allowed) {
+    return new Response(JSON.stringify({ error: 'Příliš mnoho požadavků, zkus to za chvíli.' }), {
+      status: 429,
       headers: { 'Content-Type': 'application/json' },
     });
   }
@@ -200,11 +208,11 @@ export const POST: APIRoute = async ({ request }) => {
           userMessage = errData.detail;
         }
       } catch { /* not JSON */ }
+      console.error('[leasing] UCL error', uclResp.status, txt.substring(0, 300));
       return new Response(JSON.stringify({
         error: `UCL ${uclResp.status}`,
         userMessage,
         errorCode,
-        detail: txt.substring(0, 300),
       }), { status: 502, headers: { 'Content-Type': 'application/json' } });
     }
     const data = await uclResp.json();
@@ -238,14 +246,9 @@ export const POST: APIRoute = async ({ request }) => {
       headers: { 'Content-Type': 'application/json' },
     });
   } catch (e: any) {
-    // Detailní error pro debugging — cause obsahuje DNS/TLS/network info
-    const cause = e?.cause;
-    return new Response(JSON.stringify({
-      error: 'Calculation failed',
-      detail: e?.message?.substring(0, 200) ?? null,
-      causeCode: cause?.code ?? null,
-      causeMessage: cause?.message?.substring(0, 200) ?? null,
-      step: e?.message?.startsWith('Auth') ? 'auth' : 'calc',
-    }), { status: 500, headers: { 'Content-Type': 'application/json' } });
+    console.error('[leasing] calc failed:', e?.message, e?.cause?.code, e?.cause?.message);
+    return new Response(JSON.stringify({ error: 'Calculation failed' }), {
+      status: 500, headers: { 'Content-Type': 'application/json' },
+    });
   }
 };
